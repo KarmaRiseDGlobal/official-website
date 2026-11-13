@@ -1,0 +1,487 @@
+/* Hallmark · v2.0.0 · theme: Garden (dealt 3/3) · genre: editorial · shape: founder narrative · job: trust then hire · hero: Ledge · nav: project floating pill · footer: project statement · imagery: user photographs, natural · signature: woodland portrait close · draw: 5cfeec */
+/* Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V4 · weakest: E, kept the first screen to one sentence and one action before adding the longer founder narrative */
+/* Hallmark · hero-review: fix · 5 findings · 4 resolved · 1 dismissed: the user requested the woodland portrait as the closing reveal */
+
+.about {
+  background: var(--color-paper);
+  color: var(--color-forest-deep);
+}
+
+.hero {
+  min-height: 100svh;
+  background: var(--color-forest-deep);
+  color: var(--color-paper);
+}
+
+.heroInner {
+  display: grid;
+  min-height: 100svh;
+  padding-top: calc(var(--nav-height) + var(--space-3xl));
+  padding-bottom: var(--space-3xl);
+  grid-template-columns: minmax(0, 9fr) minmax(0, 3fr);
+  align-items: end;
+}
+
+.heroCopy {
+  display: grid;
+  min-width: 0;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  align-items: end;
+  gap: var(--space-3xl);
+}
+
+.heroCopy h1 {
+  max-width: 8.5ch;
+  color: var(--color-paper);
+  font-size: clamp(5rem, 8vw, 8rem);
+  font-weight: 600;
+  line-height: 0.86;
+  text-wrap: balance;
+}
+
+.heroIntro {
+  min-width: 0;
+  max-width: 44ch;
+  padding-bottom: var(--space-md);
+  color: var(--color-paper-2);
+  font-size: var(--text-lead);
+}
+
+.founder {
+  padding-block: var(--section-gap-l);
+  background: var(--color-paper);
+}
+
+.founder + .founder {
+  padding-top: 0;
+}
+
+.founderGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: center;
+  gap: clamp(var(--space-2xl), 7vw, var(--space-4xl));
+}
+
+.founderShirish .founderGrid {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.founderPortrait {
+  position: relative;
+  min-height: clamp(620px, 72vw, 920px);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+}
+
+.founderPortrait img {
+  object-fit: cover;
+  object-position: 64% center;
+}
+
+.shirishPortrait img {
+  object-position: center 44%;
+}
+
+.founderCopy {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  gap: var(--space-xl);
+}
+
+.eyebrow {
+  color: var(--color-clay-ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+.origin .eyebrow,
+.invitation .eyebrow {
+  color: var(--color-clay-light);
+}
+
+.founderCopy h2,
+.originStory h2,
+.meaningTitle h2,
+.indiaCopy h2,
+.futureHeading h2,
+.invitation h2,
+.togetherHeading h2 {
+  color: var(--color-forest-deep);
+  font-size: var(--text-display-s);
+  font-weight: 500;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.founderCopy > p:last-child,
+.meaningCopy > p:last-child,
+.indiaCopy > p,
+.future article > p {
+  max-width: 48ch;
+  color: var(--color-muted);
+}
+
+.founderLead,
+.largeCopy {
+  max-width: 34ch;
+  color: var(--color-ink-2);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.6vw, 3rem);
+  line-height: 1.08;
+}
+
+.origin {
+  padding-block: var(--section-gap-l);
+  background: var(--color-forest-deep);
+  color: var(--color-paper);
+}
+
+.originStory h2 {
+  max-width: 14ch;
+  color: var(--color-paper);
+  font-size: clamp(4rem, 8vw, 8.5rem);
+}
+
+.originStory > p:last-child {
+  max-width: 48ch;
+  color: var(--color-paper-2);
+}
+
+.meaning {
+  padding-block: var(--section-gap-l);
+  background: var(--color-pale-sage);
+}
+
+.meaningGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: start;
+  gap: var(--gap-columns);
+}
+
+.meaningTitle,
+.meaningCopy {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-xl);
+}
+
+.meaningTitle h2 {
+  max-width: 10ch;
+}
+
+.meaningCopy {
+  padding-top: var(--space-3xl);
+}
+
+.india {
+  padding-block: var(--section-gap-l);
+  background: var(--color-paper);
+}
+
+.indiaGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: center;
+  gap: clamp(var(--space-2xl), 6vw, var(--space-4xl));
+}
+
+.indiaImage {
+  position: relative;
+  min-height: clamp(480px, 55vw, 720px);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+}
+
+.indiaImage img {
+  object-fit: cover;
+  object-position: 65% 46%;
+}
+
+.indiaCopy {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-xl);
+}
+
+.indiaCopy a {
+  width: fit-content;
+  color: var(--color-forest-deep);
+  font-weight: 600;
+  text-decoration-color: var(--color-clay);
+}
+
+.indiaCopy a:active {
+  color: var(--color-muted);
+}
+
+.indiaCopy a:focus-visible,
+.invitationActions a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.future {
+  padding-block: var(--section-gap-l);
+  background: var(--color-paper-2);
+}
+
+.futureGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 6fr) repeat(2, minmax(0, 3fr));
+  align-items: start;
+  gap: var(--gap-columns);
+}
+
+.futureHeading {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-xl);
+  padding-right: var(--space-2xl);
+}
+
+.future article {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-lg);
+  padding-top: var(--space-sm);
+}
+
+.futureIndex {
+  color: var(--color-clay);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.future h3 {
+  max-width: 12ch;
+  color: var(--color-forest-deep);
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.invitation {
+  padding-block: var(--section-gap-l);
+  background: var(--color-forest-deep);
+  color: var(--color-paper);
+}
+
+.invitationInner {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xl);
+  text-align: center;
+}
+
+.invitation h2 {
+  max-width: 13ch;
+  color: var(--color-paper);
+  font-size: clamp(3.5rem, 7vw, 7.5rem);
+}
+
+.invitationActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.invitationActions a {
+  display: inline-flex;
+  min-height: var(--control-height);
+  padding-inline: var(--space-lg);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.primaryAction {
+  background: var(--color-paper);
+  color: var(--color-forest-deep);
+}
+
+.primaryAction:active {
+  background: var(--color-paper-2);
+}
+
+.secondaryAction {
+  color: var(--color-paper);
+  text-decoration: underline;
+  text-decoration-color: var(--color-clay);
+  text-underline-offset: 0.25em;
+}
+
+.secondaryAction:active {
+  color: var(--color-paper-2);
+}
+
+.together {
+  padding-top: var(--section-gap-l);
+  background: var(--color-paper);
+}
+
+.togetherHeading {
+  display: grid;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-3xl);
+}
+
+.togetherHeading h2 {
+  max-width: 11ch;
+  font-size: clamp(4rem, 9vw, 9rem);
+}
+
+.togetherPortrait {
+  position: relative;
+  width: 100%;
+  min-height: clamp(760px, 95svh, 1080px);
+  overflow: hidden;
+  background: var(--color-forest-deep);
+}
+
+.togetherPortrait img {
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+@media (max-width: 44rem) {
+  .hero,
+  .heroInner {
+    min-height: max(100svh, 720px);
+  }
+
+  .heroInner {
+    padding-top: calc(var(--nav-height) + var(--space-3xl));
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroCopy h1 {
+    max-width: 8.5ch;
+    font-size: clamp(4rem, 19vw, 5.8rem);
+  }
+
+  .heroCopy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .heroIntro {
+    max-width: 30ch;
+    padding-bottom: 0;
+  }
+
+  .founder {
+    padding-block: var(--section-gap-l);
+  }
+
+  .founder + .founder {
+    padding-top: 0;
+  }
+
+  .founderGrid,
+  .founderShirish .founderGrid,
+  .meaningGrid,
+  .indiaGrid,
+  .futureGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .founderGrid,
+  .indiaGrid {
+    gap: var(--space-2xl);
+  }
+
+  .founderShirish .founderCopy {
+    order: 2;
+  }
+
+  .founderShirish .founderPortrait {
+    order: 1;
+  }
+
+  .founderPortrait {
+    min-height: 620px;
+  }
+
+  .founderCopy {
+    gap: var(--space-lg);
+  }
+
+  .meaningGrid,
+  .futureGrid {
+    gap: var(--space-2xl);
+  }
+
+  .originStory h2 {
+    font-size: clamp(3.75rem, 18vw, 6rem);
+  }
+
+  .meaningCopy {
+    padding-top: 0;
+  }
+
+  .indiaImage {
+    min-height: 440px;
+  }
+
+  .futureHeading {
+    padding-right: 0;
+  }
+
+  .future article {
+    padding-top: 0;
+  }
+
+  .invitationActions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .togetherHeading {
+    padding-bottom: var(--space-2xl);
+  }
+
+  .togetherPortrait {
+    min-height: 720px;
+  }
+}
+
+@media (min-width: 44.01rem) and (max-width: 60rem) {
+  .founderGrid,
+  .founderShirish .founderGrid,
+  .indiaGrid {
+    gap: var(--space-2xl);
+  }
+
+  .founderPortrait {
+    min-height: 680px;
+  }
+
+  .futureGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .futureHeading {
+    grid-column: 1 / -1;
+    max-width: 720px;
+    padding-right: 0;
+    padding-bottom: var(--space-2xl);
+  }
+}

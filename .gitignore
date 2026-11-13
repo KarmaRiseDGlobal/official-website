@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# Next.js output
+.next/
+next-env.d.ts
+out/
+
+# local environment
+.env*
+!.env.example
+
+# logs and coverage
+*.log
+coverage/
+.hallmark/shots/
+.hallmark/video-frames/
+
+# editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
