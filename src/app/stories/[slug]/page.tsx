@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { MediaPlaceholder } from "@/components/media-placeholder";
 import { SiteFooter } from "@/components/site-footer";
-import { stories } from "@/data/stories";
+import { StoryMedia } from "@/components/story-media";
+import { getStories, getStoryBySlug } from "@/lib/sanity";
 
-export function generateStaticParams() {
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const stories = await getStories();
   return stories.map((story) => ({ slug: story.slug }));
 }
 
@@ -16,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const story = stories.find((entry) => entry.slug === slug);
+  const story = await getStoryBySlug(slug);
 
   if (!story) {
     return { title: "Story" };
@@ -34,14 +38,20 @@ export default async function StoryDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const currentIndex = stories.findIndex((entry) => entry.slug === slug);
-  const story = stories[currentIndex];
+  const [story, allStories] = await Promise.all([
+    getStoryBySlug(slug),
+    getStories(),
+  ]);
 
   if (!story) {
     notFound();
   }
 
-  const nextStory = stories[(currentIndex + 1) % stories.length];
+  const currentIndex = allStories.findIndex((entry) => entry.slug === slug);
+  const nextStory =
+    allStories.length > 1 && currentIndex >= 0
+      ? allStories[(currentIndex + 1) % allStories.length]
+      : undefined;
 
   return (
     <>
@@ -69,13 +79,15 @@ export default async function StoryDetailPage({
               </p>
             </div>
 
-            <MediaPlaceholder
+            <StoryMedia
+              image={story.leadImage}
               kind={story.leadSlot.kind}
               ratio="16:9 wide"
               aspectClass="aspect-[16/9]"
-              tone="light"
               title={story.leadSlot.title}
               description={story.leadSlot.description}
+              sizes="(max-width: 80rem) 100vw, 1200px"
+              priority
             />
 
             <div className="mx-auto grid w-full max-w-[64ch] gap-[var(--space-xl)]">
@@ -97,15 +109,16 @@ export default async function StoryDetailPage({
             </div>
 
             <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
-              {story.pairSlots.map((slot) => (
-                <MediaPlaceholder
+              {story.pairSlots.map((slot, index) => (
+                <StoryMedia
                   key={slot.title}
+                  image={story.pairImages?.[index]}
                   kind="Photo"
                   ratio="4:5 portrait"
                   aspectClass="aspect-[4/5]"
-                  tone="light"
                   title={slot.title}
                   description={slot.description}
+                  sizes="(max-width: 48rem) 100vw, 50vw"
                 />
               ))}
             </div>

@@ -7,8 +7,9 @@ const contactEmail = "hola@karmarisedglobal.com";
 export function ContactForm() {
   const [message, setMessage] = useState("");
   const [mailtoHref, setMailtoHref] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
 
@@ -26,6 +27,7 @@ export function ContactForm() {
     const email = String(data.get("email") ?? "").trim();
     const topic = String(data.get("topic") ?? "").trim();
     const note = String(data.get("note") ?? "").trim();
+    const companyWebsite = String(data.get("companyWebsite") ?? "").trim();
 
     const subject = encodeURIComponent(`${topic} · ${name}`);
     const body = encodeURIComponent(
@@ -33,20 +35,64 @@ export function ContactForm() {
         "\n",
       ),
     );
+    const fallbackHref = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
 
-    setMailtoHref(`mailto:${contactEmail}?subject=${subject}&body=${body}`);
-    setMessage(
-      "Direct web delivery is not wired yet. Your note is ready to send via your email app or directly to hola@karmarisedglobal.com.",
-    );
+    setIsSubmitting(true);
+    setMailtoHref(null);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, topic, note, companyWebsite }),
+      });
+
+      const result = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
+
+      if (!response.ok || !result.ok) {
+        setMailtoHref(fallbackHref);
+        setMessage(
+          result.error ??
+            "Direct delivery failed. You can still send your message via your email app.",
+        );
+        return;
+      }
+
+      form.reset();
+      setMessage(
+        "Your message has been sent to KarmaRise D Global. We will reply to your email shortly.",
+      );
+    } catch {
+      setMailtoHref(fallbackHref);
+      setMessage(
+        "Unable to reach the server right now. You can still send your message via your email app.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form
       className="brief-form"
-      data-endpoint=""
+      data-endpoint="/api/contact"
       noValidate
       onSubmit={handleSubmit}
     >
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="contact-company-website">Company website</label>
+        <input
+          id="contact-company-website"
+          name="companyWebsite"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <div className="field-row">
         <div className="field">
           <label htmlFor="contact-name">Your name</label>
@@ -89,8 +135,12 @@ export function ContactForm() {
       </div>
 
       <div className="form-footer">
-        <button className="primary-button" type="submit">
-          Prepare my message
+        <button
+          className="primary-button"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Sending..." : "Send message"}
         </button>
         <div className="form-message" aria-live="polite">
           {message ? <p>{message}</p> : null}

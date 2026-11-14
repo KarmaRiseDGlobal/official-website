@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { NewsletterForm } from "@/components/newsletter-form";
+
 const email = "hola@karmarisedglobal.com";
 
 // Platform marks from Simple Icons.
@@ -14,6 +16,21 @@ const socialPlatforms = [
 export function SiteFooter() {
   return (
     <footer className="site-footer">
+      <div className="border-b border-[var(--color-paper)]/15 py-[var(--space-2xl)]">
+        <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
+          <div className="grid gap-2 lg:col-span-5">
+            <p className="footer-group-heading">Stories &amp; updates</p>
+            <p className="text-[length:var(--text-lg)] font-medium text-[var(--color-paper)]">
+              Follow new Stories from workshops, materials, and company
+              progress.
+            </p>
+          </div>
+          <div className="lg:col-span-7">
+            <NewsletterForm variant="footer" />
+          </div>
+        </div>
+      </div>
+
       <div className="footer-inner container">
         <div className="footer-brand">
           <Image

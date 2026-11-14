@@ -245,22 +245,24 @@ export default function AboutPage() {
             </div>
 
             <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
-              <MediaPlaceholder
-                kind="Photo"
-                ratio="3:2 horizontal"
-                aspectClass="aspect-[3/2]"
-                tone="light"
-                title="Regional workshop arrival in India"
-                description="Horizontal documentary photograph capturing arrival at an Indian manufacturing workshop or textile cluster during field visits."
-              />
-              <MediaPlaceholder
-                kind="Photo"
-                ratio="3:2 horizontal"
-                aspectClass="aspect-[3/2]"
-                tone="light"
-                title="Inspecting weave and hide grain in daylight"
-                description="Horizontal close-up of hands inspecting woven fabric texture or raw leather grain in natural workshop daylight."
-              />
+              <figure className="relative m-0 aspect-[3/2] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper-2)]">
+                <Image
+                  src="/media/workers-arriving-at-textile-workshop.webp"
+                  alt="Visitors greeting a textile worker at the workshop entrance"
+                  fill
+                  sizes="(max-width: 48rem) 100vw, 48vw"
+                  className="object-cover"
+                />
+              </figure>
+              <figure className="relative m-0 aspect-[3/2] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper-2)]">
+                <Image
+                  src="/media/hands-inspecting-fabric-and-leather.webp"
+                  alt="Hands feeling woven fabric and a tan leather hide beside a window"
+                  fill
+                  sizes="(max-width: 48rem) 100vw, 48vw"
+                  className="object-cover"
+                />
+              </figure>
             </div>
           </div>
         </section>

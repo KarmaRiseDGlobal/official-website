@@ -2,7 +2,21 @@
 
 import { useEffect, useRef } from "react";
 
-export function HeroVideo() {
+interface HeroVideoProps {
+  src?: string;
+  poster?: string;
+  label?: string;
+  className?: string;
+  videoClassName?: string;
+}
+
+export function HeroVideo({
+  src = "/media/demo.mp4",
+  poster = "/media/demo-poster.jpg",
+  label = "Production footage from a KarmaRise D Global Manufacturing Programme",
+  className = "hero-video",
+  videoClassName,
+}: HeroVideoProps) {
   const frameRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -13,7 +27,7 @@ export function HeroVideo() {
     if (!frame || !video) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let visible = true;
+    let visible = false;
 
     const sync = () => {
       const shouldPlay = visible && !reducedMotion.matches;
@@ -38,20 +52,21 @@ export function HeroVideo() {
       observer.disconnect();
       reducedMotion.removeEventListener("change", sync);
     };
-  }, []);
+  }, [src]);
 
   return (
-    <figure ref={frameRef} className="hero-video" data-loop>
+    <figure ref={frameRef} className={className} data-loop>
       <video
         ref={videoRef}
+        className={videoClassName}
         muted
         loop
         playsInline
         preload="auto"
-        poster="/media/demo-poster.jpg"
-        aria-label="Production footage from a KarmaRise D Global Manufacturing Programme"
+        poster={poster}
+        aria-label={label}
       >
-        <source src="/media/demo.mp4" type="video/mp4" />
+        <source src={src} type="video/mp4" />
       </video>
     </figure>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { HeroVideo } from "@/components/hero-video";
 import { MediaPlaceholder } from "@/components/media-placeholder";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -97,13 +98,12 @@ export default function WorkingAcrossDistancePage() {
               </p>
             </div>
 
-            <MediaPlaceholder
-              kind="Photo or video"
-              ratio="16:9 wide"
-              aspectClass="aspect-[16/9]"
-              tone="dark"
-              title="Two-continent working desk"
-              description="Atmospheric wide photograph or slow silent loop showing Indian textiles and leather swatches beside a notebook or laptop, connecting a European design desk and an Indian workshop."
+            <HeroVideo
+              className="m-0 overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-night)]"
+              videoClassName="block aspect-video w-full object-cover"
+              label="A worktable with textiles, leather swatches, and an open sketchbook"
+              poster="/media/working-desk-connecting-two-continents.webp"
+              src="/media/working-desk-connecting-two-continents.mp4"
             />
           </div>
         </section>
@@ -120,14 +120,15 @@ export default function WorkingAcrossDistancePage() {
 
             <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
               <article className="grid content-start gap-5">
-                <MediaPlaceholder
-                  kind="Photo"
-                  ratio="4:3 horizontal"
-                  aspectClass="aspect-[4/3]"
-                  tone="light"
-                  title="Alma in Europe"
-                  description="4:3 candid portrait of Alma on a video conversation or reviewing a garment and bag sample beside fabric swatches in natural European daylight."
-                />
+                <figure className="relative m-0 aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper-2)]">
+                  <Image
+                    src="/founders/alma-reviewing-garment-spain.webp"
+                    alt="Alma comparing material samples beside a stack of fabric swatches"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 48rem) 100vw, 48vw"
+                  />
+                </figure>
                 <h3 className="text-[length:var(--text-2xl)] font-medium">
                   In Europe · Alma in Spain
                 </h3>
@@ -141,14 +142,15 @@ export default function WorkingAcrossDistancePage() {
               </article>
 
               <article className="grid content-start gap-5">
-                <MediaPlaceholder
-                  kind="Photo"
-                  ratio="4:3 horizontal"
-                  aspectClass="aspect-[4/3]"
-                  tone="light"
-                  title="Shirish at an Indian workshop"
-                  description="4:3 candid photograph of Shirish speaking with workshop staff or inspecting leather and stitching details on a factory floor in India."
-                />
+                <figure className="relative m-0 aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper-2)]">
+                  <Image
+                    src="/founders/shirish-reviewing-leather-india.webp"
+                    alt="Shirish inspecting a leather seam at a workshop table"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 48rem) 100vw, 48vw"
+                  />
+                </figure>
                 <h3 className="text-[length:var(--text-2xl)] font-medium">
                   In India · Shirish in Maharashtra and across India
                 </h3>
@@ -259,13 +261,12 @@ export default function WorkingAcrossDistancePage() {
             </div>
 
             <div className="lg:col-span-6">
-              <MediaPlaceholder
-                kind="Video"
-                ratio="4:5 or 5 to 8s silent loop"
-                aspectClass="aspect-[4/5]"
-                tone="sage"
-                title="Sample measurement and inspection loop"
-                description="Silent 5 to 8 second video loop (or 2-up photo pair) showing hands measuring a finished bag or garment with a metal ruler beside inspection notes in natural factory light."
+              <HeroVideo
+                className="m-0 overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper)]"
+                videoClassName="block aspect-video w-full object-cover"
+                label="Hands measuring a leather bag with a metal ruler beside an open notebook"
+                poster="/media/measuring-leather-bag-and-garment.webp"
+                src="/media/measuring-leather-bag-and-garment.mp4"
               />
             </div>
           </div>

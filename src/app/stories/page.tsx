@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { NewsletterForm } from "@/components/newsletter-form";
 import { SiteFooter } from "@/components/site-footer";
 import { StoriesBrowser } from "@/components/stories-browser";
+import { getStories } from "@/lib/sanity";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Stories",
@@ -10,7 +14,9 @@ export const metadata: Metadata = {
     "Editorial accounts of manufacturing, materials, people, completed work, and company progress published by KarmaRise D Global.",
 };
 
-export default function StoriesPage() {
+export default async function StoriesPage() {
+  const allStories = await getStories();
+
   return (
     <>
       <main id="main">
@@ -30,32 +36,35 @@ export default function StoriesPage() {
 
         <section className="bg-[var(--color-paper)] pb-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container">
-            <StoriesBrowser />
+            <StoriesBrowser stories={allStories} />
           </div>
         </section>
 
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
-          <div className="container flex flex-wrap items-center justify-between gap-6">
-            <div className="grid gap-2">
+          <div className="container grid items-center gap-8 lg:grid-cols-12">
+            <div className="grid gap-2 lg:col-span-6">
               <p className="section-index">Follow progress</p>
               <h2 className="text-[length:var(--text-2xl)] font-medium">
                 Want to discuss a product or follow upcoming Stories?
               </h2>
               <p className="max-w-[54ch] text-[var(--color-muted)]">
-                New Stories are added as workshops, sampling runs, and company
-                milestones progress.
+                Subscribe for new Stories as workshops, sampling runs, and
+                company milestones progress, or start a Product Brief directly.
               </p>
+              <div className="mt-3 flex flex-wrap items-center gap-6">
+                <Link className="primary-button" href="/product-brief">
+                  Start a Product Brief
+                </Link>
+                <Link
+                  className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  href="/contact"
+                >
+                  Write to us
+                </Link>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-6">
-              <Link className="primary-button" href="/product-brief">
-                Start a Product Brief
-              </Link>
-              <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                href="/contact"
-              >
-                Write to us
-              </Link>
+            <div className="lg:col-span-6">
+              <NewsletterForm variant="light" />
             </div>
           </div>
         </section>

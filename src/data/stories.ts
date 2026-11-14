@@ -4,6 +4,11 @@ export type StoryCategory =
   | "Working across distance"
   | "Company progress";
 
+export interface StoryImage {
+  url: string;
+  alt: string;
+}
+
 export interface StoryEntry {
   slug: string;
   featured?: boolean;
@@ -11,12 +16,14 @@ export interface StoryEntry {
   location: string;
   title: string;
   summary: string;
+  leadImage?: StoryImage;
   leadSlot: {
     kind: "Photo" | "Video" | "Photo or video";
     ratio: string;
     title: string;
     description: string;
   };
+  pairImages?: StoryImage[];
   pairSlots: [
     {
       title: string;

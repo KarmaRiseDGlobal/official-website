@@ -3,10 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { MediaPlaceholder } from "@/components/media-placeholder";
-import { stories, storyCategories, type StoryCategory } from "@/data/stories";
+import { StoryMedia } from "@/components/story-media";
+import {
+  storyCategories,
+  type StoryCategory,
+  type StoryEntry,
+} from "@/data/stories";
 
-export function StoriesBrowser() {
+interface StoriesBrowserProps {
+  stories: StoryEntry[];
+}
+
+export function StoriesBrowser({ stories }: StoriesBrowserProps) {
   const [activeCategory, setActiveCategory] = useState<
     "All Stories" | StoryCategory
   >("All Stories");
@@ -52,13 +60,15 @@ export function StoriesBrowser() {
       {featured ? (
         <article className="grid items-center gap-[var(--gap-columns)] border-b border-[var(--color-rule)] pb-[var(--space-2xl)] lg:grid-cols-12">
           <div className="lg:col-span-7">
-            <MediaPlaceholder
+            <StoryMedia
+              image={featured.leadImage}
               kind={featured.leadSlot.kind}
               ratio={featured.leadSlot.ratio}
               aspectClass="aspect-[16/10]"
-              tone="light"
               title={featured.leadSlot.title}
               description={featured.leadSlot.description}
+              sizes="(max-width: 64rem) 100vw, 58vw"
+              priority
             />
           </div>
           <div className="grid gap-4 lg:col-span-5">
@@ -88,13 +98,14 @@ export function StoriesBrowser() {
               key={story.slug}
               className="grid content-start gap-4 border-b border-[var(--color-rule)] pb-8"
             >
-              <MediaPlaceholder
+              <StoryMedia
+                image={story.leadImage}
                 kind={story.leadSlot.kind}
                 ratio={story.leadSlot.ratio}
                 aspectClass="aspect-[4/3]"
-                tone="light"
                 title={story.leadSlot.title}
                 description={story.leadSlot.description}
+                sizes="(max-width: 48rem) 100vw, 50vw"
               />
               <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-ink)] uppercase">
                 {story.category} · {story.location}

@@ -128,13 +128,12 @@ export default function ManufacturingProgrammePage() {
               <figure className="m-0 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
                 <video
                   aria-label="Product Brief and material bench, with close-ups of hands working with patterns, leather and fabric"
+                  autoPlay
                   className="block aspect-[3/4] w-full object-cover"
-                  controls
                   loop
                   muted
                   playsInline
                   poster="/media/product-brief-material-bench.webp"
-                  preload="none"
                   src="/media/product-brief-material-bench.mp4"
                 />
               </figure>
@@ -242,15 +241,15 @@ export default function ManufacturingProgrammePage() {
               <div className="lg:col-span-6">
                 <figure className="m-0 overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-forest)]/25 bg-[var(--color-paper)]">
                   <video
-                    aria-label="Shirish and Alma visiting an Indian Manufacturing Partner workshop and reviewing textile and sewing benches with a floor supervisor"
+                    aria-label="A workshop visit, from an aerial approach to the sewing room and Shirish reviewing fabric with the team"
                     autoPlay
                     className="aspect-[16/9] h-full w-full object-cover"
                     loop
                     muted
                     playsInline
-                    poster="/warehouse visit images/working_together.jpeg"
+                    poster="/warehouse visit images/manufacturing-partner-visit-edit.webp"
                     preload="metadata"
-                    src="/warehouse visit images/manufacturing-partner-floor-visit.mp4"
+                    src="/warehouse visit images/manufacturing-partner-visit-edit.mp4"
                   />
                 </figure>
               </div>

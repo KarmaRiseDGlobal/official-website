@@ -7,8 +7,9 @@ const contactEmail = "hola@karmarisedglobal.com";
 export function ProductBriefForm() {
   const [message, setMessage] = useState("");
   const [mailtoHref, setMailtoHref] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
 
@@ -29,6 +30,7 @@ export function ProductBriefForm() {
     const readiness = String(data.get("readiness") ?? "").trim();
     const quantity = String(data.get("quantity") ?? "").trim();
     const brief = String(data.get("brief") ?? "").trim();
+    const companyWebsite = String(data.get("companyWebsite") ?? "").trim();
 
     const subject = encodeURIComponent(
       `Product Brief: ${company} (${product})`,
@@ -50,20 +52,75 @@ export function ProductBriefForm() {
         .filter((line): line is string => line !== null)
         .join("\n"),
     );
+    const fallbackHref = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
 
-    setMailtoHref(`mailto:${contactEmail}?subject=${subject}&body=${body}`);
-    setMessage(
-      "Direct web delivery is not wired yet. Your Product Brief details are ready to send via your email app or directly to hola@karmarisedglobal.com.",
-    );
+    setIsSubmitting(true);
+    setMailtoHref(null);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/product-brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          company,
+          profile,
+          email,
+          language,
+          product,
+          readiness,
+          quantity,
+          brief,
+          companyWebsite,
+        }),
+      });
+
+      const result = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
+
+      if (!response.ok || !result.ok) {
+        setMailtoHref(fallbackHref);
+        setMessage(
+          result.error ??
+            "Direct delivery failed. You can still send your Product Brief via your email app.",
+        );
+        return;
+      }
+
+      form.reset();
+      setMessage(
+        "Your Product Brief has been sent to KarmaRise D Global. We will reply to your work email shortly.",
+      );
+    } catch {
+      setMailtoHref(fallbackHref);
+      setMessage(
+        "Unable to reach the server right now. You can still send your Product Brief via your email app.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form
       className="brief-form"
-      data-endpoint=""
+      data-endpoint="/api/product-brief"
       noValidate
       onSubmit={handleSubmit}
     >
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="brief-company-website">Company website</label>
+        <input
+          id="brief-company-website"
+          name="companyWebsite"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <div className="field-row">
         <div className="field">
           <label htmlFor="brief-name">Your name</label>
@@ -181,8 +238,12 @@ export function ProductBriefForm() {
       </div>
 
       <div className="form-footer">
-        <button className="primary-button" type="submit">
-          Prepare my Product Brief
+        <button
+          className="primary-button"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Sending..." : "Send Product Brief"}
         </button>
         <div className="form-message" aria-live="polite">
           {message ? <p>{message}</p> : null}
