@@ -18,6 +18,8 @@ out/
 # logs and coverage
 *.log
 coverage/
+output/
+reference/
 .hallmark/shots/
 .hallmark/video-frames/
 

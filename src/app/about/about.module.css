@@ -32,11 +32,12 @@
 }
 
 .heroCopy h1 {
-  max-width: 8.5ch;
+  max-width: 10ch;
   color: var(--color-paper);
-  font-size: clamp(5rem, 8vw, 8rem);
-  font-weight: 600;
-  line-height: 0.86;
+  font-size: clamp(3.25rem, 6.4vw, 6.25rem);
+  font-weight: 500;
+  letter-spacing: -0.018em;
+  line-height: 0.98;
   text-wrap: balance;
 }
 
@@ -93,34 +94,19 @@
   gap: var(--space-xl);
 }
 
-.eyebrow {
-  color: var(--color-clay-ink);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.015em;
-}
-
-.origin .eyebrow,
-.invitation .eyebrow {
-  color: var(--color-clay-light);
-}
-
 .founderCopy h2,
 .originStory h2,
 .meaningTitle h2,
 .indiaCopy h2,
 .futureHeading h2,
-.invitation h2,
-.togetherHeading h2 {
+.invitation h2 {
   color: var(--color-forest-deep);
   font-size: var(--text-display-s);
   font-weight: 500;
-  line-height: 0.98;
+  line-height: 1.04;
   text-wrap: balance;
 }
 
-.founderCopy > p:last-child,
-.meaningCopy > p:last-child,
 .indiaCopy > p,
 .future article > p {
   max-width: 48ch;
@@ -132,8 +118,9 @@
   max-width: 34ch;
   color: var(--color-ink-2);
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 2.6vw, 3rem);
-  line-height: 1.08;
+  font-size: clamp(1.45rem, 2.1vw, 2.25rem);
+  letter-spacing: -0.012em;
+  line-height: 1.22;
 }
 
 .origin {
@@ -145,7 +132,9 @@
 .originStory h2 {
   max-width: 14ch;
   color: var(--color-paper);
-  font-size: clamp(4rem, 8vw, 8.5rem);
+  font-size: clamp(2.75rem, 5.8vw, 5.75rem);
+  letter-spacing: -0.018em;
+  line-height: 1;
 }
 
 .originStory > p:last-child {
@@ -178,7 +167,7 @@
 }
 
 .meaningCopy {
-  padding-top: var(--space-3xl);
+  align-self: center;
 }
 
 .india {
@@ -257,19 +246,13 @@
   padding-top: var(--space-sm);
 }
 
-.futureIndex {
-  color: var(--color-clay);
-  font-size: var(--text-sm);
-  font-weight: 600;
-}
-
 .future h3 {
-  max-width: 12ch;
+  max-width: 13ch;
   color: var(--color-forest-deep);
   font-family: var(--font-display);
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.1;
   text-wrap: balance;
 }
 
@@ -287,9 +270,11 @@
 }
 
 .invitation h2 {
-  max-width: 13ch;
+  max-width: 14ch;
   color: var(--color-paper);
-  font-size: clamp(3.5rem, 7vw, 7.5rem);
+  font-size: clamp(2.65rem, 5.2vw, 5.25rem);
+  letter-spacing: -0.018em;
+  line-height: 1.02;
 }
 
 .invitationActions {
@@ -331,22 +316,6 @@
   color: var(--color-paper-2);
 }
 
-.together {
-  padding-top: var(--section-gap-l);
-  background: var(--color-paper);
-}
-
-.togetherHeading {
-  display: grid;
-  gap: var(--space-xl);
-  padding-bottom: var(--space-3xl);
-}
-
-.togetherHeading h2 {
-  max-width: 11ch;
-  font-size: clamp(4rem, 9vw, 9rem);
-}
-
 .togetherPortrait {
   position: relative;
   width: 100%;
@@ -372,8 +341,8 @@
   }
 
   .heroCopy h1 {
-    max-width: 8.5ch;
-    font-size: clamp(4rem, 19vw, 5.8rem);
+    max-width: 10ch;
+    font-size: clamp(2.5rem, 11.5vw, 3.85rem);
   }
 
   .heroCopy {
@@ -429,11 +398,7 @@
   }
 
   .originStory h2 {
-    font-size: clamp(3.75rem, 18vw, 6rem);
-  }
-
-  .meaningCopy {
-    padding-top: 0;
+    font-size: clamp(2.35rem, 11vw, 3.75rem);
   }
 
   .indiaImage {
@@ -452,10 +417,6 @@
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .togetherHeading {
-    padding-bottom: var(--space-2xl);
   }
 
   .togetherPortrait {

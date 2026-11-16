@@ -15,6 +15,7 @@
     "studio": "sanity dev",
     "studio:deploy": "sanity deploy",
     "sanity:seed": "node scripts/seed-sanity-stories.mjs",
+    "brevo:setup": "node scripts/setup-brevo.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

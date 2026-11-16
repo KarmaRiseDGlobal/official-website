@@ -25,7 +25,7 @@ export default function Home() {
                 Start a Product Brief
               </Link>
               <Link className="hero-secondary" href="/manufacturing-programme">
-                Follow the programme
+                See how manufacturing works
               </Link>
             </div>
           </div>
@@ -34,33 +34,24 @@ export default function Home() {
         <section className="ownership" id="work">
           <div className="ownership-grid container">
             <div className="ownership-copy">
-              <p className="section-index">Where the work begins</p>
-              <h2>Your knowledge becomes the starting point.</h2>
+              <h2>What would you change about the pieces on your shelves?</h2>
               <p className="lead">
-                You know what people ask for, what is missing and what should be
-                made differently. The Product Brief turns that knowledge into
-                decisions about design, materials, quantity, quality and
-                delivery.
+                Maybe the bag needs a longer strap. Maybe the fabric is right
+                but the fit is wrong. Tell us what people reach for and what
+                they put back. Those are good clues for what to make under your
+                own label.
               </p>
               <p className="max-w-[var(--measure-narrow)] text-[var(--color-muted)]">
-                KarmaRise D Global carries those decisions into manufacturing
-                and stays involved until the finished Bulk Order is ready for
+                We turn those clues into a Product Brief the workshop can use,
+                with decisions about design, materials, quantity, quality and
                 delivery.
               </p>
-              <div>
-                <Link
-                  className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                  href="/working-across-distance"
-                >
-                  Read how we work across distance
-                </Link>
-              </div>
             </div>
 
             <figure className="ownership-image">
               <Image
-                src="/warehouse visit images/working_together.jpeg"
-                alt="A garment workspace with people working at sewing and cutting tables"
+                src="/images/garment-work-in-progress.jpg"
+                alt="Alma and a garment maker draping embroidered teal fabric on a dressmaker form in the sunlit studio"
                 fill
                 sizes="(max-width: 60rem) 100vw, 52vw"
               />
@@ -74,88 +65,54 @@ export default function Home() {
         <WorkingAcrossDistance />
 
         <section className="founders" id="company-story">
-          <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
-            <div className="grid gap-[var(--space-lg)] lg:col-span-5">
-              <p className="section-index">Behind the work</p>
-              <h2 className="text-[length:var(--text-display-s)] leading-[0.96] font-medium text-[var(--color-forest-deep)]">
-                Two founders between Spain and India.
-              </h2>
-              <p className="lead text-[var(--color-ink-2)]">
-                Alma works directly with European clients in Spanish, English
-                and Portuguese. Shirish works across India with Manufacturing
-                Partners and artisans.
-              </p>
-              <p className="text-[var(--color-muted)]">
-                Together they keep one Product Brief at the center of every
-                project, alongside longer-term work in Almarise and Maharashtra.
-              </p>
+          <div className="founders-media py-[clamp(8.5rem,18svh,13rem)]">
+            <Image
+              className="object-cover object-[50%_40%]"
+              src="/images/alma-and-shirish-founders.jpg"
+              alt="Shirish and Alma in discussion across a sunlit studio table with a tablet and fabric and leather swatches"
+              fill
+              sizes="100vw"
+            />
+            <div className="founders-scrim" aria-hidden="true" />
 
-              <div className="flex flex-wrap gap-x-6 gap-y-3 pt-2 font-semibold text-[var(--color-forest-deep)]">
+            <div className="relative z-10 container flex flex-col items-center text-center">
+              <div className="flex max-w-lg flex-col items-center gap-[var(--space-lg)]">
+                <p className="lead text-[var(--color-paper)]">
+                  Alma flew from Spain to India a few months after she and
+                  Shirish met. They started KarmaRise D Global there. Today Alma
+                  works with clients in Europe, and Shirish works with the
+                  people making their products in India.
+                </p>
+
                 <Link
-                  className="underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  className="inline-flex items-center justify-center rounded-full border border-[var(--color-paper)]/60 bg-[var(--color-night)]/35 px-7 py-3 text-[length:var(--text-sm)] font-semibold tracking-[0.02em] text-[var(--color-paper)] backdrop-blur-sm transition-colors hover:border-[var(--color-paper)] hover:bg-[var(--color-paper)] hover:text-[var(--color-night)]"
                   href="/about"
                 >
                   Meet Alma and Shirish
                 </Link>
-                <Link
-                  className="underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                  href="/stories"
-                >
-                  Read Stories from the work
-                </Link>
               </div>
-
-              <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-[var(--color-rule)] pt-4 text-[length:var(--text-sm)] text-[var(--color-muted)]">
-                <span>Wider company story:</span>
-                <Link
-                  className="underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
-                  href="/almarise"
-                >
-                  Almarise
-                </Link>
-                <Link
-                  className="underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
-                  href="/womens-training-initiative"
-                >
-                  Women&apos;s Training Initiative
-                </Link>
-              </div>
-            </div>
-
-            <div className="lg:col-span-7">
-              <Image
-                className="h-auto w-full rounded-[var(--radius-card)]"
-                src="/founders/alma-shirish-leather-review-v2.webp"
-                alt="Alma and Shirish examining a leather hide at a workshop cutting table"
-                width={1584}
-                height={990}
-                sizes="(max-width: 64rem) 100vw, 58vw"
-              />
             </div>
           </div>
-
-          <div className="founders-color-bridge" aria-hidden="true" />
         </section>
 
         <section className="enquiry" id="enquire">
           <div className="container grid items-end gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="enquiry-copy lg:col-span-7">
-              <p className="section-index">Begin the conversation</p>
-              <h2>What should belong to your brand?</h2>
+              <h2>What do you want to make?</h2>
               <p className="lead">
-                Bring the product, a physical reference or a clear vision. The
-                first step is preparing your Product Brief.
+                A sketch, a piece you already sell or a sample you can point to
+                is enough to start.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-6 lg:col-span-5 lg:justify-end">
               <Link className="primary-button" href="/product-brief">
-                Prepare your Product Brief
+                Start a Product Brief
               </Link>
               <Link
                 className="font-semibold text-[var(--color-paper)] underline decoration-[var(--color-clay-light)] underline-offset-4 hover:text-[var(--color-clay-light)]"
                 href="/contact"
               >
-                Direct contact
+                Contact us
               </Link>
             </div>
           </div>

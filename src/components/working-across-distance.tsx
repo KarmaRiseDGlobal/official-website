@@ -10,27 +10,27 @@ const bulkOrderImage = "/bulk_order/bulk-order-dispatch-readiness-v2.webp";
 
 const workingPrinciples = [
   {
-    title: "One conversation across countries",
-    body: "Alma works directly with clients in Spanish, English and Portuguese. Shirish works with manufacturing partners and artisans in India. The Product Brief remains the common reference between them.",
+    title: "Tell Alma what you want to change",
+    body: "Talk through the product in Spanish, English or Portuguese. Shirish follows up with the people making it in India.",
     image: "/warehouse visit images/at_the_plant.jpeg",
     imageAlt:
       "A group reviewing leather and finished bags during a factory visit",
   },
   {
-    title: "A Product Brief the factory can work from",
-    body: "Design, materials, quantity, quality and delivery expectations are made clear before bulk production. Any documentation or testing scope can be agreed around the product being made.",
+    title: "Give the workshop a clear reference",
+    body: "The Product Brief records decisions like the colour to match, the hardware to use and the finish to check.",
     image: "/warehouse visit images/working.jpeg",
     imageAlt: "Two people reviewing patterned textiles at a worktable",
   },
   {
-    title: "Production decisions remain connected",
-    body: "KarmaRise D Global stays involved while materials, samples and workmanship are reviewed. The client is not left to manage those conversations from a distance.",
+    title: "Come back to the approved sample",
+    body: "If something changes on the floor, we check it with the workshop and bring the decision back to you.",
     image: "/warehouse visit images/working_together.jpeg",
     imageAlt: "People working with garments in a production studio",
   },
   {
-    title: "Quantities and delivery are discussed early",
-    body: "The intended order quantity, available flexibility and delivery responsibilities are considered before production begins, not after the product has already been committed.",
+    title: "Plan for the day the order leaves",
+    body: "We agree the quantity, packing requirements and who handles delivery before production starts.",
     image: bulkOrderImage,
     imageAlt:
       "Finished packaged goods beside export cartons and a packing checklist before dispatch",
@@ -76,18 +76,13 @@ export function WorkingAcrossDistance() {
   return (
     <section className="concerns" id="working-across-distance" ref={rootRef}>
       <div className="section-intro concerns-intro container">
-        <p className="section-index">Working across distance</p>
-        <h2>The work stays connected.</h2>
-        <p>
-          A Manufacturing Programme keeps the people defining the product close
-          to the people making it.
-        </p>
+        <h2>When your workshop is in another country</h2>
         <p>
           <Link
             className="text-[length:var(--text-md)] font-semibold text-[var(--color-paper)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-light)]"
             href="/working-across-distance"
           >
-            Explore how Spain and India stay connected
+            How we work across distance
           </Link>
         </p>
       </div>

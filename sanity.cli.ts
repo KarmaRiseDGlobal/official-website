@@ -43,6 +43,7 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
+  studioHost: "karmarisedglobal",
   vite: (config) => ({
     ...config,
     define: {

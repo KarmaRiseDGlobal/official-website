@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const contactEmail = "hola@karmarisedglobal.com";
@@ -259,6 +260,25 @@ export function ProductBriefForm() {
           ) : null}
         </div>
       </div>
+
+      <p className="text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
+        Your Product Brief designs remain your sole intellectual property under
+        our{" "}
+        <Link
+          className="underline decoration-[var(--color-clay-light)] underline-offset-4 hover:text-[var(--color-paper)]"
+          href="/terms#confidentiality"
+        >
+          Website terms
+        </Link>{" "}
+        and are processed in accordance with our{" "}
+        <Link
+          className="underline decoration-[var(--color-clay-light)] underline-offset-4 hover:text-[var(--color-paper)]"
+          href="/privacy-policy"
+        >
+          Privacy policy
+        </Link>
+        .
+      </p>
     </form>
   );
 }

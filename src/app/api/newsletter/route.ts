@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { subscribeToBrevoNewsletter } from "@/lib/brevo";
+import {
+  resolveCountryName,
+  resolveSubscriberLanguage,
+  subscribeToBrevoNewsletter,
+} from "@/lib/brevo";
 import { isValidEmail, readTrimmedString } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -27,7 +31,32 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await subscribeToBrevoNewsletter(email);
+  const firstName = readTrimmedString(payload.firstName, 80) || undefined;
+  const explicitLanguage = readTrimmedString(payload.language, 10);
+  const browserLocale = readTrimmedString(payload.browserLocale, 32);
+  const cfIpCountry = request.headers.get("cf-ipcountry");
+  const acceptLanguage = request.headers.get("accept-language");
+
+  const language = resolveSubscriberLanguage({
+    explicitLanguage,
+    browserLocale,
+    acceptLanguageHeader: acceptLanguage,
+    cfIpCountryHeader: cfIpCountry,
+  });
+
+  const country = resolveCountryName(cfIpCountry);
+  const interest = readTrimmedString(payload.interest, 100) || undefined;
+  const source = readTrimmedString(payload.source, 80) || "Website";
+
+  const result = await subscribeToBrevoNewsletter({
+    email,
+    firstName,
+    language,
+    country,
+    interest,
+    source,
+  });
+
   if (!result.ok) {
     return NextResponse.json(
       { ok: false, error: result.error },
@@ -35,5 +64,9 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({
+    ok: true,
+    language: result.language,
+    welcomeSent: result.welcomeSent,
+  });
 }

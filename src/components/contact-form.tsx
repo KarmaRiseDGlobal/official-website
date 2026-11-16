@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const contactEmail = "hola@karmarisedglobal.com";
@@ -156,6 +157,17 @@ export function ContactForm() {
           ) : null}
         </div>
       </div>
+
+      <p className="text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
+        Your message is handled by Karmarise Global LLP in accordance with our{" "}
+        <Link
+          className="underline decoration-[var(--color-clay-light)] underline-offset-4 hover:text-[var(--color-paper)]"
+          href="/privacy-policy"
+        >
+          Privacy policy
+        </Link>
+        .
+      </p>
     </form>
   );
 }

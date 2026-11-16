@@ -8,27 +8,27 @@ import { useEffect, useRef, useState } from "react";
 const programmeStages = [
   {
     title: "The Product Brief",
-    body: "The client and KarmaRise D Global agree the product, design, materials, quantity, quality and delivery expectations. The Product Brief becomes the common reference for the work ahead.",
+    body: "We agree on what the product should look like, how it should perform and when you need it.",
   },
   {
-    title: "Manufacturing fit",
-    body: "The programme is matched with an Indian Manufacturing Partner suited to the product, material and intended production quantity.",
+    title: "Choosing a workshop",
+    body: "We look for a Manufacturing Partner with the right equipment and experience for your materials and order size.",
   },
   {
     title: "Design and sampling",
-    body: "Product decisions are developed and tested through sampling before the Bulk Order begins, keeping the intended design and the realities of making connected.",
+    body: "You review the design and handle a physical sample. We record any changes before the Bulk Order goes into production.",
   },
   {
     title: "Materials and preparation",
-    body: "Materials, trims, finishes, quantities and timing are aligned with the Product Brief so production begins from decisions everyone can see.",
+    body: "We confirm the production quantities, materials, trims and finishes with the workshop.",
   },
   {
     title: "Production oversight",
-    body: "Workmanship, approvals and production decisions remain tied to the Product Brief while the Manufacturing Partner makes the Bulk Order.",
+    body: "As the workshop makes the Bulk Order, we check workmanship against the approved sample and specifications.",
   },
   {
-    title: "Quality and Bulk Delivery",
-    body: "Quality and delivery responsibilities stay visible until the finished Bulk Order is ready for the client.",
+    title: "Final checks and delivery",
+    body: "We check the finished pieces and packing, then coordinate dispatch under the agreed delivery terms.",
   },
 ] as const;
 
@@ -123,19 +123,14 @@ export function ManufacturingProgramme() {
     <section className="programme" id="programme" ref={rootRef}>
       <div className="programme-pin" ref={pinRef}>
         <div className="programme-intro container">
-          <p className="section-index">The Manufacturing Programme</p>
           <div className="programme-intro-copy">
-            <h2>One Product Brief. Six connected stages.</h2>
-            <div className="grid gap-4 pb-2">
-              <p className="max-w-[38ch] text-[length:var(--text-lg)] text-[var(--color-forest-deep)]/80">
-                Product direction, manufacturing decisions and delivery stay
-                connected instead of becoming separate jobs.
-              </p>
+            <h2>What happens to your Product Brief</h2>
+            <div className="pb-2">
               <Link
                 className="w-fit font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href="/manufacturing-programme"
               >
-                See the four phases in detail
+                Explore the Manufacturing Programme
               </Link>
             </div>
           </div>

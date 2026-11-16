@@ -1,0 +1,281 @@
+import { defineArrayMember, defineField, defineType } from "sanity";
+
+export const newsletterIssueType = defineType({
+  name: "newsletterIssue",
+  title: "Newsletter Issue",
+  type: "document",
+  groups: [
+    { name: "editorial", title: "Editorial & Curation", default: true },
+    { name: "english", title: "English Edition (EN)" },
+    { name: "spanish", title: "Spanish Edition (ES)" },
+    { name: "delivery", title: "Brevo Delivery & Analytics" },
+  ],
+  fields: [
+    defineField({
+      name: "internalName",
+      title: "Internal campaign name",
+      description: "Example: Newsletter Issue #001 - Heritage & Craft",
+      type: "string",
+      group: "editorial",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "issueNumber",
+      title: "Issue number",
+      description: "Example: Issue #001",
+      type: "string",
+      group: "editorial",
+      initialValue: "Issue #001",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "status",
+      title: "Editorial & campaign status",
+      description:
+        "Changing status to Approved allows the Sanity webhook to create or update campaign drafts in Brevo.",
+      type: "string",
+      group: ["editorial", "delivery"],
+      initialValue: "draft",
+      options: {
+        list: [
+          { title: "Draft (in progress)", value: "draft" },
+          { title: "Ready for review", value: "review" },
+          { title: "Approved (sync drafts to Brevo)", value: "approved" },
+          {
+            title: "Synced to Brevo (drafts created)",
+            value: "synced_to_brevo",
+          },
+          { title: "Scheduled in Brevo", value: "scheduled" },
+          { title: "Sent", value: "sent" },
+        ],
+        layout: "radio",
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "campaignDate",
+      title: "Target campaign date",
+      type: "datetime",
+      group: "editorial",
+    }),
+    defineField({
+      name: "targetAudience",
+      title: "Target audience",
+      type: "string",
+      group: ["editorial", "delivery"],
+      initialValue: "both",
+      options: {
+        list: [
+          {
+            title: "English + Spanish subscribers (both editions)",
+            value: "both",
+          },
+          { title: "English subscribers only (EN)", value: "en" },
+          { title: "Spanish subscribers only (ES)", value: "es" },
+        ],
+      },
+    }),
+    defineField({
+      name: "heroImage",
+      title: "Hero image",
+      type: "image",
+      group: "editorial",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+        }),
+      ],
+    }),
+    defineField({
+      name: "selectedStories",
+      title: "Selected Stories (2 to 4 recommended)",
+      description:
+        "Curate published Stories from the website to include in this newsletter issue.",
+      type: "array",
+      group: "editorial",
+      validation: (rule) => rule.min(1).max(6),
+      of: [
+        defineArrayMember({
+          type: "reference",
+          to: [{ type: "story" }],
+        }),
+      ],
+    }),
+    defineField({
+      name: "titleEn",
+      title: "Newsletter heading (English)",
+      type: "string",
+      group: "english",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "subjectEn",
+      title: "Email subject line (English)",
+      type: "string",
+      group: "english",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "previewTextEn",
+      title: "Inbox preview text (English)",
+      type: "string",
+      group: "english",
+    }),
+    defineField({
+      name: "introEn",
+      title: "Editorial introduction (English)",
+      type: "text",
+      rows: 4,
+      group: "english",
+    }),
+    defineField({
+      name: "closingEn",
+      title: "Closing message (English)",
+      type: "text",
+      rows: 3,
+      group: "english",
+    }),
+    defineField({
+      name: "ctaTextEn",
+      title: "Primary button label (English)",
+      type: "string",
+      group: "english",
+      initialValue: "Explore the KarmaRise Journal",
+    }),
+    defineField({
+      name: "titleEs",
+      title: "Newsletter heading (Spanish)",
+      type: "string",
+      group: "spanish",
+    }),
+    defineField({
+      name: "subjectEs",
+      title: "Email subject line (Spanish)",
+      type: "string",
+      group: "spanish",
+    }),
+    defineField({
+      name: "previewTextEs",
+      title: "Inbox preview text (Spanish)",
+      type: "string",
+      group: "spanish",
+    }),
+    defineField({
+      name: "introEs",
+      title: "Editorial introduction (Spanish)",
+      type: "text",
+      rows: 4,
+      group: "spanish",
+    }),
+    defineField({
+      name: "closingEs",
+      title: "Closing message (Spanish)",
+      type: "text",
+      rows: 3,
+      group: "spanish",
+    }),
+    defineField({
+      name: "ctaTextEs",
+      title: "Primary button label (Spanish)",
+      type: "string",
+      group: "spanish",
+      initialValue: "Explorar el Diario KarmaRise",
+    }),
+    defineField({
+      name: "ctaUrl",
+      title: "Primary CTA destination URL",
+      type: "url",
+      group: ["editorial", "delivery"],
+      initialValue: "https://karmarisedglobal.com/stories",
+    }),
+    defineField({
+      name: "brevoCampaignIdEn",
+      title: "Brevo Campaign ID (English draft)",
+      type: "number",
+      group: "delivery",
+      readOnly: true,
+    }),
+    defineField({
+      name: "brevoCampaignIdEs",
+      title: "Brevo Campaign ID (Spanish draft)",
+      type: "number",
+      group: "delivery",
+      readOnly: true,
+    }),
+    defineField({
+      name: "lastSyncedAt",
+      title: "Last synced to Brevo at",
+      type: "datetime",
+      group: "delivery",
+      readOnly: true,
+    }),
+    defineField({
+      name: "analytics",
+      title: "Brevo campaign performance",
+      type: "object",
+      group: "delivery",
+      fields: [
+        defineField({
+          name: "deliveredCount",
+          title: "Delivered",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "openedCount",
+          title: "Opened",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "clickedCount",
+          title: "Clicked",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "bouncedCount",
+          title: "Bounced",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "unsubscribedCount",
+          title: "Unsubscribed",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "spamCount",
+          title: "Spam complaints",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "lastEventAt",
+          title: "Last webhook event at",
+          type: "datetime",
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: {
+      issueNumber: "issueNumber",
+      titleEn: "titleEn",
+      internalName: "internalName",
+      status: "status",
+      media: "heroImage",
+    },
+    prepare({ issueNumber, titleEn, internalName, status, media }) {
+      return {
+        title: `${issueNumber ? `${issueNumber} · ` : ""}${titleEn || internalName || "Newsletter Issue"}`,
+        subtitle: `Status: ${status ?? "draft"}`,
+        media,
+      };
+    },
+  },
+});

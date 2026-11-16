@@ -47,15 +47,15 @@ export function MediaPlaceholder({
 
   return (
     <figure
-      className={`m-0 flex flex-col justify-between border p-6 sm:p-8 ${aspectClass} ${radiusClass} ${toneClasses} ${className}`}
+      className={`m-0 flex w-full min-w-0 flex-col justify-between border p-6 sm:p-8 ${aspectClass} ${radiusClass} ${toneClasses} ${className}`}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-current/15 pb-3 text-[length:var(--text-xs)] font-semibold tracking-[0.04em] uppercase">
+      <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-2 border-b border-current/15 pb-3 text-[length:var(--text-xs)] font-semibold tracking-[0.04em] uppercase">
         <span className={metaClass}>{kind}</span>
         <span className={bodyClass}>{ratio}</span>
       </div>
 
-      <figcaption className="mt-auto grid gap-2 pt-6">
-        <p className="font-[family-name:var(--font-display)] text-[length:var(--text-title)] leading-[1.15] font-medium">
+      <figcaption className="mt-auto grid min-w-0 gap-2 pt-6">
+        <p className="font-[family-name:var(--font-display)] text-[length:var(--text-title)] leading-[1.2] font-medium">
           {title}
         </p>
         <p

@@ -25,6 +25,7 @@ const darkHeroRoutes = new Set([
   "/about",
   "/working-across-distance",
   "/almarise",
+  "/stories",
 ]);
 
 export function SiteMenu() {

@@ -14,43 +14,31 @@ export const metadata: Metadata = {
 
 const principlesInPractice = [
   {
-    number: "01",
-    title: "One conversation across countries",
-    summary:
-      "Alma works directly with clients in Spanish, English and Portuguese. Shirish works with manufacturing partners and artisans in India. The Product Brief remains the common reference between them.",
+    title: "A correction comes in from Europe",
     practice:
-      "In practice: you never relay corrections through an anonymous ticket desk. Feedback spoken in your language reaches the pattern maker or workshop floor through someone who understands both sides.",
+      "You talk through the change with Alma in your preferred language. Shirish takes it to the pattern maker or workshop in India, using the same Product Brief.",
     image: "/warehouse visit images/at_the_plant.jpeg",
     imageAlt:
       "A group reviewing leather and finished bags during a factory visit",
   },
   {
-    number: "02",
-    title: "A Product Brief the factory can work from",
-    summary:
-      "Design, materials, quantity, quality and delivery expectations are made clear before bulk production. Any documentation or testing scope can be agreed around the product being made.",
+    title: "The workshop needs a colour to match",
     practice:
-      "In practice: ambiguity is the main cause of manufacturing disputes. Materials, colour references, tolerances, and packaging specs are agreed in writing before sampling turns into bulk buying.",
+      "We put the colour reference in the Product Brief, alongside the material, dimensions and tolerances. That gives the workshop something precise to check before it orders bulk materials.",
     image: "/warehouse visit images/working.jpeg",
     imageAlt: "Two people reviewing patterned textiles at a worktable",
   },
   {
-    number: "03",
-    title: "Production decisions remain connected",
-    summary:
-      "KarmaRise D Global stays involved while materials, samples and workmanship are reviewed. The client is not left to manage those conversations from a distance.",
+    title: "A seam needs reinforcing",
     practice:
-      "In practice: when a material batch differs slightly or a seam needs reinforcing, we inspect the issue on site with the Manufacturing Partner and align any decision with you before production advances.",
+      "We look at the seam on site with the Manufacturing Partner. If the construction needs to change, we agree on the adjustment with you before production moves ahead.",
     image: "/warehouse visit images/working_together.jpeg",
     imageAlt: "People working with garments in a production studio",
   },
   {
-    number: "04",
-    title: "Quantities and delivery are discussed early",
-    summary:
-      "The intended order quantity, available flexibility and delivery responsibilities are considered before production begins, not after the product has already been committed.",
+    title: "The Bulk Order has a launch date to meet",
     practice:
-      "In practice: delivery terms, packing requirements, and realistic Bulk Order quantities are agreed at the proposal stage so budgets and retail launch dates stay grounded.",
+      "We discuss feasible quantities, packing and who handles delivery at the proposal stage. You can plan your launch and budget around what the workshop can deliver.",
     image: null,
     imageAlt:
       "Finished packaged goods beside export cartons and a packing checklist prior to dispatch",
@@ -66,12 +54,12 @@ const communicationHabits = [
     body: "Regular calls with Alma to walk through progress, sample adjustments, and open questions in Spanish, English, or Portuguese.",
   },
   {
-    title: "Physical sample checkpoints",
-    body: "Couriers send tangible prototypes to your team in Europe for hands-on testing before any Bulk Order is greenlit.",
+    title: "Physical samples",
+    body: "We send samples to your team in Europe so you can test them before approving the Bulk Order.",
   },
   {
-    title: "Floor-level photo and video updates",
-    body: "Direct visual documentation of material arrivals, first-piece runs, stitching quality, and pre-dispatch packing.",
+    title: "Photos and video from the workshop",
+    body: "See materials as they arrive, the first pieces off the line and how the finished order is packed.",
   },
 ] as const;
 
@@ -83,18 +71,14 @@ export default function WorkingAcrossDistancePage() {
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid items-end gap-[var(--gap-columns)] lg:grid-cols-12">
               <div className="grid gap-[var(--space-lg)] lg:col-span-7">
-                <p className="section-index text-[var(--color-clay-light)]">
+                <h1 className="max-w-[16ch] text-[clamp(2.5rem,5.6vw,5.25rem)] leading-[0.98] font-medium text-[var(--color-paper)]">
                   Working across distance
-                </p>
-                <h1 className="max-w-[11ch] text-[clamp(3.75rem,7.5vw,7.5rem)] leading-[0.88] font-medium text-[var(--color-paper)]">
-                  Distance breaks products when nobody holds both ends.
                 </h1>
               </div>
               <p className="lead text-[var(--color-paper-2)] lg:col-span-5">
-                Designing in Europe and manufacturing in India fails when specs
-                get translated three times and nobody checks the result on the
-                floor. KarmaRise D Global keeps both sides in one continuous
-                conversation.
+                If you change a detail in Spain, who checks it on the workshop
+                floor in India? Alma and Shirish keep that conversation
+                connected through one Product Brief.
               </p>
             </div>
 
@@ -111,10 +95,8 @@ export default function WorkingAcrossDistancePage() {
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
-              <p className="section-index">Spain and India</p>
-              <h2 className="max-w-[20ch] text-[length:var(--text-display-s)] leading-[0.96] font-medium">
-                Local fluency on the client side. Legal and workshop presence on
-                the making side.
+              <h2 className="max-w-[20ch] text-[length:var(--text-display-s)] leading-[1.04] font-medium">
+                Who you work with
               </h2>
             </div>
 
@@ -130,14 +112,12 @@ export default function WorkingAcrossDistancePage() {
                   />
                 </figure>
                 <h3 className="text-[length:var(--text-2xl)] font-medium">
-                  In Europe · Alma in Spain
+                  Alma in Spain
                 </h3>
                 <p className="text-[var(--color-muted)]">
-                  Clients work directly with Alma in Spanish, English or
-                  Portuguese. She understands European retail expectations,
-                  store calendars, fit and finish standards, and commercial
-                  clarity. Nothing gets softened or lost when a Product Brief is
-                  drafted.
+                  You can speak with Alma in Spanish, English or Portuguese. She
+                  brings the details that matter to your retail team, such as
+                  fit, finish and launch dates, into the Product Brief.
                 </p>
               </article>
 
@@ -152,14 +132,13 @@ export default function WorkingAcrossDistancePage() {
                   />
                 </figure>
                 <h3 className="text-[length:var(--text-2xl)] font-medium">
-                  In India · Shirish in Maharashtra and across India
+                  Shirish in India
                 </h3>
                 <p className="text-[var(--color-muted)]">
                   Shirish works directly with Manufacturing Partners and
-                  artisans in India. Trained as a lawyer, he approaches
-                  agreements, material commitments, and workshop relationships
-                  with precision, staying present where samples and bulk runs
-                  are produced.
+                  artisans. A lawyer by training, he works through agreements
+                  and material commitments with the workshops where samples and
+                  Bulk Orders are made.
                 </p>
               </article>
             </div>
@@ -169,33 +148,24 @@ export default function WorkingAcrossDistancePage() {
         <section className="bg-[var(--color-forest-deep)] py-[var(--section-gap)] text-[var(--color-paper)]">
           <div className="container grid gap-[var(--space-3xl)]">
             <div className="grid gap-[var(--space-md)]">
-              <p className="section-index text-[var(--color-clay-light)]">
-                Four working principles
-              </p>
-              <h2 className="max-w-[16ch] text-[length:var(--text-display-s)] leading-[0.94] font-medium text-[var(--color-paper)]">
-                How the Product Brief holds across timezones.
+              <h2 className="max-w-[16ch] text-[length:var(--text-display-s)] leading-[1.02] font-medium text-[var(--color-paper)]">
+                Decisions between Spain and India
               </h2>
             </div>
 
             <div className="grid gap-[var(--space-3xl)]">
               {principlesInPractice.map((item, index) => (
                 <article
-                  key={item.number}
+                  key={item.title}
                   className="grid items-center gap-[var(--gap-columns)] border-t border-[var(--color-paper)]/15 pt-[var(--space-2xl)] lg:grid-cols-12"
                 >
                   <div
                     className={`grid gap-4 lg:col-span-6 ${index % 2 === 1 ? "lg:order-2" : ""}`}
                   >
-                    <span className="num text-[length:var(--text-sm)] font-semibold text-[var(--color-clay-light)]">
-                      {item.number}
-                    </span>
-                    <h3 className="text-[length:var(--text-2xl)] leading-[1.08] font-medium text-[var(--color-paper)]">
+                    <h3 className="text-[length:var(--text-2xl)] leading-[1.14] font-medium text-[var(--color-paper)]">
                       {item.title}
                     </h3>
-                    <p className="text-[length:var(--text-lg)] text-[var(--color-paper-2)]">
-                      {item.summary}
-                    </p>
-                    <p className="border-t border-[var(--color-paper)]/15 pt-4 text-[var(--color-paper-2)]/85">
+                    <p className="max-w-[48ch] text-[length:var(--text-lg)] text-[var(--color-paper-2)]">
                       {item.practice}
                     </p>
                   </div>
@@ -233,16 +203,9 @@ export default function WorkingAcrossDistancePage() {
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-[var(--space-lg)] lg:col-span-6">
-              <p className="section-index">Visibility without guesswork</p>
-              <h2 className="max-w-[14ch] text-[length:var(--text-display-s)] leading-[0.96] font-medium">
-                Seeing the work between milestones.
+              <h2 className="max-w-[14ch] text-[length:var(--text-display-s)] leading-[1.04] font-medium">
+                What you can see from Europe
               </h2>
-              <p className="text-[var(--color-ink-2)]">
-                Distance feels risky only when silence sets in between deposit
-                and delivery. Throughout your Manufacturing Programme, visual
-                documentation and structured check-ins keep the factory floor
-                legible from your office.
-              </p>
               <ul className="m-0 grid list-none gap-5 p-0">
                 {communicationHabits.map((habit) => (
                   <li
@@ -275,11 +238,8 @@ export default function WorkingAcrossDistancePage() {
         <section className="bg-[var(--color-wood)] py-[var(--section-gap)] text-[var(--color-paper)]">
           <div className="container grid items-end gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-[var(--space-lg)] lg:col-span-7">
-              <p className="section-index text-[var(--color-clay-light)]">
-                Ready to review your project?
-              </p>
-              <h2 className="max-w-[13ch] text-[length:var(--text-display)] leading-[0.92] font-medium text-[var(--color-paper)]">
-                Bring your product across the table.
+              <h2 className="max-w-[13ch] text-[length:var(--text-display)] leading-[1.02] font-medium text-[var(--color-paper)]">
+                Let&apos;s talk about your product.
               </h2>
             </div>
             <div className="flex flex-wrap items-center gap-6 lg:col-span-5 lg:justify-end">

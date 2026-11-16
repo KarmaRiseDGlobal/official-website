@@ -41,5 +41,5 @@ _Avoid_: NGO, charity, operating programme
 ## Publishing
 
 **Story**:
-An editorial account of manufacturing, materials, people, completed work, or company progress published by KarmaRise D Global.
+An editorial account of manufacturing, materials, people, completed work, or company progress published by KarmaRise D Global. See `LANGUAGE.md` for the conversational tone, cultural storytelling, and native transcreation standards across English, Spanish, and other languages.
 _Avoid_: Blog post, news item

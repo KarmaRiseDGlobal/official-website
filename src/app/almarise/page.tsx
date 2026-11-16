@@ -13,24 +13,24 @@ export const metadata: Metadata = {
 const transformationSteps = [
   {
     number: "01",
-    title: "Saree selection",
-    body: "Existing silk, cotton, and blended sarees in Maharashtra are examined individually for weave strength, colour harmony, and intact borders.",
+    title: "Read the cloth",
+    body: "We start with existing silk, cotton and blended sarees in Maharashtra. We check how strong the weave is and which parts of the border are intact.",
     slotTitle: "Inspecting existing sarees",
     slotDescription:
       "4:3 photograph of hands inspecting folded Maharashtrian sarees and checking border weave strength in natural daylight.",
   },
   {
     number: "02",
-    title: "Pattern and placement",
-    body: "Patterns are laid out around the pallu and woven borders so the original work frames collars, cuffs, hems, or drape without needless offcuts.",
+    title: "Place the pattern",
+    body: "The pallu and woven borders help decide where to cut. A border can become a cuff or hem, with the pattern laid out to limit offcuts.",
     slotTitle: "Cutting layout around woven borders",
     slotDescription:
       "4:3 photograph of pattern paper pinned directly across a patterned saree on a wooden cutting table.",
   },
   {
     number: "03",
-    title: "Tailoring and finish",
-    body: "Garments are stitched in Maharashtra with clean internal finishes, practical closures, and silhouettes designed to pair effortlessly with modern everyday wear.",
+    title: "Make it wearable",
+    body: "The plan is to stitch the garments in Maharashtra, with tidy seams and closures that make sense for everyday wear.",
     slotTitle: "Studio stitching and seam finish",
     slotDescription:
       "4:3 photograph of an artisan sewing a garment hem or finishing an interior seam on a sewing machine.",
@@ -63,22 +63,17 @@ export default function AlmarisePage() {
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid items-end gap-[var(--gap-columns)] lg:grid-cols-12">
               <div className="grid gap-[var(--space-lg)] lg:col-span-7">
-                <p className="section-index text-[var(--color-clay-light)]">
-                  Owned by KarmaRise D Global
-                </p>
-                <h1 className="max-w-[11ch] text-[clamp(3.75rem,7.5vw,7.5rem)] leading-[0.88] font-medium text-[var(--color-paper)]">
-                  Existing Maharashtrian sarees. Contemporary women&apos;s
-                  clothing.
+                <h1 className="text-[clamp(2.5rem,5.6vw,5.25rem)] leading-[0.98] font-medium text-[var(--color-paper)]">
+                  Almarise
                 </h1>
               </div>
               <div className="grid gap-4 lg:col-span-5">
                 <p className="lead text-[var(--color-paper-2)]">
-                  Almarise is KarmaRise D Global&apos;s own fashion brand,
-                  taking existing sarees from Maharashtra and reshaping them
-                  into contemporary garments made to be worn every day.
+                  We&apos;re developing a fashion brand that turns existing
+                  Maharashtrian sarees into contemporary clothes for women.
                 </p>
                 <p className="text-[length:var(--text-sm)] font-semibold text-[var(--color-clay-light)]">
-                  In development. Part of the wider KarmaRise D Global story.
+                  A fashion brand by KarmaRise D Global
                 </p>
               </div>
             </div>
@@ -97,20 +92,14 @@ export default function AlmarisePage() {
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-[var(--space-lg)] lg:col-span-6">
-              <p className="section-index">Why existing sarees</p>
-              <h2 className="max-w-[15ch] text-[length:var(--text-display-s)] leading-[0.96] font-medium">
-                Cloth that already carries skill deserves a second silhouette.
+              <h2 className="max-w-[15ch] text-[length:var(--text-display-s)] leading-[1.04] font-medium">
+                What if the border became a cuff?
               </h2>
               <p className="text-[var(--color-ink-2)]">
-                Across Maharashtra, sarees hold generations of weaving, border
-                work, dyeing, and hand skill. Many sit unworn in cupboards for
-                decades despite intact fabric and remarkable pattern.
-              </p>
-              <p className="text-[var(--color-muted)]">
-                Almarise starts from those existing sarees instead of
-                commissioning new yardage, transforming each piece into
-                contemporary women&apos;s clothing while keeping the original
-                textile&apos;s character intact.
+                A saree can sit folded for years with its weave and pattern
+                intact. Spread it out and look at where the dense border meets
+                the body of the cloth. That edge can tell you where a sleeve
+                should end.
               </p>
             </div>
 
@@ -130,9 +119,8 @@ export default function AlmarisePage() {
         <section className="bg-[var(--color-dune)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
-              <p className="section-index">How pieces are made</p>
-              <h2 className="max-w-[18ch] text-[length:var(--text-display-s)] leading-[0.96] font-medium">
-                Every garment begins with the border and weave in front of us.
+              <h2 className="max-w-[18ch] text-[length:var(--text-display-s)] leading-[1.04] font-medium">
+                How a saree becomes a garment
               </h2>
             </div>
 
@@ -163,14 +151,12 @@ export default function AlmarisePage() {
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
-              <p className="section-index">Early garment studies</p>
-              <h2 className="max-w-[16ch] text-[length:var(--text-display-s)] leading-[0.96] font-medium">
-                Between Maharashtra and Madrid.
+              <h2 className="max-w-[16ch] text-[length:var(--text-display-s)] leading-[1.04] font-medium">
+                Garment studies
               </h2>
               <p className="lead text-[var(--color-muted)]">
-                These pieces place traditional Indian borders, block prints, and
-                bandhani patterns into relaxed, structured silhouettes worn
-                across everyday European streets.
+                We&apos;re exploring how woven borders, block prints and
+                bandhani might work in a tunic, a loose jacket or a dress.
               </p>
             </div>
 
@@ -193,17 +179,14 @@ export default function AlmarisePage() {
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-[var(--space-md)] lg:col-span-7">
-              <p className="section-index">Wider company story</p>
-              <h2 className="max-w-[15ch] text-[length:var(--text-display-s)] leading-[0.96] font-medium">
-                One company. Two connected paths.
+              <h2 className="max-w-[15ch] text-[length:var(--text-display-s)] leading-[1.04] font-medium">
+                At work in Maharashtra
               </h2>
               <p className="text-[var(--color-ink-2)]">
-                Almarise is owned by KarmaRise D Global and sits alongside our
-                Manufacturing Programmes. Creating our own brand keeps us
-                hands-on with fabric sourcing, garment construction, and quality
-                standards, while helping build the Maharashtra workshop
-                ecosystem connected to our planned Women&apos;s Training
-                Initiative.
+                Developing Almarise gives us first-hand experience choosing
+                cloth, constructing garments and checking finish. In time, we
+                hope that work can help create employment opportunities for
+                women who take part in our planned training initiative.
               </p>
             </div>
 
@@ -212,8 +195,7 @@ export default function AlmarisePage() {
                 className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href="/manufacturing-programme"
               >
-                Looking to manufacture your own brand&apos;s products? Explore
-                the Manufacturing Programme
+                Explore the Manufacturing Programme
               </Link>
               <Link
                 className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
@@ -225,7 +207,7 @@ export default function AlmarisePage() {
                 className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href="/contact"
               >
-                Follow progress or reach out about Almarise
+                Ask us about Almarise
               </Link>
             </div>
           </div>

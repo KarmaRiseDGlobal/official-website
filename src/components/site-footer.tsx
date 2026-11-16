@@ -62,6 +62,8 @@ export function SiteFooter() {
             <Link href="/contact">Contact</Link>
             <Link href="/privacy-policy">Privacy policy</Link>
             <Link href="/terms">Terms</Link>
+            <Link href="/cookie-policy">Cookie policy</Link>
+            <Link href="/legal-notice">Legal notice</Link>
           </div>
         </nav>
 
@@ -78,6 +80,9 @@ export function SiteFooter() {
             </a>
             <a className="underline" href={`mailto:${email}`}>
               {email}
+            </a>
+            <a className="underline" href="mailto:namaste@karmarisedglobal.com">
+              namaste@karmarisedglobal.com
             </a>
             <a className="underline" href="tel:+918530009798">
               +91 8530009798
@@ -122,6 +127,33 @@ export function SiteFooter() {
               </li>
             ))}
           </ul>
+        </div>
+      </div>
+
+      <div className="border-t border-[var(--color-paper)]/12 py-5 text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
+        <div className="container flex flex-wrap items-center justify-between gap-4">
+          <p>
+            KarmaRise D Global is a brand of{" "}
+            <strong className="font-semibold text-[var(--color-paper)]">
+              Karmarise Global LLP
+            </strong>{" "}
+            · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL · Incorporated 15 May
+            2025 (India)
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link className="underline" href="/legal-notice">
+              Aviso Legal / Legal notice
+            </Link>
+            <Link className="underline" href="/privacy-policy">
+              Privacy
+            </Link>
+            <Link className="underline" href="/cookie-policy">
+              Cookies
+            </Link>
+            <Link className="underline" href="/terms">
+              Terms
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

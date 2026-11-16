@@ -2,6 +2,7 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
 import { schemaTypes } from "./src/sanity/schemaTypes";
+import { editorialStructure } from "./src/sanity/structure";
 
 const projectId =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ||
@@ -14,10 +15,10 @@ const dataset =
 
 export default defineConfig({
   name: "default",
-  title: "KarmaRise D Global Stories",
+  title: "KarmaRise Editorial & Newsletter Desk",
   projectId,
   dataset,
-  plugins: [structureTool()],
+  plugins: [structureTool({ structure: editorialStructure })],
   schema: {
     types: schemaTypes,
   },

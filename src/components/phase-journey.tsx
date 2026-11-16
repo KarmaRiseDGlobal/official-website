@@ -8,9 +8,9 @@ const phases = [
   {
     number: "01",
     title: "Design approval",
-    body: "The Product Brief is translated into design decisions the client can review and approve before sampling begins.",
+    body: "You review the design against the Product Brief and approve it before the first sample is made.",
     locked:
-      "Locked here: silhouettes, dimensions, material qualities, hardware or trim direction, colourways, and target cost framework.",
+      "We agree on shape, dimensions, materials, trims, colours and target cost.",
     video: "/phases/Design.mp4",
     videoLabel:
       "Alma and Shirish reviewing a product design during development",
@@ -18,27 +18,27 @@ const phases = [
   {
     number: "02",
     title: "Sample approval",
-    body: "The sample gives the client a tangible point of review before the Bulk Order moves into production.",
+    body: "Try the fit, check the stitching and see how the finish looks in your hands.",
     locked:
-      "Locked here: physical fit, stitch density, construction tolerances, finish quality, and any revisions documented before bulk materials are ordered.",
+      "We compare sample revisions with the written notes. Your approval sets the standard for the Bulk Order.",
     video: "/phases/Approval.mp4",
     videoLabel: "Finished samples being reviewed at a worktable",
   },
   {
     number: "03",
     title: "Production",
-    body: "The Manufacturing Partner makes the Bulk Order while KarmaRise D Global stays close to workmanship and the decisions recorded in the Product Brief.",
+    body: "The Manufacturing Partner makes the Bulk Order. Our team in India checks the work on the production floor.",
     locked:
-      "Checked here: material batch consistency, in-line floor supervision by our team in India, defect prevention, and schedule tracking.",
+      "We compare dye batches, watch for changes in stitching or hardware and track the production schedule.",
     video: "/phases/Manufacturing.mp4",
     videoLabel: "A Manufacturing Partner producing leather goods",
   },
   {
     number: "04",
     title: "Shipping",
-    body: "The finished Bulk Order is prepared for the delivery responsibilities agreed with the client.",
+    body: "We inspect the finished pieces before the order leaves the workshop.",
     locked:
-      "Verified here: final piece-level inspection, packaging and labelling accuracy, export paperwork alignment, and handover for dispatch.",
+      "We check packing, labels and export paperwork against the agreed delivery terms before handing over for dispatch.",
     video: "/phases/Logistics.mp4",
     videoLabel: "Finished products being packed for delivery",
   },
@@ -210,12 +210,7 @@ export function PhaseJourney() {
   return (
     <section className="phase-journey" id="phases" ref={rootRef}>
       <div className="section-intro phase-journey-heading container">
-        <p className="section-index">From approval to delivery</p>
-        <h2>Four phases keep the programme moving.</h2>
-        <p>
-          Each phase gives the client a clear point of review before the work
-          moves forward.
-        </p>
+        <h2>From design approval to delivery</h2>
       </div>
 
       <div className="phase-scroll" data-phase-scroll>
