@@ -1,52 +1,64 @@
 import { NextResponse } from "next/server";
 
 import { fetchSanity, patchSanityDocument } from "@/lib/sanity";
+import { readJsonObject, verifyWebhookSecret } from "@/lib/security";
 
-const EVENT_TO_COUNTER_FIELD: Record<string, string> = {
-  delivered: "analytics.deliveredCount",
-  opened: "analytics.openedCount",
-  unique_opened: "analytics.openedCount",
-  click: "analytics.clickedCount",
-  hard_bounce: "analytics.bouncedCount",
-  soft_bounce: "analytics.bouncedCount",
-  unsubscribed: "analytics.unsubscribedCount",
-  spam: "analytics.spamCount",
-  complaint: "analytics.spamCount",
-};
+const EVENT_TO_COUNTER_FIELD = new Map<string, string>([
+  ["delivered", "analytics.deliveredCount"],
+  ["opened", "analytics.openedCount"],
+  ["unique_opened", "analytics.openedCount"],
+  ["click", "analytics.clickedCount"],
+  ["hard_bounce", "analytics.bouncedCount"],
+  ["soft_bounce", "analytics.bouncedCount"],
+  ["unsubscribed", "analytics.unsubscribedCount"],
+  ["spam", "analytics.spamCount"],
+  ["complaint", "analytics.spamCount"],
+]);
+
+function parsePositiveSafeInt(value: unknown): number | null {
+  if (typeof value === "number") {
+    return Number.isSafeInteger(value) && value > 0 ? value : null;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!/^\d+$/.test(trimmed)) {
+      return null;
+    }
+    const parsed = Number.parseInt(trimmed, 10);
+    return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
+  }
+  return null;
+}
 
 export async function POST(request: Request) {
-  const secret = process.env.BREVO_WEBHOOK_SECRET?.trim();
-  if (secret) {
-    const provided =
-      request.headers.get("x-brevo-secret") ||
-      new URL(request.url).searchParams.get("secret");
-    if (provided !== secret) {
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized Brevo webhook." },
-        { status: 401 },
-      );
-    }
-  }
-
-  let payload: Record<string, unknown>;
-  try {
-    payload = (await request.json()) as Record<string, unknown>;
-  } catch {
+  const auth = verifyWebhookSecret(
+    request,
+    ["BREVO_WEBHOOK_SECRET"],
+    ["x-brevo-secret", "authorization"],
+  );
+  if (!auth.ok) {
     return NextResponse.json(
-      { ok: false, error: "Invalid JSON payload." },
-      { status: 400 },
+      { ok: false, error: auth.error },
+      { status: auth.status },
     );
   }
 
-  const event = String(payload.event ?? "").toLowerCase();
-  const campIdRaw = payload.camp_id ?? payload["camp-id"] ?? payload.campaignId;
-  const campId =
-    typeof campIdRaw === "number"
-      ? campIdRaw
-      : Number.parseInt(String(campIdRaw ?? ""), 10);
+  const parsed = await readJsonObject(request, 64 * 1024);
+  if (!parsed.ok) {
+    return NextResponse.json(
+      { ok: false, error: parsed.error },
+      { status: parsed.status },
+    );
+  }
 
-  const counterField = EVENT_TO_COUNTER_FIELD[event];
-  if (!counterField || !Number.isFinite(campId) || campId <= 0) {
+  const payload = parsed.data;
+  const event =
+    typeof payload.event === "string" ? payload.event.trim().toLowerCase() : "";
+  const campIdRaw = payload.camp_id ?? payload["camp-id"] ?? payload.campaignId;
+  const campId = parsePositiveSafeInt(campIdRaw);
+
+  const counterField = EVENT_TO_COUNTER_FIELD.get(event);
+  if (!counterField || !campId) {
     return NextResponse.json({
       ok: true,
       ignored: true,
@@ -57,6 +69,7 @@ export async function POST(request: Request) {
   const matchingIssue = await fetchSanity<{ _id: string }>(
     `*[_type == "newsletterIssue" && (brevoCampaignIdEn == $campId || brevoCampaignIdEs == $campId)][0]{ _id }`,
     { campId },
+    { cache: "no-store" },
   );
 
   if (!matchingIssue?._id) {
@@ -67,11 +80,18 @@ export async function POST(request: Request) {
     });
   }
 
-  await patchSanityDocument(
+  const patched = await patchSanityDocument(
     matchingIssue._id,
     { "analytics.lastEventAt": new Date().toISOString() },
     { [counterField]: 1 },
   );
+
+  if (!patched) {
+    return NextResponse.json(
+      { ok: false, error: "Failed to record Brevo webhook event in Sanity." },
+      { status: 502 },
+    );
+  }
 
   return NextResponse.json({
     ok: true,

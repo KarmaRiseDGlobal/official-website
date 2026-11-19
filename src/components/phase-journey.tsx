@@ -4,49 +4,104 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef } from "react";
 
-const phases = [
+import { useLanguage, type SiteLanguage } from "@/context/language-context";
+
+const phases: ReadonlyArray<{
+  number: string;
+  title: Record<SiteLanguage, string>;
+  body: Record<SiteLanguage, string>;
+  locked: Record<SiteLanguage, string>;
+  video: string;
+  videoLabel: Record<SiteLanguage, string>;
+}> = [
   {
     number: "01",
-    title: "Design approval",
-    body: "You review the design against the Product Brief and approve it before the first sample is made.",
-    locked:
-      "We agree on shape, dimensions, materials, trims, colours and target cost.",
-    video: "/phases/Design.mp4",
-    videoLabel:
-      "Alma and Shirish reviewing a product design during development",
+    title: {
+      en: "Design approval",
+      es: "Aprobación del diseño",
+    },
+    body: {
+      en: "You review the design against the Product Brief and approve it before the first sample is made.",
+      es: "Revisas el diseño frente al Product Brief y lo apruebas antes de confeccionar la primera muestra.",
+    },
+    locked: {
+      en: "We agree on shape, dimensions, materials, trims, colours, and target cost.",
+      es: "Dejamos cerrados la forma, las dimensiones, los materiales, las fornituras, los colores y el coste objetivo.",
+    },
+    video: "/phases/phases (1).mp4",
+    videoLabel: {
+      en: "Alma reviewing product designs and specifications during development",
+      es: "Alma revisando diseños y especificaciones de producto durante la fase de desarrollo",
+    },
   },
   {
     number: "02",
-    title: "Sample approval",
-    body: "Try the fit, check the stitching and see how the finish looks in your hands.",
-    locked:
-      "We compare sample revisions with the written notes. Your approval sets the standard for the Bulk Order.",
-    video: "/phases/Approval.mp4",
-    videoLabel: "Finished samples being reviewed at a worktable",
+    title: {
+      en: "Sample approval",
+      es: "Aprobación de la muestra",
+    },
+    body: {
+      en: "Test the fit, check the stitching, and see how the finish feels in your hands.",
+      es: "Prueba el corte, comprueba las costuras y valora en tus propias manos el acabado de la pieza.",
+    },
+    locked: {
+      en: "We compare sample revisions with the written notes. Your approval sets the physical standard for the Bulk Order.",
+      es: "Contrastamos cada ajuste con las notas escritas. Tu aprobación fija el estándar físico para todo el pedido.",
+    },
+    video: "/phases/phases (2).mp4",
+    videoLabel: {
+      en: "Shirish inspecting sample details and construction at a workshop table in India",
+      es: "Shirish revisando los detalles y la confección de una muestra en la mesa del taller en la India",
+    },
   },
   {
     number: "03",
-    title: "Production",
-    body: "The Manufacturing Partner makes the Bulk Order. Our team in India checks the work on the production floor.",
-    locked:
-      "We compare dye batches, watch for changes in stitching or hardware and track the production schedule.",
-    video: "/phases/Manufacturing.mp4",
-    videoLabel: "A Manufacturing Partner producing leather goods",
+    title: {
+      en: "Production",
+      es: "Producción en taller",
+    },
+    body: {
+      en: "The Manufacturing Partner makes the Bulk Order while we check the work on the production floor in India.",
+      es: "El taller fabrica el pedido mientras supervisamos el trabajo a pie de línea en la India.",
+    },
+    locked: {
+      en: "We compare dye batches, watch for changes in stitching or hardware, and track the production schedule.",
+      es: "Comparamos tintadas, vigilamos que no varíen las costuras ni los herrajes y seguimos de cerca el calendario de fabricación.",
+    },
+    video: "/phases/phases (3).mp4",
+    videoLabel: {
+      en: "A craftsman stitching a leather strap on an industrial machine in India",
+      es: "Un artesano cosiendo una correa de piel en una máquina industrial en la India",
+    },
   },
   {
     number: "04",
-    title: "Shipping",
-    body: "We inspect the finished pieces before the order leaves the workshop.",
-    locked:
-      "We check packing, labels and export paperwork against the agreed delivery terms before handing over for dispatch.",
-    video: "/phases/Logistics.mp4",
-    videoLabel: "Finished products being packed for delivery",
+    title: {
+      en: "Shipping",
+      es: "Inspección y envío",
+    },
+    body: {
+      en: "We inspect the finished pieces in India before the order leaves the workshop.",
+      es: "Inspeccionamos las piezas terminadas en la India antes de que el pedido salga del taller.",
+    },
+    locked: {
+      en: "We check packing, labels, and export paperwork against the agreed delivery terms before handing over for dispatch.",
+      es: "Comprobamos el embalaje, el etiquetado y la documentación de exportación según los términos acordados antes de la salida.",
+    },
+    video: "/phases/phases (4).mp4",
+    videoLabel: {
+      en: "Finished textile pieces being inspected and stacked for packing in India",
+      es: "Piezas textiles terminadas siendo revisadas y apiladas para su embalaje en la India",
+    },
   },
-] as const;
+];
 
 const phaseTotal = String(phases.length).padStart(2, "0");
 
 export function PhaseJourney() {
+  const { language } = useLanguage();
+  const isEs = language === "es";
+
   const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -150,7 +205,7 @@ export function PhaseJourney() {
           end: () => `+=${window.innerHeight * (phases.length - 1)}`,
           pin: stage,
           pinSpacing: true,
-          scrub: 0.8,
+          scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -171,33 +226,33 @@ export function PhaseJourney() {
             videoTrack,
             {
               y: () => -videoViewport.clientHeight * index,
-              duration: 1,
-              ease: "power2.inOut",
+              duration: 0.56,
+              ease: "power3.inOut",
             },
-            transitionStart,
+            transitionStart + 0.22,
           )
           .to(
             outgoingCopy,
             {
               autoAlpha: 0,
-              yPercent: -10,
-              duration: 0.3,
+              yPercent: -8,
+              duration: 0.32,
               ease: "power2.in",
             },
-            transitionStart,
+            transitionStart + 0.22,
           )
-          .fromTo(
+          .to(
             incomingCopy,
-            { autoAlpha: 0, yPercent: 10 },
             {
               autoAlpha: 1,
               yPercent: 0,
-              duration: 0.38,
+              duration: 0.34,
               ease: "power2.out",
             },
-            transitionStart + 0.48,
+            transitionStart + 0.44,
           );
       }
+      sequence.to({}, { duration: 0.22 });
     }, root);
 
     return () => {
@@ -210,7 +265,11 @@ export function PhaseJourney() {
   return (
     <section className="phase-journey" id="phases" ref={rootRef}>
       <div className="section-intro phase-journey-heading container">
-        <h2>From design approval to delivery</h2>
+        <h2>
+          {isEs
+            ? "De la aprobación del diseño a la entrega"
+            : "From design approval to delivery"}
+        </h2>
       </div>
 
       <div className="phase-scroll" data-phase-scroll>
@@ -219,21 +278,16 @@ export function PhaseJourney() {
             <div className="phase-video-viewport" data-phase-video-viewport>
               <div className="phase-video-track" data-phase-video-track>
                 {phases.map((phase) => (
-                  <figure className="phase-video-panel" key={phase.title}>
+                  <figure className="phase-video-panel" key={phase.number}>
                     <video
-                      aria-label={phase.videoLabel}
+                      aria-label={phase.videoLabel[language]}
                       data-desktop-phase-video
                       loop
                       muted
                       playsInline
                       preload="metadata"
-                    >
-                      <source
-                        media="(min-width: 64.001rem)"
-                        src={phase.video}
-                        type="video/mp4"
-                      />
-                    </video>
+                      src={phase.video}
+                    />
                   </figure>
                 ))}
               </div>
@@ -250,15 +304,15 @@ export function PhaseJourney() {
                     : "phase-copy-panel"
                 }
                 data-phase-copy
-                key={phase.title}
+                key={phase.number}
               >
                 <p className="phase-number">
                   {phase.number} / {phaseTotal}
                 </p>
-                <h3>{phase.title}</h3>
-                <p className="phase-body">{phase.body}</p>
+                <h3>{phase.title[language]}</h3>
+                <p className="phase-body">{phase.body[language]}</p>
                 <p className="mt-2 max-w-[40ch] border-t border-[var(--color-rule)] pt-4 text-[length:var(--text-sm)] text-[var(--color-forest-deep)]">
-                  {phase.locked}
+                  {phase.locked[language]}
                 </p>
               </article>
             ))}
@@ -271,32 +325,27 @@ export function PhaseJourney() {
           <li
             className="phase-mobile-step"
             data-mobile-phase-step
-            key={phase.title}
+            key={phase.number}
           >
             <figure className="phase-mobile-frame">
               <video
-                aria-label={phase.videoLabel}
+                aria-label={phase.videoLabel[language]}
                 loop
                 muted
                 playsInline
                 preload="metadata"
-              >
-                <source
-                  media="(max-width: 64rem)"
-                  src={phase.video}
-                  type="video/mp4"
-                />
-              </video>
+                src={phase.video}
+              />
             </figure>
 
             <div className="phase-mobile-copy">
               <p className="phase-number">
                 {phase.number} / {phaseTotal}
               </p>
-              <h3>{phase.title}</h3>
-              <p className="phase-body">{phase.body}</p>
+              <h3>{phase.title[language]}</h3>
+              <p className="phase-body">{phase.body[language]}</p>
               <p className="max-w-[40ch] border-t border-[var(--color-rule)] pt-4 text-[length:var(--text-sm)] text-[var(--color-forest-deep)]">
-                {phase.locked}
+                {phase.locked[language]}
               </p>
             </div>
           </li>

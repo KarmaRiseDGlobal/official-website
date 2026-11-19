@@ -1,28 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
 import { NewsletterForm } from "@/components/newsletter-form";
+import { useLanguage } from "@/context/language-context";
 
 const email = "hola@karmarisedglobal.com";
-
-// Platform marks from Simple Icons.
-const socialPlatforms = [
-  { name: "WhatsApp", icon: "whatsapp" },
-  { name: "Instagram", icon: "instagram" },
-  { name: "TikTok", icon: "tiktok" },
-  { name: "YouTube", icon: "youtube" },
-];
+const whatsappHref = "https://wa.me/34611722276";
 
 export function SiteFooter() {
+  const { language, localizeHref } = useLanguage();
+  const isEs = language === "es";
+
   return (
     <footer className="site-footer">
       <div className="border-b border-[var(--color-paper)]/15 py-[var(--space-2xl)]">
         <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
           <div className="grid gap-2 lg:col-span-5">
-            <p className="footer-group-heading">Stories &amp; updates</p>
+            <p className="footer-group-heading">
+              {isEs ? "Historias y novedades" : "Stories & updates"}
+            </p>
             <p className="text-[length:var(--text-lg)] font-medium text-[var(--color-paper)]">
-              Follow new Stories from workshops, materials, and company
-              progress.
+              {isEs
+                ? "Recibe nuestras historias sobre talleres, materiales y avances de la empresa."
+                : "Follow new Stories from workshops, materials, and company progress."}
             </p>
           </div>
           <div className="lg:col-span-7">
@@ -41,34 +43,67 @@ export function SiteFooter() {
             height={815}
             sizes="(max-width: 44rem) 112px, (max-width: 80rem) 12vw, 154px"
           />
-          <p>Your product, carried through.</p>
+          <p>
+            {isEs
+              ? "Tu producto, acompañado de principio a fin."
+              : "Your product, carried through."}
+          </p>
         </div>
 
-        <nav className="footer-links" aria-label="Footer navigation">
+        <nav
+          className="footer-links"
+          aria-label={
+            isEs ? "Navegación del pie de página" : "Footer navigation"
+          }
+        >
           <div className="footer-link-group">
-            <h2 className="footer-group-heading">Manufacturing</h2>
-            <Link href="/manufacturing-programme">Manufacturing Programme</Link>
-            <Link href="/working-across-distance">Working across distance</Link>
-            <Link href="/about">About</Link>
-            <Link href="/stories">Stories</Link>
-            <Link href="/product-brief">Start a Product Brief</Link>
+            <h2 className="footer-group-heading">
+              {isEs ? "Fabricación" : "Manufacturing"}
+            </h2>
+            <Link href={localizeHref("/product-brief")}>
+              {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
+            </Link>
+            <Link href={localizeHref("/manufacturing-programme")}>
+              {isEs ? "Programa de fabricación" : "Manufacturing Programme"}
+            </Link>
+            <Link href={localizeHref("/working-across-distance")}>
+              {isEs ? "Trabajar a distancia" : "Working across distance"}
+            </Link>
+            <Link href={localizeHref("/about")}>
+              {isEs ? "Quiénes somos" : "About"}
+            </Link>
+            <Link href={localizeHref("/stories")}>
+              {isEs ? "Historias" : "Stories"}
+            </Link>
           </div>
           <div className="footer-link-group">
-            <h2 className="footer-group-heading">Company and legal</h2>
-            <Link href="/almarise">Almarise</Link>
-            <Link href="/womens-training-initiative">
-              Women&apos;s Training Initiative
+            <h2 className="footer-group-heading">
+              {isEs ? "Empresa y legal" : "Company and legal"}
+            </h2>
+            <Link href={localizeHref("/almarise")}>Almarise</Link>
+            <Link href={localizeHref("/womens-training-initiative")}>
+              {isEs ? "Formación para mujeres" : "Women's Training Initiative"}
             </Link>
-            <Link href="/contact">Contact</Link>
-            <Link href="/privacy-policy">Privacy policy</Link>
-            <Link href="/terms">Terms</Link>
-            <Link href="/cookie-policy">Cookie policy</Link>
-            <Link href="/legal-notice">Legal notice</Link>
+            <Link href={localizeHref("/contact")}>
+              {isEs ? "Contacto" : "Contact"}
+            </Link>
+            <Link href={localizeHref("/privacy-policy")}>
+              {isEs ? "Política de privacidad" : "Privacy policy"}
+            </Link>
+            <Link href={localizeHref("/terms")}>
+              {isEs ? "Condiciones" : "Terms"}
+            </Link>
+            <Link href={localizeHref("/cookie-policy")}>
+              {isEs ? "Política de cookies" : "Cookie policy"}
+            </Link>
+            <Link href={localizeHref("/legal-notice")}>
+              {isEs ? "Aviso legal" : "Legal notice"}
+            </Link>
           </div>
         </nav>
 
         <div className="footer-contact">
-          <h2>Contact</h2>
+          <h2>{isEs ? "Contacto" : "Contact"}</h2>
           <address>
             <a
               className="underline"
@@ -93,14 +128,14 @@ export function SiteFooter() {
           </address>
           <ul
             className="footer-channels"
-            aria-label="Contact and social channels"
+            aria-label={isEs ? "Canales de contacto" : "Contact channels"}
             role="list"
           >
             <li>
               <a
                 className="footer-channel"
                 href={`mailto:${email}`}
-                aria-label="Email"
+                aria-label={isEs ? "Enviar correo electrónico" : "Email"}
               >
                 <svg
                   aria-hidden="true"
@@ -116,16 +151,20 @@ export function SiteFooter() {
                 </svg>
               </a>
             </li>
-            {socialPlatforms.map(({ name, icon }) => (
-              <li key={icon}>
-                <span className="footer-channel" role="img" aria-label={name}>
-                  <span
-                    className="footer-channel-icon"
-                    style={{ maskImage: `url(/brand/icons/${icon}.svg)` }}
-                  />
-                </span>
-              </li>
-            ))}
+            <li>
+              <a
+                className="footer-channel"
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+              >
+                <span
+                  className="footer-channel-icon"
+                  style={{ maskImage: "url(/brand/icons/whatsapp.svg)" }}
+                />
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -133,25 +172,38 @@ export function SiteFooter() {
       <div className="border-t border-[var(--color-paper)]/12 py-5 text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
         <div className="container flex flex-wrap items-center justify-between gap-4">
           <p>
-            KarmaRise D Global is a brand of{" "}
-            <strong className="font-semibold text-[var(--color-paper)]">
-              Karmarise Global LLP
-            </strong>{" "}
-            · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL · Incorporated 15 May
-            2025 (India)
+            {isEs ? (
+              <>
+                KarmaRise D Global es una marca de{" "}
+                <strong className="font-semibold text-[var(--color-paper)]">
+                  Karmarise Global LLP
+                </strong>{" "}
+                · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL · Constituida el 15
+                de mayo de 2025 (India)
+              </>
+            ) : (
+              <>
+                KarmaRise D Global is a brand of{" "}
+                <strong className="font-semibold text-[var(--color-paper)]">
+                  Karmarise Global LLP
+                </strong>{" "}
+                · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL · Incorporated 15 May
+                2025 (India)
+              </>
+            )}
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link className="underline" href="/legal-notice">
-              Aviso Legal / Legal notice
+            <Link className="underline" href={localizeHref("/legal-notice")}>
+              {isEs ? "Aviso legal" : "Legal notice"}
             </Link>
-            <Link className="underline" href="/privacy-policy">
-              Privacy
+            <Link className="underline" href={localizeHref("/privacy-policy")}>
+              {isEs ? "Privacidad" : "Privacy"}
             </Link>
-            <Link className="underline" href="/cookie-policy">
-              Cookies
+            <Link className="underline" href={localizeHref("/cookie-policy")}>
+              {isEs ? "Cookies" : "Cookies"}
             </Link>
-            <Link className="underline" href="/terms">
-              Terms
+            <Link className="underline" href={localizeHref("/terms")}>
+              {isEs ? "Condiciones" : "Terms"}
             </Link>
           </div>
         </div>

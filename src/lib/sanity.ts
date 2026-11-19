@@ -5,6 +5,7 @@ import {
   type StoryEntry,
   type StoryImage,
   type StoryLanguage,
+  type StorySection,
 } from "@/data/stories";
 
 const SANITY_API_VERSION = "2025-01-01";
@@ -15,14 +16,15 @@ const VALID_CATEGORIES = new Set<StoryCategory>([
   "People & Craftsmanship",
   "Art & Design",
   "India Meets Europe",
-  "KarmaRise Journal",
+  "Inside KarmaRise",
 ]);
 
 const LEGACY_CATEGORY_MAP: Record<string, StoryCategory> = {
   "Working across distance": "India Meets Europe",
   "Materials and sampling": "Art & Design",
   "Manufacturing and people": "People & Craftsmanship",
-  "Company progress": "KarmaRise Journal",
+  "Company progress": "Inside KarmaRise",
+  "KarmaRise Journal": "Inside KarmaRise",
 };
 
 interface SanityRawBodyBlock {
@@ -45,11 +47,29 @@ interface SanityRawBodyBlock {
   alt?: string;
   caption?: string;
   aspectRatio?: "16:9" | "4:3" | "4:5";
+  objectPosition?: string;
+  hotspot?: { x?: number; y?: number };
   text?: string;
   attribution?: string;
 }
 
-interface SanityRawStory {
+export interface SanityRawSectionImage {
+  url?: string;
+  alt?: string;
+  caption?: string;
+  aspectRatio?: "16:9" | "4:3" | "4:5";
+  objectPosition?: string;
+  hotspot?: { x?: number; y?: number };
+}
+
+export interface SanityRawSection {
+  _key?: string;
+  heading?: string;
+  paragraphs?: string[];
+  images?: SanityRawSectionImage[];
+}
+
+export interface SanityRawStory {
   slug?: string;
   featured?: boolean;
   newsletterEligible?: boolean;
@@ -59,6 +79,7 @@ interface SanityRawStory {
   readingTimeMinutes?: number;
   category?: string;
   location?: string;
+  spanishLocation?: string;
   title?: string;
   spanishTitle?: string;
   summary?: string;
@@ -66,11 +87,24 @@ interface SanityRawStory {
   author?: {
     name?: string;
     role?: string;
+    spanishRole?: string;
     location?: string;
+    spanishLocation?: string;
     portraitUrl?: string;
   };
   tags?: string[];
-  leadImage?: { url?: string; alt?: string; caption?: string };
+  spanishTags?: string[];
+  leadImage?: {
+    url?: string;
+    alt?: string;
+    spanishAlt?: string;
+    caption?: string;
+    spanishCaption?: string;
+    objectPosition?: string;
+    hotspot?: { x?: number; y?: number };
+  };
+  spanishLeadAlt?: string;
+  spanishLeadCaption?: string;
   leadSlot?: {
     kind?: "Photo" | "Video" | "Photo or video";
     ratio?: string;
@@ -81,14 +115,32 @@ interface SanityRawStory {
     text?: string;
     attribution?: string;
   };
-  pairImages?: Array<{ url?: string; alt?: string; caption?: string }>;
+  spanishPullQuote?: {
+    text?: string;
+    attribution?: string;
+  };
+  pairImages?: Array<{
+    url?: string;
+    alt?: string;
+    spanishAlt?: string;
+    caption?: string;
+    spanishCaption?: string;
+    objectPosition?: string;
+    hotspot?: { x?: number; y?: number };
+  }>;
+  spanishPairAlts?: string[];
+  spanishPairCaptions?: string[];
   pairSlots?: Array<{ title?: string; description?: string }>;
   body?: SanityRawBodyBlock[];
-  sections?: Array<{ heading?: string; paragraphs?: string[] }>;
+  sections?: SanityRawSection[];
+  spanishSections?: SanityRawSection[];
   takeaway?: string;
+  spanishTakeaway?: string;
   seo?: {
     title?: string;
     description?: string;
+    spanishTitle?: string;
+    spanishDescription?: string;
   };
 }
 
@@ -123,12 +175,13 @@ export interface SanityNewsletterIssue {
     spanishSummary?: string;
     category?: string;
     location?: string;
+    spanishLocation?: string;
     readingTimeMinutes?: number;
     leadImageUrl?: string;
   }>;
 }
 
-const STORY_PROJECTION = `{
+export const STORY_PROJECTION = `{
   "slug": slug.current,
   featured,
   newsletterEligible,
@@ -138,31 +191,46 @@ const STORY_PROJECTION = `{
   readingTimeMinutes,
   category,
   location,
+  spanishLocation,
   title,
   spanishTitle,
   summary,
   spanishSummary,
   "author": {
-    "name": coalesce(authorRef->name, author.name, "Alma & Shirish"),
-    "role": coalesce(authorRef->role, author.role, "Co-founders, KarmaRise D Global"),
-    "location": coalesce(authorRef->location, author.location, location, "Spain & Maharashtra"),
+    "name": coalesce(authorRef->name, author.name),
+    "role": coalesce(authorRef->role, author.role),
+    "spanishRole": coalesce(authorRef->spanishRole, author.spanishRole),
+    "location": coalesce(authorRef->location, author.location),
+    "spanishLocation": coalesce(authorRef->spanishLocation, author.spanishLocation),
     "portraitUrl": authorRef->portrait.asset->url
   },
   tags,
-  "leadImage": select(
-    defined(leadImage.asset->url) => {
-      "url": leadImage.asset->url,
-      "alt": coalesce(leadImage.alt, title),
-      "caption": leadImage.caption
-    }
-  ),
+  spanishTags,
+  "leadImage": {
+    "url": leadImage.asset->url,
+    "alt": leadImage.alt,
+    "spanishAlt": leadImage.spanishAlt,
+    "caption": leadImage.caption,
+    "spanishCaption": leadImage.spanishCaption,
+    "objectPosition": leadImage.objectPosition,
+    "hotspot": leadImage.hotspot
+  },
+  spanishLeadAlt,
+  spanishLeadCaption,
   leadSlot,
   pullQuote,
+  spanishPullQuote,
   "pairImages": pairImages[]{
     "url": asset->url,
-    "alt": coalesce(alt, ^.title),
-    "caption": caption
+    "alt": alt,
+    "spanishAlt": spanishAlt,
+    "caption": caption,
+    "spanishCaption": spanishCaption,
+    "objectPosition": objectPosition,
+    "hotspot": hotspot
   },
+  spanishPairAlts,
+  spanishPairCaptions,
   pairSlots,
   "body": body[]{
     _key,
@@ -175,12 +243,45 @@ const STORY_PROJECTION = `{
     alt,
     caption,
     aspectRatio,
+    objectPosition,
+    hotspot,
     text,
     attribution
   },
-  sections,
+  "sections": sections[]{
+    _key,
+    heading,
+    paragraphs,
+    "images": images[]{
+      "url": asset->url,
+      alt,
+      caption,
+      aspectRatio,
+      objectPosition,
+      hotspot
+    }
+  },
+  "spanishSections": spanishSections[]{
+    _key,
+    heading,
+    paragraphs,
+    "images": images[]{
+      "url": asset->url,
+      alt,
+      caption,
+      aspectRatio,
+      objectPosition,
+      hotspot
+    }
+  },
   takeaway,
-  seo
+  spanishTakeaway,
+  "seo": seo{
+    title,
+    description,
+    spanishTitle,
+    spanishDescription
+  }
 }`;
 
 const ALL_STORIES_QUERY = `*[_type == "story" && defined(slug.current)] | order(coalesce(featured, false) desc, coalesce(publishedAt, _createdAt) desc) ${STORY_PROJECTION}`;
@@ -217,19 +318,137 @@ const NEWSLETTER_ISSUE_BY_ID_QUERY = `*[_type == "newsletterIssue" && _id == $id
     spanishSummary,
     category,
     location,
+    spanishLocation,
     readingTimeMinutes,
     "leadImageUrl": leadImage.asset->url
   }
 }`;
 
-function resolveCategory(rawCategory: string | undefined): StoryCategory {
+export function resolveCategory(
+  rawCategory: string | undefined,
+  fallbackCategory?: StoryCategory,
+): StoryCategory {
   if (rawCategory && VALID_CATEGORIES.has(rawCategory as StoryCategory)) {
     return rawCategory as StoryCategory;
   }
-  if (rawCategory && rawCategory in LEGACY_CATEGORY_MAP) {
+  if (rawCategory && Object.hasOwn(LEGACY_CATEGORY_MAP, rawCategory)) {
     return LEGACY_CATEGORY_MAP[rawCategory]!;
   }
-  return "KarmaRise Journal";
+  if (fallbackCategory) {
+    if (fallbackCategory === "KarmaRise Journal") {
+      return "Inside KarmaRise";
+    }
+    if (VALID_CATEGORIES.has(fallbackCategory)) {
+      return fallbackCategory;
+    }
+  }
+  return "Inside KarmaRise";
+}
+
+function hotspotToObjectPosition(hotspot?: {
+  x?: number;
+  y?: number;
+}): string | undefined {
+  if (typeof hotspot?.x === "number" && typeof hotspot?.y === "number") {
+    return `${Math.round(hotspot.x * 100)}% ${Math.round(hotspot.y * 100)}%`;
+  }
+  return undefined;
+}
+
+function matchFallbackSection(
+  heading: string,
+  rawKey: string | undefined,
+  fallbackList: StorySection[] | undefined,
+): StorySection | undefined {
+  if (!fallbackList?.length) {
+    return undefined;
+  }
+  const normalizedHeading = heading.trim().toLowerCase();
+  const byHeading = fallbackList.find(
+    (fb) => fb.heading.trim().toLowerCase() === normalizedHeading,
+  );
+  if (byHeading) {
+    return byHeading;
+  }
+  if (rawKey) {
+    const keyMatch = /^(?:es-)?section-(\d+)$/.exec(rawKey);
+    if (keyMatch) {
+      const keyIndex = Number(keyMatch[1]);
+      if (Number.isInteger(keyIndex) && fallbackList[keyIndex]) {
+        return fallbackList[keyIndex];
+      }
+    }
+  }
+  return undefined;
+}
+
+function normalizeSectionList(
+  rawSections: SanityRawSection[] | undefined,
+  fallbackSections: StorySection[] | undefined,
+  fallbackTitle: string,
+): StorySection[] {
+  const validRaw = (rawSections ?? []).filter(
+    (section) =>
+      Boolean(section?.heading?.trim()) &&
+      Array.isArray(section.paragraphs) &&
+      section.paragraphs.some((p) => Boolean(p?.trim())),
+  );
+
+  return validRaw.map((section) => {
+    const heading = section.heading!.trim();
+    const paragraphs = (section.paragraphs ?? []).filter(
+      (p): p is string => typeof p === "string" && p.length > 0,
+    );
+    const fbSection = matchFallbackSection(
+      heading,
+      section._key,
+      fallbackSections,
+    );
+
+    const rawImages = (section.images ?? [])
+      .map((img, imgIdx): StoryImage | null => {
+        const fbImg = fbSection?.images?.[imgIdx];
+        const url = img?.url || fbImg?.url;
+        if (!url) {
+          return null;
+        }
+        const resolved: StoryImage = {
+          url,
+          alt: img?.alt || fbImg?.alt || fallbackTitle,
+        };
+        const caption = img?.caption ?? fbImg?.caption ?? undefined;
+        if (caption !== undefined) {
+          resolved.caption = caption;
+        }
+        const aspectRatio = img?.aspectRatio ?? fbImg?.aspectRatio ?? undefined;
+        if (aspectRatio !== undefined) {
+          resolved.aspectRatio = aspectRatio;
+        }
+        const objectPosition =
+          img?.objectPosition ??
+          hotspotToObjectPosition(img?.hotspot) ??
+          fbImg?.objectPosition ??
+          undefined;
+        if (objectPosition !== undefined) {
+          resolved.objectPosition = objectPosition;
+        }
+        return resolved;
+      })
+      .filter((img): img is StoryImage => img !== null);
+
+    const images =
+      rawImages.length > 0
+        ? rawImages
+        : fbSection?.images?.length
+          ? fbSection.images
+          : undefined;
+
+    return {
+      heading,
+      paragraphs,
+      ...(images ? { images } : {}),
+    };
+  });
 }
 
 function normalizeBodyBlocks(
@@ -283,6 +502,8 @@ function normalizeBodyBlocks(
         markDefs: markDefs.length > 0 ? markDefs : undefined,
       });
     } else if (block._type === "image" && block.url) {
+      const objectPosition =
+        block.objectPosition ?? hotspotToObjectPosition(block.hotspot);
       result.push({
         _key: key,
         _type: "image",
@@ -290,6 +511,7 @@ function normalizeBodyBlocks(
         alt: block.alt || fallbackTitle,
         caption: block.caption,
         aspectRatio: block.aspectRatio || "16:9",
+        ...(objectPosition ? { objectPosition } : {}),
       });
     } else if (block._type === "pullQuoteBlock" && block.text) {
       result.push({
@@ -341,7 +563,7 @@ function deriveSectionsFromBody(
   return sections.filter((s) => Boolean(s.heading) && s.paragraphs.length > 0);
 }
 
-function normalizeStory(
+export function normalizeStory(
   raw: SanityRawStory | null | undefined,
 ): StoryEntry | null {
   if (!raw?.slug || !raw.title) {
@@ -352,91 +574,261 @@ function normalizeStory(
     (entry) => entry.slug === raw.slug,
   );
 
-  const category = resolveCategory(raw.category ?? fallbackMatch?.category);
-  const language: StoryLanguage = raw.language === "es" ? "es" : "en";
+  const category = resolveCategory(
+    raw.category ?? undefined,
+    fallbackMatch?.category,
+  );
+  const language: StoryLanguage =
+    raw.language === "es"
+      ? "es"
+      : raw.language === "en"
+        ? "en"
+        : (fallbackMatch?.language ?? "en");
   const summary =
     raw.summary ||
     fallbackMatch?.summary ||
-    "Notes from our worktables in Spain and Maharashtra.";
-  const location =
-    raw.location || fallbackMatch?.location || "Spain & Maharashtra";
+    "Stories from our work across India, Spain, and Europe.";
+  const location = raw.location || fallbackMatch?.location || "India & Spain";
 
-  const leadImage: StoryImage | undefined = raw.leadImage?.url
+  const leadImageUrl = raw.leadImage?.url || fallbackMatch?.leadImage?.url;
+  const leadImage: StoryImage | undefined = leadImageUrl
     ? {
-        url: raw.leadImage.url,
-        alt: raw.leadImage.alt || raw.title,
-        caption: raw.leadImage.caption,
+        url: leadImageUrl,
+        alt: raw.leadImage?.alt || fallbackMatch?.leadImage?.alt || raw.title,
+        caption:
+          raw.leadImage?.caption ??
+          fallbackMatch?.leadImage?.caption ??
+          undefined,
+        objectPosition:
+          raw.leadImage?.objectPosition ??
+          hotspotToObjectPosition(raw.leadImage?.hotspot) ??
+          fallbackMatch?.leadImage?.objectPosition ??
+          undefined,
       }
-    : fallbackMatch?.leadImage;
+    : undefined;
 
-  const sanityPairImages = (raw.pairImages ?? [])
-    .filter((img): img is { url: string; alt?: string; caption?: string } =>
-      Boolean(img?.url),
-    )
-    .map((img) => ({
-      url: img.url,
-      alt: img.alt || raw.title || "Story image",
-      caption: img.caption,
-    }));
+  const spanishLeadAlt =
+    raw.leadImage?.spanishAlt ||
+    raw.spanishLeadAlt ||
+    fallbackMatch?.spanishLeadAlt ||
+    undefined;
+  const spanishLeadCaption =
+    raw.leadImage?.spanishCaption ??
+    raw.spanishLeadCaption ??
+    fallbackMatch?.spanishLeadCaption ??
+    undefined;
+
+  const sanityPairItems = (raw.pairImages ?? [])
+    .map((img, originalIdx) => {
+      const fbImg = fallbackMatch?.pairImages?.[originalIdx];
+      const url = img?.url || fbImg?.url;
+      if (!url) {
+        return null;
+      }
+      return {
+        image: {
+          url,
+          alt: img?.alt || fbImg?.alt || raw.title || "Story image",
+          caption: img?.caption ?? fbImg?.caption ?? undefined,
+          objectPosition:
+            img?.objectPosition ??
+            hotspotToObjectPosition(img?.hotspot) ??
+            fbImg?.objectPosition ??
+            undefined,
+        } satisfies StoryImage,
+        spanishAlt:
+          img?.spanishAlt ||
+          raw.spanishPairAlts?.[originalIdx] ||
+          fallbackMatch?.spanishPairAlts?.[originalIdx] ||
+          "",
+        spanishCaption:
+          img?.spanishCaption ||
+          raw.spanishPairCaptions?.[originalIdx] ||
+          fallbackMatch?.spanishPairCaptions?.[originalIdx] ||
+          "",
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 
   const pairImages =
-    sanityPairImages.length > 0 ? sanityPairImages : fallbackMatch?.pairImages;
+    sanityPairItems.length > 0
+      ? sanityPairItems.map((item) => item.image)
+      : fallbackMatch?.pairImages;
 
-  const firstSlot = raw.pairSlots?.[0] ?? fallbackMatch?.pairSlots[0];
-  const secondSlot = raw.pairSlots?.[1] ?? fallbackMatch?.pairSlots[1];
+  const resolvedSpanishPairAlts =
+    sanityPairItems.length > 0
+      ? sanityPairItems.map((item) => item.spanishAlt)
+      : fallbackMatch?.pairImages?.map(
+          (_, idx) =>
+            raw.spanishPairAlts?.[idx] ||
+            fallbackMatch?.spanishPairAlts?.[idx] ||
+            "",
+        );
+  const spanishPairAlts = resolvedSpanishPairAlts?.some(Boolean)
+    ? resolvedSpanishPairAlts
+    : undefined;
 
-  const body = normalizeBodyBlocks(raw.body, raw.title);
+  const resolvedSpanishPairCaptions =
+    sanityPairItems.length > 0
+      ? sanityPairItems.map((item) => item.spanishCaption)
+      : fallbackMatch?.pairImages?.map(
+          (_, idx) =>
+            raw.spanishPairCaptions?.[idx] ||
+            fallbackMatch?.spanishPairCaptions?.[idx] ||
+            "",
+        );
+  const spanishPairCaptions = resolvedSpanishPairCaptions?.some(Boolean)
+    ? resolvedSpanishPairCaptions
+    : undefined;
 
-  const explicitSections = (raw.sections ?? [])
-    .filter((section) => Boolean(section.heading && section.paragraphs?.length))
-    .map((section) => ({
-      heading: section.heading ?? "",
-      paragraphs: (section.paragraphs ?? []).filter(Boolean),
-    }));
+  const firstSlot = raw.pairSlots?.[0];
+  const secondSlot = raw.pairSlots?.[1];
+
+  const body =
+    normalizeBodyBlocks(raw.body ?? undefined, raw.title) ??
+    fallbackMatch?.body;
+
+  const explicitSections = normalizeSectionList(
+    raw.sections ?? undefined,
+    fallbackMatch?.sections,
+    raw.title,
+  );
+
+  const derivedFromBody =
+    explicitSections.length === 0 ? deriveSectionsFromBody(body) : [];
+  const enrichedFromBody: StorySection[] = derivedFromBody.map((sec) => {
+    const fbSection = matchFallbackSection(
+      sec.heading,
+      undefined,
+      fallbackMatch?.sections,
+    );
+    return fbSection?.images?.length
+      ? { ...sec, images: fbSection.images }
+      : sec;
+  });
 
   const sections =
     explicitSections.length > 0
       ? explicitSections
-      : deriveSectionsFromBody(body).length > 0
-        ? deriveSectionsFromBody(body)
+      : enrichedFromBody.length > 0
+        ? enrichedFromBody
         : (fallbackMatch?.sections ?? []);
+
+  const explicitSpanishSections = normalizeSectionList(
+    raw.spanishSections ?? undefined,
+    fallbackMatch?.spanishSections,
+    raw.spanishTitle || raw.title,
+  );
+  const spanishSections =
+    explicitSpanishSections.length > 0
+      ? explicitSpanishSections
+      : fallbackMatch?.spanishSections;
+
+  const rawTags = (raw.tags ?? []).filter(
+    (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
+  );
+  const tags =
+    rawTags.length > 0
+      ? rawTags
+      : fallbackMatch?.tags?.length
+        ? fallbackMatch.tags
+        : [category];
+
+  const rawSpanishTags = (raw.spanishTags ?? []).filter(
+    (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
+  );
+  const spanishTags =
+    rawSpanishTags.length > 0 ? rawSpanishTags : fallbackMatch?.spanishTags;
+
+  const pullQuote = raw.pullQuote?.text
+    ? {
+        text: raw.pullQuote.text,
+        attribution:
+          raw.pullQuote.attribution ??
+          fallbackMatch?.pullQuote?.attribution ??
+          undefined,
+      }
+    : fallbackMatch?.pullQuote;
+
+  const spanishPullQuote = raw.spanishPullQuote?.text
+    ? {
+        text: raw.spanishPullQuote.text,
+        attribution:
+          raw.spanishPullQuote.attribution ??
+          fallbackMatch?.spanishPullQuote?.attribution ??
+          undefined,
+      }
+    : fallbackMatch?.spanishPullQuote;
+
+  const seoTitle = raw.seo?.title ?? fallbackMatch?.seo?.title ?? undefined;
+  const seoDescription =
+    raw.seo?.description ?? fallbackMatch?.seo?.description ?? undefined;
+  const seoSpanishTitle =
+    raw.seo?.spanishTitle ?? fallbackMatch?.seo?.spanishTitle ?? undefined;
+  const seoSpanishDescription =
+    raw.seo?.spanishDescription ??
+    fallbackMatch?.seo?.spanishDescription ??
+    undefined;
+  const seo =
+    seoTitle || seoDescription || seoSpanishTitle || seoSpanishDescription
+      ? {
+          ...(seoTitle ? { title: seoTitle } : {}),
+          ...(seoDescription ? { description: seoDescription } : {}),
+          ...(seoSpanishTitle ? { spanishTitle: seoSpanishTitle } : {}),
+          ...(seoSpanishDescription
+            ? { spanishDescription: seoSpanishDescription }
+            : {}),
+        }
+      : undefined;
 
   return {
     slug: raw.slug,
-    featured: Boolean(raw.featured),
-    newsletterEligible: raw.newsletterEligible ?? true,
+    featured: raw.featured ?? fallbackMatch?.featured ?? false,
+    newsletterEligible:
+      raw.newsletterEligible ?? fallbackMatch?.newsletterEligible ?? true,
     language,
-    issueNumber: raw.issueNumber || fallbackMatch?.issueNumber || "Edition 01",
+    issueNumber: raw.issueNumber || fallbackMatch?.issueNumber || "01",
     publishedAt:
       raw.publishedAt ||
       fallbackMatch?.publishedAt ||
       new Date().toISOString().slice(0, 10),
     readingTimeMinutes:
-      raw.readingTimeMinutes || fallbackMatch?.readingTimeMinutes || 5,
+      raw.readingTimeMinutes ?? fallbackMatch?.readingTimeMinutes ?? 5,
     category,
     location,
+    spanishLocation:
+      raw.spanishLocation ?? fallbackMatch?.spanishLocation ?? undefined,
     title: raw.title,
-    spanishTitle: raw.spanishTitle || fallbackMatch?.spanishTitle,
+    spanishTitle: raw.spanishTitle ?? fallbackMatch?.spanishTitle ?? undefined,
     summary,
-    spanishSummary: raw.spanishSummary || fallbackMatch?.spanishSummary,
+    spanishSummary:
+      raw.spanishSummary ?? fallbackMatch?.spanishSummary ?? undefined,
     author: {
       name: raw.author?.name || fallbackMatch?.author.name || "Alma & Shirish",
       role:
         raw.author?.role ||
         fallbackMatch?.author.role ||
         "Co-founders, KarmaRise D Global",
+      spanishRole:
+        raw.author?.spanishRole ??
+        fallbackMatch?.author.spanishRole ??
+        undefined,
       location:
         raw.author?.location || fallbackMatch?.author.location || location,
+      spanishLocation:
+        raw.author?.spanishLocation ??
+        fallbackMatch?.author.spanishLocation ??
+        undefined,
       portraitUrl:
         raw.author?.portraitUrl ||
         fallbackMatch?.author.portraitUrl ||
         "/images/alma-and-shirish-founders.jpg",
     },
-    tags:
-      raw.tags && raw.tags.length > 0
-        ? raw.tags
-        : (fallbackMatch?.tags ?? [category]),
+    tags,
+    spanishTags,
     leadImage,
+    spanishLeadAlt,
+    spanishLeadCaption,
     leadSlot: {
       kind: raw.leadSlot?.kind ?? fallbackMatch?.leadSlot.kind ?? "Photo",
       ratio:
@@ -449,53 +841,114 @@ function normalizeStory(
         fallbackMatch?.leadSlot.description ||
         summary,
     },
-    pullQuote: raw.pullQuote?.text
-      ? {
-          text: raw.pullQuote.text,
-          attribution: raw.pullQuote.attribution,
-        }
-      : fallbackMatch?.pullQuote,
+    pullQuote,
+    spanishPullQuote,
     pairImages,
+    spanishPairAlts,
+    spanishPairCaptions,
     pairSlots: [
       {
-        title: firstSlot?.title || `${raw.title} detail one`,
-        description: firstSlot?.description || summary,
+        title:
+          firstSlot?.title ||
+          fallbackMatch?.pairSlots[0].title ||
+          `${raw.title} detail one`,
+        description:
+          firstSlot?.description ||
+          fallbackMatch?.pairSlots[0].description ||
+          summary,
       },
       {
-        title: secondSlot?.title || `${raw.title} detail two`,
-        description: secondSlot?.description || summary,
+        title:
+          secondSlot?.title ||
+          fallbackMatch?.pairSlots[1].title ||
+          `${raw.title} detail two`,
+        description:
+          secondSlot?.description ||
+          fallbackMatch?.pairSlots[1].description ||
+          summary,
       },
     ],
     body,
     sections,
-    takeaway: raw.takeaway || fallbackMatch?.takeaway || "",
-    seo: raw.seo ?? fallbackMatch?.seo,
+    spanishSections,
+    takeaway: raw.takeaway ?? fallbackMatch?.takeaway ?? "",
+    spanishTakeaway:
+      raw.spanishTakeaway ?? fallbackMatch?.spanishTakeaway ?? undefined,
+    seo,
   };
+}
+
+export interface FetchSanityOptions {
+  cache?: RequestCache;
+  revalidate?: number;
+  tags?: string[];
+}
+
+function getSanityProjectConfig(): {
+  projectId: string;
+  dataset: string;
+} | null {
+  const projectId =
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim() ||
+    process.env.SANITY_PROJECT_ID?.trim() ||
+    "";
+  if (!projectId) {
+    return null;
+  }
+  const dataset =
+    process.env.NEXT_PUBLIC_SANITY_DATASET?.trim() ||
+    process.env.SANITY_DATASET?.trim() ||
+    "production";
+  return { projectId, dataset };
+}
+
+function compareStoryPublishDatesDesc(a: StoryEntry, b: StoryEntry): number {
+  const timeA = Date.parse(a.publishedAt);
+  const timeB = Date.parse(b.publishedAt);
+  if (!Number.isNaN(timeA) && !Number.isNaN(timeB) && timeA !== timeB) {
+    return timeB - timeA;
+  }
+  return b.publishedAt.localeCompare(a.publishedAt);
 }
 
 export async function fetchSanity<T>(
   query: string,
   params: Record<string, string | number> = {},
+  options: FetchSanityOptions = {},
 ): Promise<T | null> {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim();
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET?.trim();
-  if (!projectId || !dataset) {
+  const config = getSanityProjectConfig();
+  if (!config) {
     return null;
   }
 
-  const searchParams = new URLSearchParams({ query });
+  const searchParams = new URLSearchParams({
+    query,
+    perspective: "published",
+  });
   for (const [key, value] of Object.entries(params)) {
     searchParams.set(`$${key}`, JSON.stringify(value));
   }
 
   const token = process.env.SANITY_API_KEY?.trim();
-  const url = `https://${projectId}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${dataset}?${searchParams.toString()}`;
+  const url = `https://${config.projectId}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${config.dataset}?${searchParams.toString()}`;
+
+  const fetchInit: RequestInit & {
+    next?: { revalidate?: number; tags?: string[] };
+  } = {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  };
+
+  if (options.cache === "no-store") {
+    fetchInit.cache = "no-store";
+  } else {
+    fetchInit.next = {
+      revalidate: options.revalidate ?? 30,
+      tags: options.tags ?? ["stories"],
+    };
+  }
 
   try {
-    const response = await fetch(url, {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      next: { revalidate: 30, tags: ["stories"] },
-    });
+    const response = await fetch(url, fetchInit);
 
     if (!response.ok) {
       console.error("Sanity query failed:", response.status);
@@ -516,16 +969,14 @@ export async function patchSanityDocument(
   setFields: Record<string, unknown>,
   incFields?: Record<string, number>,
 ): Promise<boolean> {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim();
-  const dataset =
-    process.env.NEXT_PUBLIC_SANITY_DATASET?.trim() || "production";
+  const config = getSanityProjectConfig();
   const token = process.env.SANITY_API_KEY?.trim();
 
-  if (!projectId || !token) {
+  if (!config || !token) {
     return false;
   }
 
-  const url = `https://${projectId}.api.sanity.io/v${SANITY_API_VERSION}/data/mutate/${dataset}`;
+  const url = `https://${config.projectId}.api.sanity.io/v${SANITY_API_VERSION}/data/mutate/${config.dataset}`;
   const patch: Record<string, unknown> = {
     id: documentId,
     set: setFields,
@@ -554,12 +1005,14 @@ export async function patchSanityDocument(
 export async function getNewsletterIssueById(
   id: string,
 ): Promise<SanityNewsletterIssue | null> {
-  return fetchSanity<SanityNewsletterIssue>(NEWSLETTER_ISSUE_BY_ID_QUERY, {
-    id,
-  });
+  return fetchSanity<SanityNewsletterIssue>(
+    NEWSLETTER_ISSUE_BY_ID_QUERY,
+    { id },
+    { cache: "no-store" },
+  );
 }
 
-/** Fetches published Stories from Sanity, falling back to static Stories only when Sanity has no published Stories. */
+/** Fetches published Stories from Sanity merged with any local static Stories not yet synced to Sanity. */
 export async function getStories(): Promise<StoryEntry[]> {
   const rawStories = await fetchSanity<SanityRawStory[]>(ALL_STORIES_QUERY);
   if (!rawStories?.length) {
@@ -570,7 +1023,25 @@ export async function getStories(): Promise<StoryEntry[]> {
     .map((entry) => normalizeStory(entry))
     .filter((entry): entry is StoryEntry => entry !== null);
 
-  return normalized.length > 0 ? normalized : fallbackStories;
+  if (normalized.length === 0) {
+    return fallbackStories;
+  }
+
+  const seenSlugs = new Set(normalized.map((entry) => entry.slug));
+  const missingLocalStories = fallbackStories.filter(
+    (entry) => !seenSlugs.has(entry.slug),
+  );
+
+  if (missingLocalStories.length === 0) {
+    return normalized;
+  }
+
+  return [...normalized, ...missingLocalStories].sort((a, b) => {
+    if (Boolean(a.featured) !== Boolean(b.featured)) {
+      return a.featured ? -1 : 1;
+    }
+    return compareStoryPublishDatesDesc(a, b);
+  });
 }
 
 /** Fetches one Story by slug from Sanity, falling back to static Stories if unavailable. */

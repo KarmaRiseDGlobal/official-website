@@ -121,7 +121,7 @@ async function ensureFolderAndLists() {
   const foldersRes = await brevoRequest("/contacts/folders?limit=50&offset=0");
   const folders = foldersRes.data?.folders || [];
   let folder = folders.find(
-    (f) => f.name.toLowerCase() === folderName.toLowerCase(),
+    (f) => String(f?.name || "").toLowerCase() === folderName.toLowerCase(),
   );
 
   if (!folder) {
@@ -146,20 +146,55 @@ async function ensureFolderAndLists() {
   const existingLists = listsRes.data?.lists || [];
 
   const desiredLists = [
-    { key: "master", name: "KarmaRise Journal Master" },
-    { key: "en", name: "KarmaRise Journal (EN)" },
-    { key: "es", name: "KarmaRise Journal (ES)" },
+    {
+      key: "master",
+      envId: Number.parseInt(process.env.BREVO_LIST_ID || "", 10),
+      name: "KarmaRise Stories Master",
+    },
+    {
+      key: "en",
+      envId: Number.parseInt(process.env.BREVO_LIST_ID_EN || "", 10),
+      name: "KarmaRise Stories (EN)",
+    },
+    {
+      key: "es",
+      envId: Number.parseInt(process.env.BREVO_LIST_ID_ES || "", 10),
+      name: "KarmaRise Stories (ES)",
+    },
   ];
 
   const resolvedLists = {};
 
   for (const item of desiredLists) {
-    const found = existingLists.find(
-      (l) => l.name.toLowerCase() === item.name.toLowerCase(),
-    );
+    const found =
+      existingLists.find(
+        (l) => Number.isFinite(item.envId) && l.id === item.envId,
+      ) ||
+      existingLists.find(
+        (l) => String(l?.name || "").toLowerCase() === item.name.toLowerCase(),
+      );
+
     if (found) {
+      if (found.name !== item.name) {
+        const renameRes = await brevoRequest(`/contacts/lists/${found.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ name: item.name }),
+        });
+        if (renameRes.ok || renameRes.status === 204) {
+          console.log(
+            `   * Renamed list "${found.name}" -> "${item.name}" (ID: ${found.id}).`,
+          );
+        } else {
+          console.warn(
+            `   ! Could not rename list "${found.name}" (ID: ${found.id}):`,
+            renameRes.status,
+            renameRes.data,
+          );
+        }
+      } else {
+        console.log(`   - Found list "${found.name}" (ID: ${found.id}).`);
+      }
       resolvedLists[item.key] = found.id;
-      console.log(`   - Found list "${found.name}" (ID: ${found.id}).`);
       continue;
     }
 
@@ -298,28 +333,30 @@ function buildWelcomeHtml({ lang, assets }) {
   const copy = isEs
     ? {
         preheader:
-          "Pasa y ponte cómodo: de España a la India, entre telas, chai y buenas charlas.",
-        journalNote: "De Madrid a Maharashtra · Alma y Shirish",
+          "De España a la India: qué alegría tenerte por aquí. Respóndenos y cuéntanos desde dónde nos lees.",
+        eyebrowNote: "Una carta de Alma y Shirish · España e India",
         heading: "¡Pasa, estás en tu casa!",
         greeting: '¡Hola {{ contact.FIRSTNAME | default:"" }}! ¿Qué tal todo?',
         p1: "Nos ha hecho una ilusión enorme ver tu correo por aquí. Si te somos sinceros, todo esto empezó casi sin planearlo: nos conocimos, conectamos desde el minuto uno y, a los pocos meses, Alma ya estaba subiéndose a un avión rumbo a la India. Desde aquel viaje no hemos parado quietos ni un segundo.",
-        p2: "Hoy vivimos con un pie en España y otro en Maharashtra, rodeados de telas increíbles, tomando chai a todas horas en los talleres y rescatando saris antiguos para darles otra vida. Queríamos un rincón donde contarte todo esto tal cual lo vivimos, como quien se sienta a charlar un rato con amigos, sin filtros ni rollos corporativos.",
+        p2: "Hoy trabajamos entre España y toda la India, recorriendo talleres de piel y confección, revisando materiales sobre el terreno y rescatando saris antiguos para darles otra vida con Almarise. Queríamos un espacio cercano donde contarte cómo se hacen las cosas por dentro, sin filtros ni rollos corporativos.",
         pillarsIntro:
           "Por aquí nos va a encantar charlar contigo de todo lo que nos mueve:",
         pillars: [
-          { title: "Costumbres y raíces" },
+          { title: "Cultura y raíces" },
           { title: "Moda sostenible" },
-          { title: "Nuestra gente y sus oficios" },
-          { title: "Arte, telas y diseño" },
-          { title: "Entre India y España" },
-          { title: "El día a día en KarmaRise" },
+          { title: "Oficios y talleres" },
+          { title: "Diseño y materiales" },
+          { title: "Entre India y Europa" },
+          { title: "Día a día en KarmaRise" },
         ],
         p3: "Y oye, que esto no sea un monólogo. Antes de mandarte la próxima carta, nos morimos de curiosidad por saber quién anda al otro lado: dale a responder ahora mismo y cuéntanos desde dónde nos lees y qué te llamó la atención para apuntarte. ¿Te pierde el mundo textil, te tira la India o andas con ganas de dar forma a algo tuyo?",
-        p4: "Los correos nos llegan directo a nosotros dos, así que te leemos y te contestamos seguro.",
+        p4: "Los correos nos llegan directamente a nosotros dos, así que te leemos y te contestamos seguro.",
         primaryCta: "Ven a leer nuestras historias",
         signoff: "Un abrazo enorme,",
         founders: "Alma y Shirish",
-        locations: "Madrid · Ulhasnagar, Maharashtra",
+        locations: "España · India",
+        heroAlt:
+          "Alma y Shirish revisando muestras de tejido en nuestro estudio en la India",
         footerNote:
           "Te escribimos porque te apuntaste para recibir nuestras historias en KarmaRise.",
         unsubscribeLabel: "Darte de baja cuando quieras",
@@ -327,11 +364,11 @@ function buildWelcomeHtml({ lang, assets }) {
     : {
         preheader:
           "From Spain to India: we are thrilled you are here. Hit reply and tell us where you are reading from.",
-        journalNote: "A note from Alma & Shirish · Spain & India",
-        heading: "You are in! Welcome to our table.",
+        eyebrowNote: "A note from Alma & Shirish · Spain & India",
+        heading: "You are in. Glad you are here.",
         greeting: 'Hey {{ contact.FIRSTNAME | default:"there" }},',
         p1: "Seeing your name pop up here honestly makes our day. A few months after we first connected, Alma got on a plane from Spain to India, and our lives have been a whirlwind of colours, workshops, and late-night ideas ever since.",
-        p2: "Between Madrid and Maharashtra, we spend our days hunting down forgotten silk sarees, drinking endless cups of chai with master tailors, and watching raw sketches turn into real pieces you can hold in your hands. This journal is where we bring you right along with us.",
+        p2: "Working across Spain, Europe, and India, we spend our days visiting leather and garment workshops, selecting existing silk sarees for Almarise, and turning raw sketches into physical samples you can hold in your hands. Through these Stories, we bring you straight into that work.",
         pillarsIntro:
           "Over the coming weeks, we would love talking to you about:",
         pillars: [
@@ -340,16 +377,18 @@ function buildWelcomeHtml({ lang, assets }) {
           { title: "People & Craftsmanship" },
           { title: "Art & Design" },
           { title: "India Meets Europe" },
-          { title: "KarmaRise Journal" },
+          { title: "Inside KarmaRise" },
         ],
-        p3: "Before we send our next story, we would love to know who is on the other side of this screen. Hit reply right now and tell us: where are you reading this from, and what drew you to our world? Was it Indian textiles, sustainable fashion, or making something of your own?",
+        p3: "Before we send our next Story, we would love to know who is on the other side of this screen. Hit reply right now and tell us: where are you reading this from, and what drew you to our world? Was it Indian textiles, sustainable fashion, or making something of your own?",
         p4: "Every reply lands straight in our inbox, and we read and answer every single one.",
-        primaryCta: "Read our first stories",
+        primaryCta: "Read our first Stories",
         signoff: "Can't wait to hear from you,",
         founders: "Alma & Shirish",
-        locations: "Madrid · Ulhasnagar, Maharashtra",
+        locations: "Spain · India",
+        heroAlt:
+          "Alma and Shirish reviewing fabric swatches in our studio in India",
         footerNote:
-          "You are receiving this letter because you signed up for KarmaRise stories.",
+          "You are receiving this letter because you signed up for KarmaRise Stories.",
         unsubscribeLabel: "Unsubscribe anytime",
       };
 
@@ -423,7 +462,7 @@ function buildWelcomeHtml({ lang, assets }) {
                 <img src="${logoUrl}" alt="KarmaRise" width="84" style="display:block;width:84px;height:auto;margin:0 auto;border:0;" />
               </a>
               <p style="margin:14px 0 0;font-family:${fontSans};font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#BD7057;font-weight:600;">
-                ${copy.journalNote}
+                ${copy.eyebrowNote}
               </p>
             </td>
           </tr>
@@ -451,7 +490,7 @@ function buildWelcomeHtml({ lang, assets }) {
           <tr>
             <td style="padding:0;line-height:0;font-size:0;">
               <a href="${storiesUrl}" style="display:block;text-decoration:none;">
-                <img src="${heroImageUrl}" alt="Alma and Shirish at the studio table" width="580" style="display:block;width:100%;max-width:580px;height:auto;border:0;" />
+                <img src="${heroImageUrl}" alt="${copy.heroAlt}" width="580" style="display:block;width:100%;max-width:580px;height:auto;border:0;" />
               </a>
             </td>
           </tr>
@@ -543,13 +582,21 @@ async function ensureWelcomeTemplates(sender, assets) {
   const templatesToSync = [
     {
       key: "en",
-      templateName: "Welcome - KarmaRise Journal (EN)",
+      envId: Number.parseInt(
+        process.env.BREVO_WELCOME_TEMPLATE_ID_EN || "",
+        10,
+      ),
+      templateName: "Welcome - KarmaRise Stories (EN)",
       subject: "A warm welcome from Alma & Shirish",
       htmlContent: buildWelcomeHtml({ lang: "en", assets }),
     },
     {
       key: "es",
-      templateName: "Bienvenida - Diario KarmaRise (ES)",
+      envId: Number.parseInt(
+        process.env.BREVO_WELCOME_TEMPLATE_ID_ES || "",
+        10,
+      ),
+      templateName: "Bienvenida - Historias KarmaRise (ES)",
       subject: "¡Qué ilusión tenerte por aquí! · Alma y Shirish",
       htmlContent: buildWelcomeHtml({ lang: "es", assets }),
     },
@@ -558,9 +605,15 @@ async function ensureWelcomeTemplates(sender, assets) {
   const syncedIds = {};
 
   for (const tpl of templatesToSync) {
-    const existing = existingTemplates.find(
-      (t) => t.name.toLowerCase() === tpl.templateName.toLowerCase(),
-    );
+    const existing =
+      existingTemplates.find(
+        (t) => Number.isFinite(tpl.envId) && t.id === tpl.envId,
+      ) ||
+      existingTemplates.find(
+        (t) =>
+          String(t?.name || "").toLowerCase() ===
+          tpl.templateName.toLowerCase(),
+      );
 
     const payload = {
       templateName: tpl.templateName,

@@ -47,6 +47,11 @@ export function StoryMedia({
             fill
             sizes={sizes}
             priority={priority}
+            style={
+              image.objectPosition
+                ? { objectPosition: image.objectPosition }
+                : undefined
+            }
             className={`object-cover ${
               interactive
                 ? "transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.03]"

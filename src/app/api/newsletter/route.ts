@@ -5,21 +5,37 @@ import {
   resolveSubscriberLanguage,
   subscribeToBrevoNewsletter,
 } from "@/lib/brevo";
+import { guardFormRequest, readJsonObject } from "@/lib/security";
 import { isValidEmail, readTrimmedString } from "@/lib/validation";
 
 export async function POST(request: Request) {
-  let payload: Record<string, unknown>;
-  try {
-    payload = (await request.json()) as Record<string, unknown>;
-  } catch {
+  const parsed = await readJsonObject(request, 16 * 1024);
+  if (!parsed.ok) {
     return NextResponse.json(
-      { ok: false, error: "Invalid request payload." },
-      { status: 400 },
+      { ok: false, error: parsed.error },
+      { status: parsed.status },
+    );
+  }
+
+  const payload = parsed.data;
+  const guard = await guardFormRequest(
+    request,
+    {
+      companyWebsite: payload.companyWebsite,
+      turnstileToken: payload.turnstileToken,
+    },
+    { scope: "newsletter", limit: 10, windowMs: 10 * 60 * 1000 },
+  );
+
+  if (!guard.ok) {
+    return NextResponse.json(
+      { ok: false, error: guard.error },
+      { status: guard.status },
     );
   }
 
   // Silently accept honeypot submissions so automated bots do not retry.
-  if (readTrimmedString(payload.companyWebsite, 200)) {
+  if (guard.honeypotTriggered) {
     return NextResponse.json({ ok: true });
   }
 

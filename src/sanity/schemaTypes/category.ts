@@ -6,12 +6,6 @@ export const categoryType = defineType({
   type: "document",
   fields: [
     defineField({
-      name: "number",
-      title: "Pillar number (01-06)",
-      type: "string",
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: "title",
       title: "Title (English)",
       type: "string",
@@ -62,14 +56,13 @@ export const categoryType = defineType({
   ],
   preview: {
     select: {
-      number: "number",
       title: "title",
       spanishTitle: "spanishTitle",
       media: "coverImage",
     },
-    prepare({ number, title, spanishTitle, media }) {
+    prepare({ title, spanishTitle, media }) {
       return {
-        title: `${number ? `${number}. ` : ""}${title ?? "Category"}`,
+        title: title ?? "Category",
         subtitle: spanishTitle,
         media,
       };

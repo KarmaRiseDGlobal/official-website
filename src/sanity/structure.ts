@@ -6,7 +6,7 @@ const STORY_CATEGORIES = [
   "People & Craftsmanship",
   "Art & Design",
   "India Meets Europe",
-  "KarmaRise Journal",
+  "Inside KarmaRise",
 ] as const;
 
 export const editorialStructure: StructureResolver = (S) =>
@@ -41,17 +41,25 @@ export const editorialStructure: StructureResolver = (S) =>
                     .filter('_type == "story" && newsletterEligible == true'),
                 ),
               S.divider(),
-              ...STORY_CATEGORIES.map((category, index) =>
-                S.listItem()
+              ...STORY_CATEGORIES.map((category, index) => {
+                const isInsideKarmaRise = category === "Inside KarmaRise";
+                const documentList = S.documentList()
+                  .title(category)
+                  .filter(
+                    isInsideKarmaRise
+                      ? '_type == "story" && (category == "Inside KarmaRise" || category == "KarmaRise Journal")'
+                      : '_type == "story" && category == $category',
+                  );
+
+                return S.listItem()
                   .title(`0${index + 1}. ${category}`)
                   .schemaType("story")
                   .child(
-                    S.documentList()
-                      .title(category)
-                      .filter('_type == "story" && category == $category')
-                      .params({ category }),
-                  ),
-              ),
+                    isInsideKarmaRise
+                      ? documentList
+                      : documentList.params({ category }),
+                  );
+              }),
             ]),
         ),
 

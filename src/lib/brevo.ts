@@ -269,7 +269,7 @@ export async function subscribeToBrevoNewsletter(
     CONSENT_STATUS: "Yes",
     CONSENT_DATE: new Date().toISOString(),
     SOURCE: subscriber.source || "Website",
-    INTEREST: subscriber.interest || "KarmaRise Journal",
+    INTEREST: subscriber.interest || "KarmaRise Stories",
   };
 
   if (subscriber.firstName) {

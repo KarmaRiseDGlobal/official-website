@@ -46,7 +46,7 @@ export const newsletterSettingsType = defineType({
       type: "text",
       rows: 3,
       initialValue:
-        "KarmaRise · Madrid & Maharashtra · stories@karmarisedglobal.com",
+        "KarmaRise D Global · Spain & India · stories@karmarisedglobal.com",
     }),
     defineField({
       name: "defaultFooterEs",
@@ -54,7 +54,7 @@ export const newsletterSettingsType = defineType({
       type: "text",
       rows: 3,
       initialValue:
-        "KarmaRise · Madrid y Maharashtra · stories@karmarisedglobal.com",
+        "KarmaRise D Global · España e India · stories@karmarisedglobal.com",
     }),
   ],
   preview: {

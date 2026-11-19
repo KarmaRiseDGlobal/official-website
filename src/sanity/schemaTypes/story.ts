@@ -1,5 +1,85 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+function buildSectionMember(isSpanish: boolean) {
+  return defineArrayMember({
+    type: "object",
+    fields: [
+      defineField({
+        name: "heading",
+        title: isSpanish ? "Heading (Spanish)" : "Heading",
+        type: "string",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "paragraphs",
+        title: isSpanish ? "Paragraphs (Spanish)" : "Paragraphs",
+        type: "array",
+        of: [defineArrayMember({ type: "text", rows: 4 })],
+        validation: (rule) => rule.min(1),
+      }),
+      defineField({
+        name: "images",
+        title: isSpanish
+          ? "Section photographs (Spanish, optional)"
+          : "Section photographs (optional)",
+        description:
+          "Optional documentary photographs displayed below this section.",
+        type: "array",
+        of: [
+          defineArrayMember({
+            type: "image",
+            options: { hotspot: true },
+            fields: [
+              defineField({
+                name: "alt",
+                title: isSpanish ? "Alt text (Spanish)" : "Alt text",
+                type: "string",
+              }),
+              defineField({
+                name: "caption",
+                title: isSpanish ? "Caption (Spanish)" : "Caption",
+                type: "string",
+              }),
+              defineField({
+                name: "aspectRatio",
+                title: "Display frame aspect ratio",
+                type: "string",
+                initialValue: "4:5",
+                options: {
+                  list: [
+                    { title: "4:5 editorial portrait", value: "4:5" },
+                    { title: "4:3 classic horizontal", value: "4:3" },
+                    { title: "16:9 wide horizontal", value: "16:9" },
+                  ],
+                },
+              }),
+              defineField({
+                name: "objectPosition",
+                title: "CSS focal crop override (optional)",
+                type: "string",
+                hidden: true,
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+    preview: {
+      select: {
+        title: "heading",
+        paragraphs: "paragraphs",
+      },
+      prepare({ title, paragraphs }) {
+        const count = Array.isArray(paragraphs) ? paragraphs.length : 0;
+        return {
+          title: title || "Untitled section",
+          subtitle: `${count} paragraph${count === 1 ? "" : "s"}`,
+        };
+      },
+    },
+  });
+}
+
 export const storyType = defineType({
   name: "story",
   title: "Story",
@@ -44,18 +124,18 @@ export const storyType = defineType({
       title: "Editorial pillar (Category)",
       type: "string",
       group: "editorial",
-      initialValue: "KarmaRise Journal",
+      initialValue: "Inside KarmaRise",
       options: {
         list: [
-          { title: "01. Heritage & Culture", value: "Heritage & Culture" },
-          { title: "02. Sustainable Fashion", value: "Sustainable Fashion" },
+          { title: "Heritage & Culture", value: "Heritage & Culture" },
+          { title: "Sustainable Fashion", value: "Sustainable Fashion" },
           {
-            title: "03. People & Craftsmanship",
+            title: "People & Craftsmanship",
             value: "People & Craftsmanship",
           },
-          { title: "04. Art & Design", value: "Art & Design" },
-          { title: "05. India Meets Europe", value: "India Meets Europe" },
-          { title: "06. KarmaRise Journal", value: "KarmaRise Journal" },
+          { title: "Art & Design", value: "Art & Design" },
+          { title: "India Meets Europe", value: "India Meets Europe" },
+          { title: "Inside KarmaRise", value: "Inside KarmaRise" },
         ],
         layout: "radio",
       },
@@ -75,7 +155,7 @@ export const storyType = defineType({
       name: "leadImage",
       title: "Cover / lead photograph",
       description:
-        "Main photograph displayed on the /stories journal grid and at the top of the Story.",
+        "Main photograph displayed on the /stories grid and at the top of the Story.",
       type: "image",
       group: ["editorial", "media"],
       options: { hotspot: true },
@@ -86,9 +166,25 @@ export const storyType = defineType({
           type: "string",
         }),
         defineField({
+          name: "spanishAlt",
+          title: "Alt text (Spanish)",
+          type: "string",
+        }),
+        defineField({
           name: "caption",
           title: "Editorial caption",
           type: "string",
+        }),
+        defineField({
+          name: "spanishCaption",
+          title: "Editorial caption (Spanish)",
+          type: "string",
+        }),
+        defineField({
+          name: "objectPosition",
+          title: "CSS focal crop override (optional)",
+          type: "string",
+          hidden: true,
         }),
       ],
     }),
@@ -96,7 +192,7 @@ export const storyType = defineType({
       name: "body",
       title: "Story body (Rich text article editor)",
       description:
-        "Write your Story naturally here. Use H2 for main section headings (they appear automatically in the sidebar table of contents), Blockquote for pull quotes, and insert inline photographs anywhere.",
+        "Write your Story naturally here. Use H2 for main section headings (they appear automatically in the sidebar contents list), Blockquote for pull quotes, and insert inline photographs anywhere.",
       type: "array",
       group: "editorial",
       of: [
@@ -168,6 +264,12 @@ export const storyType = defineType({
                 ],
               },
             }),
+            defineField({
+              name: "objectPosition",
+              title: "CSS focal crop override (optional)",
+              type: "string",
+              hidden: true,
+            }),
           ],
         }),
         defineArrayMember({
@@ -231,9 +333,25 @@ export const storyType = defineType({
               type: "string",
             }),
             defineField({
+              name: "spanishAlt",
+              title: "Alt text (Spanish)",
+              type: "string",
+            }),
+            defineField({
               name: "caption",
               title: "Caption",
               type: "string",
+            }),
+            defineField({
+              name: "spanishCaption",
+              title: "Caption (Spanish)",
+              type: "string",
+            }),
+            defineField({
+              name: "objectPosition",
+              title: "CSS focal crop override (optional)",
+              type: "string",
+              hidden: true,
             }),
           ],
         }),
@@ -251,10 +369,10 @@ export const storyType = defineType({
     defineField({
       name: "location",
       title: "Story dateline / location",
-      description: "Example: Madrid and Ulhasnagar, or Maharashtra, India",
+      description: "Example: India & Spain, or Across India",
       type: "string",
       group: "editorial",
-      initialValue: "Spain & Maharashtra",
+      initialValue: "India & Spain",
     }),
     defineField({
       name: "publishedAt",
@@ -273,7 +391,7 @@ export const storyType = defineType({
     }),
     defineField({
       name: "issueNumber",
-      title: "Journal edition label",
+      title: "Stories edition label",
       type: "string",
       group: "editorial",
       initialValue: "Edition 01",
@@ -313,10 +431,20 @@ export const storyType = defineType({
           initialValue: "Co-founders, KarmaRise D Global",
         }),
         defineField({
+          name: "spanishRole",
+          title: "Role (Spanish)",
+          type: "string",
+        }),
+        defineField({
           name: "location",
           title: "Location",
           type: "string",
-          initialValue: "Spain & Maharashtra",
+          initialValue: "India & Spain",
+        }),
+        defineField({
+          name: "spanishLocation",
+          title: "Location (Spanish)",
+          type: "string",
         }),
       ],
     }),
@@ -365,6 +493,58 @@ export const storyType = defineType({
       group: "localization",
     }),
     defineField({
+      name: "spanishLocation",
+      title: "Spanish dateline / location",
+      description: "Example: India y España, or España e India",
+      type: "string",
+      group: "localization",
+    }),
+    defineField({
+      name: "spanishTags",
+      title: "Spanish topics & keywords",
+      type: "array",
+      group: "localization",
+      of: [defineArrayMember({ type: "string" })],
+    }),
+    defineField({
+      name: "spanishPullQuote",
+      title: "Spanish highlighted pull quote (optional)",
+      description: "Spanish pull quote highlighted after the opening section.",
+      type: "object",
+      group: "localization",
+      fields: [
+        defineField({
+          name: "text",
+          title: "Quote text (Spanish)",
+          type: "text",
+          rows: 3,
+        }),
+        defineField({
+          name: "attribution",
+          title: "Attribution (Spanish)",
+          type: "string",
+        }),
+      ],
+    }),
+    defineField({
+      name: "spanishSections",
+      title: "Spanish structured sections",
+      description:
+        "Spanish sections rendered on the website when ES is selected. Write in natural Peninsular Spanish (see LANGUAGE.md).",
+      type: "array",
+      group: "localization",
+      of: [buildSectionMember(true)],
+    }),
+    defineField({
+      name: "spanishTakeaway",
+      title: "Spanish key takeaway (optional)",
+      description:
+        "Closing reflection box in Spanish (1 to 2 sentences). Leave empty if the closing paragraph already lands.",
+      type: "text",
+      rows: 3,
+      group: "localization",
+    }),
+    defineField({
       name: "translationOf",
       title: "Linked translation document (optional)",
       description:
@@ -386,7 +566,7 @@ export const storyType = defineType({
       name: "seo",
       title: "Search engine metadata (SEO)",
       type: "object",
-      group: "distribution",
+      group: ["distribution", "localization"],
       fields: [
         defineField({
           name: "title",
@@ -399,6 +579,17 @@ export const storyType = defineType({
           type: "text",
           rows: 2,
         }),
+        defineField({
+          name: "spanishTitle",
+          title: "SEO title (Spanish)",
+          type: "string",
+        }),
+        defineField({
+          name: "spanishDescription",
+          title: "SEO description (Spanish)",
+          type: "text",
+          rows: 2,
+        }),
       ],
     }),
     defineField({
@@ -408,26 +599,7 @@ export const storyType = defineType({
         "If Story body is filled in above, Story body takes priority. You can also organize content as numbered heading + paragraph sections here.",
       type: "array",
       group: "editorial",
-      of: [
-        defineArrayMember({
-          type: "object",
-          fields: [
-            defineField({
-              name: "heading",
-              title: "Heading",
-              type: "string",
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "paragraphs",
-              title: "Paragraphs",
-              type: "array",
-              of: [defineArrayMember({ type: "text", rows: 4 })],
-              validation: (rule) => rule.min(1),
-            }),
-          ],
-        }),
-      ],
+      of: [buildSectionMember(false)],
     }),
     defineField({
       name: "leadSlot",
@@ -500,7 +672,7 @@ export const storyType = defineType({
       const star = featured ? "★ Cover · " : "";
       return {
         title: title ?? "Untitled Story",
-        subtitle: `${star}[${langTag}] ${category ?? "KarmaRise Journal"}`,
+        subtitle: `${star}[${langTag}] ${category ?? "Inside KarmaRise"}`,
         media,
       };
     },

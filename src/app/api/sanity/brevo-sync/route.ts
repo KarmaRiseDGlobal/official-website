@@ -2,45 +2,56 @@ import { NextResponse } from "next/server";
 
 import { syncNewsletterIssueToBrevo } from "@/lib/brevo-campaigns";
 import { getNewsletterIssueById, patchSanityDocument } from "@/lib/sanity";
+import { readJsonObject, verifyWebhookSecret } from "@/lib/security";
+import { readTrimmedString } from "@/lib/validation";
+
+const VALID_SANITY_ID_PATTERN = /^[a-zA-Z0-9._-]+$/;
 
 export async function POST(request: Request) {
-  const secret =
-    process.env.SANITY_WEBHOOK_SECRET?.trim() ||
-    process.env.SANITY_REVALIDATE_SECRET?.trim();
-
-  if (secret) {
-    const provided =
-      request.headers.get("x-sanity-secret") ||
-      new URL(request.url).searchParams.get("secret");
-    if (provided !== secret) {
-      return NextResponse.json(
-        { ok: false, error: "Unauthorized webhook request." },
-        { status: 401 },
-      );
-    }
-  }
-
-  let payload: Record<string, unknown>;
-  try {
-    payload = (await request.json()) as Record<string, unknown>;
-  } catch {
+  const auth = verifyWebhookSecret(
+    request,
+    ["SANITY_WEBHOOK_SECRET", "SANITY_REVALIDATE_SECRET"],
+    ["x-sanity-secret", "authorization"],
+  );
+  if (!auth.ok) {
     return NextResponse.json(
-      { ok: false, error: "Invalid JSON payload." },
-      { status: 400 },
+      { ok: false, error: auth.error },
+      { status: auth.status },
     );
   }
 
-  const docType = typeof payload._type === "string" ? payload._type : "";
-  const docId = typeof payload._id === "string" ? payload._id : "";
+  const parsed = await readJsonObject(request, 64 * 1024);
+  if (!parsed.ok) {
+    return NextResponse.json(
+      { ok: false, error: parsed.error },
+      { status: parsed.status },
+    );
+  }
+
+  const payload = parsed.data;
+  const docType = readTrimmedString(payload._type, 64);
+  const docId = readTrimmedString(payload._id, 128);
 
   // Safety rule: ordinary Story publications never trigger a newsletter campaign.
-  if (docType !== "newsletterIssue" || !docId || docId.startsWith("drafts.")) {
+  if (
+    docType !== "newsletterIssue" ||
+    !docId ||
+    docId.startsWith("drafts.") ||
+    docId.startsWith("versions.")
+  ) {
     return NextResponse.json({
       ok: true,
       skipped: true,
       reason:
         "Only published newsletterIssue documents are eligible for Brevo sync.",
     });
+  }
+
+  if (!VALID_SANITY_ID_PATTERN.test(docId)) {
+    return NextResponse.json(
+      { ok: false, error: "Invalid Sanity document ID." },
+      { status: 400 },
+    );
   }
 
   const issue = await getNewsletterIssueById(docId);
@@ -70,7 +81,7 @@ export async function POST(request: Request) {
     );
   }
 
-  await patchSanityDocument(docId, {
+  const patched = await patchSanityDocument(docId, {
     status: "synced_to_brevo",
     ...(syncResult.brevoCampaignIdEn
       ? { brevoCampaignIdEn: syncResult.brevoCampaignIdEn }
@@ -80,6 +91,17 @@ export async function POST(request: Request) {
       : {}),
     lastSyncedAt: new Date().toISOString(),
   });
+
+  if (!patched) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "Brevo drafts synced, but failed to update Sanity document status.",
+      },
+      { status: 502 },
+    );
+  }
 
   return NextResponse.json({
     ok: true,

@@ -1,14 +1,16 @@
+import {
+  getLocalizedCategory,
+  stories as fallbackStories,
+  storyCategoryDetails,
+  type StoryCategory,
+} from "@/data/stories";
 import type { SanityNewsletterIssue } from "@/lib/sanity";
+import { escapeHtml, isSafeHttpUrl } from "@/lib/security";
 
 const BREVO_CAMPAIGNS_API_URL = "https://api.brevo.com/v3/emailCampaigns";
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+function appendQueryParams(url: string, params: string): string {
+  return `${url}${url.includes("?") ? "&" : "?"}${params}`;
 }
 
 function parsePositiveInt(raw: string | undefined): number | null {
@@ -17,81 +19,195 @@ function parsePositiveInt(raw: string | undefined): number | null {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
-/** Renders the KarmaRise Journal HTML email template for English or Spanish editions. */
+const DEFAULT_STORY_CATEGORY: StoryCategory = (
+  storyCategoryDetails.find(
+    (item) => item.displayTitle === "Inside KarmaRise",
+  ) ?? storyCategoryDetails[storyCategoryDetails.length - 1]!
+).title;
+
+const LEGACY_STORY_CATEGORY_ALIASES: Record<string, StoryCategory> = {
+  "working across distance": "India Meets Europe",
+  "materials and sampling": "Art & Design",
+  "manufacturing and people": "People & Craftsmanship",
+  "company progress": DEFAULT_STORY_CATEGORY,
+};
+
+const SPANISH_LOCATION_FALLBACKS: Record<string, string> = {
+  "India & Spain": "India y España",
+  "Spain & India": "España e India",
+  "Across India": "Por toda la India",
+  "Spain, Europe & India": "España, Europa e India",
+  "India, Spain & Europe": "India, España y Europa",
+  "Spain & Europe": "España y Europa",
+  India: "India",
+  Spain: "España",
+};
+
+function resolveNewsletterCategoryLabel(
+  rawCategory: string | undefined,
+  language: "en" | "es",
+): string {
+  const trimmed = rawCategory?.trim();
+  if (!trimmed) {
+    return getLocalizedCategory(DEFAULT_STORY_CATEGORY, language).title;
+  }
+
+  const aliased =
+    LEGACY_STORY_CATEGORY_ALIASES[trimmed.toLowerCase()] ?? trimmed;
+  const normalized = aliased.toLowerCase();
+  const matchedDetail = storyCategoryDetails.find(
+    (item) =>
+      item.title.toLowerCase() === normalized ||
+      item.displayTitle.toLowerCase() === normalized ||
+      item.spanishTitle.toLowerCase() === normalized ||
+      item.shortLabel.toLowerCase() === normalized,
+  );
+
+  const categoryKey = matchedDetail?.title ?? DEFAULT_STORY_CATEGORY;
+  return getLocalizedCategory(categoryKey, language).title;
+}
+
+function resolveNewsletterLocationLabel(
+  story: NonNullable<SanityNewsletterIssue["selectedStories"]>[number],
+  language: "en" | "es",
+): string {
+  if (language !== "es") {
+    return story.location || "India & Spain";
+  }
+
+  const explicitSpanish = story.spanishLocation?.trim();
+  if (explicitSpanish) {
+    return explicitSpanish;
+  }
+
+  const localMatch = story.slug
+    ? fallbackStories.find((entry) => entry.slug === story.slug)
+    : undefined;
+  if (localMatch?.spanishLocation) {
+    return localMatch.spanishLocation;
+  }
+
+  const rawLocation = story.location?.trim();
+  if (rawLocation && rawLocation in SPANISH_LOCATION_FALLBACKS) {
+    return SPANISH_LOCATION_FALLBACKS[rawLocation]!;
+  }
+
+  return rawLocation || "India y España";
+}
+
+/** Renders the KarmaRise Stories HTML email template for English or Spanish editions. */
 export function renderNewsletterHtml(
   issue: SanityNewsletterIssue,
   language: "en" | "es",
 ): string {
   const isEs = language === "es";
-  const siteUrl = (
+  const rawSiteUrl = (
     process.env.NEXT_PUBLIC_SITE_URL || "https://karmarisedglobal.com"
-  ).replace(/\/$/, "");
-  const assetBase = siteUrl.includes("localhost")
+  )
+    .trim()
+    .replace(/\/$/, "");
+  const candidateBase = rawSiteUrl.includes("localhost")
     ? "https://karmarisedglobal.com"
-    : siteUrl;
+    : rawSiteUrl;
+  const assetBase = isSafeHttpUrl(candidateBase)
+    ? candidateBase
+    : "https://karmarisedglobal.com";
+  const escapedAssetBase = escapeHtml(assetBase);
 
   const fontSerif =
     "'Lora', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
   const fontSans =
     "'Plus Jakarta Sans', 'Trebuchet MS', 'Gill Sans', Helvetica, sans-serif";
 
-  const issueNumber = escapeHtml(issue.issueNumber || "Issue #001");
-  const heading = escapeHtml(
-    (isEs ? issue.titleEs || issue.titleEn : issue.titleEn) ||
-      (isEs
-        ? "Notas desde nuestra mesa de trabajo"
-        : "Notes from our worktable"),
+  const rawIssueNumber =
+    issue.issueNumber?.trim() || (isEs ? "Edición #001" : "Issue #001");
+  const issueNumber = escapeHtml(
+    isEs
+      ? rawIssueNumber.trim().replace(/^Issue\b/i, "Edición")
+      : rawIssueNumber,
   );
+  const headingText =
+    (isEs ? issue.titleEs || issue.titleEn : issue.titleEn) ||
+    (isEs
+      ? "Historias entre España y la India"
+      : "Stories from Spain and India");
+  const heading = escapeHtml(headingText);
   const preheader = escapeHtml(
     (isEs ? issue.previewTextEs || issue.previewTextEn : issue.previewTextEn) ||
-      heading,
+      headingText,
   );
   const intro = escapeHtml(
     (isEs ? issue.introEs || issue.introEn : issue.introEn) ||
       (isEs
-        ? "Te escribimos con un pie en España y otro en Maharashtra para compartirte las historias en las que hemos estado trabajando estos días."
-        : "Writing to you from Madrid and Maharashtra with the latest Stories from our workshops and cutting tables."),
+        ? "Te escribimos entre España y la India para compartir contigo las últimas historias en las que hemos estado trabajando."
+        : "Writing to you from Spain and India with the latest Stories from our workshops and travels."),
   );
   const closing = escapeHtml(
     (isEs ? issue.closingEs || issue.closingEn : issue.closingEn) ||
       (isEs
-        ? "Dale a responder cuando quieras y cuéntanos qué te ha parecido. Los correos nos llegan directo a nosotros dos."
+        ? "Dale a responder cuando quieras y cuéntanos qué te ha parecido. Los correos nos llegan directamente a nosotros dos."
         : "Hit reply anytime and tell us what caught your eye. Every message lands straight in our inbox."),
   );
   const ctaLabel = escapeHtml(
     (isEs ? issue.ctaTextEs || issue.ctaTextEn : issue.ctaTextEn) ||
       (isEs ? "Ven a leer nuestras historias" : "Read our latest Stories"),
   );
-  const ctaUrl = escapeHtml(issue.ctaUrl || `${assetBase}/stories`);
+  const rawCtaUrl = issue.ctaUrl?.trim() ?? "";
+  const ctaUrl = escapeHtml(
+    isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : `${assetBase}/stories`,
+  );
   const readMoreLabel = isEs ? "Leer esta historia →" : "Read this Story →";
   const signoff = isEs ? "Un abrazo enorme," : "Can't wait to hear from you,";
   const founders = isEs ? "Alma y Shirish" : "Alma & Shirish";
   const footerNote = isEs
     ? "Te escribimos porque te apuntaste para recibir nuestras historias en KarmaRise."
-    : "You are receiving this letter because you signed up for KarmaRise stories.";
+    : "You are receiving this letter because you signed up for KarmaRise Stories.";
   const unsubscribeLabel = isEs
     ? "Darte de baja cuando quieras"
     : "Unsubscribe anytime";
 
-  const logoUrl = `${assetBase}/brand/main-logo-transparent.png`;
-  const heroImageUrl = issue.heroImageUrl
-    ? `${issue.heroImageUrl}?w=1100&q=85&auto=format`
-    : `${assetBase}/images/alma-and-shirish-founders.jpg`;
+  const logoUrl = escapeHtml(`${assetBase}/brand/main-logo-transparent.png`);
+  const rawHeroImageUrl = issue.heroImageUrl?.trim() ?? "";
+  const heroImageUrl = escapeHtml(
+    isSafeHttpUrl(rawHeroImageUrl)
+      ? appendQueryParams(rawHeroImageUrl, "w=1100&q=85&auto=format")
+      : `${assetBase}/images/alma-and-shirish-founders.jpg`,
+  );
 
   const storiesHtml = (issue.selectedStories ?? [])
-    .filter((story) => Boolean(story.slug && story.title))
+    .filter((story) =>
+      Boolean(
+        story.slug && (story.title?.trim() || story.spanishTitle?.trim()),
+      ),
+    )
     .map((story) => {
       const title = escapeHtml(
-        (isEs ? story.spanishTitle || story.title : story.title) || "",
+        (isEs
+          ? story.spanishTitle?.trim() || story.title?.trim()
+          : story.title?.trim() || story.spanishTitle?.trim()) || "",
       );
       const summary = escapeHtml(
-        (isEs ? story.spanishSummary || story.summary : story.summary) || "",
+        (isEs
+          ? story.spanishSummary || story.summary
+          : story.summary || story.spanishSummary) || "",
       );
-      const category = escapeHtml(story.category || "KarmaRise Journal");
-      const location = escapeHtml(story.location || "Spain & Maharashtra");
-      const storyUrl = `${assetBase}/stories/${encodeURIComponent(story.slug || "")}`;
-      const storyImageHtml = story.leadImageUrl
-        ? `<a href="${storyUrl}" style="display:block;margin-bottom:14px;text-decoration:none;"><img src="${escapeHtml(story.leadImageUrl)}?w=960&q=82&auto=format" alt="${title}" width="492" style="display:block;width:100%;max-width:492px;height:auto;border-radius:12px;border:0;" /></a>`
+      const category = escapeHtml(
+        resolveNewsletterCategoryLabel(story.category, language),
+      );
+      const location = escapeHtml(
+        resolveNewsletterLocationLabel(story, language),
+      );
+      const storyUrl = escapeHtml(
+        `${assetBase}/stories/${encodeURIComponent(story.slug || "")}`,
+      );
+      const rawLeadImageUrl = story.leadImageUrl?.trim() ?? "";
+      const safeLeadImageUrl = isSafeHttpUrl(rawLeadImageUrl)
+        ? escapeHtml(
+            appendQueryParams(rawLeadImageUrl, "w=960&q=82&auto=format"),
+          )
+        : "";
+      const storyImageHtml = safeLeadImageUrl
+        ? `<a href="${storyUrl}" style="display:block;margin-bottom:14px;text-decoration:none;"><img src="${safeLeadImageUrl}" alt="${title}" width="492" style="display:block;width:100%;max-width:492px;height:auto;border-radius:12px;border:0;" /></a>`
         : "";
 
       return `
@@ -136,11 +252,11 @@ export function renderNewsletterHtml(
         <table role="presentation" width="580" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:580px;background-color:#F2ECDF;border-radius:24px;overflow:hidden;box-shadow:0 14px 38px rgba(24,45,32,0.08);">
           <tr>
             <td align="center" style="padding:42px 36px 20px;background-color:#F2ECDF;">
-              <a href="${assetBase}" style="text-decoration:none;display:inline-block;">
+              <a href="${escapedAssetBase}" style="text-decoration:none;display:inline-block;">
                 <img src="${logoUrl}" alt="KarmaRise" width="84" style="display:block;width:84px;height:auto;margin:0 auto;border:0;" />
               </a>
               <p style="margin:14px 0 0;font-family:${fontSans};font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#BD7057;font-weight:600;">
-                KarmaRise Journal &middot; ${issueNumber}
+                ${isEs ? "Historias de KarmaRise" : "KarmaRise Stories"} &middot; ${issueNumber}
               </p>
             </td>
           </tr>
@@ -188,7 +304,7 @@ export function renderNewsletterHtml(
                       ${founders}
                     </p>
                     <p style="margin:0;font-family:${fontSans};font-size:12px;letter-spacing:0.6px;color:#833E28;">
-                      Madrid &middot; Ulhasnagar, Maharashtra
+                      ${isEs ? "España &middot; India" : "Spain &middot; India"}
                     </p>
                   </td>
                 </tr>
@@ -228,7 +344,7 @@ async function upsertBrevoEmailCampaignDraft(options: {
   senderName: string;
   senderEmail: string;
   replyTo: string;
-}): Promise<number | null> {
+}): Promise<{ ok: true; id: number } | { ok: false; error: string }> {
   const payload = {
     name: options.name,
     subject: options.subject,
@@ -245,33 +361,64 @@ async function upsertBrevoEmailCampaignDraft(options: {
   };
 
   if (options.existingCampaignId && options.existingCampaignId > 0) {
-    const updateRes = await fetch(
-      `${BREVO_CAMPAIGNS_API_URL}/${options.existingCampaignId}`,
-      {
-        method: "PUT",
-        headers: {
-          "api-key": options.apiKey,
-          "Content-Type": "application/json",
-          Accept: "application/json",
+    let updateRes: Response;
+    try {
+      updateRes = await fetch(
+        `${BREVO_CAMPAIGNS_API_URL}/${options.existingCampaignId}`,
+        {
+          method: "PUT",
+          headers: {
+            "api-key": options.apiKey,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      },
-    );
+      );
+    } catch (error) {
+      console.error("Brevo campaign draft update request failed:", error);
+      return {
+        ok: false,
+        error: "Brevo campaign update request failed.",
+      };
+    }
 
     if (updateRes.ok) {
-      return options.existingCampaignId;
+      return { ok: true, id: options.existingCampaignId };
+    }
+
+    const errorBody = await updateRes.text().catch(() => "");
+    if (updateRes.status !== 404) {
+      console.error(
+        "Brevo campaign draft update failed:",
+        updateRes.status,
+        errorBody,
+      );
+      return {
+        ok: false,
+        error: `Brevo campaign update failed (${updateRes.status}).`,
+      };
     }
   }
 
-  const createRes = await fetch(BREVO_CAMPAIGNS_API_URL, {
-    method: "POST",
-    headers: {
-      "api-key": options.apiKey,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  let createRes: Response;
+  try {
+    createRes = await fetch(BREVO_CAMPAIGNS_API_URL, {
+      method: "POST",
+      headers: {
+        "api-key": options.apiKey,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    console.error("Brevo campaign draft creation request failed:", error);
+    return {
+      ok: false,
+      error: "Brevo campaign creation request failed.",
+    };
+  }
 
   if (!createRes.ok) {
     console.error(
@@ -279,11 +426,32 @@ async function upsertBrevoEmailCampaignDraft(options: {
       createRes.status,
       await createRes.text().catch(() => ""),
     );
-    return null;
+    return {
+      ok: false,
+      error: `Brevo campaign creation failed (${createRes.status}).`,
+    };
   }
 
-  const created = (await createRes.json()) as { id?: number };
-  return typeof created.id === "number" ? created.id : null;
+  try {
+    const created = (await createRes.json()) as { id?: number };
+    if (typeof created.id === "number") {
+      return { ok: true, id: created.id };
+    }
+  } catch (error) {
+    console.error(
+      "Brevo campaign draft creation returned invalid JSON:",
+      error,
+    );
+    return {
+      ok: false,
+      error: "Brevo campaign creation returned invalid JSON.",
+    };
+  }
+
+  return {
+    ok: false,
+    error: "Brevo campaign creation returned no ID.",
+  };
 }
 
 /**
@@ -321,17 +489,16 @@ export async function syncNewsletterIssueToBrevo(
   const audience = issue.targetAudience || "both";
   let brevoCampaignIdEn = issue.brevoCampaignIdEn;
   let brevoCampaignIdEs = issue.brevoCampaignIdEs;
+  const errors: string[] = [];
 
   if (audience === "both" || audience === "en") {
     const htmlEn = renderNewsletterHtml(issue, "en");
-    const idEn = await upsertBrevoEmailCampaignDraft({
+    const enResult = await upsertBrevoEmailCampaignDraft({
       apiKey,
       existingCampaignId: issue.brevoCampaignIdEn,
       name: `[EN] ${issue.internalName || issue.issueNumber || "KarmaRise Newsletter"}`,
       subject:
-        issue.subjectEn ||
-        issue.titleEn ||
-        "The KarmaRise Journal · New Edition",
+        issue.subjectEn || issue.titleEn || "KarmaRise Stories · New Edition",
       previewText: issue.previewTextEn,
       htmlContent: htmlEn,
       listIds: [enListId!],
@@ -339,22 +506,25 @@ export async function syncNewsletterIssueToBrevo(
       senderEmail,
       replyTo,
     });
-    if (idEn) {
-      brevoCampaignIdEn = idEn;
+    if (enResult.ok) {
+      brevoCampaignIdEn = enResult.id;
+    } else {
+      brevoCampaignIdEn = undefined;
+      errors.push(`EN: ${enResult.error}`);
     }
   }
 
   if (audience === "both" || audience === "es") {
     const htmlEs = renderNewsletterHtml(issue, "es");
-    const idEs = await upsertBrevoEmailCampaignDraft({
+    const esResult = await upsertBrevoEmailCampaignDraft({
       apiKey,
       existingCampaignId: issue.brevoCampaignIdEs,
-      name: `[ES] ${issue.internalName || issue.issueNumber || "Diario KarmaRise"}`,
+      name: `[ES] ${issue.internalName || issue.issueNumber || "Historias de KarmaRise"}`,
       subject:
         issue.subjectEs ||
         issue.titleEs ||
         issue.subjectEn ||
-        "El Diario KarmaRise · Nueva Edición",
+        "Historias de KarmaRise · Nueva edición",
       previewText: issue.previewTextEs || issue.previewTextEn,
       htmlContent: htmlEs,
       listIds: [esListId!],
@@ -362,9 +532,21 @@ export async function syncNewsletterIssueToBrevo(
       senderEmail,
       replyTo,
     });
-    if (idEs) {
-      brevoCampaignIdEs = idEs;
+    if (esResult.ok) {
+      brevoCampaignIdEs = esResult.id;
+    } else {
+      brevoCampaignIdEs = undefined;
+      errors.push(`ES: ${esResult.error}`);
     }
+  }
+
+  if (errors.length > 0) {
+    return {
+      ok: false,
+      brevoCampaignIdEn,
+      brevoCampaignIdEs,
+      error: errors.join(" "),
+    };
   }
 
   return {

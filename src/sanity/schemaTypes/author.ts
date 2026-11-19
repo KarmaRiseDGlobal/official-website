@@ -39,6 +39,11 @@ export const authorType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "spanishLocation",
+      title: "Base location (Spanish)",
+      type: "string",
+    }),
+    defineField({
       name: "bio",
       title: "Short bio",
       type: "text",

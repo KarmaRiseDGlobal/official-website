@@ -143,7 +143,7 @@ export const newsletterIssueType = defineType({
       title: "Primary button label (English)",
       type: "string",
       group: "english",
-      initialValue: "Explore the KarmaRise Journal",
+      initialValue: "Explore KarmaRise Stories",
     }),
     defineField({
       name: "titleEs",
@@ -182,7 +182,7 @@ export const newsletterIssueType = defineType({
       title: "Primary button label (Spanish)",
       type: "string",
       group: "spanish",
-      initialValue: "Explorar el Diario KarmaRise",
+      initialValue: "Explorar las historias de KarmaRise",
     }),
     defineField({
       name: "ctaUrl",
