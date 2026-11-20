@@ -207,6 +207,7 @@ export function ChatWidget() {
   const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
   const [statusError, setStatusError] = useState("");
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -243,8 +244,22 @@ export function ChatWidget() {
       }
     };
 
+    const onPointerDownOutside = (event: PointerEvent) => {
+      if (
+        containerRef.current &&
+        event.target instanceof Node &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDownOutside);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDownOutside);
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -548,7 +563,10 @@ export function ChatWidget() {
     !sessionVerified;
 
   return (
-    <div className="fixed right-4 bottom-4 z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-6">
+    <div
+      ref={containerRef}
+      className="fixed right-4 bottom-4 z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-6"
+    >
       {!isOpen ? (
         <button
           ref={launcherRef}
@@ -577,14 +595,14 @@ export function ChatWidget() {
           }
           className="flex max-h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
         >
-          <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)] bg-[var(--color-paper-2)]/85 px-4 py-3.5 text-[var(--color-ink)]">
+          <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)]/70 px-5 py-3.5">
             <div className="flex min-w-0 items-center gap-2.5">
               <Image
                 src="/brand/main-logo-transparent.png"
                 alt=""
                 width={701}
                 height={815}
-                className="h-8 w-7 shrink-0 object-contain"
+                className="h-7 w-6 shrink-0 object-contain"
               />
               <div className="grid min-w-0 gap-0.5">
                 <p className="font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-tight font-normal text-[var(--color-ink)]">
@@ -597,12 +615,12 @@ export function ChatWidget() {
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-2">
               {messages.length > 0 ? (
                 <button
                   type="button"
                   onClick={clearConversation}
-                  className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] px-2.5 py-1 text-[length:var(--text-xs)] font-medium text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]"
+                  className="cursor-pointer px-1.5 py-1 text-[length:var(--text-xs)] font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
                 >
                   {isEs ? "Limpiar" : "Clear"}
                 </button>
@@ -612,7 +630,7 @@ export function ChatWidget() {
                 type="button"
                 onClick={closeDrawer}
                 aria-label={isEs ? "Cerrar chat" : "Close chat"}
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule-2)] bg-[var(--color-paper)] text-[var(--color-ink)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/60"
               >
                 <span aria-hidden="true" className="text-base leading-none">
                   ×
@@ -624,13 +642,13 @@ export function ChatWidget() {
           <div
             ref={scrollRef}
             data-lenis-prevent
-            className="grid flex-1 content-start gap-2.5 overflow-y-auto overscroll-contain px-4 py-3.5"
+            className="grid flex-1 content-start gap-3 overflow-y-auto overscroll-contain px-5 py-4"
           >
-            <div className="rounded-2xl border border-[var(--color-rule)] bg-[var(--color-white)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-snug text-[var(--color-ink)]">
+            <p className="text-[length:var(--text-sm)] leading-relaxed text-[var(--color-ink-2)]">
               {isEs
                 ? "Hola. Elige una pregunta para ver cómo trabajamos desde el Product Brief hasta el pedido en serie, o abre el teclado si quieres preguntarnos algo concreto."
                 : "Hello. Pick a question below to see how we work from Product Brief to Bulk Order, or open the text box if you want to ask something specific."}
-            </div>
+            </p>
 
             {messages.map((item) => (
               <div
@@ -638,7 +656,7 @@ export function ChatWidget() {
                 className={
                   item.role === "user"
                     ? "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-[var(--color-wood)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
-                    : "mr-auto max-w-[90%] rounded-2xl rounded-bl-sm border border-[var(--color-rule)] bg-[var(--color-white)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)]"
+                    : "mr-auto max-w-[92%] rounded-2xl rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)]"
                 }
               >
                 {item.role === "assistant"
@@ -652,22 +670,22 @@ export function ChatWidget() {
             {isSending ? (
               <div
                 role="status"
-                className="mr-auto rounded-2xl rounded-bl-sm border border-[var(--color-rule)] bg-[var(--color-white)] px-3.5 py-2 text-[length:var(--text-xs)] text-[var(--color-muted)]"
+                className="mr-auto rounded-2xl rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2 text-[length:var(--text-xs)] text-[var(--color-muted)]"
               >
                 {isEs ? "Escribiendo respuesta..." : "Writing reply..."}
               </div>
             ) : null}
 
             {!isSending ? (
-              <div className="grid gap-1.5 rounded-2xl border border-[var(--color-rule)]/90 bg-[var(--color-paper-2)]/55 p-2.5">
-                <p className="text-[length:var(--text-xs)] font-semibold tracking-wide text-[var(--color-muted)]">
+              <div className="grid gap-2 pt-1">
+                <p className="text-[length:var(--text-xs)] font-medium text-[var(--color-muted)]">
                   {messages.length === 0
                     ? isEs
-                      ? "Preguntas rápidas"
-                      : "Suggested questions"
+                      ? "Preguntas frecuentes"
+                      : "Common questions"
                     : isEs
-                      ? "Haz otra pregunta"
-                      : "Ask another question"}
+                      ? "Siguiente pregunta"
+                      : "Next question"}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {presetQuestions.map((prompt) => (
@@ -678,7 +696,7 @@ export function ChatWidget() {
                       onClick={() => {
                         void sendMessage(prompt);
                       }}
-                      className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] px-3 py-1 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-paper-2)] disabled:opacity-50"
+                      className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule)] bg-[var(--color-white)]/80 px-3 py-1.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] disabled:opacity-50"
                     >
                       {prompt}
                     </button>
@@ -687,7 +705,7 @@ export function ChatWidget() {
                     <button
                       type="button"
                       onClick={enableCustomInput}
-                      className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-clay-ink)]/60 bg-[var(--color-paper)] px-3 py-1 text-left text-[length:var(--text-xs)] leading-snug font-semibold text-[var(--color-clay-ink)] transition-colors hover:border-[var(--color-clay-ink)] hover:bg-[var(--color-white)]"
+                      className="cursor-pointer rounded-[var(--radius-pill)] border border-dashed border-[var(--color-rule-2)] bg-transparent px-3 py-1.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/60 hover:text-[var(--color-ink)]"
                     >
                       {isEs
                         ? "Escribir mi propia pregunta"
@@ -699,7 +717,7 @@ export function ChatWidget() {
             ) : null}
 
             {showFallbackActions ? (
-              <div className="flex flex-wrap gap-2 rounded-2xl border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-3">
+              <div className="flex flex-wrap gap-2 pt-1">
                 <Link
                   href={localizeHref("/product-brief")}
                   onClick={() => setIsOpen(false)}
@@ -710,7 +728,7 @@ export function ChatWidget() {
                 <Link
                   href={localizeHref("/contact")}
                   onClick={() => setIsOpen(false)}
-                  className="rounded-[var(--radius-pill)] border border-[var(--color-wood)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-wood)] no-underline"
+                  className="rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)]/80 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-ink)] no-underline"
                 >
                   {isEs ? "Contacto" : "Contact"}
                 </Link>
@@ -718,7 +736,7 @@ export function ChatWidget() {
                   href={WHATSAPP_HREF}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-[var(--radius-pill)] border border-[var(--color-clay-ink)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-clay-ink)] no-underline"
+                  className="rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)]/80 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-ink)] no-underline"
                 >
                   WhatsApp
                 </a>
@@ -728,7 +746,7 @@ export function ChatWidget() {
 
           <form
             onSubmit={handleFormSubmit}
-            className="grid gap-2.5 border-t border-[var(--color-rule)] bg-[var(--color-paper-2)]/70 px-4 py-3"
+            className="grid gap-2.5 border-t border-[var(--color-rule)]/70 px-5 py-3"
           >
             <input
               type="text"
