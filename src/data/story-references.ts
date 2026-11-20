@@ -10,7 +10,8 @@ export type StoryReferenceKind =
   | "textile"
   | "script"
   | "tradition"
-  | "food";
+  | "food"
+  | "legal";
 
 export type StoryReferenceVisual =
   | {
@@ -48,6 +49,7 @@ export const REFERENCE_KIND_LABELS: Readonly<
   script: { en: "Language & script", es: "Lengua y escritura" },
   tradition: { en: "Living tradition", es: "Tradición viva" },
   food: { en: "Home cooking", es: "Cocina casera" },
+  legal: { en: "Legal & governance", es: "Marco legal" },
 };
 
 export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
@@ -1337,6 +1339,86 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
         en: "Traditional leatherworking bench tools including a half-moon cutting knife, awl, brass buckle, waxed linen thread, shears, and wooden mallet",
         es: "Herramientas tradicionales de marroquinería sobre banco de madera: cuchilla de media luna, lezna, hebilla de latón, hilo encerado, tijeras y mazo",
       },
+    },
+  },
+  {
+    id: "goxo-goxo",
+    category: "script",
+    title: {
+      en: "Goxo-goxo (Basque)",
+      es: "Goxo-goxo (euskera)",
+    },
+    description: {
+      en: "Basque expression from 'goxo' (warm, pleasant, cozy), used for something soft, gentle, and comfortable to touch and live with.",
+      es: "Expresión vasca derivada de 'goxo' (agradable, cálido, acogedor), usada para describir algo muy suave, gustoso al tacto y cómodo de llevar.",
+    },
+    terms: {
+      en: ["goxo-goxo"],
+      es: ["goxo-goxo"],
+    },
+  },
+  {
+    id: "vegetable-tanning",
+    category: "craft",
+    title: {
+      en: "Vegetable tanning",
+      es: "Curtición vegetal",
+    },
+    description: {
+      en: "Leather tanning method using natural plant tannins from tree bark, leaves, and pods rather than heavy chrome salts, valued for warm hand-feel and natural ageing.",
+      es: "Método de curtido con taninos naturales extraídos de cortezas, hojas y vainas vegetales en lugar de sales pesadas de cromo, apreciado por su tacto cálido y su envejecimiento natural.",
+    },
+    terms: {
+      en: ["vegetable tanning"],
+      es: ["curtición vegetal"],
+    },
+  },
+  {
+    id: "pre-production-sample",
+    category: "craft",
+    title: {
+      en: "Pre-production sample",
+      es: "Muestra de preproducción",
+    },
+    description: {
+      en: "Trial piece sewn on the actual factory line using the exact bulk hides, fabrics, linings, and metal hardware before full cutting begins, distinct from an early design prototype made with substitute stock.",
+      es: "Pieza de prueba cosida en la línea real del taller con las mismas pieles, telas, forros y herrajes del lote definitivo antes de cortar el pedido, a diferencia de un primer prototipo hecho con materiales aproximados.",
+    },
+    terms: {
+      en: ["pre-production sample"],
+      es: ["muestra de preproducción"],
+    },
+  },
+  {
+    id: "maratha-code",
+    category: "tradition",
+    title: {
+      en: "Maratha code",
+      es: "Espíritu maratha",
+    },
+    description: {
+      en: "Historical warrior and ruling tradition of Maharashtra known for stubborn determination and standing by one's word under pressure.",
+      es: "Tradición histórica de Maharashtra asociada a la determinación firme y a cumplir la palabra dada incluso bajo presión.",
+    },
+    terms: {
+      en: ["Maratha stories"],
+      es: ["historias marathas"],
+    },
+  },
+  {
+    id: "section-8-company",
+    category: "legal",
+    title: {
+      en: "Section 8 foundation (India)",
+      es: "Fundación Section 8 (India)",
+    },
+    description: {
+      en: "A non-profit company registered under Section 8 of India's Companies Act, 2013 for educational or social objectives, legally required to reinvest all surplus into its mission rather than pay dividends.",
+      es: "Entidad sin ánimo de lucro registrada bajo la sección 8 de la Ley de Sociedades de la India de 2013 para fines educativos o sociales, obligada por ley a reinvertir todo excedente en su misión sin repartir dividendos.",
+    },
+    terms: {
+      en: ["Section 8"],
+      es: ["Section 8"],
     },
   },
 ];

@@ -299,9 +299,14 @@ export function HorizontalShowcase() {
   const triggerRef = useRef<ScrollTrigger | null>(null);
   const mobileSwipeRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Used for mobile fallback (< 48rem) and initial aria state
+  // Used for touch / non-enhanced fallback (< 80rem or coarse pointer) and initial aria state
   const [activeSlice, setActiveSlice] = useState(0);
   const [activeStage, setActiveStage] = useState(0);
+  const activeSliceRef = useRef(0);
+
+  useEffect(() => {
+    activeSliceRef.current = activeSlice;
+  }, [activeSlice]);
 
   const principlesCount = workingPrinciples.length;
 
@@ -338,7 +343,8 @@ export function HorizontalShowcase() {
 
     media.add(
       {
-        enhancedViewport: "(min-width: 48rem)",
+        enhancedViewport:
+          "(min-width: 80rem) and (hover: hover) and (pointer: fine)",
         reducedMotion: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
@@ -895,6 +901,7 @@ export function HorizontalShowcase() {
           sliceScrims.forEach((c) => c?.removeAttribute("style"));
           sliceBridges.forEach((b) => b.removeAttribute("style"));
           stageCards.forEach((s) => s.removeAttribute("style"));
+          updatePaginationDOM(activeSliceRef.current, 1);
           pin.style.removeProperty("background-color");
           glow.style.removeProperty("opacity");
           delete root.dataset.enhanced;
@@ -917,12 +924,10 @@ export function HorizontalShowcase() {
   }
 
   function selectSliceIndex(targetIndex: number) {
-    const clamped = Math.max(
-      0,
-      Math.min(workingPrinciples.length - 1, targetIndex),
-    );
-    setActiveSlice(clamped);
-    scrollToStopIndex(clamped);
+    const wrapped =
+      ((targetIndex % principlesCount) + principlesCount) % principlesCount;
+    setActiveSlice(wrapped);
+    scrollToStopIndex(wrapped);
   }
 
   function selectStage(index: number) {
@@ -953,6 +958,10 @@ export function HorizontalShowcase() {
         selectSliceIndex(activeSlice - 1);
       }
     }
+  }
+
+  function handleMobileSliceTouchCancel() {
+    mobileSwipeRef.current = null;
   }
 
   return (
@@ -989,7 +998,12 @@ export function HorizontalShowcase() {
                 </p>
               </div>
 
-              <div className="concerns-carousel-stage container">
+              <div
+                className="concerns-carousel-stage container"
+                onTouchStart={handleMobileSliceTouchStart}
+                onTouchEnd={handleMobileSliceTouchEnd}
+                onTouchCancel={handleMobileSliceTouchCancel}
+              >
                 <div
                   ref={sliceTrackRef}
                   className="concerns-slice-track"
@@ -999,8 +1013,6 @@ export function HorizontalShowcase() {
                       ? "Pasos de coordinación entre Europa y la India"
                       : "Coordination steps between Europe and India"
                   }
-                  onTouchStart={handleMobileSliceTouchStart}
-                  onTouchEnd={handleMobileSliceTouchEnd}
                 >
                   {PERSISTENT_SLOTS.map((slotOffset, slotIdx) => {
                     const itemIndex =
@@ -1044,18 +1056,7 @@ export function HorizontalShowcase() {
                           data-active={isCurrentMobile}
                           data-tier={initialTier}
                           onClick={() => {
-                            const target = Math.max(
-                              0,
-                              Math.min(
-                                principlesCount - 1,
-                                slotOffset < 0
-                                  ? 0
-                                  : slotOffset >= principlesCount
-                                    ? principlesCount - 1
-                                    : slotOffset,
-                              ),
-                            );
-                            selectSliceIndex(target);
+                            selectSliceIndex(itemIndex);
                           }}
                         >
                           <div
@@ -1104,37 +1105,83 @@ export function HorizontalShowcase() {
                   })}
                 </div>
 
-                <div
-                  ref={paginationRef}
-                  className="concerns-pagination"
-                  role="tablist"
-                  aria-label={
-                    isEs ? "Seleccionar paso" : "Select coordination principle"
-                  }
-                >
-                  {workingPrinciples.map((principle, index) => {
-                    const isActive = index === activeSlice;
-                    return (
-                      <button
-                        key={principle.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={isActive}
-                        aria-label={principle.title[language]}
-                        className="concerns-pagination-dot"
-                        data-active={isActive}
-                        onClick={() => selectSliceIndex(index)}
-                      >
-                        <span
-                          className="concerns-pagination-fill"
-                          style={{
-                            opacity: isActive ? 1 : 0,
-                            transform: `scaleX(${isActive ? 1 : 0})`,
-                          }}
-                        />
-                      </button>
-                    );
-                  })}
+                <div className="concerns-controls">
+                  <button
+                    type="button"
+                    className="concerns-nav-btn"
+                    aria-label={isEs ? "Anterior" : "Previous"}
+                    onClick={() => selectSliceIndex(activeSlice - 1)}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                  </button>
+
+                  <div
+                    ref={paginationRef}
+                    className="concerns-pagination"
+                    role="tablist"
+                    aria-label={
+                      isEs
+                        ? "Seleccionar paso"
+                        : "Select coordination principle"
+                    }
+                  >
+                    {workingPrinciples.map((principle, index) => {
+                      const isActive = index === activeSlice;
+                      return (
+                        <button
+                          key={principle.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={isActive}
+                          aria-label={principle.title[language]}
+                          className="concerns-pagination-dot"
+                          data-active={isActive}
+                          onClick={() => selectSliceIndex(index)}
+                        >
+                          <span
+                            className="concerns-pagination-fill"
+                            style={{
+                              opacity: isActive ? 1 : 0,
+                              transform: `scaleX(${isActive ? 1 : 0})`,
+                            }}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="concerns-nav-btn"
+                    aria-label={isEs ? "Siguiente" : "Next"}
+                    onClick={() => selectSliceIndex(activeSlice + 1)}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>

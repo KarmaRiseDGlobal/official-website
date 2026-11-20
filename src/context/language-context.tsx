@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { markLanguageSwitchSkip, requestPageTransition } from "@/lib/loader";
 import { localizePath, stripLocalePrefix, type SiteLanguage } from "@/lib/seo";
 
 export type { SiteLanguage };
@@ -121,7 +122,14 @@ export function LanguageProvider({
         const targetPath = localizePath(stripLocalePrefix(currentPath), next);
         if (targetPath !== currentPath) {
           const targetUrl = `${targetPath}${window.location.search}${window.location.hash}`;
-          router.push(targetUrl);
+          const handled = requestPageTransition({
+            href: targetUrl,
+            isLanguageSwitch: true,
+          });
+          if (!handled) {
+            markLanguageSwitchSkip();
+            router.push(targetUrl);
+          }
         }
       }
     },

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 
@@ -364,6 +365,8 @@ export function PrivacyPolicyPageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="paper" to="night" />
       </main>
 
       <SiteFooter />

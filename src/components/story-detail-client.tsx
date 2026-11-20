@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
-import { NewsletterForm } from "@/components/newsletter-form";
 import { StoryMedia } from "@/components/story-media";
 import {
   segmentParagraphWithReferences,
@@ -16,10 +15,12 @@ import {
   getLocalizedStory,
   type StoryBodyBlock,
   type StoryEntry,
+  type StoryImage,
   type StoryLanguage,
   type StoryMarkDef,
   type StoryTextSpan,
 } from "@/data/stories";
+import { siteUrl } from "@/lib/seo";
 
 interface StoryDetailClientProps {
   story: StoryEntry;
@@ -102,6 +103,66 @@ function toSectionId(heading: string, index: number): string {
   return slugified || `section-${index + 1}`;
 }
 
+function getImageDimensionsFromUrl(
+  url?: string,
+): { width: number; height: number } | null {
+  if (!url) return null;
+  const match = url.match(/-(\d+)x(\d+)\.[a-z0-9]+(?:\?.*)?$/i);
+  if (!match) return null;
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  if (
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width <= 0 ||
+    height <= 0
+  ) {
+    return null;
+  }
+  return { width, height };
+}
+
+function resolveAspectRatio(
+  url?: string,
+  declared?: StoryImage["aspectRatio"],
+  fallback: StoryImage["aspectRatio"] = "4:5",
+): StoryImage["aspectRatio"] {
+  const dims = getImageDimensionsFromUrl(url);
+  if (dims) {
+    const ratio = dims.width / dims.height;
+    if (ratio >= 1.55) return "16:9";
+    if (ratio >= 1.15) return "4:3";
+    if (ratio <= 0.88) return "4:5";
+  }
+  return declared ?? fallback;
+}
+
+function getAspectConfig(aspectRatio?: StoryImage["aspectRatio"]): {
+  aspectClass: string;
+  ratioLabel: string;
+  singleMaxWidthClass: string;
+} {
+  if (aspectRatio === "16:9") {
+    return {
+      aspectClass: "aspect-[16/9]",
+      ratioLabel: "16:9 wide",
+      singleMaxWidthClass: "w-full",
+    };
+  }
+  if (aspectRatio === "4:3") {
+    return {
+      aspectClass: "aspect-[4/3]",
+      ratioLabel: "4:3 horizontal",
+      singleMaxWidthClass: "mx-auto w-full max-w-[44rem] lg:mx-0",
+    };
+  }
+  return {
+    aspectClass: "aspect-[4/5]",
+    ratioLabel: "4:5 portrait",
+    singleMaxWidthClass: "mx-auto w-full max-w-[28rem] lg:mx-0",
+  };
+}
+
 function renderSpanWithMarks(
   span: StoryTextSpan,
   markDefs: StoryMarkDef[] | undefined,
@@ -162,18 +223,104 @@ function renderSpanWithMarks(
   return <span key={span._key}>{content}</span>;
 }
 
-function renderPortableBody(
+interface PortableChapter {
+  id: string;
+  heading?: string;
+  headingNodes?: ReactNode;
+  blocks: StoryBodyBlock[];
+}
+
+function groupPortableBlocksIntoChapters(
   blocks: StoryBodyBlock[],
   lang: StoryLanguage,
+): PortableChapter[] {
+  const chapters: PortableChapter[] = [];
+  let current: PortableChapter = { id: "opening", blocks: [] };
+  let h2Counter = 0;
+
+  for (const block of blocks) {
+    if (block._type === "block" && block.style === "h2") {
+      if (current.heading || current.blocks.length > 0) {
+        chapters.push(current);
+      }
+      const plainText = block.children.map((c) => c.text).join("");
+      const idx = h2Counter;
+      h2Counter += 1;
+      current = {
+        id: toSectionId(plainText, idx),
+        heading: plainText,
+        headingNodes: block.children.map((span) =>
+          renderSpanWithMarks(span, block.markDefs, lang, undefined),
+        ),
+        blocks: [],
+      };
+    } else {
+      current.blocks.push(block);
+    }
+  }
+
+  if (current.heading || current.blocks.length > 0) {
+    chapters.push(current);
+  }
+
+  return chapters;
+}
+
+interface PortableChapterRow {
+  kind: "prose";
+  key: string;
+  blocks: Exclude<StoryBodyBlock, { _type: "image" }>[];
+}
+
+interface PortableImageRow {
+  kind: "image";
+  key: string;
+  block: Extract<StoryBodyBlock, { _type: "image" }>;
+}
+
+type PortableRenderRow = PortableChapterRow | PortableImageRow;
+
+function splitChapterIntoRows(blocks: StoryBodyBlock[]): PortableRenderRow[] {
+  const rows: PortableRenderRow[] = [];
+  let proseBuffer: Exclude<StoryBodyBlock, { _type: "image" }>[] = [];
+
+  const flushProse = () => {
+    if (proseBuffer.length === 0) return;
+    rows.push({
+      kind: "prose",
+      key: `prose-${proseBuffer[0]!._key}`,
+      blocks: proseBuffer,
+    });
+    proseBuffer = [];
+  };
+
+  for (const block of blocks) {
+    if (block._type === "image") {
+      flushProse();
+      rows.push({
+        kind: "image",
+        key: block._key,
+        block,
+      });
+    } else {
+      proseBuffer.push(block);
+    }
+  }
+  flushProse();
+
+  return rows;
+}
+
+function renderPortableProseBlocks(
+  blocks: Exclude<StoryBodyBlock, { _type: "image" }>[],
+  lang: StoryLanguage,
+  seenReferenceIds: Set<string>,
+  firstParagraphState: { rendered: boolean },
 ): ReactNode[] {
   const elements: ReactNode[] = [];
-  const seenReferenceIds = new Set<string>();
-  let h2Counter = 0;
-  let normalParagraphCounter = 0;
 
   for (const block of blocks) {
     if (block._type === "block") {
-      const plainText = block.children.map((c) => c.text).join("");
       const isAnnotatable =
         block.style !== "h2" &&
         block.style !== "h3" &&
@@ -187,23 +334,11 @@ function renderPortableBody(
         ),
       );
 
-      if (block.style === "h2") {
-        const currentIndex = h2Counter;
-        h2Counter += 1;
-        elements.push(
-          <h2
-            key={block._key}
-            id={toSectionId(plainText, currentIndex)}
-            className="max-w-[64ch] scroll-mt-32 pt-4 text-[length:var(--text-2xl)] font-medium text-[var(--color-forest-deep)]"
-          >
-            {renderedChildren}
-          </h2>,
-        );
-      } else if (block.style === "h3") {
+      if (block.style === "h3") {
         elements.push(
           <h3
             key={block._key}
-            className="max-w-[64ch] pt-2 text-[length:var(--text-xl)] font-medium text-[var(--color-forest-deep)]"
+            className="max-w-[60ch] pt-3 font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.2] font-normal text-[var(--color-forest-deep)]"
           >
             {renderedChildren}
           </h3>,
@@ -212,9 +347,9 @@ function renderPortableBody(
         elements.push(
           <blockquote
             key={block._key}
-            className="m-0 my-2 grid max-w-[60ch] gap-3 border-l-4 border-[var(--color-clay)] bg-[var(--color-paper-2)]/55 py-6 pr-6 pl-6 sm:pl-8"
+            className="m-0 my-4 grid max-w-[56ch] gap-3 border-l-2 border-[var(--color-clay)] py-2 pl-6 sm:pl-8"
           >
-            <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.2vw,1.95rem)] leading-[1.24] text-[var(--color-forest-deep)]">
+            <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.1vw,1.9rem)] leading-[1.28] text-[var(--color-forest-deep)]">
               &ldquo;{renderedChildren}&rdquo;
             </p>
           </blockquote>,
@@ -223,7 +358,7 @@ function renderPortableBody(
         elements.push(
           <div
             key={block._key}
-            className="flex max-w-[64ch] items-baseline gap-3 pl-2 text-[length:var(--text-md)] leading-[1.75] text-[var(--color-ink)]"
+            className="flex max-w-[60ch] items-baseline gap-3 pl-1 text-[1.0625rem] leading-[1.82] text-[var(--color-ink)]"
           >
             <span
               aria-hidden="true"
@@ -235,14 +370,14 @@ function renderPortableBody(
           </div>,
         );
       } else {
-        const isFirstParagraph = normalParagraphCounter === 0;
-        normalParagraphCounter += 1;
+        const isFirst = !firstParagraphState.rendered;
+        firstParagraphState.rendered = true;
         elements.push(
           <p
             key={block._key}
-            className={`max-w-[64ch] text-[length:var(--text-md)] leading-[1.78] text-[var(--color-ink)] ${
-              isFirstParagraph
-                ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[3.35rem] first-letter:leading-[0.88] first-letter:text-[var(--color-forest-deep)]"
+            className={`max-w-[60ch] text-[1.0625rem] leading-[1.82] text-[var(--color-ink)] ${
+              isFirst
+                ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[3.4rem] first-letter:leading-[0.94] first-letter:text-[var(--color-forest-deep)]"
                 : ""
             }`}
           >
@@ -254,44 +389,17 @@ function renderPortableBody(
       elements.push(
         <blockquote
           key={block._key}
-          className="m-0 my-2 grid max-w-[60ch] gap-3 border-l-4 border-[var(--color-clay)] bg-[var(--color-paper-2)]/55 py-6 pr-6 pl-6 sm:pl-8"
+          className="m-0 my-4 grid max-w-[56ch] gap-3 border-l-2 border-[var(--color-clay)] py-2 pl-6 sm:pl-8"
         >
-          <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.2vw,1.95rem)] leading-[1.24] text-[var(--color-forest-deep)]">
+          <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.1vw,1.9rem)] leading-[1.28] text-[var(--color-forest-deep)]">
             &ldquo;{block.text}&rdquo;
           </p>
           {block.attribution ? (
-            <cite className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-ink)] uppercase not-italic">
+            <cite className="text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-clay-ink)] uppercase not-italic">
               {block.attribution}
             </cite>
           ) : null}
         </blockquote>,
-      );
-    } else if (block._type === "image") {
-      const aspectClass =
-        block.aspectRatio === "4:5"
-          ? "aspect-[4/5] max-w-[32rem]"
-          : block.aspectRatio === "4:3"
-            ? "aspect-[4/3]"
-            : "aspect-[16/9]";
-
-      elements.push(
-        <div key={block._key} className="my-2">
-          <StoryMedia
-            image={{
-              url: block.url,
-              alt: block.alt,
-              caption: block.caption,
-              objectPosition: block.objectPosition,
-            }}
-            kind="Photo"
-            ratio={block.aspectRatio || "16:9"}
-            aspectClass={aspectClass}
-            title={block.alt}
-            description={block.caption || block.alt}
-            sizes="(max-width: 64rem) 100vw, 760px"
-            showCaption
-          />
-        </div>,
       );
     }
   }
@@ -305,6 +413,7 @@ export function StoryDetailClient({
 }: StoryDetailClientProps) {
   const { language, localizeHref } = useLanguage();
   const isEs = language === "es";
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const localized = getLocalizedStory(story, language);
   const currentIndex = allStories.findIndex(
@@ -318,9 +427,13 @@ export function StoryDetailClient({
     ? getLocalizedStory(nextStory, language)
     : undefined;
 
-  const relatedStories = allStories
-    .filter((entry) => entry.slug !== story.slug)
-    .slice(0, 3);
+  // Put the immediate next Story first in the "Up Next" strip, then fill up to 3 unique Stories.
+  const orderedRelatedStories = [
+    ...(nextStory ? [nextStory] : []),
+    ...allStories.filter(
+      (entry) => entry.slug !== story.slug && entry.slug !== nextStory?.slug,
+    ),
+  ].slice(0, 3);
 
   const usePortableBody =
     Boolean(story.body && story.body.length > 0) &&
@@ -328,15 +441,13 @@ export function StoryDetailClient({
       (story.language === "es" &&
         (!story.spanishSections || story.spanishSections.length === 0)));
 
-  const tocHeadings = usePortableBody
-    ? (story.body ?? [])
-        .filter(
-          (b): b is Extract<StoryBodyBlock, { _type: "block" }> =>
-            b._type === "block" && b.style === "h2",
-        )
-        .map((b) => b.children.map((c) => c.text).join(""))
-        .filter(Boolean)
-    : localized.sections.map((s) => s.heading);
+  const portableChapters =
+    usePortableBody && story.body
+      ? groupPortableBlocksIntoChapters(story.body, language)
+      : [];
+
+  const portableSeenRefs = new Set<string>();
+  const portableFirstParagraphState = { rendered: false };
 
   const seenSectionReferenceIds = new Set<string>();
   const segmentedSections = localized.sections.map((section) => ({
@@ -351,12 +462,44 @@ export function StoryDetailClient({
     })),
   }));
 
+  const shareUrl = `${siteUrl}${localizeHref(`/stories/${story.slug}`)}`;
+  const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(`${localized.title} ${shareUrl}`)}`;
+  const linkedinShareHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+  const xShareHref = `https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(localized.title)}`;
+  const emailShareHref = `mailto:?subject=${encodeURIComponent(localized.title)}&body=${encodeURIComponent(`${localized.summary}\n\n${shareUrl}`)}`;
+
+  const handleCopyLink = async () => {
+    if (typeof window === "undefined") return;
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      window.setTimeout(() => setCopiedLink(false), 2400);
+    } catch {
+      setCopiedLink(false);
+    }
+  };
+
+  const authorPortraitUrl = (() => {
+    const rawUrl = story.author.portraitUrl;
+    if (!rawUrl) return undefined;
+    if (/alma.*shirish/i.test(story.author.name)) {
+      const dims = getImageDimensionsFromUrl(rawUrl);
+      if (
+        rawUrl.includes("alma-and-shirish-founders") ||
+        (dims && dims.width / dims.height > 1.35)
+      ) {
+        return "/images/alma-and-shirish-avatar.jpg";
+      }
+    }
+    return rawUrl;
+  })();
+
   return (
     <>
-      <article className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-2xl))] pb-[var(--section-gap)] text-[var(--color-forest-deep)]">
-        <div className="container grid gap-[var(--space-2xl)]">
-          {/* Top Breadcrumb Bar (no numbers) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--color-rule)] pb-5 text-[length:var(--text-xs)] font-semibold tracking-[0.05em] uppercase">
+      <article className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-2xl))] pb-[var(--section-gap)] text-[var(--color-forest-deep)] lg:pt-[calc(var(--nav-height)+var(--space-3xl))]">
+        <div className="container grid gap-[var(--space-xl)] lg:gap-[var(--space-2xl)]">
+          {/* Top Hairline Breadcrumb & Reading Metadata */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-b border-[var(--color-rule)] py-4 text-[length:var(--text-xs)] font-medium tracking-[0.06em] uppercase">
             <div className="flex flex-wrap items-center gap-3">
               <Link
                 className="text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
@@ -385,32 +528,21 @@ export function StoryDetailClient({
             </div>
           </div>
 
-          {/* Article Title & Intro */}
-          <header className="grid gap-[var(--space-xl)] lg:grid-cols-12 lg:items-end">
-            <div className="grid gap-[var(--space-lg)] lg:col-span-8">
-              <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.05em] text-[var(--color-clay-ink)] uppercase">
+          {/* Studio DADO-inspired Asymmetric 5/7 Monograph Header */}
+          <header className="grid gap-8 pt-2 lg:grid-cols-12 lg:items-end lg:gap-[var(--gap-columns)]">
+            <div className="grid content-between gap-6 lg:col-span-5 lg:pr-10">
+              <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
                 {localized.location}
               </p>
 
-              <h1 className="max-w-[18ch] text-[clamp(2.45rem,4.8vw,4.5rem)] leading-[1.01] font-medium text-[var(--color-forest-deep)]">
-                {localized.title}
-              </h1>
-
-              <p className="lead max-w-[56ch] text-[var(--color-ink-2)]">
-                {localized.summary}
-              </p>
-            </div>
-
-            {/* Author Card */}
-            <div className="grid gap-4 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]/65 p-5 lg:col-span-4">
-              <div className="flex items-center gap-3.5">
-                {story.author.portraitUrl ? (
-                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[var(--color-rule)] bg-[var(--color-paper)]">
+              <div className="flex items-center gap-3.5 pt-1">
+                {authorPortraitUrl ? (
+                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
                     <Image
-                      src={story.author.portraitUrl}
+                      src={authorPortraitUrl}
                       alt={story.author.name}
                       fill
-                      sizes="48px"
+                      sizes="44px"
                       className="object-cover"
                     />
                   </div>
@@ -418,193 +550,292 @@ export function StoryDetailClient({
                 <div className="grid gap-0.5 text-[length:var(--text-xs)]">
                   <p className="font-semibold text-[var(--color-forest-deep)]">
                     {isEs
-                      ? `Escrito por ${story.author.name}`
-                      : `Written by ${story.author.name}`}
+                      ? `Por ${story.author.name}`
+                      : `By ${story.author.name}`}
                   </p>
                   <p className="text-[var(--color-muted)]">
                     {localized.authorRole}
                   </p>
-                  <p className="text-[var(--color-clay-ink)]">
-                    {localized.authorLocation}
-                  </p>
                 </div>
               </div>
             </div>
+
+            <div className="grid gap-6 lg:col-span-7">
+              <h1 className="max-w-[17ch] text-[clamp(2.45rem,4.9vw,4.65rem)] leading-[1.02] font-normal tracking-[-0.015em] text-balance text-[var(--color-forest-deep)]">
+                {localized.title}
+              </h1>
+
+              <p className="max-w-[52ch] font-[family-name:var(--font-display)] text-[clamp(1.18rem,1.55vw,1.45rem)] leading-[1.44] text-[var(--color-ink-2)]">
+                {localized.summary}
+              </p>
+            </div>
           </header>
 
-          {/* Lead Photograph */}
-          <StoryMedia
-            image={localized.leadImage}
-            kind={story.leadSlot.kind}
-            ratio="16:9 wide"
-            aspectClass="aspect-[16/9]"
-            title={story.leadSlot.title}
-            description={story.leadSlot.description}
-            sizes="(max-width: 80rem) 100vw, 1280px"
-            priority
-            showCaption
-          />
+          {/* Lead Photograph (adapts automatically if Sanity cover is portrait vs landscape) */}
+          {(() => {
+            const leadDims = getImageDimensionsFromUrl(
+              localized.leadImage?.url,
+            );
+            const isPortraitLead = Boolean(
+              leadDims && leadDims.height > leadDims.width,
+            );
 
-          {/* Two-column Reading Layout */}
-          <div className="grid items-start gap-[var(--gap-columns)] pt-4 lg:grid-cols-12">
-            {/* Left Sticky Sidebar */}
-            <aside className="grid gap-6 lg:sticky lg:top-32 lg:col-span-4">
-              {tocHeadings.length > 0 ? (
-                <div className="grid gap-3 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]/45 p-6">
-                  <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.05em] text-[var(--color-clay-ink)] uppercase">
-                    {isEs ? "En esta historia" : "In this Story"}
-                  </p>
-                  <ol className="m-0 grid list-none gap-2.5 p-0 text-[length:var(--text-sm)]">
-                    {tocHeadings.map((heading, idx) => (
-                      <li key={`${heading}-${idx}`}>
-                        <a
-                          href={`#${toSectionId(heading, idx)}`}
-                          className="inline-flex items-baseline gap-2.5 text-[var(--color-forest-deep)] underline decoration-[var(--color-rule)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                        >
-                          {heading}
-                        </a>
-                      </li>
-                    ))}
-                    {localized.takeaway ? (
-                      <li>
-                        <a
-                          href="#story-takeaway"
-                          className="inline-flex items-baseline gap-2.5 text-[var(--color-forest-deep)] underline decoration-[var(--color-rule)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                        >
-                          {isEs ? "En resumen" : "Key takeaway"}
-                        </a>
-                      </li>
-                    ) : null}
-                  </ol>
-                </div>
-              ) : null}
-
-              {localized.tags.length > 0 ? (
-                <div className="grid gap-2.5 border-t border-[var(--color-rule)] pt-4">
-                  <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.05em] text-[var(--color-muted)] uppercase">
-                    {isEs ? "Temas" : "Topics"}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {localized.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-[var(--radius-pill)] border border-[var(--color-rule)] bg-[var(--color-paper)] px-3 py-1 text-[length:var(--text-xs)] text-[var(--color-forest-deep)]"
-                      >
-                        {tag}
+            if (isPortraitLead && localized.leadImage) {
+              return (
+                <figure className="m-0 grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-[var(--gap-columns)]">
+                  <figcaption className="order-2 grid gap-2 lg:order-1 lg:col-span-5 lg:pr-12">
+                    <span className="text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-clay-ink)] uppercase">
+                      {isEs ? "Fotografía de portada" : "Lead photograph"}
+                    </span>
+                    {localized.leadImage.caption ? (
+                      <span className="text-[length:var(--text-xs)] leading-[1.65] text-[var(--color-muted)]">
+                        {localized.leadImage.caption}
                       </span>
-                    ))}
+                    ) : null}
+                  </figcaption>
+                  <div className="order-1 lg:order-2 lg:col-span-7">
+                    <div className="max-w-[34rem]">
+                      <StoryMedia
+                        image={{
+                          ...localized.leadImage,
+                          objectPosition:
+                            localized.leadImage.objectPosition || "50% 18%",
+                        }}
+                        kind={story.leadSlot.kind}
+                        ratio="4:5 portrait"
+                        aspectClass="aspect-[4/5]"
+                        title={story.leadSlot.title}
+                        description={story.leadSlot.description}
+                        sizes="(max-width: 64rem) 100vw, 560px"
+                        variant="editorial"
+                        priority
+                        showCaption={false}
+                      />
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                </figure>
+              );
+            }
 
-              <div className="grid gap-3 rounded-[var(--radius-card)] bg-[var(--color-forest-deep)] p-6 text-[var(--color-paper)]">
-                <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.05em] text-[var(--color-gold)] uppercase">
-                  {isEs ? "Contacto directo" : "Direct conversation"}
-                </p>
-                <p className="font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.15]">
-                  {isEs
-                    ? "Hablemos sobre tu próximo proyecto."
-                    : "Looking to develop a product in India?"}
-                </p>
-                <p className="text-[length:var(--text-sm)] text-[var(--color-paper-2)]">
-                  {isEs
-                    ? "Escríbenos directamente para comentar tu idea, cantidades o dudas sobre cómo trabajamos entre España, Europa y toda la India."
-                    : "Write directly to Alma and Shirish to discuss your product, quantities, or how we work across Spain, Europe, and India."}
-                </p>
-                <div className="pt-1">
-                  <Link
-                    href={localizeHref("/contact")}
-                    className="inline-flex items-center font-semibold text-[var(--color-gold)] underline decoration-[var(--color-gold)] underline-offset-4 hover:text-[var(--color-paper)]"
-                  >
-                    {isEs
-                      ? "Escribir a Alma y Shirish"
-                      : "Write to Alma & Shirish"}
-                  </Link>
-                </div>
+            return (
+              <div className="grid gap-4">
+                <StoryMedia
+                  image={localized.leadImage}
+                  kind={story.leadSlot.kind}
+                  ratio="16:10 wide"
+                  aspectClass="aspect-[16/10]"
+                  title={story.leadSlot.title}
+                  description={story.leadSlot.description}
+                  sizes="(max-width: 80rem) 100vw, 1312px"
+                  variant="editorial"
+                  priority
+                  showCaption={false}
+                />
+
+                {localized.leadImage?.caption ? (
+                  <div className="grid gap-2 pt-1 lg:grid-cols-12 lg:gap-[var(--gap-columns)]">
+                    <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-clay-ink)] uppercase lg:col-span-5 lg:pr-10">
+                      {isEs ? "Fotografía de portada" : "Lead photograph"}
+                    </p>
+                    <p className="max-w-[60ch] text-[length:var(--text-xs)] leading-[1.6] text-[var(--color-muted)] lg:col-span-7">
+                      {localized.leadImage.caption}
+                    </p>
+                  </div>
+                ) : null}
               </div>
-            </aside>
+            );
+          })()}
 
-            {/* Main Reading Column */}
-            <div className="grid gap-[var(--space-xl)] lg:col-span-8">
-              {usePortableBody && story.body ? (
-                <div className="grid gap-5">
-                  {renderPortableBody(story.body, language)}
-                </div>
-              ) : (
-                segmentedSections.map((section, sectionIndex) => (
-                  <div
-                    key={section.heading}
-                    className="grid gap-[var(--space-2xl)]"
-                  >
+          {/* Asymmetric 5/7 Marginalia Reading Flow */}
+          <div className="grid gap-14 pt-4 lg:gap-20">
+            {usePortableBody && portableChapters.length > 0
+              ? portableChapters.map((chapter, chapterIndex) => {
+                  const rows = splitChapterIntoRows(chapter.blocks);
+                  return (
+                    <section
+                      key={chapter.id}
+                      id={chapter.id}
+                      className={`grid scroll-mt-32 gap-10 lg:gap-14 ${
+                        chapterIndex > 0 || chapter.heading
+                          ? "border-t border-[var(--color-rule)] pt-10 lg:pt-14"
+                          : ""
+                      }`}
+                    >
+                      {rows.map((row, rowIndex) => {
+                        if (row.kind === "image") {
+                          const resolvedAr = resolveAspectRatio(
+                            row.block.url,
+                            row.block.aspectRatio,
+                            "16:9",
+                          );
+                          const {
+                            aspectClass,
+                            ratioLabel,
+                            singleMaxWidthClass,
+                          } = getAspectConfig(resolvedAr);
+
+                          return (
+                            <figure
+                              key={row.key}
+                              className="m-0 grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-[var(--gap-columns)]"
+                            >
+                              <figcaption className="order-2 text-[length:var(--text-xs)] leading-[1.65] text-[var(--color-muted)] lg:order-1 lg:col-span-5 lg:pr-12">
+                                {row.block.caption || row.block.alt}
+                              </figcaption>
+                              <div className="order-1 lg:order-2 lg:col-span-7">
+                                <div className={singleMaxWidthClass}>
+                                  <StoryMedia
+                                    image={{
+                                      url: row.block.url,
+                                      alt: row.block.alt,
+                                      caption: row.block.caption,
+                                      objectPosition: row.block.objectPosition,
+                                    }}
+                                    kind="Photo"
+                                    ratio={ratioLabel}
+                                    aspectClass={aspectClass}
+                                    title={row.block.alt}
+                                    description={
+                                      row.block.caption || row.block.alt
+                                    }
+                                    sizes="(max-width: 64rem) 100vw, 720px"
+                                    variant="editorial"
+                                    showCaption={false}
+                                  />
+                                </div>
+                              </div>
+                            </figure>
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={row.key}
+                            className="grid gap-6 lg:grid-cols-12 lg:gap-[var(--gap-columns)]"
+                          >
+                            <div className="lg:col-span-5 lg:pr-12">
+                              {rowIndex === 0 && chapter.heading ? (
+                                <h2 className="font-[family-name:var(--font-display)] text-[clamp(1.45rem,2.1vw,2.05rem)] leading-[1.16] font-normal text-[var(--color-forest-deep)] lg:sticky lg:top-32">
+                                  {chapter.headingNodes}
+                                </h2>
+                              ) : null}
+                            </div>
+
+                            <div className="grid gap-6 lg:col-span-7">
+                              {renderPortableProseBlocks(
+                                row.blocks,
+                                language,
+                                portableSeenRefs,
+                                portableFirstParagraphState,
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </section>
+                  );
+                })
+              : segmentedSections.map((section, sectionIndex) => (
+                  <div key={section.heading} className="grid gap-12 lg:gap-16">
                     <section
                       id={toSectionId(section.heading, sectionIndex)}
-                      className="grid max-w-[64ch] scroll-mt-32 gap-5"
+                      className="grid scroll-mt-32 gap-6 border-t border-[var(--color-rule)] pt-10 lg:grid-cols-12 lg:gap-[var(--gap-columns)] lg:pt-14"
                     >
-                      <h2 className="text-[length:var(--text-2xl)] font-medium text-[var(--color-forest-deep)]">
-                        {section.heading}
-                      </h2>
+                      {/* Left Margin Heading */}
+                      <div className="lg:col-span-5 lg:pr-12">
+                        <h2 className="font-[family-name:var(--font-display)] text-[clamp(1.45rem,2.1vw,2.05rem)] leading-[1.16] font-normal text-[var(--color-forest-deep)] lg:sticky lg:top-32">
+                          {section.heading}
+                        </h2>
+                      </div>
 
-                      {section.segmentedParagraphs.map((paragraph, pIndex) => (
-                        <p
-                          key={paragraph.raw}
-                          className={`text-[length:var(--text-md)] leading-[1.78] text-[var(--color-ink)] ${
-                            sectionIndex === 0 && pIndex === 0
-                              ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[3.35rem] first-letter:leading-[0.88] first-letter:text-[var(--color-forest-deep)]"
-                              : ""
-                          }`}
-                        >
-                          <StoryReferenceSegments
-                            segments={paragraph.segments}
-                            lang={language}
-                          />
-                        </p>
-                      ))}
+                      {/* Right Reading Track */}
+                      <div className="grid gap-6 lg:col-span-7">
+                        {section.segmentedParagraphs.map(
+                          (paragraph, pIndex) => (
+                            <p
+                              key={paragraph.raw}
+                              className={`max-w-[60ch] text-[1.0625rem] leading-[1.82] text-[var(--color-ink)] ${
+                                sectionIndex === 0 && pIndex === 0
+                                  ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[3.4rem] first-letter:leading-[0.86] first-letter:text-[var(--color-forest-deep)]"
+                                  : ""
+                              }`}
+                            >
+                              <StoryReferenceSegments
+                                segments={paragraph.segments}
+                                lang={language}
+                              />
+                            </p>
+                          ),
+                        )}
+                      </div>
                     </section>
 
+                    {/* Editorial Pull Quote */}
                     {sectionIndex === 0 && localized.pullQuote ? (
-                      <blockquote className="m-0 my-2 grid max-w-[60ch] gap-3 border-l-4 border-[var(--color-clay)] bg-[var(--color-paper-2)]/55 py-6 pr-6 pl-6 sm:pl-8">
-                        <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.2vw,1.95rem)] leading-[1.24] text-[var(--color-forest-deep)]">
-                          &ldquo;{localized.pullQuote.text}&rdquo;
-                        </p>
-                        {localized.pullQuote.attribution ? (
-                          <cite className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-ink)] uppercase not-italic">
-                            {localized.pullQuote.attribution}
-                          </cite>
-                        ) : null}
-                      </blockquote>
+                      <div className="grid lg:grid-cols-12 lg:gap-[var(--gap-columns)]">
+                        <div className="hidden lg:col-span-5 lg:block" />
+                        <blockquote className="m-0 grid max-w-[56ch] gap-4 border-l-2 border-[var(--color-clay)] py-2 pl-6 sm:pl-8 lg:col-span-7">
+                          <p className="font-[family-name:var(--font-display)] text-[clamp(1.4rem,2.2vw,2rem)] leading-[1.28] text-[var(--color-forest-deep)]">
+                            &ldquo;{localized.pullQuote.text}&rdquo;
+                          </p>
+                          {localized.pullQuote.attribution ? (
+                            <cite className="text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase not-italic">
+                              {localized.pullQuote.attribution}
+                            </cite>
+                          ) : null}
+                        </blockquote>
+                      </div>
                     ) : null}
 
-                    {section.images && section.images.length > 0 ? (
-                      <div
-                        className={
-                          section.images.length > 1
-                            ? "grid gap-[var(--gap-columns)] pt-2 md:grid-cols-2"
-                            : "max-w-[32rem] pt-2"
-                        }
-                      >
+                    {/* Section Photographs */}
+                    {section.images && section.images.length === 1 ? (
+                      (() => {
+                        const img = section.images[0]!;
+                        const { aspectClass, ratioLabel, singleMaxWidthClass } =
+                          getAspectConfig(
+                            resolveAspectRatio(img.url, img.aspectRatio),
+                          );
+                        return (
+                          <figure className="m-0 grid gap-5 lg:grid-cols-12 lg:items-end lg:gap-[var(--gap-columns)]">
+                            {/* Left-margin caption on desktop (generous right padding prevents clipping) */}
+                            <figcaption className="order-2 text-[length:var(--text-xs)] leading-[1.65] text-[var(--color-muted)] lg:order-1 lg:col-span-5 lg:pr-12">
+                              {img.caption || img.alt}
+                            </figcaption>
+                            <div className="order-1 lg:order-2 lg:col-span-7">
+                              <div className={singleMaxWidthClass}>
+                                <StoryMedia
+                                  image={img}
+                                  kind="Photo"
+                                  ratio={ratioLabel}
+                                  aspectClass={aspectClass}
+                                  title={img.alt || `${localized.title} detail`}
+                                  description={img.caption || localized.summary}
+                                  sizes="(max-width: 64rem) 100vw, 720px"
+                                  variant="editorial"
+                                  showCaption={false}
+                                />
+                              </div>
+                            </div>
+                          </figure>
+                        );
+                      })()
+                    ) : section.images && section.images.length > 1 ? (
+                      <div className="grid items-start gap-[var(--gap-columns)] md:grid-cols-2">
                         {section.images.map((img) => {
-                          const imgAspect =
-                            img.aspectRatio === "4:3"
-                              ? "aspect-[4/3]"
-                              : img.aspectRatio === "16:9"
-                                ? "aspect-[16/9]"
-                                : "aspect-[4/5]";
-                          const imgRatioLabel =
-                            img.aspectRatio === "4:3"
-                              ? "4:3 horizontal"
-                              : img.aspectRatio === "16:9"
-                                ? "16:9 wide"
-                                : "4:5 portrait";
+                          const { aspectClass, ratioLabel } = getAspectConfig(
+                            resolveAspectRatio(img.url, img.aspectRatio),
+                          );
                           return (
                             <StoryMedia
                               key={img.url}
                               image={img}
                               kind="Photo"
-                              ratio={imgRatioLabel}
-                              aspectClass={imgAspect}
+                              ratio={ratioLabel}
+                              aspectClass={aspectClass}
                               title={img.alt || `${localized.title} detail`}
                               description={img.caption || localized.summary}
-                              sizes="(max-width: 48rem) 100vw, 38vw"
+                              sizes="(max-width: 48rem) 100vw, 48vw"
+                              variant="editorial"
                               showCaption
                             />
                           );
@@ -612,19 +843,22 @@ export function StoryDetailClient({
                       </div>
                     ) : null}
                   </div>
-                ))
-              )}
+                ))}
 
-              {/* Paired Documentary Photographs */}
-              {localized.pairImages && localized.pairImages.length > 0 ? (
-                <div className="grid gap-[var(--gap-columns)] pt-4 md:grid-cols-2">
-                  {localized.pairImages.map((img, index) => (
+            {/* Paired Documentary Photographs */}
+            {localized.pairImages && localized.pairImages.length > 0 ? (
+              <div className="grid items-start gap-[var(--gap-columns)] border-t border-[var(--color-rule)] pt-12 md:grid-cols-2 lg:pt-14">
+                {localized.pairImages.map((img, index) => {
+                  const { aspectClass, ratioLabel } = getAspectConfig(
+                    resolveAspectRatio(img.url, img.aspectRatio),
+                  );
+                  return (
                     <StoryMedia
                       key={img.url}
                       image={img}
                       kind="Photo"
-                      ratio="4:5 portrait"
-                      aspectClass="aspect-[4/5]"
+                      ratio={ratioLabel}
+                      aspectClass={aspectClass}
                       title={
                         story.pairSlots[index]?.title ||
                         img.alt ||
@@ -635,29 +869,37 @@ export function StoryDetailClient({
                         story.pairSlots[index]?.description ||
                         localized.summary
                       }
-                      sizes="(max-width: 48rem) 100vw, 38vw"
+                      sizes="(max-width: 48rem) 100vw, 48vw"
+                      variant="editorial"
                       showCaption
                     />
-                  ))}
-                </div>
-              ) : null}
+                  );
+                })}
+              </div>
+            ) : null}
 
-              {/* Key Takeaway Card */}
-              {localized.takeaway ? (
-                <div
-                  id="story-takeaway"
-                  className="grid max-w-[64ch] scroll-mt-32 gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-8"
-                >
-                  <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.05em] text-[var(--color-clay-ink)] uppercase">
-                    {isEs ? "En resumen" : "Key takeaway"} ·{" "}
+            {/* Closing Reflection (only when takeaway text is present) */}
+            {localized.takeaway ? (
+              <div
+                id="story-takeaway"
+                className="grid scroll-mt-32 gap-6 border-t border-[var(--color-rule)] pt-10 lg:grid-cols-12 lg:gap-[var(--gap-columns)] lg:pt-14"
+              >
+                <div className="grid content-start gap-1.5 lg:col-span-5 lg:pr-12">
+                  <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
+                    {isEs ? "En resumen" : "Key takeaway"}
+                  </p>
+                  <p className="text-[length:var(--text-xs)] text-[var(--color-muted)]">
                     {localized.categoryLabel}
                   </p>
-                  <p className="font-[family-name:var(--font-display)] text-[length:var(--text-2xl)] leading-[1.22] font-medium text-[var(--color-forest-deep)]">
+                </div>
+
+                <div className="grid max-w-[60ch] gap-6 lg:col-span-7">
+                  <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.1vw,1.85rem)] leading-[1.3] font-normal text-[var(--color-forest-deep)]">
                     {localized.takeaway}
                   </p>
-                  <div className="flex flex-wrap items-center justify-between gap-6 border-t border-[var(--color-rule)] pt-4 text-[length:var(--text-sm)] font-semibold">
+                  <div className="flex flex-wrap items-center gap-6 text-[length:var(--text-sm)] font-semibold">
                     <Link
-                      className="underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                      className="text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                       href={localizeHref("/contact")}
                     >
                       {isEs
@@ -666,122 +908,268 @@ export function StoryDetailClient({
                     </Link>
                     {nextStory && nextStoryLocalized ? (
                       <Link
-                        className="underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                        className="text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
                         href={localizeHref(`/stories/${nextStory.slug}`)}
                       >
                         {isEs
-                          ? `Siguiente historia: ${nextStoryLocalized.title}`
-                          : `Next Story: ${nextStoryLocalized.title}`}
+                          ? `Siguiente: ${nextStoryLocalized.title}`
+                          : `Next: ${nextStoryLocalized.title}`}
                       </Link>
                     ) : null}
                   </div>
                 </div>
-              ) : null}
+              </div>
+            ) : null}
+
+            {/* Quiet Topics & Share Utility Strip */}
+            <div className="grid gap-6 border-t border-[var(--color-rule)] pt-8 lg:grid-cols-12 lg:items-center lg:gap-[var(--gap-columns)]">
+              <div className="flex flex-wrap items-center gap-2 lg:col-span-5 lg:pr-10">
+                {localized.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="border border-[var(--color-rule)] px-3 py-1 text-[length:var(--text-xs)] text-[var(--color-muted)]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-5 lg:col-span-7">
+                <div
+                  aria-label={
+                    isEs ? "Compartir esta historia" : "Share this Story"
+                  }
+                  className="flex flex-wrap items-center gap-2"
+                  role="group"
+                >
+                  <span className="mr-1 text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-muted)] uppercase">
+                    {isEs ? "Compartir" : "Share"}
+                  </span>
+
+                  <a
+                    aria-label={
+                      isEs ? "Compartir por WhatsApp" : "Share on WhatsApp"
+                    }
+                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    href={whatsappShareHref}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    title="WhatsApp"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-[17px] w-[17px]"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                    </svg>
+                  </a>
+
+                  <a
+                    aria-label={
+                      isEs ? "Compartir en LinkedIn" : "Share on LinkedIn"
+                    }
+                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    href={linkedinShareHref}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    title="LinkedIn"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-[17px] w-[17px]"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M6.94 5a2 2 0 1 1-4-.002 2 2 0 0 1 4 .002ZM7 8.48H3V21h4V8.48Zm6.32 0H9.34V21h3.94v-6.57c0-3.66 4.77-4 4.77 0V21H22v-7.93c0-6.17-7.06-5.94-8.72-2.91l.04-1.68Z" />
+                    </svg>
+                  </a>
+
+                  <a
+                    aria-label={isEs ? "Compartir en X" : "Share on X"}
+                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    href={xShareHref}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    title="X"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-[15px] w-[15px]"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                  </a>
+
+                  <a
+                    aria-label={
+                      isEs ? "Compartir por correo" : "Share by email"
+                    }
+                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    href={emailShareHref}
+                    title={isEs ? "Correo electrónico" : "Email"}
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.6"
+                      viewBox="0 0 24 24"
+                    >
+                      <rect height="14" rx="1.5" width="18" x="3" y="5" />
+                      <path d="m4 7 8 6 8-6" />
+                    </svg>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => void handleCopyLink()}
+                    className="inline-flex h-10 cursor-pointer items-center gap-2 border border-[var(--color-rule-2)]/60 bg-transparent px-3.5 text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-forest-deep)] uppercase transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.6"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.4 4.5" />
+                      <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.42-1.42" />
+                    </svg>
+                    <span>
+                      {copiedLink
+                        ? isEs
+                          ? "Enlace copiado"
+                          : "Link copied"
+                        : isEs
+                          ? "Copiar enlace"
+                          : "Copy link"}
+                    </span>
+                  </button>
+                </div>
+
+                <Link
+                  href={localizeHref("/product-brief")}
+                  className="text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                >
+                  {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </article>
 
-      {/* Continue Reading */}
-      {relatedStories.length > 0 ? (
-        <section className="border-t border-[var(--color-rule)] bg-[var(--color-dune)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
-          <div className="container grid gap-[var(--space-2xl)]">
-            <div className="flex flex-wrap items-end justify-between gap-4">
+      {/* More Stories Band with Continuous Color Flow into SiteFooter */}
+      {orderedRelatedStories.length > 0 ? (
+        <section
+          className="text-[var(--color-forest-deep)]"
+          style={{
+            background:
+              "linear-gradient(180deg, var(--color-paper) 0%, var(--color-dune) 14%, var(--color-dune) 100%)",
+          }}
+        >
+          <div className="container grid gap-[var(--space-2xl)] pt-[var(--section-gap-s)] pb-[var(--space-2xl)]">
+            <div className="flex flex-wrap items-end justify-between gap-6 border-b border-[var(--color-rule-2)]/40 pb-6">
               <div className="grid gap-2">
-                <p className="section-index">
+                <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
                   {isEs ? "Seguir leyendo" : "Continue reading"}
                 </p>
-                <h2 className="text-[length:var(--text-display-s)] leading-[1.04] font-medium">
-                  {isEs ? "Más historias" : "More Stories"}
+                <h2 className="m-0 font-[family-name:var(--font-display)] text-[length:var(--text-display-s)] leading-[1.06] font-normal text-[var(--color-forest-deep)]">
+                  {isEs ? "Más historias" : "Up next"}
                 </h2>
               </div>
+
               <Link
                 href={localizeHref("/stories")}
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-forest-deep)] uppercase underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
               >
-                {isEs ? "Ver todas las historias" : "View all Stories"}
+                {isEs ? "Ver todas las historias" : "See all Stories"}
               </Link>
             </div>
 
             <div className="grid gap-[var(--gap-columns)] md:grid-cols-3">
-              {relatedStories.map((entry) => {
+              {orderedRelatedStories.map((entry) => {
                 const entryLocalized = getLocalizedStory(entry, language);
                 return (
                   <article
                     key={entry.slug}
-                    className="group flex flex-col justify-between gap-4 rounded-[var(--radius-card)] border border-[var(--color-rule-2)]/35 bg-[var(--color-paper)] p-5"
+                    className="group grid content-start gap-4"
                   >
-                    <div className="grid gap-4">
-                      <Link
-                        href={localizeHref(`/stories/${entry.slug}`)}
-                        className="block"
-                      >
-                        <StoryMedia
-                          image={entryLocalized.leadImage}
-                          kind={entry.leadSlot.kind}
-                          ratio="4:3 horizontal"
-                          aspectClass="aspect-[4/3]"
-                          title={entry.leadSlot.title}
-                          description={entry.leadSlot.description}
-                          sizes="(max-width: 48rem) 100vw, 33vw"
-                          interactive
-                        />
-                      </Link>
-                      <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-ink)] uppercase">
-                        {entryLocalized.categoryLabel} ·{" "}
-                        {isEs
-                          ? `${entry.readingTimeMinutes} min de lectura`
-                          : `${entry.readingTimeMinutes} min read`}
+                    <Link
+                      href={localizeHref(`/stories/${entry.slug}`)}
+                      data-transition-title={entryLocalized.title}
+                      className="block"
+                    >
+                      <StoryMedia
+                        image={entryLocalized.leadImage}
+                        kind={entry.leadSlot.kind}
+                        ratio="4:3 horizontal"
+                        aspectClass="aspect-[4/3]"
+                        title={entry.leadSlot.title}
+                        description={entry.leadSlot.description}
+                        sizes="(max-width: 48rem) 100vw, 33vw"
+                        variant="editorial"
+                        interactive
+                      />
+                    </Link>
+
+                    <div className="grid gap-2 pt-1">
+                      <p className="num text-[length:var(--text-xs)] font-medium tracking-[0.05em] text-[var(--color-muted)] uppercase">
+                        <time dateTime={entry.publishedAt}>
+                          {formatStoryDate(entry.publishedAt, language)}
+                        </time>
+                        <span aria-hidden="true"> · </span>
+                        <span className="text-[var(--color-clay-ink)]">
+                          {entryLocalized.categoryLabel}
+                        </span>
                       </p>
-                      <h3 className="text-[length:var(--text-xl)] leading-[1.15] font-medium">
+
+                      <h3 className="font-[family-name:var(--font-display)] text-[clamp(1.3rem,1.8vw,1.65rem)] leading-[1.18] font-normal">
                         <Link
                           href={localizeHref(`/stories/${entry.slug}`)}
-                          className="no-underline group-hover:text-[var(--color-clay-ink)]"
+                          data-transition-title={entryLocalized.title}
+                          className="text-[var(--color-forest-deep)] no-underline transition-colors group-hover:text-[var(--color-clay-ink)]"
                         >
                           {entryLocalized.title}
                         </Link>
                       </h3>
-                    </div>
-
-                    <div className="border-t border-[var(--color-rule)] pt-3">
-                      <Link
-                        href={localizeHref(`/stories/${entry.slug}`)}
-                        className="text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                      >
-                        {isEs ? "Leer historia" : "Read Story"}
-                      </Link>
                     </div>
                   </article>
                 );
               })}
             </div>
           </div>
-        </section>
-      ) : null}
 
-      {/* Article Footer Newsletter Signup */}
-      <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
-        <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
-          <div className="grid gap-3 lg:col-span-5">
-            <p className="section-index">
-              {isEs ? "Mantente al día" : "Stay connected"}
-            </p>
-            <h2 className="text-[length:var(--text-2xl)] font-medium">
-              {isEs
-                ? "Recibe nuestras nuevas historias por correo."
-                : "Receive new Stories by email."}
-            </h2>
-            <p className="max-w-[48ch] text-[var(--color-muted)]">
-              {isEs
-                ? "Cada pocas semanas enviamos nuestras últimas historias sobre fabricación en la India, Almarise y nuestro trabajo entre España y la India."
-                : "Every few weeks, we send our latest Stories on Indian manufacturing, Almarise, and our work across India and Spain."}
-            </p>
-          </div>
-          <div className="lg:col-span-7">
-            <NewsletterForm variant="journal" source={`Story: ${story.slug}`} />
-          </div>
-        </div>
-      </section>
+          {/* Smooth Color Bridge into SiteFooter (--color-night) */}
+          <div
+            aria-hidden="true"
+            className="h-[clamp(96px,15svh,168px)] w-full"
+            style={{
+              background:
+                "linear-gradient(180deg, var(--color-dune) 0%, color-mix(in srgb, var(--color-forest-deep) 42%, var(--color-dune)) 48%, var(--color-forest-deep) 78%, var(--color-night) 100%)",
+            }}
+          />
+        </section>
+      ) : (
+        <div
+          aria-hidden="true"
+          className="h-[clamp(96px,15svh,168px)] w-full"
+          style={{
+            background:
+              "linear-gradient(180deg, var(--color-paper) 0%, var(--color-forest-deep) 75%, var(--color-night) 100%)",
+          }}
+        />
+      )}
     </>
   );
 }

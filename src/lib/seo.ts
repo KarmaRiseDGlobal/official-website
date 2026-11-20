@@ -12,6 +12,7 @@ export type StaticRouteKey =
   | "home"
   | "about"
   | "almarise"
+  | "book-a-call"
   | "contact"
   | "cookie-policy"
   | "legal-notice"
@@ -70,6 +71,12 @@ export const STATIC_ROUTES: readonly StaticRouteEntry[] = [
     path: "/product-brief",
     changeFrequency: "monthly",
     priority: 0.9,
+  },
+  {
+    key: "book-a-call",
+    path: "/book-a-call",
+    changeFrequency: "monthly",
+    priority: 0.8,
   },
   {
     key: "contact",
@@ -147,6 +154,19 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
       title: "Almarise",
       description:
         "Almarise es una marca de moda de KarmaRise D Global que transforma saris existentes de la India en prendas femeninas contemporáneas para España y Europa.",
+    },
+  },
+  "book-a-call": {
+    path: "/book-a-call",
+    en: {
+      title: "Book a video call",
+      description:
+        "Schedule a Google Meet video call with Alma at KarmaRise D Global in English, Spanish, or Portuguese to discuss your Product Brief and Indian manufacturing.",
+    },
+    es: {
+      title: "Reservar videollamada",
+      description:
+        "Reserva una videollamada por Google Meet con Alma de KarmaRise D Global en español, inglés o portugués para hablar sobre tu Product Brief y fabricación en la India.",
     },
   },
   contact: {
@@ -425,6 +445,54 @@ export function getRouteMetadata(
   };
 }
 
+function buildStoryShareImage(
+  rawUrl: string | undefined,
+  alt: string,
+): {
+  url: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  type?: string;
+} {
+  if (!rawUrl?.trim()) {
+    return {
+      url: "/opengraph-image.jpg",
+      width: 1200,
+      height: 630,
+      type: "image/jpeg",
+      alt: alt || "KarmaRise D Global",
+    };
+  }
+
+  const trimmed = rawUrl.trim();
+  if (/^https:\/\/cdn\.sanity\.io\/images\//i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      parsed.searchParams.set("w", "1200");
+      parsed.searchParams.set("h", "630");
+      parsed.searchParams.set("fit", "crop");
+      parsed.searchParams.set("crop", "focalpoint");
+      parsed.searchParams.set("q", "80");
+      parsed.searchParams.set("fm", "jpg");
+      return {
+        url: parsed.toString(),
+        width: 1200,
+        height: 630,
+        type: "image/jpeg",
+        alt,
+      };
+    } catch {
+      return { url: trimmed, alt };
+    }
+  }
+
+  return {
+    url: encodeURI(trimmed),
+    alt,
+  };
+}
+
 export function getStoryMetadata(
   story: StoryEntry | undefined,
   lang: SiteLanguage,
@@ -457,14 +525,12 @@ export function getStoryMetadata(
 
   const path = `/stories/${story.slug}`;
   const ogTitle = `${title} | KarmaRise D Global`;
-  const leadImage = story.leadImage?.url
-    ? {
-        url: story.leadImage.url,
-        alt:
-          (isEs ? story.spanishLeadAlt?.trim() : undefined) ||
-          story.leadImage.alt,
-      }
-    : undefined;
+  const shareImageAlt =
+    (isEs ? story.spanishLeadAlt?.trim() : undefined) ||
+    story.leadImage?.alt ||
+    title;
+  const shareImage = buildStoryShareImage(story.leadImage?.url, shareImageAlt);
+  const storyTags = isEs ? story.spanishTags || story.tags : story.tags;
 
   return {
     title,
@@ -479,13 +545,15 @@ export function getStoryMetadata(
       locale: isEs ? "es_ES" : "en_GB",
       alternateLocale: [isEs ? "en_GB" : "es_ES"],
       publishedTime: story.publishedAt,
-      ...(leadImage ? { images: [leadImage] } : {}),
+      authors: [story.author.name],
+      tags: storyTags,
+      images: [shareImage],
     },
     twitter: {
       card: "summary_large_image",
       title: ogTitle,
       description,
-      ...(leadImage ? { images: [leadImage.url] } : {}),
+      images: [shareImage.url],
     },
   };
 }

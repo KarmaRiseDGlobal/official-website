@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { ContactForm } from "@/components/contact-form";
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 
@@ -95,9 +96,9 @@ export function ContactPageClient() {
               </p>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-3">
-              <article className="grid content-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-7">
-                <div className="grid gap-3">
+            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2 xl:grid-cols-3">
+              <article className="grid min-w-0 content-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-6 sm:p-7">
+                <div className="grid min-w-0 gap-3">
                   <h2 className="text-[length:var(--text-2xl)] font-medium">
                     {isEs
                       ? "¿Quieres fabricar un producto?"
@@ -109,14 +110,14 @@ export function ContactPageClient() {
                         Comparte tu Product Brief online o escríbenos
                         directamente a{" "}
                         <a
-                          className="underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="[overflow-wrap:anywhere] break-words underline decoration-[var(--color-clay)] underline-offset-4"
                           href="mailto:hola@karmarisedglobal.com"
                         >
                           hola@karmarisedglobal.com
                         </a>{" "}
                         o a{" "}
                         <a
-                          className="underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="[overflow-wrap:anywhere] break-words underline decoration-[var(--color-clay)] underline-offset-4"
                           href="mailto:namaste@karmarisedglobal.com"
                         >
                           namaste@karmarisedglobal.com
@@ -127,14 +128,14 @@ export function ContactPageClient() {
                       <>
                         Share your Product Brief online or write directly to{" "}
                         <a
-                          className="underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="[overflow-wrap:anywhere] break-words underline decoration-[var(--color-clay)] underline-offset-4"
                           href="mailto:hola@karmarisedglobal.com"
                         >
                           hola@karmarisedglobal.com
                         </a>{" "}
                         or{" "}
                         <a
-                          className="underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="[overflow-wrap:anywhere] break-words underline decoration-[var(--color-clay)] underline-offset-4"
                           href="mailto:namaste@karmarisedglobal.com"
                         >
                           namaste@karmarisedglobal.com
@@ -152,8 +153,8 @@ export function ContactPageClient() {
                 </Link>
               </article>
 
-              <article className="grid content-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] p-7">
-                <div className="grid gap-3">
+              <article className="grid min-w-0 content-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] p-6 sm:p-7">
+                <div className="grid min-w-0 gap-3">
                   <h2 className="text-[length:var(--text-2xl)] font-medium">
                     {isEs
                       ? "Talleres y artesanos en la India"
@@ -166,7 +167,7 @@ export function ContactPageClient() {
                   </p>
                 </div>
                 <a
-                  className="w-fit font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  className="inline-flex min-h-[44px] w-fit max-w-full items-center py-1 font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                   href="mailto:partners@karmarisedglobal.com?subject=Manufacturing%20Partner%20Introduction"
                 >
                   {isEs
@@ -175,8 +176,8 @@ export function ContactPageClient() {
                 </a>
               </article>
 
-              <article className="grid content-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] p-7">
-                <div className="grid gap-3">
+              <article className="grid min-w-0 content-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] p-6 sm:p-7 md:col-span-2 xl:col-span-1">
+                <div className="grid min-w-0 gap-3">
                   <h2 className="text-[length:var(--text-2xl)] font-medium">
                     {isEs ? "Otras consultas" : "Other enquiries"}
                   </h2>
@@ -185,7 +186,7 @@ export function ContactPageClient() {
                       <>
                         Para prensa, Historias (
                         <a
-                          className="underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="[overflow-wrap:anywhere] break-words underline decoration-[var(--color-clay)] underline-offset-4"
                           href="mailto:stories@karmarisedglobal.com"
                         >
                           stories@karmarisedglobal.com
@@ -197,7 +198,7 @@ export function ContactPageClient() {
                       <>
                         For press, Stories (
                         <a
-                          className="underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="[overflow-wrap:anywhere] break-words underline decoration-[var(--color-clay)] underline-offset-4"
                           href="mailto:stories@karmarisedglobal.com"
                         >
                           stories@karmarisedglobal.com
@@ -209,15 +210,38 @@ export function ContactPageClient() {
                   </p>
                 </div>
                 <a
-                  className="w-fit font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  className="inline-flex min-h-[44px] w-fit items-center py-1 font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                   href="#general-note"
                 >
                   {isEs ? "Enviar un mensaje" : "Send a message"}
                 </a>
               </article>
             </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-5 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-6 sm:p-7">
+              <div className="grid gap-1.5">
+                <h2 className="text-[length:var(--text-xl)] font-medium text-[var(--color-forest-deep)]">
+                  {isEs
+                    ? "Habla directamente con Alma por videollamada"
+                    : "Talk your product through with Alma on a video call"}
+                </h2>
+                <p className="max-w-[58ch] text-[length:var(--text-sm)] text-[var(--color-muted)]">
+                  {isEs
+                    ? "Elige un hueco de 15 o 30 minutos por Google Meet en español, inglés o portugués para comentar materiales, muestreo o plazos en la India."
+                    : "Pick a 15 or 30 minute Google Meet time in English, Spanish, or Portuguese to go over materials, sampling, or delivery timings in India."}
+                </p>
+              </div>
+              <Link
+                className="inline-flex min-h-[44px] items-center justify-center rounded-[var(--radius-pill)] bg-[var(--color-forest-deep)] px-6 py-2.5 text-[length:var(--text-sm)] font-semibold text-[var(--color-paper)] no-underline transition-colors hover:bg-[var(--color-forest)]"
+                href={localizeHref("/book-a-call")}
+              >
+                {isEs ? "Reservar videollamada" : "Book a video call"}
+              </Link>
+            </div>
           </div>
         </section>
+
+        <SectionBridge from="paper" to="forest-deep" />
 
         <section className="bg-[var(--color-forest-deep)] py-[var(--section-gap)] text-[var(--color-paper)]">
           <div className="container grid items-start gap-[var(--gap-columns)] lg:grid-cols-12">
@@ -250,8 +274,8 @@ export function ContactPageClient() {
               </p>
             </div>
 
-            <dl className="m-0 grid gap-6 text-[var(--color-paper-2)] lg:col-span-7">
-              <div className="grid gap-1 border-t border-[var(--color-paper)]/15 pt-4">
+            <dl className="m-0 grid min-w-0 gap-6 text-[var(--color-paper-2)] lg:col-span-7">
+              <div className="grid min-w-0 gap-1 border-t border-[var(--color-paper)]/15 pt-4">
                 <dt className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-light)] uppercase">
                   {isEs
                     ? "Domicilio social registrado (India)"
@@ -259,7 +283,7 @@ export function ContactPageClient() {
                 </dt>
                 <dd className="m-0">
                   <a
-                    className="underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-paper)]"
+                    className="inline-flex min-h-[44px] items-center py-1 underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-paper)]"
                     href="https://www.google.com/maps/place/Guru+Charan/@19.2324905,73.1534675,49m/data=!3m1!1e3!4m6!3m5!1s0x3be7943c1ba890cf:0x3c332f2cfae05f64!8m2!3d19.2325!4d73.1536!16s%2Fg%2F1pyqv_7by?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D"
                   >
                     2nd floor, Guru Charan Apartment, Ulhasnagar, Maharashtra,
@@ -269,7 +293,7 @@ export function ContactPageClient() {
               </div>
 
               <div className="grid gap-6 border-t border-[var(--color-paper)]/15 pt-4 sm:grid-cols-2">
-                <div className="grid gap-1">
+                <div className="grid min-w-0 gap-1">
                   <dt className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-light)] uppercase">
                     {isEs
                       ? "Teléfono en la India (Shirish)"
@@ -277,14 +301,14 @@ export function ContactPageClient() {
                   </dt>
                   <dd className="m-0">
                     <a
-                      className="underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-paper)]"
+                      className="inline-flex min-h-[44px] items-center underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-paper)]"
                       href="tel:+918530009798"
                     >
                       +91 8530009798
                     </a>
                   </dd>
                 </div>
-                <div className="grid gap-1">
+                <div className="grid min-w-0 gap-1">
                   <dt className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-light)] uppercase">
                     {isEs
                       ? "Teléfono para España y Europa (Alma)"
@@ -292,7 +316,7 @@ export function ContactPageClient() {
                   </dt>
                   <dd className="m-0">
                     <a
-                      className="underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-paper)]"
+                      className="inline-flex min-h-[44px] items-center underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-paper)]"
                       href="tel:+34611722276"
                     >
                       +34 611722276
@@ -301,23 +325,23 @@ export function ContactPageClient() {
                 </div>
               </div>
 
-              <div className="grid gap-3 border-t border-[var(--color-paper)]/15 pt-4">
+              <div className="grid min-w-0 gap-3 border-t border-[var(--color-paper)]/15 pt-4">
                 <dt className="text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-light)] uppercase">
                   {isEs
                     ? "Directorio de correos oficiales"
                     : "Official email directory"}
                 </dt>
-                <dd className="m-0 grid gap-3 sm:grid-cols-2">
+                <dd className="m-0 grid min-w-0 gap-3 sm:grid-cols-2">
                   {departmentEmails.map((item) => (
                     <div
                       key={item.email}
-                      className="grid gap-0.5 rounded-xl border border-[var(--color-paper)]/12 bg-[var(--color-night)]/30 p-3.5 text-[length:var(--text-sm)]"
+                      className="grid min-w-0 gap-0.5 rounded-xl border border-[var(--color-paper)]/12 bg-[var(--color-night)]/30 p-3.5 text-[length:var(--text-sm)]"
                     >
                       <span className="text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
                         {item.label[language]}
                       </span>
                       <a
-                        className="font-medium text-[var(--color-paper)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-gold)]"
+                        className="inline-flex min-h-[44px] min-w-0 items-center font-medium [overflow-wrap:anywhere] break-words text-[var(--color-paper)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-gold)]"
                         href={`mailto:${item.email}`}
                       >
                         {item.email}
@@ -330,12 +354,14 @@ export function ContactPageClient() {
           </div>
         </section>
 
+        <SectionBridge from="forest-deep" to="wood" />
+
         <section
           className="bg-[var(--color-wood)] py-[var(--section-gap)] text-[var(--color-paper)]"
           id="general-note"
         >
           <div className="container grid items-start gap-[var(--gap-columns)] lg:grid-cols-12">
-            <div className="grid gap-4 lg:col-span-5">
+            <div className="grid min-w-0 gap-4 lg:col-span-5">
               <h2 className="text-[length:var(--text-display-s)] leading-[1.04] font-medium text-[var(--color-paper)]">
                 {isEs ? "Envíanos un mensaje" : "Send a message"}
               </h2>
@@ -366,11 +392,13 @@ export function ContactPageClient() {
               </p>
             </div>
 
-            <div className="lg:col-span-7">
+            <div className="min-w-0 lg:col-span-7">
               <ContactForm />
             </div>
           </div>
         </section>
+
+        <SectionBridge from="wood" to="night" />
       </main>
 
       <SiteFooter />

@@ -135,7 +135,7 @@ function renderPreferencesHtml(options: {
     ? `<input type="hidden" name="email" value="${escapeHtml(options.email)}" />`
     : `<div style="margin:0 0 18px;text-align:left;">
         <label for="pref-email" style="display:block;margin:0 0 6px;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#182D20;">${escapeHtml(emailLabel)}</label>
-        <input id="pref-email" type="email" name="email" required autocomplete="email" placeholder="${escapeHtml(emailPlaceholder)}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #CDBB9C;background-color:#FAF6EE;font-family:Arial,sans-serif;font-size:15px;color:#182D20;" />
+        <input id="pref-email" type="email" name="email" required autocomplete="email" placeholder="${escapeHtml(emailPlaceholder)}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #CDBB9C;background-color:#FAF6EE;font-family:Arial,sans-serif;font-size:16px;color:#182D20;" />
       </div>`;
 
   const turnstileHtml =
@@ -189,7 +189,7 @@ function renderPreferencesHtml(options: {
   ${turnstileScriptTag}
 </head>
 <body style="margin:0;padding:40px 16px;background-color:#D9DFD3;font-family:Georgia,'Times New Roman',serif;color:#182D20;display:flex;align-items:center;justify-content:center;min-height:85vh;">
-  <main style="max-width:520px;width:100%;background-color:#F2ECDF;border-radius:24px;padding:44px 36px;text-align:center;box-shadow:0 14px 38px rgba(24,45,32,0.08);">
+  <main style="max-width:520px;width:100%;box-sizing:border-box;background-color:#F2ECDF;border-radius:24px;padding:44px 36px;text-align:center;box-shadow:0 14px 38px rgba(24,45,32,0.08);">
     <p style="margin:0 0 12px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#BD7057;font-weight:bold;">
       ${isEs ? "Historias de KarmaRise" : "KarmaRise Stories"} &middot; ${isEs ? "Preferencia de idioma" : "Language preference"}
     </p>

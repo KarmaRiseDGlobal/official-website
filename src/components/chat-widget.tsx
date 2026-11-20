@@ -134,6 +134,7 @@ function BrandMarkBadge({ size = "md" }: { size?: "sm" | "md" }) {
         alt=""
         width={701}
         height={815}
+        sizes="36px"
         className="h-full w-full object-contain [filter:brightness(0)_invert(96%)_sepia(12%)_saturate(349%)_hue-rotate(344deg)_brightness(103%)_contrast(93%)]"
       />
     </span>
@@ -183,6 +184,26 @@ function ProductBriefIcon({
       <path d="M11.75 3.25V7h3.75" />
       <path d="M7.5 10.5h5" />
       <path d="M7.5 13.5h3.5" />
+    </svg>
+  );
+}
+
+function VideoCallIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 ${className}`}
+    >
+      <rect x="2.75" y="4.5" width="14.5" height="12.25" rx="2" />
+      <path d="M6.5 2.75v3.5" />
+      <path d="M13.5 2.75v3.5" />
+      <path d="M2.75 8.5h14.5" />
     </svg>
   );
 }
@@ -327,6 +348,7 @@ export function ChatWidget() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
   const [statusError, setStatusError] = useState("");
+  const [drawerMaxHeight, setDrawerMaxHeight] = useState<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
@@ -382,6 +404,31 @@ export function ChatWidget() {
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("pointerdown", onPointerDownOutside);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const viewport = window.visualViewport;
+    const updateMaxHeight = () => {
+      const availableHeight = viewport?.height ?? window.innerHeight;
+      setDrawerMaxHeight(
+        Math.max(200, Math.min(660, Math.floor(availableHeight - 48))),
+      );
+    };
+
+    updateMaxHeight();
+    viewport?.addEventListener("resize", updateMaxHeight);
+    viewport?.addEventListener("scroll", updateMaxHeight);
+    window.addEventListener("resize", updateMaxHeight);
+    window.addEventListener("orientationchange", updateMaxHeight);
+
+    return () => {
+      viewport?.removeEventListener("resize", updateMaxHeight);
+      viewport?.removeEventListener("scroll", updateMaxHeight);
+      window.removeEventListener("resize", updateMaxHeight);
+      window.removeEventListener("orientationchange", updateMaxHeight);
     };
   }, [isOpen]);
 
@@ -723,7 +770,7 @@ export function ChatWidget() {
   return (
     <div
       ref={containerRef}
-      className="fixed right-4 bottom-4 z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-6"
+      className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
     >
       {!isOpen ? (
         <button
@@ -745,21 +792,26 @@ export function ChatWidget() {
           aria-label={
             isEs ? "Guía de KarmaRise D Global" : "KarmaRise D Global guide"
           }
-          className="flex max-h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
+          style={
+            drawerMaxHeight !== null
+              ? { maxHeight: `${drawerMaxHeight}px` }
+              : undefined
+          }
+          className="flex max-h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden overscroll-contain rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
         >
-          <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)]/70 px-5 py-3.5">
+          <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)]/70 px-5 py-2.5">
             <div className="flex min-w-0 items-center gap-2.5">
               <BrandMarkBadge size="sm" />
               <p className="font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-none font-normal text-[var(--color-ink)]">
                 KarmaRise D Global
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5">
               {messages.length > 0 ? (
                 <button
                   type="button"
                   onClick={clearConversation}
-                  className="cursor-pointer px-1.5 py-1 text-[length:var(--text-xs)] font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
+                  className="inline-flex min-h-[44px] cursor-pointer items-center px-2.5 text-[length:var(--text-xs)] font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
                 >
                   {isEs ? "Limpiar" : "Clear"}
                 </button>
@@ -769,7 +821,7 @@ export function ChatWidget() {
                 type="button"
                 onClick={closeDrawer}
                 aria-label={isEs ? "Cerrar chat" : "Close chat"}
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/70 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/70 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
                 <svg
                   aria-hidden="true"
@@ -863,8 +915,8 @@ export function ChatWidget() {
               <div className="grid gap-2 border-t border-[var(--color-rule)]/60 pt-3 text-[length:var(--text-xs)] leading-relaxed text-[var(--color-ink-2)]">
                 <p>
                   {isEs
-                    ? "Cuando quieras comentar una pieza directamente, puedes escribir a Alma o Shirish por WhatsApp o compartirnos un Product Brief."
-                    : "Whenever you are ready to talk a piece through directly, you can message Alma or Shirish on WhatsApp or send us a Product Brief."}
+                    ? "Cuando quieras comentar una pieza directamente, puedes escribir a Alma o Shirish por WhatsApp, reservar una videollamada con Alma o enviarnos un Product Brief."
+                    : "Whenever you are ready to talk a piece through directly, you can message Alma or Shirish on WhatsApp, book a video call with Alma, or send a Product Brief."}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <a
@@ -880,6 +932,16 @@ export function ChatWidget() {
                         : "WhatsApp Alma or Shirish"}
                     </span>
                   </a>
+                  <Link
+                    href={localizeHref("/book-a-call")}
+                    onClick={() => setIsOpen(false)}
+                    className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-wood)]/35 bg-[var(--color-white)]/85 px-3 py-1.5 font-medium text-[var(--color-wood)] no-underline transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]"
+                  >
+                    <VideoCallIcon className="h-3.5 w-3.5 text-[var(--color-wood)]" />
+                    <span>
+                      {isEs ? "Videollamada con Alma" : "Book a video call"}
+                    </span>
+                  </Link>
                   <Link
                     href={localizeHref("/product-brief")}
                     onClick={() => setIsOpen(false)}
@@ -909,6 +971,14 @@ export function ChatWidget() {
                   </span>
                 </Link>
                 <Link
+                  href={localizeHref("/book-a-call")}
+                  onClick={() => setIsOpen(false)}
+                  className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-wood)]/35 bg-[var(--color-white)]/85 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-wood)] no-underline"
+                >
+                  <VideoCallIcon className="h-3.5 w-3.5 text-[var(--color-wood)]" />
+                  <span>{isEs ? "Videollamada" : "Book a call"}</span>
+                </Link>
+                <Link
                   href={localizeHref("/contact")}
                   onClick={() => setIsOpen(false)}
                   className="rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)]/80 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-ink)] no-underline"
@@ -934,7 +1004,7 @@ export function ChatWidget() {
 
           <form
             onSubmit={handleFormSubmit}
-            className="grid gap-2.5 border-t border-[var(--color-rule)]/70 px-5 py-3"
+            className="grid gap-2.5 border-t border-[var(--color-rule)]/70 px-5 py-2.5"
           >
             <input
               type="text"
@@ -969,7 +1039,7 @@ export function ChatWidget() {
             ) : null}
 
             {allowCustomInput ? (
-              <div className="flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] pr-1.5 pl-3.5 focus-within:border-[var(--color-wood)]">
+              <div className="flex items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] p-1 pl-4 focus-within:border-[var(--color-wood)]">
                 <label htmlFor="karmarise-chat-input" className="sr-only">
                   {isEs ? "Escribe tu pregunta" : "Write your question"}
                 </label>
@@ -983,13 +1053,13 @@ export function ChatWidget() {
                   placeholder={
                     isEs ? "Escribe tu pregunta..." : "Ask a question..."
                   }
-                  className="h-10 min-w-0 flex-1 bg-transparent text-[length:var(--text-sm)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:outline-none"
+                  className="h-11 min-w-0 flex-1 bg-transparent text-[length:var(--text-md)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setAllowCustomInput(false)}
                   aria-label={isEs ? "Ocultar teclado" : "Close text input"}
-                  className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--color-muted)] transition-colors hover:bg-[var(--color-paper)] hover:text-[var(--color-ink)]"
+                  className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--color-muted)] transition-colors hover:bg-[var(--color-paper)] hover:text-[var(--color-ink)]"
                 >
                   <svg
                     aria-hidden="true"
@@ -998,7 +1068,7 @@ export function ChatWidget() {
                     stroke="currentColor"
                     strokeWidth="1.6"
                     strokeLinecap="round"
-                    className="h-3 w-3"
+                    className="h-3.5 w-3.5"
                   >
                     <path d="M4 4l8 8M12 4l-8 8" />
                   </svg>
@@ -1007,7 +1077,7 @@ export function ChatWidget() {
                   type="submit"
                   disabled={isSending || !inputValue.trim()}
                   aria-label={isEs ? "Enviar" : "Send"}
-                  className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-wood)] text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-11 min-h-[44px] w-11 min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-wood)] text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <svg
                     aria-hidden="true"
@@ -1017,25 +1087,25 @@ export function ChatWidget() {
                     strokeWidth="1.7"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="h-3.5 w-3.5"
+                    className="h-4 w-4"
                   >
                     <path d="M3 8h10M9 4l4 4-4 4" />
                   </svg>
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-3 text-[length:var(--text-xs)]">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[length:var(--text-xs)]">
                 <button
                   type="button"
                   onClick={enableCustomInput}
-                  className="cursor-pointer font-medium text-[var(--color-ink-2)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
+                  className="inline-flex min-h-[44px] cursor-pointer items-center font-medium text-[var(--color-ink-2)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
                 >
                   {isEs ? "Escribir otra pregunta" : "Ask something else"}
                 </button>
                 <Link
                   href={localizeHref("/product-brief")}
                   onClick={() => setIsOpen(false)}
-                  className="inline-flex items-center gap-1.5 font-medium text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-4 hover:text-[var(--color-wood)]"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 font-medium text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-4 hover:text-[var(--color-wood)]"
                 >
                   <ProductBriefIcon className="h-3.5 w-3.5" />
                   <span>

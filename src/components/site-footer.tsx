@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { MouseEvent } from "react";
 
 import { NewsletterForm } from "@/components/newsletter-form";
 import { useLanguage } from "@/context/language-context";
@@ -11,7 +13,28 @@ const whatsappHref = "https://wa.me/34611722276";
 
 export function SiteFooter() {
   const { language, localizeHref } = useLanguage();
+  const pathname = usePathname();
   const isEs = language === "es";
+  const homeHref = localizeHref("/");
+
+  function handleHomeLogoClick(event: MouseEvent<HTMLAnchorElement>) {
+    const normalizedCurrent = (pathname || "/").replace(/\/+$/, "") || "/";
+    const normalizedHome = homeHref.replace(/\/+$/, "") || "/";
+    if (normalizedCurrent === normalizedHome) {
+      event.preventDefault();
+      if (window.location.hash) {
+        window.history.replaceState(null, "", homeHref);
+      }
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: reducedMotion ? "auto" : "smooth",
+      });
+    }
+  }
 
   return (
     <footer className="site-footer">
@@ -35,14 +58,21 @@ export function SiteFooter() {
 
       <div className="footer-inner container">
         <div className="footer-brand">
-          <Image
-            className="footer-logo"
-            src="/brand/main-logo-transparent.png"
-            alt="KarmaRise D Global"
-            width={701}
-            height={815}
-            sizes="(max-width: 44rem) 112px, (max-width: 80rem) 12vw, 154px"
-          />
+          <Link
+            href={homeHref}
+            className="shrink-0"
+            aria-label="KarmaRise D Global"
+            onClick={handleHomeLogoClick}
+          >
+            <Image
+              className="footer-logo"
+              src="/brand/main-logo-transparent.png"
+              alt=""
+              width={701}
+              height={815}
+              sizes="(max-width: 44rem) 112px, (max-width: 80rem) 12vw, 154px"
+            />
+          </Link>
           <p>
             {isEs
               ? "Tu producto, acompañado de principio a fin."
@@ -62,6 +92,9 @@ export function SiteFooter() {
             </h2>
             <Link href={localizeHref("/product-brief")}>
               {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
+            </Link>
+            <Link href={localizeHref("/book-a-call")}>
+              {isEs ? "Reservar videollamada" : "Book a video call"}
             </Link>
             <Link href={localizeHref("/manufacturing-programme")}>
               {isEs ? "Programa de fabricación" : "Manufacturing Programme"}
@@ -169,40 +202,51 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-[var(--color-paper)]/12 py-5 text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
-        <div className="container flex flex-wrap items-center justify-between gap-4">
-          <p>
-            {isEs ? (
-              <>
-                KarmaRise D Global es una marca de{" "}
-                <strong className="font-semibold text-[var(--color-paper)]">
-                  Karmarise Global LLP
-                </strong>{" "}
-                · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL · Constituida el 15
-                de mayo de 2025 (India)
-              </>
-            ) : (
-              <>
-                KarmaRise D Global is a brand of{" "}
-                <strong className="font-semibold text-[var(--color-paper)]">
-                  Karmarise Global LLP
-                </strong>{" "}
-                · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL · Incorporated 15 May
-                2025 (India)
-              </>
-            )}
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link className="underline" href={localizeHref("/legal-notice")}>
+      <div className="border-t border-[var(--color-paper)]/12 pt-6 pb-24 text-[length:var(--text-xs)] text-[var(--color-paper-2)]/65 xl:py-6">
+        <div className="container flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-8 xl:pr-52">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <p className="m-0 font-medium text-[var(--color-paper)]/85">
+              &copy; {new Date().getFullYear()} KarmaRise D Global
+            </p>
+            <div className="num flex flex-wrap items-center gap-x-5 gap-y-1 text-[var(--color-paper-2)]/60">
+              <span className="whitespace-nowrap">
+                <span className="tracking-[0.06em] text-[var(--color-paper-2)]/45 uppercase">
+                  LLPIN
+                </span>{" "}
+                ACO-3878
+              </span>
+              <span className="whitespace-nowrap">
+                <span className="tracking-[0.06em] text-[var(--color-paper-2)]/45 uppercase">
+                  GSTIN
+                </span>{" "}
+                27ABDFK8128R1ZL
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-0">
+            <Link
+              className="inline-flex min-h-[44px] items-center text-[var(--color-paper-2)]/70 no-underline transition-colors hover:text-[var(--color-paper)]"
+              href={localizeHref("/legal-notice")}
+            >
               {isEs ? "Aviso legal" : "Legal notice"}
             </Link>
-            <Link className="underline" href={localizeHref("/privacy-policy")}>
+            <Link
+              className="inline-flex min-h-[44px] items-center text-[var(--color-paper-2)]/70 no-underline transition-colors hover:text-[var(--color-paper)]"
+              href={localizeHref("/privacy-policy")}
+            >
               {isEs ? "Privacidad" : "Privacy"}
             </Link>
-            <Link className="underline" href={localizeHref("/cookie-policy")}>
+            <Link
+              className="inline-flex min-h-[44px] items-center text-[var(--color-paper-2)]/70 no-underline transition-colors hover:text-[var(--color-paper)]"
+              href={localizeHref("/cookie-policy")}
+            >
               {isEs ? "Cookies" : "Cookies"}
             </Link>
-            <Link className="underline" href={localizeHref("/terms")}>
+            <Link
+              className="inline-flex min-h-[44px] items-center text-[var(--color-paper-2)]/70 no-underline transition-colors hover:text-[var(--color-paper)]"
+              href={localizeHref("/terms")}
+            >
               {isEs ? "Condiciones" : "Terms"}
             </Link>
           </div>

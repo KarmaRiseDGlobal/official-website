@@ -17,6 +17,7 @@ export function HomeClient() {
       <main id="main">
         <section className="hero" id="top">
           <HeroVideo
+            eager
             label={
               isEs
                 ? "Imágenes de producción de un programa de fabricación de KarmaRise D Global"
@@ -88,7 +89,7 @@ export function HomeClient() {
                     : "Alma and a garment maker draping embroidered teal fabric on a dressmaker form in our studio in India"
                 }
                 fill
-                sizes="(max-width: 60rem) 100vw, 52vw"
+                sizes="(max-width: 64rem) 100vw, 54vw"
               />
               <figcaption>
                 {isEs

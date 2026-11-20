@@ -15,6 +15,7 @@ interface StoryMediaProps {
   showCaption?: boolean;
   figureNumber?: string;
   interactive?: boolean;
+  variant?: "card" | "editorial";
   className?: string;
 }
 
@@ -31,15 +32,21 @@ export function StoryMedia({
   showCaption = false,
   figureNumber,
   interactive = false,
+  variant = "card",
   className = "",
 }: StoryMediaProps) {
   if (image?.url) {
     const captionText = image.caption || description;
+    const isEditorial = variant === "editorial";
 
     return (
       <figure className={`m-0 grid gap-3 ${className}`}>
         <div
-          className={`relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)]/70 bg-[var(--color-paper-2)] ${aspectClass}`}
+          className={`relative overflow-hidden bg-[var(--color-paper-2)] ${
+            isEditorial
+              ? "rounded-none"
+              : "rounded-[var(--radius-card)] border border-[var(--color-rule)]/70"
+          } ${aspectClass}`}
         >
           <Image
             src={image.url}
@@ -60,7 +67,13 @@ export function StoryMedia({
           />
         </div>
         {showCaption && captionText ? (
-          <figcaption className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[var(--color-rule)]/70 pb-3 text-[length:var(--text-xs)] leading-[1.5] text-[var(--color-muted)]">
+          <figcaption
+            className={`flex flex-wrap items-baseline justify-between gap-2 text-[length:var(--text-xs)] leading-[1.55] text-[var(--color-muted)] ${
+              isEditorial
+                ? "pt-0.5"
+                : "border-b border-[var(--color-rule)]/70 pb-3"
+            }`}
+          >
             <span>{captionText}</span>
             {figureNumber ? (
               <span className="num shrink-0 font-semibold tracking-[0.06em] text-[var(--color-clay-ink)] uppercase">

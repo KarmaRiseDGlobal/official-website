@@ -151,8 +151,8 @@ test("getLayoutMetadata sets localized OpenGraph locales and card-only Twitter m
   );
 });
 
-test("getRouteMetadata returns compliant EN/ES titles, descriptions, and hreflang alternates for all 13 static routes", () => {
-  assert.equal(STATIC_ROUTES.length, 13);
+test("getRouteMetadata returns compliant EN/ES titles, descriptions, and hreflang alternates for all 14 static routes", () => {
+  assert.equal(STATIC_ROUTES.length, 14);
 
   for (const route of STATIC_ROUTES) {
     const enMeta = getRouteMetadata(route.key, "en");
@@ -286,6 +286,44 @@ test("getStoryMetadata prioritizes Spanish SEO/story fields on ES and handles mi
   assert.equal(enMeta.description, "EN SEO Description");
   assert.equal(enMeta.alternates?.canonical, `/stories/${baseStory.slug}`);
   assert.equal(enMeta.openGraph?.locale, "en_GB");
+});
+
+test("every story defines EN and ES SEO metadata without duplicating the brand suffix", () => {
+  for (const story of stories) {
+    assert.ok(story.seo?.title, `${story.slug} missing seo.title`);
+    assert.ok(story.seo?.description, `${story.slug} missing seo.description`);
+    assert.ok(
+      story.seo?.spanishTitle,
+      `${story.slug} missing seo.spanishTitle`,
+    );
+    assert.ok(
+      story.seo?.spanishDescription,
+      `${story.slug} missing seo.spanishDescription`,
+    );
+    assert.equal(
+      story.seo.title.includes("KarmaRise D Global"),
+      false,
+      `${story.slug} seo.title must not duplicate brand suffix`,
+    );
+    assert.equal(
+      story.seo.spanishTitle.includes("KarmaRise D Global"),
+      false,
+      `${story.slug} seo.spanishTitle must not duplicate brand suffix`,
+    );
+    if (story.leadImage) {
+      assert.ok(
+        story.spanishLeadAlt?.trim(),
+        `${story.slug} missing spanishLeadAlt`,
+      );
+    }
+    if (story.pairImages?.length) {
+      assert.equal(
+        story.spanishPairAlts?.length,
+        story.pairImages.length,
+        `${story.slug} spanishPairAlts count mismatch`,
+      );
+    }
+  }
 });
 
 test("sitemap emits paired EN and ES URLs with hreflang alternates for all static routes and stories", async () => {

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { NewsletterForm } from "@/components/newsletter-form";
+import { SectionBridge } from "@/components/section-bridge";
 import { StoryMedia } from "@/components/story-media";
 import { useLanguage } from "@/context/language-context";
 import {
@@ -285,7 +286,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
 
     media.add(
       {
-        desktop: "(min-width: 64.001rem)",
+        desktop: "(min-width: 80rem) and (hover: hover) and (pointer: fine)",
         reducedMotion: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
@@ -375,6 +376,8 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
           }
           const ctx = canvas.getContext("2d");
           if (ctx) {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             drawWatercolorWave(
               ctx,
               window.innerWidth,
@@ -386,11 +389,14 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
         };
 
         const syncCanvasSize = () => {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
           const w = window.innerWidth;
           const h = window.innerHeight;
-          if (canvas.width !== w || canvas.height !== h) {
-            canvas.width = w;
-            canvas.height = h;
+          const targetW = Math.round(w * dpr);
+          const targetH = Math.round(h * dpr);
+          if (canvas.width !== targetW || canvas.height !== targetH) {
+            canvas.width = targetW;
+            canvas.height = targetH;
           }
           measureDockTarget();
           lastDrawnWaveP = -1;
@@ -619,7 +625,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                 <button
                   type="button"
                   onClick={scrollToNewsletterAndFocus}
-                  className="cursor-pointer font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  className="inline-flex min-h-[44px] cursor-pointer items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 >
                   {isEs
                     ? "Recibir nuevas historias por correo"
@@ -632,6 +638,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
               <div className="lg:col-span-5">
                 <Link
                   href={localizeHref(`/stories/${heroStory.slug}`)}
+                  data-transition-title={heroStoryLocalized.title}
                   className="group block overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] shadow-[var(--shadow-card)]"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -644,51 +651,59 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                       fill
                       priority
                       sizes="(max-width: 64rem) 100vw, 42vw"
+                      style={
+                        heroStoryLocalized.leadImage.objectPosition
+                          ? {
+                              objectPosition:
+                                heroStoryLocalized.leadImage.objectPosition,
+                            }
+                          : undefined
+                      }
                       className="object-cover transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.03]"
                     />
                   </div>
-                  <div className="flex items-center justify-between gap-4 px-5 py-3.5 text-[length:var(--text-xs)]">
-                    <span className="font-semibold tracking-[0.05em] text-[var(--color-clay-ink)] uppercase">
-                      {heroStoryLocalized.categoryLabel}
-                    </span>
-                    <span className="font-medium text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4">
-                      {isEs ? "Leer historia destacada" : "Read featured Story"}
-                    </span>
+                  <div className="grid gap-2 px-5 py-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[length:var(--text-xs)]">
+                      <span className="font-semibold tracking-[0.05em] text-[var(--color-clay-ink)] uppercase">
+                        {heroStoryLocalized.categoryLabel}
+                      </span>
+                      <span className="font-medium text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4">
+                        {isEs
+                          ? "Leer historia destacada"
+                          : "Read featured Story"}
+                      </span>
+                    </div>
+                    <p className="font-[family-name:var(--font-display)] text-[length:var(--text-lg)] leading-[1.2] font-medium text-[var(--color-forest-deep)] transition-colors group-hover:text-[var(--color-clay-ink)]">
+                      {heroStoryLocalized.title}
+                    </p>
                   </div>
                 </Link>
               </div>
             ) : null}
           </div>
 
-          {/* Centered six-category strip with dividers only between items (no line before first or after last) */}
-          <div className="flex flex-wrap items-center justify-center gap-y-3 border-t border-[var(--color-rule)] pt-6 text-center">
-            {storyCategoryDetails.map((pillar, idx) => {
+          {/* Centered six-category wrapped pills (44px touch targets, zero orphaned dividers) */}
+          <div className="flex flex-wrap items-center justify-center gap-2 border-t border-[var(--color-rule)] pt-6 text-center">
+            {storyCategoryDetails.map((pillar) => {
               const localized = getLocalizedCategory(pillar.title, language);
               const isSelected = activeCategory === pillar.title;
               return (
-                <div key={pillar.slug} className="inline-flex items-center">
-                  {idx > 0 ? (
-                    <span
-                      className="mx-5 h-4 w-px bg-[var(--color-rule)]"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      selectCategoryAndBrowse(
-                        isSelected ? "All Stories" : pillar.title,
-                      )
-                    }
-                    className={`cursor-pointer text-[length:var(--text-sm)] font-semibold transition-colors ${
-                      isSelected
-                        ? "text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)] underline-offset-4"
-                        : "text-[var(--color-forest-deep)] hover:text-[var(--color-clay-ink)]"
-                    }`}
-                  >
-                    {localized.title}
-                  </button>
-                </div>
+                <button
+                  key={pillar.slug}
+                  type="button"
+                  onClick={() =>
+                    selectCategoryAndBrowse(
+                      isSelected ? "All Stories" : pillar.title,
+                    )
+                  }
+                  className={`inline-flex min-h-[44px] cursor-pointer items-center rounded-full border px-3.5 text-[length:var(--text-sm)] font-semibold transition-colors ${
+                    isSelected
+                      ? "border-[var(--color-forest-deep)] bg-[var(--color-forest-deep)] text-[var(--color-paper)]"
+                      : "border-[var(--color-rule)] bg-[var(--color-paper-2)]/60 text-[var(--color-forest-deep)] hover:border-[var(--color-forest-deep)] hover:text-[var(--color-clay-ink)]"
+                  }`}
+                >
+                  {localized.title}
+                </button>
               );
             })}
           </div>
@@ -724,6 +739,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                   >
                     <Link
                       href={localizeHref(`/stories/${story.slug}`)}
+                      data-transition-title={localized.title}
                       className="stories-corridor-media"
                       aria-label={localized.title}
                     >
@@ -732,8 +748,16 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                           src={localized.leadImage.url}
                           alt={localized.leadImage.alt || localized.title}
                           fill
-                          sizes="(max-width: 64rem) 100vw, 520px"
+                          sizes="(max-width: 80rem) 100vw, 520px"
                           priority={idx < 2}
+                          style={
+                            localized.leadImage.objectPosition
+                              ? {
+                                  objectPosition:
+                                    localized.leadImage.objectPosition,
+                                }
+                              : undefined
+                          }
                         />
                       ) : null}
                       <span className="stories-corridor-badge">
@@ -759,7 +783,10 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         </p>
 
                         <h3>
-                          <Link href={localizeHref(`/stories/${story.slug}`)}>
+                          <Link
+                            href={localizeHref(`/stories/${story.slug}`)}
+                            data-transition-title={localized.title}
+                          >
                             {localized.title}
                           </Link>
                         </h3>
@@ -779,6 +806,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
 
                         <Link
                           href={localizeHref(`/stories/${story.slug}`)}
+                          data-transition-title={localized.title}
                           className="stories-corridor-link"
                         >
                           {isEs ? "Leer historia" : "Read Story"}
@@ -980,7 +1008,10 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                 </div>
               </div>
 
-              <div className="grid gap-8 md:grid-cols-2">
+              <div
+                key={activeCategory}
+                className="stories-category-grid grid gap-8 md:grid-cols-2"
+              >
                 {filteredStories.map((story) => {
                   const localized = getLocalizedStory(story, language);
                   return (
@@ -991,6 +1022,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                       <div className="grid gap-4">
                         <Link
                           href={localizeHref(`/stories/${story.slug}`)}
+                          data-transition-title={localized.title}
                           className="block"
                         >
                           <StoryMedia
@@ -1013,7 +1045,10 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                           </span>
                         </div>
                         <h3 className="text-[length:var(--text-xl)] leading-[1.15] font-medium">
-                          <Link href={localizeHref(`/stories/${story.slug}`)}>
+                          <Link
+                            href={localizeHref(`/stories/${story.slug}`)}
+                            data-transition-title={localized.title}
+                          >
                             {localized.title}
                           </Link>
                         </h3>
@@ -1029,6 +1064,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         </span>
                         <Link
                           href={localizeHref(`/stories/${story.slug}`)}
+                          data-transition-title={localized.title}
                           className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
                         >
                           {isEs ? "Leer historia" : "Read Story"}
@@ -1189,6 +1225,8 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
           </div>
         </div>
       </section>
+
+      <SectionBridge from="forest-deep" to="night" className="z-[10]" />
     </div>
   );
 }

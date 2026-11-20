@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 
@@ -79,6 +80,8 @@ export function AboutPageClient() {
           </div>
         </section>
 
+        <SectionBridge from="forest-deep" to="paper" />
+
         <section className={styles.founder} id="alma">
           <div className={`${styles.founderGrid} container`}>
             <figure className={styles.founderPortrait}>
@@ -90,7 +93,7 @@ export function AboutPageClient() {
                     : "Alma at a coastal hillside overlook in Spain"
                 }
                 fill
-                sizes="(max-width: 60rem) 100vw, 50vw"
+                sizes="(max-width: 64rem) 100vw, 50vw"
                 priority
               />
             </figure>
@@ -156,11 +159,13 @@ export function AboutPageClient() {
                     : "Shirish seated at his office desk in India"
                 }
                 fill
-                sizes="(max-width: 60rem) 100vw, 50vw"
+                sizes="(max-width: 64rem) 100vw, 50vw"
               />
             </figure>
           </div>
         </section>
+
+        <SectionBridge from="paper" to="forest-deep" />
 
         <section className={styles.origin}>
           <div className={`${styles.originStory} section-intro container`}>
@@ -172,6 +177,8 @@ export function AboutPageClient() {
             </p>
           </div>
         </section>
+
+        <SectionBridge from="forest-deep" to="pale-sage" />
 
         <section className={styles.meaning}>
           <div className="container grid gap-[var(--space-2xl)]">
@@ -204,6 +211,8 @@ export function AboutPageClient() {
           </div>
         </section>
 
+        <SectionBridge from="pale-sage" to="paper" />
+
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
@@ -214,7 +223,7 @@ export function AboutPageClient() {
               </h2>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2">
               {companyPrinciples.map((principle) => (
                 <article
                   key={principle.id}
@@ -244,7 +253,7 @@ export function AboutPageClient() {
                       : "Alma and three workshop specialists inspecting cognac leather hides on a table in India"
                   }
                   fill
-                  sizes="(max-width: 44rem) 100vw, 58vw"
+                  sizes="(max-width: 64rem) 100vw, 58vw"
                 />
               </figure>
               <div className={styles.indiaCopy}>
@@ -256,17 +265,17 @@ export function AboutPageClient() {
                 <p>
                   {isEs
                     ? "Trabajar piel estructurada exige una maquinaria y unas manos muy distintas a las de cortar y coser prendas de tejido ligero. Alma y Shirish visitan talleres por toda la India para comprobar qué hace bien cada uno y qué Product Brief puede asumir."
-                    : "Working with structured leather takes a different setup from cutting and sewing woven garments. Alma and Shirish visit workshops across India to see what each does well and which Product Briefs it can take on."}{" "}
-                  <Link href={localizeHref("/manufacturing-programme")}>
-                    {isEs
-                      ? "Descubre cómo seleccionamos a cada socio de fabricación."
-                      : "See how we choose a Manufacturing Partner."}
-                  </Link>
+                    : "Working with structured leather takes a different setup from cutting and sewing woven garments. Alma and Shirish visit workshops across India to see what each does well and which Product Briefs it can take on."}
                 </p>
+                <Link href={localizeHref("/manufacturing-programme")}>
+                  {isEs
+                    ? "Descubre cómo seleccionamos a cada socio de fabricación."
+                    : "See how we choose a Manufacturing Partner."}
+                </Link>
               </div>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2">
               <figure className="relative m-0 aspect-[3/2] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper-2)]">
                 <Image
                   src="/images/shirish_with_workers_at_warehouse (1).jpeg"
@@ -276,7 +285,7 @@ export function AboutPageClient() {
                       : "Shirish greeting a master cutter at the leather workshop table in India"
                   }
                   fill
-                  sizes="(max-width: 48rem) 100vw, 48vw"
+                  sizes="(max-width: 40rem) 100vw, 48vw"
                   className="object-cover"
                 />
               </figure>
@@ -289,13 +298,15 @@ export function AboutPageClient() {
                       : "Shirish and an artisan inspecting striped cotton linings and zippers before assembly"
                   }
                   fill
-                  sizes="(max-width: 48rem) 100vw, 48vw"
+                  sizes="(max-width: 40rem) 100vw, 48vw"
                   className="object-cover"
                 />
               </figure>
             </div>
           </div>
         </section>
+
+        <SectionBridge from="paper" to="dune" />
 
         <section className="bg-[var(--color-dune)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--gap-columns)] lg:grid-cols-12">
@@ -305,7 +316,7 @@ export function AboutPageClient() {
               </h2>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2 lg:col-span-7">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2 lg:col-span-7">
               <article className="grid content-start gap-2 border-t border-[var(--color-rule-2)]/45 pt-4">
                 <h3 className="text-[length:var(--text-title)] font-medium">
                   {isEs ? "Operaciones en la India" : "India operations"}
@@ -326,9 +337,9 @@ export function AboutPageClient() {
                     ? "Centrados principalmente en marcas y comercios de España junto al resto de Europa, hablando directamente en español e inglés."
                     : "Focused primarily on brands and retailers in Spain alongside wider Europe, speaking directly in Spanish and English."}
                 </p>
-                <div className="pt-2">
+                <div className="pt-1">
                   <Link
-                    className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                    className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                     href={localizeHref("/contact")}
                   >
                     {isEs ? "Ver datos de contacto" : "View contact details"}
@@ -358,7 +369,7 @@ export function AboutPageClient() {
                       : "Contemporary magenta and gold zari outer garment tailored by Almarise from an Indian saree"
                   }
                   fill
-                  sizes="(max-width: 60rem) 100vw, 33vw"
+                  sizes="(max-width: 46rem) 100vw, (max-width: 80rem) 50vw, 33vw"
                   className="object-cover object-top"
                 />
               </figure>
@@ -369,7 +380,7 @@ export function AboutPageClient() {
                   : "Our fashion brand turns existing Indian sarees into contemporary women's clothing for Spain and Europe."}
               </p>
               <Link
-                className="w-fit font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/almarise")}
               >
                 {isEs ? "Conocer Almarise" : "Explore Almarise"}
@@ -385,7 +396,7 @@ export function AboutPageClient() {
                       : "Alma and a garment maker holding a burgundy and gold woven textile in our studio in India"
                   }
                   fill
-                  sizes="(max-width: 60rem) 100vw, 33vw"
+                  sizes="(max-width: 46rem) 100vw, (max-width: 80rem) 50vw, 33vw"
                   className="object-cover"
                 />
               </figure>
@@ -400,7 +411,7 @@ export function AboutPageClient() {
                   : "A planned programme in India for garment design and stitching skills, with paid employment opportunities as a long-term aim."}
               </p>
               <Link
-                className="w-fit font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/womens-training-initiative")}
               >
                 {isEs
@@ -410,6 +421,8 @@ export function AboutPageClient() {
             </article>
           </div>
         </section>
+
+        <SectionBridge from="dune" to="forest-deep" />
 
         <section className={styles.invitation}>
           <div className={`${styles.invitationInner} container`}>

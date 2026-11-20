@@ -34,7 +34,7 @@
 .heroCopy h1 {
   max-width: 10ch;
   color: var(--color-paper);
-  font-size: clamp(3.25rem, 6.4vw, 6.25rem);
+  font-size: clamp(2.25rem, 6.4vw - 0.15rem, 6.25rem);
   font-weight: 500;
   letter-spacing: -0.018em;
   line-height: 0.98;
@@ -132,7 +132,7 @@
 .originStory h2 {
   max-width: 14ch;
   color: var(--color-paper);
-  font-size: clamp(2.75rem, 5.8vw, 5.75rem);
+  font-size: clamp(2.1rem, 5.6vw, 5.75rem);
   letter-spacing: -0.018em;
   line-height: 1;
 }
@@ -203,7 +203,10 @@
 }
 
 .indiaCopy a {
+  display: inline-flex;
+  min-height: 44px;
   width: fit-content;
+  align-items: center;
   color: var(--color-forest-deep);
   font-weight: 600;
   text-decoration-color: var(--color-clay);
@@ -272,7 +275,7 @@
 .invitation h2 {
   max-width: 14ch;
   color: var(--color-paper);
-  font-size: clamp(2.65rem, 5.2vw, 5.25rem);
+  font-size: clamp(2.1rem, 5.2vw, 5.25rem);
   letter-spacing: -0.018em;
   line-height: 1.02;
 }
@@ -324,25 +327,64 @@
   background: var(--color-forest-deep);
 }
 
+.togetherPortrait::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(
+    180deg,
+    var(--color-forest-deep) 0%,
+    color-mix(in srgb, var(--color-forest-deep) 68%, transparent) 8%,
+    transparent 24%,
+    transparent 74%,
+    color-mix(in srgb, var(--color-night) 76%, transparent) 90%,
+    var(--color-night) 100%
+  );
+}
+
 .togetherPortrait img {
   object-fit: cover;
   object-position: center bottom;
 }
 
-@media (max-width: 44rem) {
-  .hero,
-  .heroInner {
-    min-height: max(100svh, 720px);
+@media (width < 80rem) {
+  .founderPortrait {
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+    max-height: 70svh;
   }
 
+  .indiaImage {
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    max-height: 62svh;
+  }
+
+  .togetherPortrait {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    max-height: 62svh;
+  }
+
+  .futureGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .futureHeading {
+    grid-column: 1 / -1;
+    max-width: 720px;
+    padding-right: 0;
+    padding-bottom: var(--space-md);
+  }
+}
+
+@media (width < 64rem) {
   .heroInner {
-    padding-top: calc(var(--nav-height) + var(--space-3xl));
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .heroCopy h1 {
-    max-width: 10ch;
-    font-size: clamp(2.5rem, 11.5vw, 3.85rem);
   }
 
   .heroCopy {
@@ -351,28 +393,14 @@
   }
 
   .heroIntro {
-    max-width: 30ch;
     padding-bottom: 0;
-  }
-
-  .founder {
-    padding-block: var(--section-gap-l);
-  }
-
-  .founder + .founder {
-    padding-top: 0;
   }
 
   .founderGrid,
   .founderShirish .founderGrid,
   .meaningGrid,
-  .indiaGrid,
-  .futureGrid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .founderGrid,
   .indiaGrid {
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2xl);
   }
 
@@ -384,29 +412,23 @@
     order: 1;
   }
 
-  .founderPortrait {
-    min-height: 620px;
-  }
-
   .founderCopy {
     gap: var(--space-lg);
   }
+}
 
-  .meaningGrid,
+@media (width < 46rem) {
+  .heroIntro {
+    max-width: 34ch;
+  }
+
   .futureGrid {
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2xl);
   }
 
-  .originStory h2 {
-    font-size: clamp(2.35rem, 11vw, 3.75rem);
-  }
-
-  .indiaImage {
-    min-height: 440px;
-  }
-
   .futureHeading {
-    padding-right: 0;
+    padding-bottom: 0;
   }
 
   .future article {
@@ -417,32 +439,5 @@
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .togetherPortrait {
-    min-height: 720px;
-  }
-}
-
-@media (min-width: 44.01rem) and (max-width: 60rem) {
-  .founderGrid,
-  .founderShirish .founderGrid,
-  .indiaGrid {
-    gap: var(--space-2xl);
-  }
-
-  .founderPortrait {
-    min-height: 680px;
-  }
-
-  .futureGrid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-
-  .futureHeading {
-    grid-column: 1 / -1;
-    max-width: 720px;
-    padding-right: 0;
-    padding-bottom: var(--space-2xl);
   }
 }

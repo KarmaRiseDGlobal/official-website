@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroVideo } from "@/components/hero-video";
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 
@@ -143,8 +144,10 @@ export function WorkingAcrossDistancePageClient() {
             </div>
 
             <HeroVideo
+              eager
               className="m-0 overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-night)]"
               videoClassName="block aspect-video w-full object-cover"
+              poster="/media/posters/banner.jpg"
               label={
                 isEs
                   ? "Trabajo conjunto entre España y los talleres en la India"
@@ -155,6 +158,8 @@ export function WorkingAcrossDistancePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="forest-deep" to="paper" />
+
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
@@ -163,7 +168,7 @@ export function WorkingAcrossDistancePageClient() {
               </h2>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2">
               <article className="grid content-start gap-5">
                 <figure className="relative m-0 aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper-2)]">
                   <Image
@@ -175,7 +180,7 @@ export function WorkingAcrossDistancePageClient() {
                     }
                     fill
                     className="object-cover"
-                    sizes="(max-width: 48rem) 100vw, 48vw"
+                    sizes="(max-width: 40rem) 100vw, 48vw"
                   />
                 </figure>
                 <h3 className="text-[length:var(--text-2xl)] font-medium">
@@ -199,7 +204,7 @@ export function WorkingAcrossDistancePageClient() {
                     }
                     fill
                     className="object-cover"
-                    sizes="(max-width: 48rem) 100vw, 48vw"
+                    sizes="(max-width: 40rem) 100vw, 48vw"
                   />
                 </figure>
                 <h3 className="text-[length:var(--text-2xl)] font-medium">
@@ -216,6 +221,8 @@ export function WorkingAcrossDistancePageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="paper" to="forest-deep" />
 
         <section className="bg-[var(--color-forest-deep)] py-[var(--section-gap)] text-[var(--color-paper)]">
           <div className="container grid gap-[var(--space-3xl)]">
@@ -247,7 +254,7 @@ export function WorkingAcrossDistancePageClient() {
                   <div
                     className={`lg:col-span-6 ${index % 2 === 1 ? "lg:order-1" : ""}`}
                   >
-                    <figure className="relative m-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-night)]">
+                    <figure className="relative mx-auto my-0 aspect-[4/5] w-full max-w-[32rem] overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-night)] lg:max-w-none">
                       <Image
                         src={item.image}
                         alt={item.imageAlt[language]}
@@ -262,6 +269,8 @@ export function WorkingAcrossDistancePageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="forest-deep" to="pale-sage" />
 
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
@@ -292,6 +301,7 @@ export function WorkingAcrossDistancePageClient() {
               <HeroVideo
                 className="m-0 overflow-hidden rounded-[var(--radius-card)] bg-[var(--color-paper)]"
                 videoClassName="block aspect-video w-full object-cover"
+                poster="/media/posters/women-artisans.jpg"
                 label={
                   isEs
                     ? "Artesanas trabajando en el estudio textil en la India"
@@ -303,6 +313,8 @@ export function WorkingAcrossDistancePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="pale-sage" to="wood" />
+
         <section className="bg-[var(--color-wood)] py-[var(--section-gap)] text-[var(--color-paper)]">
           <div className="container grid items-end gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-[var(--space-lg)] lg:col-span-7">
@@ -312,7 +324,7 @@ export function WorkingAcrossDistancePageClient() {
                   : "Let's talk about your product."}
               </h2>
             </div>
-            <div className="flex flex-wrap items-center gap-6 lg:col-span-5 lg:justify-end">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center lg:col-span-5 lg:flex-col lg:items-end xl:flex-row xl:flex-wrap xl:items-center xl:justify-end xl:gap-6">
               <Link
                 className="primary-button"
                 href={localizeHref("/product-brief")}
@@ -320,7 +332,7 @@ export function WorkingAcrossDistancePageClient() {
                 {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
               </Link>
               <Link
-                className="font-semibold text-[var(--color-paper)] underline decoration-[var(--color-clay-light)] underline-offset-4 hover:text-[var(--color-clay-light)]"
+                className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-paper)] underline decoration-[var(--color-clay-light)] underline-offset-4 hover:text-[var(--color-clay-light)]"
                 href={localizeHref("/manufacturing-programme")}
               >
                 {isEs
@@ -330,6 +342,8 @@ export function WorkingAcrossDistancePageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="wood" to="night" />
       </main>
 
       <SiteFooter />

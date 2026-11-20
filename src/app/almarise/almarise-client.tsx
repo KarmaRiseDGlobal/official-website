@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import {
   segmentParagraphWithReferences,
@@ -176,6 +177,8 @@ export function AlmarisePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="forest-deep" to="paper" />
+
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-[var(--space-lg)] lg:col-span-6">
@@ -197,7 +200,7 @@ export function AlmarisePageClient() {
               </p>
               <div>
                 <Link
-                  className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                   href={localizeHref(
                     "/stories/giving-maharashtrian-sarees-a-second-life",
                   )}
@@ -210,7 +213,7 @@ export function AlmarisePageClient() {
             </div>
 
             <div className="lg:col-span-6">
-              <figure className="relative m-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
+              <figure className="relative mx-auto my-0 aspect-[4/5] w-full max-w-[32rem] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] lg:max-w-none">
                 <Image
                   src="/images/alma_with_a_woman (2).jpeg"
                   alt={
@@ -227,6 +230,8 @@ export function AlmarisePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="paper" to="dune" />
+
         <section className="bg-[var(--color-dune)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
@@ -237,7 +242,7 @@ export function AlmarisePageClient() {
               </h2>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-3">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2 lg:grid-cols-3">
               {transformationSteps.map((step) => (
                 <article key={step.number} className="grid content-start gap-4">
                   <figure className="relative m-0 aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule-2)]/40 bg-[var(--color-paper)]">
@@ -245,7 +250,7 @@ export function AlmarisePageClient() {
                       src={step.image}
                       alt={step.imageAlt[language]}
                       fill
-                      sizes="(max-width: 48rem) 100vw, 33vw"
+                      sizes="(max-width: 40rem) 100vw, (max-width: 64rem) 50vw, 33vw"
                       className="object-cover"
                     />
                   </figure>
@@ -264,6 +269,8 @@ export function AlmarisePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="dune" to="paper" />
+
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
@@ -278,15 +285,15 @@ export function AlmarisePageClient() {
               </p>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-3">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2 lg:grid-cols-3">
               {lookbookItems.map((item) => (
                 <figure key={item.id} className="m-0 grid content-start gap-3">
-                  <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
+                  <div className="relative mx-auto aspect-[3/4] w-full max-w-[26rem] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] sm:max-w-none">
                     <Image
                       src={item.image}
                       alt={item.alt[language]}
                       fill
-                      sizes="(max-width: 48rem) 100vw, 33vw"
+                      sizes="(max-width: 40rem) 100vw, (max-width: 64rem) 50vw, 33vw"
                       className="object-cover"
                     />
                   </div>
@@ -298,6 +305,8 @@ export function AlmarisePageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="paper" to="pale-sage" />
 
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
@@ -312,9 +321,9 @@ export function AlmarisePageClient() {
               </p>
             </div>
 
-            <div className="grid gap-4 lg:col-span-5">
+            <div className="grid gap-2 lg:col-span-5">
               <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/manufacturing-programme")}
               >
                 {isEs
@@ -322,7 +331,7 @@ export function AlmarisePageClient() {
                   : "Explore the Manufacturing Programme"}
               </Link>
               <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/womens-training-initiative")}
               >
                 {isEs
@@ -330,7 +339,7 @@ export function AlmarisePageClient() {
                   : "Read about the planned Women's Training Initiative"}
               </Link>
               <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/contact")}
               >
                 {isEs ? "Preguntarnos por Almarise" : "Ask us about Almarise"}
@@ -338,6 +347,8 @@ export function AlmarisePageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="pale-sage" to="night" />
       </main>
 
       <SiteFooter />

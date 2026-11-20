@@ -70,6 +70,7 @@
   --container: 1440px;
   --gutter: 64px;
   --gap-columns: 32px;
+  --tap-min: 44px;
   --section-gap-s: 120px;
   --section-gap: 144px;
   --section-gap-l: 176px;
@@ -81,19 +82,30 @@
   --z-modal: 400;
   --z-toast: 500;
   --z-tooltip: 600;
+  --z-loader: 1000;
   --rule-hair: 1px;
   --rule-heavy: 4px;
   --display-weight: 400;
 }
-@media (max-width: 60rem) {
+@media (width < 80rem) {
   :root {
-    --gutter: 24px;
-    --section-gap-s: 80px;
-    --section-gap: 96px;
-    --section-gap-l: 120px;
+    --gutter: 40px;
+    --gap-columns: 28px;
+    --section-gap-s: 96px;
+    --section-gap: 112px;
+    --section-gap-l: 136px;
   }
 }
-@media (max-width: 40rem) {
+@media (width < 64rem) {
+  :root {
+    --gutter: 28px;
+    --gap-columns: 24px;
+    --section-gap-s: 76px;
+    --section-gap: 92px;
+    --section-gap-l: 112px;
+  }
+}
+@media (width < 40rem) {
   :root {
     --gutter: 16px;
     --section-gap-s: 56px;

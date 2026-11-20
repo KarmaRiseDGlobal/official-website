@@ -43,6 +43,13 @@ const secondaryLinks: readonly NavLinkItem[] = [
     },
   },
   {
+    href: "/book-a-call",
+    label: {
+      en: "Book a video call",
+      es: "Reservar videollamada",
+    },
+  },
+  {
     href: "/contact",
     label: {
       en: "Contact",
@@ -88,7 +95,7 @@ export function SiteMenu() {
   useEffect(() => {
     if (!langMenuOpen) return;
 
-    const onPointerDown = (event: MouseEvent) => {
+    const onPointerDown = (event: PointerEvent) => {
       if (
         langContainerRef.current &&
         event.target instanceof Node &&
@@ -104,10 +111,10 @@ export function SiteMenu() {
       }
     };
 
-    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onEscape);
     return () => {
-      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onEscape);
     };
   }, [langMenuOpen]);
@@ -166,17 +173,39 @@ export function SiteMenu() {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [open, pathname]);
 
+  function normalizePath(path: string): string {
+    return path.replace(/\/+$/, "") || "/";
+  }
+
+  function scrollToTop() {
+    delete document.body.dataset.menuOpen;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: reducedMotion ? "auto" : "smooth",
+      });
+    });
+  }
+
   function handleNavigate(
     href: string,
     event: React.MouseEvent<HTMLAnchorElement>,
   ) {
     setOpen(false);
     setLangMenuOpen(false);
-    pageToScroll.current = href;
-    if (href === pathname) {
+    if (normalizePath(href) === normalizePath(pathname || "/")) {
       event.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (window.location.hash) {
+        window.history.replaceState(null, "", href);
+      }
+      scrollToTop();
+      return;
     }
+    pageToScroll.current = href;
   }
 
   return (
@@ -217,16 +246,14 @@ export function SiteMenu() {
             className="brand-lockup"
             href={localizeHref("/")}
             aria-label="KarmaRise D Global"
-            onClick={() => {
-              setOpen(false);
-              setLangMenuOpen(false);
-            }}
+            onClick={(event) => handleNavigate(localizeHref("/"), event)}
           >
             <Image
               src="/brand/main-logo-transparent.png"
               alt=""
               width={701}
               height={815}
+              sizes="72px"
               priority
             />
           </Link>
@@ -359,6 +386,7 @@ export function SiteMenu() {
                 alt=""
                 width={701}
                 height={815}
+                sizes="96px"
               />
               <h2>
                 {isEs

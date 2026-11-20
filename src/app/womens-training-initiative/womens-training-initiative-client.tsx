@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 
@@ -144,6 +145,8 @@ export function WomensTrainingInitiativePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="paper" to="forest-deep" />
+
         <section className="bg-[var(--color-forest-deep)] py-[var(--section-gap)] text-[var(--color-paper)]">
           <div className="container grid gap-[var(--space-xl)]">
             <p className="max-w-[32ch] font-[family-name:var(--font-display)] text-[length:var(--text-display-s)] leading-[1.12] text-[var(--color-paper)]">
@@ -153,6 +156,8 @@ export function WomensTrainingInitiativePageClient() {
             </p>
           </div>
         </section>
+
+        <SectionBridge from="forest-deep" to="paper" />
 
         <section className="bg-[var(--color-paper)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
@@ -164,15 +169,15 @@ export function WomensTrainingInitiativePageClient() {
               </h2>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2">
               {trainingTopics.map((topic) => (
                 <article key={topic.id} className="grid content-start gap-4">
-                  <figure className="relative m-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
+                  <figure className="relative mx-auto my-0 aspect-[4/5] w-full max-w-[32rem] overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] sm:max-w-none">
                     <Image
                       src={topic.image}
                       alt={topic.imageAlt[language]}
                       fill
-                      sizes="(max-width: 48rem) 100vw, 48vw"
+                      sizes="(max-width: 40rem) 100vw, 48vw"
                       className="object-cover"
                     />
                   </figure>
@@ -188,6 +193,8 @@ export function WomensTrainingInitiativePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="paper" to="dune" />
+
         <section className="bg-[var(--color-dune)] py-[var(--section-gap)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-2xl)]">
             <div className="grid gap-[var(--space-md)]">
@@ -198,7 +205,7 @@ export function WomensTrainingInitiativePageClient() {
               </h2>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-3">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2 lg:grid-cols-3">
               {roadmapStages.map((item) => (
                 <article
                   key={item.id}
@@ -219,6 +226,8 @@ export function WomensTrainingInitiativePageClient() {
           </div>
         </section>
 
+        <SectionBridge from="dune" to="pale-sage" />
+
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
           <div className="container grid items-center gap-[var(--gap-columns)] lg:grid-cols-12">
             <div className="grid gap-4 lg:col-span-7">
@@ -233,9 +242,9 @@ export function WomensTrainingInitiativePageClient() {
                   : "We would like to hear from garment trainers, pattern makers, and others in India who can help develop the programme."}
               </p>
             </div>
-            <div className="grid gap-4 lg:col-span-5">
+            <div className="grid gap-2 lg:col-span-5">
               <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/contact")}
               >
                 {isEs
@@ -243,13 +252,13 @@ export function WomensTrainingInitiativePageClient() {
                   : "Contact us about the initiative"}
               </Link>
               <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/stories")}
               >
                 {isEs ? "Leer avances en Historias" : "Read company updates"}
               </Link>
               <Link
-                className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] w-fit items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/almarise")}
               >
                 {isEs ? "Conocer Almarise" : "Learn about Almarise"}
@@ -257,6 +266,8 @@ export function WomensTrainingInitiativePageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="pale-sage" to="night" />
       </main>
 
       <SiteFooter />

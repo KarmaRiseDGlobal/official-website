@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 
 import { SiteFooter } from "@/components/site-footer";
 import { StoriesBrowser } from "@/components/stories-browser";
-import { getStories } from "@/lib/sanity";
+import { getStorySummaries } from "@/lib/sanity";
 import { getRouteMetadata } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = getRouteMetadata("stories", "en");
 
 export default async function StoriesPage() {
-  const allStories = await getStories();
+  const allStories = await getStorySummaries();
 
   return (
     <>

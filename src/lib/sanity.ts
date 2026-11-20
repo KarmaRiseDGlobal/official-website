@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import {
   stories as fallbackStories,
   type StoryBodyBlock,
@@ -284,7 +286,47 @@ export const STORY_PROJECTION = `{
   }
 }`;
 
+export const STORY_SUMMARY_PROJECTION = `{
+  "slug": slug.current,
+  featured,
+  newsletterEligible,
+  language,
+  issueNumber,
+  publishedAt,
+  readingTimeMinutes,
+  category,
+  location,
+  spanishLocation,
+  title,
+  spanishTitle,
+  summary,
+  spanishSummary,
+  "author": {
+    "name": coalesce(authorRef->name, author.name),
+    "role": coalesce(authorRef->role, author.role),
+    "spanishRole": coalesce(authorRef->spanishRole, author.spanishRole),
+    "location": coalesce(authorRef->location, author.location),
+    "spanishLocation": coalesce(authorRef->spanishLocation, author.spanishLocation),
+    "portraitUrl": authorRef->portrait.asset->url
+  },
+  tags,
+  spanishTags,
+  "leadImage": {
+    "url": leadImage.asset->url,
+    "alt": leadImage.alt,
+    "spanishAlt": leadImage.spanishAlt,
+    "caption": leadImage.caption,
+    "spanishCaption": leadImage.spanishCaption,
+    "objectPosition": leadImage.objectPosition,
+    "hotspot": leadImage.hotspot
+  },
+  spanishLeadAlt,
+  spanishLeadCaption,
+  leadSlot
+}`;
+
 const ALL_STORIES_QUERY = `*[_type == "story" && defined(slug.current)] | order(coalesce(featured, false) desc, coalesce(publishedAt, _createdAt) desc) ${STORY_PROJECTION}`;
+const ALL_STORY_SUMMARIES_QUERY = `*[_type == "story" && defined(slug.current)] | order(coalesce(featured, false) desc, coalesce(publishedAt, _createdAt) desc) ${STORY_SUMMARY_PROJECTION}`;
 const STORY_BY_SLUG_QUERY = `*[_type == "story" && slug.current == $slug][0] ${STORY_PROJECTION}`;
 
 const NEWSLETTER_ISSUE_BY_ID_QUERY = `*[_type == "newsletterIssue" && _id == $id][0]{
@@ -822,7 +864,7 @@ export function normalizeStory(
       portraitUrl:
         raw.author?.portraitUrl ||
         fallbackMatch?.author.portraitUrl ||
-        "/images/alma-and-shirish-founders.jpg",
+        "/images/alma-and-shirish-avatar.jpg",
     },
     tags,
     spanishTags,
@@ -930,7 +972,11 @@ export async function fetchSanity<T>(
   }
 
   const token = process.env.SANITY_API_KEY?.trim();
-  const url = `https://${config.projectId}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${config.dataset}?${searchParams.toString()}`;
+  const useCdn = options.cache !== "no-store";
+  const host = useCdn
+    ? `${config.projectId}.apicdn.sanity.io`
+    : `${config.projectId}.api.sanity.io`;
+  const url = `https://${host}/v${SANITY_API_VERSION}/data/query/${config.dataset}?${searchParams.toString()}`;
 
   const fetchInit: RequestInit & {
     next?: { revalidate?: number; tags?: string[] };
@@ -942,7 +988,7 @@ export async function fetchSanity<T>(
     fetchInit.cache = "no-store";
   } else {
     fetchInit.next = {
-      revalidate: options.revalidate ?? 30,
+      revalidate: options.revalidate ?? 300,
       tags: options.tags ?? ["stories"],
     };
   }
@@ -1012,21 +1058,36 @@ export async function getNewsletterIssueById(
   );
 }
 
-/** Fetches published Stories from Sanity merged with any local static Stories not yet synced to Sanity. */
-export async function getStories(): Promise<StoryEntry[]> {
-  const rawStories = await fetchSanity<SanityRawStory[]>(ALL_STORIES_QUERY);
-  if (!rawStories?.length) {
-    return fallbackStories;
-  }
+function toStorySummary(story: StoryEntry): StoryEntry {
+  return {
+    slug: story.slug,
+    featured: story.featured,
+    newsletterEligible: story.newsletterEligible,
+    language: story.language,
+    issueNumber: story.issueNumber,
+    publishedAt: story.publishedAt,
+    readingTimeMinutes: story.readingTimeMinutes,
+    category: story.category,
+    location: story.location,
+    spanishLocation: story.spanishLocation,
+    title: story.title,
+    spanishTitle: story.spanishTitle,
+    summary: story.summary,
+    spanishSummary: story.spanishSummary,
+    author: story.author,
+    tags: story.tags,
+    spanishTags: story.spanishTags,
+    leadImage: story.leadImage,
+    spanishLeadAlt: story.spanishLeadAlt,
+    spanishLeadCaption: story.spanishLeadCaption,
+    leadSlot: story.leadSlot,
+    pairSlots: story.pairSlots,
+    sections: [],
+    takeaway: "",
+  };
+}
 
-  const normalized = rawStories
-    .map((entry) => normalizeStory(entry))
-    .filter((entry): entry is StoryEntry => entry !== null);
-
-  if (normalized.length === 0) {
-    return fallbackStories;
-  }
-
+function mergeWithFallbackStories(normalized: StoryEntry[]): StoryEntry[] {
   const seenSlugs = new Set(normalized.map((entry) => entry.slug));
   const missingLocalStories = fallbackStories.filter(
     (entry) => !seenSlugs.has(entry.slug),
@@ -1044,17 +1105,55 @@ export async function getStories(): Promise<StoryEntry[]> {
   });
 }
 
-/** Fetches one Story by slug from Sanity, falling back to static Stories if unavailable. */
-export async function getStoryBySlug(
-  slug: string,
-): Promise<StoryEntry | undefined> {
-  const rawStory = await fetchSanity<SanityRawStory>(STORY_BY_SLUG_QUERY, {
-    slug,
-  });
-  const normalized = normalizeStory(rawStory);
-  if (normalized) {
-    return normalized;
+/** Fetches published Stories from Sanity merged with any local static Stories not yet synced to Sanity. */
+export const getStories = cache(async (): Promise<StoryEntry[]> => {
+  const rawStories = await fetchSanity<SanityRawStory[]>(ALL_STORIES_QUERY);
+  if (!rawStories?.length) {
+    return fallbackStories;
   }
 
-  return fallbackStories.find((entry) => entry.slug === slug);
-}
+  const normalized = rawStories
+    .map((entry) => normalizeStory(entry))
+    .filter((entry): entry is StoryEntry => entry !== null);
+
+  if (normalized.length === 0) {
+    return fallbackStories;
+  }
+
+  return mergeWithFallbackStories(normalized);
+});
+
+/** Fetches lightweight Story summaries (without body/sections) for index grids, related strips, and sitemaps. */
+export const getStorySummaries = cache(async (): Promise<StoryEntry[]> => {
+  const rawStories = await fetchSanity<SanityRawStory[]>(
+    ALL_STORY_SUMMARIES_QUERY,
+  );
+  if (!rawStories?.length) {
+    return fallbackStories.map(toStorySummary);
+  }
+
+  const normalized = rawStories
+    .map((entry) => normalizeStory(entry))
+    .filter((entry): entry is StoryEntry => entry !== null);
+
+  if (normalized.length === 0) {
+    return fallbackStories.map(toStorySummary);
+  }
+
+  return mergeWithFallbackStories(normalized).map(toStorySummary);
+});
+
+/** Fetches one Story by slug from Sanity, falling back to static Stories if unavailable. */
+export const getStoryBySlug = cache(
+  async (slug: string): Promise<StoryEntry | undefined> => {
+    const rawStory = await fetchSanity<SanityRawStory>(STORY_BY_SLUG_QUERY, {
+      slug,
+    });
+    const normalized = normalizeStory(rawStory);
+    if (normalized) {
+      return normalized;
+    }
+
+    return fallbackStories.find((entry) => entry.slug === slug);
+  },
+);

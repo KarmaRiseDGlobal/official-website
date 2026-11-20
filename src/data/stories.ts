@@ -275,7 +275,7 @@ export const stories: StoryEntry[] = [
       spanishRole: "Cofundadores de KarmaRise D Global",
       location: "Spain & India",
       spanishLocation: "España e India",
-      portraitUrl: "/images/alma-and-shirish-founders.jpg",
+      portraitUrl: "/images/alma-and-shirish-avatar.jpg",
     },
     tags: [
       "Product Brief",
@@ -468,6 +468,8 @@ export const stories: StoryEntry[] = [
         "Having brown idlis with sambar and chutney at our office table in India. It was my first time eating idli brown, and it tastes completely different from the white ones.",
       objectPosition: "50% 78%",
     },
+    spanishLeadAlt:
+      "Alma sonriendo frente a un thali metálico con idlis oscuros al vapor, sambar y chutney en nuestra mesa en la India",
     spanishLeadCaption:
       "Comiendo idlis oscuros con sambar y chutney en nuestra mesa en la India. Era la primera vez que los probaba así y saben completamente distinto a los blancos.",
     leadSlot: {
@@ -498,6 +500,10 @@ export const stories: StoryEntry[] = [
         caption:
           "Huge minced-meat croquetas in thick béchamel, crisp outside and soft and creamy inside, like the ones my mum rolled for the eight of us in Spain.",
       },
+    ],
+    spanishPairAlts: [
+      "Biryani casero de pollo servido en una fuente de cristal junto a raita y salsa especiada",
+      "Croquetas españolas grandes de carne picada abiertas en un plato mostrando la bechamel cremosa por dentro",
     ],
     spanishPairCaptions: [
       "Biryani casero de pollo con raita y salsa. El año pasado en Eid nos invitaron en tantas casas que comí tres platos completos de biryani el mismo día.",
@@ -638,6 +644,10 @@ export const stories: StoryEntry[] = [
         "Three Biryanis on Eid: Alma on Food Across India, Spain, and Europe",
       description:
         "Alma shares her first-hand experience of eating across India, Spain, and Europe, including Diwali chakli, three Eid biryanis, and her mum's croquetas.",
+      spanishTitle:
+        "Tres biryanis en Eid: Alma sobre la comida entre la India, España y Europa",
+      spanishDescription:
+        "Alma cuenta en primera persona cómo cambia la relación con la comida entre la India, España y Europa: chakli de Diwali, tres biryanis en Eid y las croquetas de su madre.",
     },
   },
   {
@@ -909,22 +919,22 @@ export const stories: StoryEntry[] = [
     language: "en",
     issueNumber: "01",
     publishedAt: "2026-11-08",
-    readingTimeMinutes: 5,
+    readingTimeMinutes: 6,
     category: "People & Craftsmanship",
     location: "Across India",
     spanishLocation: "Por toda la India",
     title:
-      "Why we audit workshops across India in person before placing a programme",
+      "Chasing a soft leather across two Indian states, and why we walk away from closed factory doors",
     spanishTitle:
-      "Por qué visitamos y evaluamos en persona los talleres en la India antes de asignar un proyecto",
+      "Persiguiendo una piel suave por dos estados de la India, y por qué nos marchamos cuando un taller cierra sus puertas",
     summary:
-      "A factory that excels at high-volume cotton shirts is rarely equipped for structured leather goods. Here is how Alma and Shirish select the right Manufacturing Partner for each product.",
+      "When a boutique in Donostia asked for leather that felt goxo-goxo, every first sample we paid for missed the mark. Splitting the hides and the stitching across India, sitting on the workshop floor with the makers, and walking away from secrecy taught us what matching a Manufacturing Partner actually takes.",
     spanishSummary:
-      "Una fábrica excelente haciendo camisas de algodón en grandes tiradas rara vez es el lugar adecuado para producir bolsos de piel estructurada. Así elegimos al taller idóneo para cada producto.",
+      "Cuando una tienda de Donostia nos pidió una piel con tacto goxo-goxo, todas las primeras muestras que pagamos fallaron al tocarlas. Dividir el curtido y la confección entre dos estados de la India, sentarnos en el taller con quienes cosen y descartar cualquier fábrica opaca nos enseñó lo que cuesta de verdad elegir al socio adecuado.",
     author: {
-      name: "Shirish & Alma",
-      role: "Co-founders, KarmaRise D Global",
-      spanishRole: "Cofundadores de KarmaRise D Global",
+      name: "Shirish",
+      role: "Co-founder, KarmaRise D Global",
+      spanishRole: "Cofundador de KarmaRise D Global",
       location: "India & Spain",
       spanishLocation: "India y España",
       portraitUrl: "/images/shirish.jpeg",
@@ -942,98 +952,198 @@ export const stories: StoryEntry[] = [
       "India",
     ],
     leadImage: {
-      url: "/images/shirish_with_workers_at_warehouse (5).jpeg",
-      alt: "Shirish observing a craftsman stitching a heavy strap on an industrial cylinder-bed machine",
+      url: "/media (ai generated)/shirish_with_workers_at_warehouse_(5).jpeg_98406e06_2K.jpg",
+      alt: "Shirish standing beside a leather craftsman stitching a black strap on an industrial sewing machine in India",
       caption:
-        "Shirish on the workshop floor reviewing stitch tension and strap construction with a master machine operator.",
+        "Standing beside a machine operator on the workshop floor while he runs a black leather strap under a heavy stitching head.",
     },
+    spanishLeadAlt:
+      "Shirish junto a un artesano de la piel cosiendo una correa negra en una máquina industrial en la India",
     spanishLeadCaption:
-      "Shirish en el taller revisando la tensión de la puntada y el armado de una correa junto a un maestro maquinista.",
+      "Junto a un maquinista en la nave del taller mientras cose una correa de piel negra en una máquina industrial.",
     leadSlot: {
       kind: "Photo",
       ratio: "4:3 horizontal",
-      title: "Artisan working at a specialised machine",
+      title: "Standing beside a strap-stitching operator",
       description:
-        "4:3 candid photo of an artisan or master tailor working at a specialised sewing or leather skiving machine inside an Indian workshop.",
+        "Candid workshop floor photo of Shirish standing beside a craftsman running a black leather strap under an industrial sewing machine.",
     },
     pullQuote: {
-      text: "Matching a Client's product and order volume to a workshop's actual machinery and daily specialisation is the single most important decision in a Manufacturing Programme.",
-      attribution: "Shirish · KarmaRise D Global",
+      text: 'I do not look at a European founder as a "client" on an invoice. They are an entrepreneur building a brand. Focus on your business and your marketing, and leave the manufacturing in India to us.',
+      attribution: "Shirish",
     },
     spanishPullQuote: {
-      text: "Hacer coincidir el tipo de producto y el volumen del encargo con la maquinaria real y la especialidad diaria del taller es la decisión más importante de todo el proceso.",
-      attribution: "Shirish · KarmaRise D Global",
+      text: 'Yo no miro a un fundador europeo como a un "cliente" más en una factura. Es un emprendedor levantando su marca. Céntrate en tu negocio y en tu marketing, y déjanos a nosotros la fabricación en la India.',
+      attribution: "Shirish",
     },
     pairImages: [
       {
-        url: "/images/shirish_with_workers_at_warehouse (8).jpeg",
-        alt: "An artisan at a preparation bench with stacked bag components",
+        url: "/images/shirish_with_workers_at_warehouse (7).jpeg",
+        alt: "Shirish flexing a soft tan leather panel in both hands at the cutting table while a craftsman watches",
         caption:
-          "Prepared strap and lining components organised in bundles before assembly.",
+          "Testing the drape and softness of a tan hide in my hands at the cutting table. Photographs never tell you if a skin actually feels right.",
       },
       {
-        url: "/media (ai generated)/shirish_with_workers_at_warehouse_(8).jpeg_0cb1fe12_2K.jpg",
-        alt: "Shirish reviewing striped lining fabric and hardware preparation with a workshop specialist",
+        url: "/images/shirish_with_workers_at_warehouse (6).jpeg",
+        alt: "Shirish checking a soft tan suede-feel bag over a stack of black leather bags while male and female artisans work beside him",
         caption:
-          "Checking lining cut consistency and zipper preparation on the workshop floor in India.",
+          "Checking a finished tan piece over a stack of black leather bags on the assembly floor, right beside the artisans trimming and finishing the batch.",
       },
     ],
+    spanishPairAlts: [
+      "Shirish doblando con ambas manos una piel blanda en tono tan sobre la mesa de corte mientras observa un artesano",
+      "Shirish revisando un bolso en tono tan sobre una pila de bolsos de piel negra junto a artesanos que rematan el lote",
+    ],
     spanishPairCaptions: [
-      "Componentes de correas y forros organizados y listos para entrar en la línea de montaje.",
-      "Comprobando la regularidad del corte de los forros y la preparación de cremalleras en el taller en la India.",
+      "Comprobando con las manos la caída y suavidad de una piel en tono tan en la mesa de corte. Una foto nunca te dice cómo se siente de verdad.",
+      "Revisando un bolso en tono tan sobre una pila de bolsos negros en plena línea de montaje, junto a los artesanos que rematan el lote.",
     ],
     pairSlots: [
       {
-        title: "Workshop line layout",
+        title: "Testing hide hand-feel at the cutting table",
         description:
-          "Portrait photo (4:5): mid-distance view of stitching stations showing light, spacing, and active work in progress.",
+          "Portrait photo 4:5: Shirish flexing a soft tan hide in both hands at the cutting table.",
       },
       {
-        title: "Reviewing regional craft skills",
+        title: "Inspecting black and tan bags on the assembly floor",
         description:
-          "Portrait photo (4:5): conversation with a Manufacturing Partner lead inspecting finished trim and material handling.",
+          "Portrait photo 4:5: Shirish inspecting a tan bag over stacked black bags flanked by workshop artisans.",
       },
     ],
     sections: [
       {
-        heading: "Specialisation over general promises",
+        heading: "The Basque word that failed every first sample",
         paragraphs: [
-          "Almost any manufacturer will say yes to an enquiry over email. Stepping inside the facility tells a very different story. Structured leather bags require skiving machines, heavy cylinder-bed stitchers, climate-controlled edge-paint drying, and artisans trained to read hide grain. Fine resort wear requires clean flat-bed lines, delicate pressing equipment, and pattern rooms accustomed to lightweight fabrics.",
-          "Alma and Shirish travel together across production clusters throughout India to inspect machinery, review current production lines, and speak directly with workshop owners and master tailors.",
+          "When an independent leather-goods boutique in Donostia came to us to produce four bag styles in black and tan, the founder did not hand us a tannery code. He gave us a Basque phrase. He wanted the leather to feel goxo-goxo: silky, warm, supple, the kind of soft skin you want to keep touching when you pick a bag up off a counter.",
+          "Over phone calls and email, almost every workshop in India will say yes to that brief. In person, the story changes fast. Alma and I travelled to leather workshops across India, checked hides under the lights, and paid out of our own pocket for trial samples. The first pieces looked decent in photographs. The moment we held them, they felt too stiff, too dry, or too lifeless. They were not goxo-goxo.",
+          'I never think of a European founder as just a "client" ticking boxes on an invoice. They are an entrepreneur putting their name and savings into a brand. When I sit with them, my promise is plain: focus on your business and your marketing, and leave Indian manufacturing to us. Keeping that promise meant admitting that the easy single-factory route was not going to deliver the feel this collection needed.',
         ],
       },
       {
-        heading: "Aligning factory scale with order volume",
+        heading: "Splitting one bag across Indian states",
         paragraphs: [
-          "Technical capability is only half of the equation; production scale matters just as much. A large export plant running fifty-thousand-unit programmes will inevitably deprioritise a three-hundred-piece order, while a small boutique workshop will struggle if asked to deliver five thousand units on a tight retail calendar.",
-          "We pair each Client with a Manufacturing Partner whose capacity fits their Bulk Order, and Shirish puts clear, fair commercial terms in place so both sides can build a lasting working relationship.",
+          "I hold to a simple rule whenever a production problem refuses to budge: the solution lies in the problem itself. If one workshop cannot nail both the leather finish and the bag construction, stop forcing one roof to do both jobs.",
+          "We went back to the raw material and studied leather treatments and vegetable tanning until we understood why the earlier samples felt wrong. India's manufacturing strength is spread across specialist clusters, not concentrated inside a single city. We had the hides tanned in Kolkata, where the tanneries know how to achieve that supple, natural-hand finish, and then moved the finished leather to Uttar Pradesh, where the workshop had stronger stitching lines and cleaner assembly for soft structured bags. We managed coordination, hide checks, and oversight from our base near Mumbai.",
+          'Working across states only works when your Manufacturing Partner cares about the unglamorous details as much as you do. When Alma wanted a Spanish hangtag printed on unbleached recycled cardboard rather than bright bleached paper, our partner spent ten to fifteen days hunting down the exact board instead of pushing whatever sat in their storeroom. Before a single tan hide was cut, because "tan" is a vague word that drifts toward mustard or mud in a dye drum, Alma flew in and worked elbow-to-elbow with the factory team for a full week checking the batch. Between checks, she ran live video calls walking the boutique founder through the workshop and introducing him straight to the makers. As Alma put it later, that is the difference between buying a shirt off a rack and having one tailor-made: you watch your own piece take shape.',
+        ],
+        images: [
+          {
+            url: "/images/alam_with_the_warehouse_owners (3).jpeg",
+            alt: "Alma inspecting full tan leather hides beside a finished tan bag while three workshop specialists look on",
+            caption:
+              'Alma checking the tan hides side by side with the workshop team before cutting started. "Tan" means something different in every dye drum unless you verify it in person.',
+            aspectRatio: "4:5",
+          },
+        ],
+      },
+      {
+        heading: "Walking past the owner's office onto the floor",
+        paragraphs: [
+          "Most foreign buyers fly into India, shake hands in the factory owner's air-conditioned office, review a tray of samples, and head back to the airport. They never speak a word to the people cutting the hides, gluing the linings, or running the heavy strap machines.",
+          'Alma and I do the opposite. When we audit a workshop, we walk onto the floor, sit beside the workers, and ask about their work and their lives. "Is this step hard? Explain it to me." You see the shift in the room immediately. People who are used to being ignored behind a partition straighten up, smile, and show you how they guide a thick leather strap under the needle or stack striped cotton linings cleanly. Once a maker feels respected as a craftsman, quality stops being a rule shouted by a supervisor and becomes personal pride: "this bag will be great because of my work."',
+          "That is also where we draw a hard line. When we first approach a workshop, initial hesitation about letting outsiders onto the floor is normal. Owners worry about competitors or buyers copying their setup, and we respect that while we earn their trust. If a factory still refuses open floor access after we have built a relationship, they are hiding something. At that point the conversation ends and we walk away.",
+        ],
+        images: [
+          {
+            url: "/images/shirish_with_workers_at_warehouse (8).jpeg",
+            alt: "Smiling woman artisan at a workshop bench with yellow-and-white striped cotton linings, glue bottle, hammer, and trimmed leather straps beside Shirish",
+            caption:
+              "Stopping at the lining and strap bench to talk through the day's assembly instead of walking straight back to the owner's office.",
+            aspectRatio: "4:5",
+          },
+        ],
+      },
+      {
+        heading:
+          "Clear agreements, first-time freight shocks, and eight bags in a Donostia window",
+        paragraphs: [
+          'Because I am a registered Bar Council lawyer in India, I handle our workshop negotiations and put every commitment in clear, fair writing. Spoken promises are where both sides get hurt: European founders fear paying a deposit and receiving substandard cartons, and honest Indian workshops fear buyers moving goalposts at the last minute. Clear agreements protect everyone, yet we never treat a signed contract as a permanent pass. As Alma always says, "the best" Manufacturing Partner means both craft quality and reliable responsiveness, and every partner keeps proving themselves run after run. Our research never stops either, because new workshops open across India every week, including the Indian vegan-leather makers we are evaluating right now.',
+          'Matching the right workshops is not the last hurdle, either, and I will not pretend our first leather run went smoothly to the airport. Production finished cleanly, eleven export cartons wrapped and labelled by style and colour. Then reality hit: we had never exported on our own before and had no corporate courier account. The first freight quotes came back at six to seven lakh rupees, higher than the entire production cost. We kept digging until we found a freight contact who was still learning the ropes but genuinely willing to work with us, linked up with a customs specialist in Delhi, and got the consignment into the air. Even then, I barely slept for three nights, waking up in the dark to refresh tracking after the courier posted a false "customs hold" notice in Spain without ever requesting a missing document.',
+          'Two or three days later, the pallet landed cleanly outside the boutique\'s door in Donostia. The founder had already teased his followers online with nothing more than one of our sample dust bags ("no spoilers, it comes in this bag"). The minute the cartons arrived, he sent us a photograph from his doorway shouting, "We got it! They\'re here!" On our next video call, he turned the camera toward the street: all four bag styles in black and all four in tan filled his entire downtown shop window.',
+        ],
+        images: [
+          {
+            url: "/images/leather-bags-export-cartons.jpeg",
+            alt: "Eleven stretch-wrapped export cartons numbered and labelled by bag style and colour ready for air freight from India to Spain",
+            caption:
+              "Eleven cartons packed, wrapped, and labelled by black and tan style codes before our eventful first air shipment to Spain.",
+            aspectRatio: "4:3",
+          },
         ],
       },
     ],
     spanishSections: [
       {
-        heading: "Especialización real frente a promesas generales",
+        heading: "La palabra vasca que tumbó todas las primeras muestras",
         paragraphs: [
-          "Por correo electrónico casi cualquier fabricante dirá que puede producir tu colección. Entrar en sus instalaciones cuenta una historia muy distinta. Los bolsos de piel estructurada exigen máquinas de rebajar, costura en brazo cilíndrico, secado cuidadoso para el tinte de los cantos y artesanos acostumbrados a trabajar pieles naturales. Las prendas ligeras requieren líneas planas impecables y equipos de planchado específicos.",
-          "Alma y Shirish viajan juntos por distintas zonas productivas de toda la India para inspeccionar la maquinaria, ver qué se está fabricando en ese momento y hablar en persona con los dueños y encargados de cada taller.",
+          "Cuando una tienda independiente de bolsos de piel en Donostia acudió a nosotros para producir cuatro modelos en negro y en tono tan, el dueño no nos dio un código técnico de curtiduría. Nos dio una expresión en euskera. Quería una piel goxo-goxo: sedosa, cálida, flexible, de esas que apetece seguir tocando en cuanto coges el bolso del mostrador.",
+          "Por correo electrónico o por teléfono, casi cualquier taller de la India te dirá que sí a ese encargo. En persona, la historia cambia enseguida. Alma y yo recorrimos talleres de marroquinería por toda la India, revisamos pieles bajo la luz y pagamos de nuestro bolsillo varias muestras de prueba. En foto daban el pego. En cuanto las teníamos en la mano, resultaban demasiado rígidas, secas o sin caída. Aquello no era goxo-goxo.",
+          'Nunca miro a un fundador europeo como a un simple "cliente" de una lista. Es un emprendedor que pone su nombre y sus ahorros en una marca. Cuando hablo con ellos, mi compromiso es directo: céntrate en tu negocio y en tu marketing, y déjanos a nosotros la fabricación en la India. Cumplir esa palabra implicaba aceptar que el camino cómodo de meterlo todo en una sola fábrica no iba a dar el tacto que esta colección pedía.',
         ],
       },
       {
-        heading: "Ajustar la escala del taller al volumen del pedido",
+        heading: "Dividir un mismo bolso entre dos estados de la India",
         paragraphs: [
-          "La capacidad técnica es solo la mitad de la ecuación; el tamaño del taller importa igual. Una gran planta de exportación centrada en pedidos de cincuenta mil unidades siempre dejará en segundo plano una tirada de trescientas piezas, mientras que un taller pequeño se verá desbordado si se le piden cinco mil unidades en pocas semanas.",
-          "Conectamos a cada cliente con un socio de fabricación cuyo ritmo encaje de verdad con su pedido, y Shirish se asegura de dejar cerrados acuerdos claros y justos para que ambas partes puedan trabajar a largo plazo.",
+          "Sigo una regla sencilla cuando un problema de producción se enquista: la solución está dentro del propio problema. Si un solo taller no clava a la vez el acabado de la piel y la costura del bolso, deja de forzar un único techo para dos oficios distintos.",
+          "Volvimos a la materia prima y estudiamos tratamientos de piel y curtición vegetal hasta entender por qué fallaban las pruebas anteriores. La fuerza industrial de la India está repartida en polos especializados, no encerrada en una sola ciudad. Mandamos curtir las pieles en Calcuta, donde las curtidurías dominan ese tacto suave y natural, y trasladamos la piel terminada a Uttar Pradesh, donde el taller tenía mejores líneas de costura y un armado más limpio para bolsos blandos. Desde nuestra base cerca de Bombay coordinamos los tiempos, los acuerdos y las revisiones en persona.",
+          'Trabajar entre estados solo funciona cuando tu socio de fabricación se toma en serio los detalles que nadie aplaude. Cuando Alma quiso imprimir una etiqueta colgante en español sobre cartón reciclado sin blanquear en lugar de papel blanqueado normal, el taller pasó entre diez y quince días buscando exactamente ese cartón en vez de colocarnos lo que ya tenía en el almacén. Antes de cortar una sola piel en tono tan, porque "tan" es una palabra engañosa que en el bombo de tinte puede irse hacia el mostaza o apagarse demasiado, Alma viajó y trabajó codo con codo con el equipo del taller durante una semana entera revisando la partida. Entre revisión y revisión hacía videollamadas en directo paseando al fundador de la tienda por el taller y presentándole directamente a quienes hacían sus bolsos. Como dijo Alma después, es la diferencia entre comprar una camisa hecha o hacértela a medida: ves nacer tu pieza paso a paso.',
+        ],
+        images: [
+          {
+            url: "/images/alam_with_the_warehouse_owners (3).jpeg",
+            alt: "Alma revisando pieles enteras en tono tan junto a un bolso terminado mientras tres responsables del taller observan",
+            caption:
+              'Alma revisando las pieles en tono tan mano a mano con el equipo del taller antes de cortar. El "tan" cambia en cada bombo de tinte si no se comprueba en persona.',
+            aspectRatio: "4:5",
+          },
+        ],
+      },
+      {
+        heading: "Pasar de largo el despacho del dueño y sentarse en el taller",
+        paragraphs: [
+          "La mayoría de los compradores extranjeros aterrizan en la India, dan la mano en el despacho con aire acondicionado del dueño, miran una bandeja de muestras y vuelven al aeropuerto. No cruzan ni una palabra con quienes cortan las pieles, preparan los forros o llevan las máquinas de costura pesada.",
+          'Alma y yo hacemos justo lo contrario. Cuando evaluamos un taller, entramos en la nave, nos sentamos junto a los trabajadores y les preguntamos por su trabajo y por su día a día. "¿Es difícil este paso? Explícamelo". El ambiente cambia al instante. Gente acostumbrada a que nadie la mire detrás de un tabique se endereza, sonríe y te enseña cómo guía una correa gruesa bajo la aguja o cómo ordena los forros de algodón a rayas. Cuando un artesano se siente tratado como persona y no como mano de obra invisible, la calidad deja de ser una orden del encargado y pasa a ser orgullo propio: "este bolso va a salir impecable porque lo he hecho yo".',
+          "Ahí también marcamos una línea roja. Al principio es normal que un taller dude antes de abrir la zona de producción a alguien que acaba de conocer; temen a la competencia o a que alguien copie su montaje, y lo entendemos mientras nos ganamos su confianza. Pero si después de trabajar la relación siguen cerrando la puerta del taller, es que esconden algo. En ese momento se acaba la conversación y nos vamos.",
+        ],
+        images: [
+          {
+            url: "/images/shirish_with_workers_at_warehouse (8).jpeg",
+            alt: "Artesana sonriendo en su mesa de trabajo con forros de algodón a rayas, bote de cola, martillo y correas de piel junto a Shirish",
+            caption:
+              "Parando en la mesa de forros y correas para hablar del montaje del día en lugar de volver directamente al despacho del dueño.",
+            aspectRatio: "4:5",
+          },
+        ],
+      },
+      {
+        heading:
+          "Acuerdos claros, sustos de primera exportación y ocho bolsos en un escaparate de Donostia",
+        paragraphs: [
+          "Como abogado colegiado en el Bar Council de la India, llevo las negociaciones con los talleres y dejo cada compromiso por escrito, claro y justo para ambas partes. Las promesas de palabra son el terreno donde todos pierden: las marcas europeas temen adelantar dinero y recibir cajas defectuosas, y los talleres serios temen que el comprador cambie las reglas a mitad del pedido. Un contrato claro protege a los dos, pero nunca es un cheque en blanco. Como repite siempre Alma, el mejor socio de fabricación combina oficio y respuesta fiable, y se lo tiene que ganar pedido tras pedido. Por eso nunca dejamos de buscar talleres nuevos en toda la India, incluidos los fabricantes de piel vegana que estamos evaluando ahora mismo.",
+          "Acertar con los talleres tampoco es el último obstáculo, y no voy a fingir que nuestra primera exportación de piel fue un camino de rosas. La producción salió impecable, once cajas precintadas y etiquetadas por modelo y color. Y entonces llegó el golpe: nunca habíamos exportado por nuestra cuenta y no teníamos cuenta corporativa de mensajería. Los primeros presupuestos de envío salieron por seis o siete lakhs de rupias, más caros que la producción entera. Seguimos buscando hasta dar con un contacto de carga que todavía estaba aprendiendo pero tenía ganas de ayudar, nos coordinamos con un especialista en aduanas en Delhi y conseguimos subir la mercancía al avión. Aun así, apenas dormí durante tres noches, despertándome de madrugada para refrescar el seguimiento después de que el sistema marcara por error una retención aduanera en España sin pedirnos jamás ningún documento extra.",
+          'Dos o tres días después, el palé aterrizó sin incidencias a la puerta de la tienda en Donostia. El dueño ya había publicado un pequeño adelanto en redes enseñando solo una de las bolsas guardapolvo de muestra ("sin spoilers, viene dentro de esta bolsa"). En cuanto llegaron las cajas, nos mandó una foto desde la puerta gritando: "¡Lo tenemos! ¡Ya están aquí!". En la siguiente videollamada giró la cámara hacia la calle: los cuatro modelos en negro y los cuatro en tono tan ocupaban entero el escaparate principal de su tienda en el centro.',
+        ],
+        images: [
+          {
+            url: "/images/leather-bags-export-cartons.jpeg",
+            alt: "Once cajas de exportación flejadas y numeradas con etiquetas de modelo y color listas para envío aéreo desde la India a España",
+            caption:
+              "Once cajas embaladas, flejadas y etiquetadas por modelo en negro y tan antes de nuestro movido primer envío aéreo a España.",
+            aspectRatio: "4:3",
+          },
         ],
       },
     ],
-    takeaway:
-      "Selecting a Manufacturing Partner based on verified machinery, craft specialisation, and matching scale protects both product quality and delivery dates.",
-    spanishTakeaway:
-      "Elegir el taller adecuado comprobando en persona su maquinaria, su especialidad y su capacidad protege tanto el acabado del producto como los plazos de entrega.",
+    takeaway: "",
+    spanishTakeaway: "",
     seo: {
-      title: "How We Audit and Select Indian Manufacturing Partners",
+      title: "Matching a Workshop to the Product Across India",
       description:
-        "Why Alma and Shirish inspect workshops across India in person to match each Client Product Brief with the right specialist factory.",
+        "How Shirish and Alma split leather tanning in Kolkata and bag assembly in Uttar Pradesh for a Donostia boutique, audit workshop floors in person, and walk away from closed doors.",
+      spanishTitle:
+        "Cómo elegimos el taller adecuado para cada producto en la India",
+      spanishDescription:
+        "Cómo Shirish y Alma dividieron el curtido en Calcuta y la costura en Uttar Pradesh para una tienda de Donostia, auditan talleres en persona y descartan fábricas opacas.",
     },
   },
   {
@@ -1043,25 +1153,25 @@ export const stories: StoryEntry[] = [
     language: "en",
     issueNumber: "01",
     publishedAt: "2026-11-04",
-    readingTimeMinutes: 4,
+    readingTimeMinutes: 7,
     category: "Art & Design",
     location: "India & Spain",
     spanishLocation: "India y España",
     title:
-      "What we verify on a pre-production sample before bulk materials are ordered",
+      "I hide bad samples, switch your zippers, and point out the flaws you missed",
     spanishTitle:
-      "Qué comprobamos en cada muestra de preproducción antes de encargar el material del pedido",
+      "Escondo las muestras malas, cambio tus cremalleras y señalo los fallos que no has visto",
     summary:
-      "A technical drawing shows dimensions, not how a leather strap carries weight or how a lining moves. Here is how we review and lock in every pre-production sample.",
+      "A rough four-line sketch never tells you if a metal zipper will ruin a winter coat or if a screen photo will delay dyeing by months. Here is how I test, question, and filter every sample in India before a Bulk Order is cut.",
     spanishSummary:
-      "Un dibujo técnico indica las medidas, pero no cómo responde un asa de piel al peso ni cómo cae un forro. Así revisamos y validamos cada prototipo antes de producir.",
+      "Un boceto de cuatro líneas no te avisa de si una cremallera metálica estropeará un abrigo en invierno ni de si una foto en pantalla retrasará un tinte meses. Así pruebo, cuestiono y filtro cada muestra en la India antes de cortar el pedido.",
     author: {
-      name: "Alma & Shirish",
-      role: "Co-founders, KarmaRise D Global",
-      spanishRole: "Cofundadores de KarmaRise D Global",
+      name: "Alma",
+      role: "Co-founder, KarmaRise D Global",
+      spanishRole: "Cofundadora de KarmaRise D Global",
       location: "India & Spain",
       spanishLocation: "India y España",
-      portraitUrl: "/images/alma-and-shirish-founders.jpg",
+      portraitUrl: "/images/alma.jpeg",
     },
     tags: ["Sampling", "Quality control", "Leather & textiles", "Bulk Order"],
     spanishTags: [
@@ -1071,98 +1181,183 @@ export const stories: StoryEntry[] = [
       "Producción",
     ],
     leadImage: {
-      url: "/images/alam_with_the_warehouse_owners (2).jpeg",
-      alt: "Alma and two workshop specialists examining the drape and colour of a purple leather hide",
+      url: "/images/alma_taking_a_look_at_design (2).jpeg",
+      alt: "Alma and a garment maker pinning embroidered teal fabric on a dress form in our studio in India",
       caption:
-        "Alma and workshop specialists examining hide thickness, softness, and dye consistency across whole skins in India.",
+        "Adjusting and pinning a garment sample on the form in our studio in India with our team. If something pulls or hangs wrong here, it never reaches the Client.",
     },
+    spanishLeadAlt:
+      "Alma y una modista ajustando con alfileres una tela bordada en tono turquesa sobre el maniquí en nuestro estudio en la India",
     spanishLeadCaption:
-      "Alma y los especialistas del taller comprobando el grosor, la suavidad y la uniformidad del tinte en pieles enteras en la India.",
+      "Ajustando con alfileres una muestra sobre el maniquí en nuestro estudio en la India. Si algo tira o cae mal aquí, ni siquiera llega al cliente.",
     leadSlot: {
       kind: "Photo",
-      ratio: "4:3 horizontal",
-      title: "Two prototypes compared side by side",
+      ratio: "16:9 horizontal",
+      title: "Sample fitting in our studio in India",
       description:
-        "4:3 documentary photograph of two bag or garment prototypes placed side by side with adjustment marks.",
+        "Horizontal documentary photograph of Alma and a garment maker pinning and checking a physical prototype on a dress form.",
     },
     pullQuote: {
-      text: "You cannot judge seam tension, zipper glide, or leather temper from a photograph. Every pre-production sample has to be tested in the hand before bulk production begins.",
-      attribution: "Alma & Shirish · Sampling review",
+      text: "Even if a Client looks at a sample and loves it, if I notice a small flaw they missed, I bring it up myself: I am not 100% happy with this, and this will be changed.",
+      attribution: "Alma",
     },
     spanishPullQuote: {
-      text: "La tensión de una costura, la suavidad de una cremallera o el cuerpo de una piel no se pueden juzgar por foto. Cada muestra hay que ponerla a prueba en mano antes de producir.",
-      attribution: "Alma y Shirish · Revisión de muestras",
+      text: "Aunque el cliente mire una muestra y le encante, si yo veo un detalle que se le ha pasado, lo saco yo misma: no estoy al cien por cien contenta con esto y esto se va a cambiar.",
+      attribution: "Alma",
     },
     pairImages: [
       {
-        url: "/images/alma_at_the_warehouse (3).jpeg",
-        alt: "Alma inspecting stacked natural canvas fabric in an Indian workshop",
+        url: "/images/alam_with_the_warehouse_owners (5).jpeg",
+        alt: "Alma inspecting a dark leather swatch across a glass table while a workshop specialist checks a swatch binder",
         caption:
-          "Checking canvas weight and weave uniformity in the workshop before batch marking.",
+          "Comparing leather swatches across the workshop table before a single prototype is cut.",
       },
       {
-        url: "/images/alma_taking_a_look_at_design (2).jpeg",
-        alt: "Alma and a garment maker pinning embroidered teal fabric on a dress form in the studio in India",
+        url: "/images/alam_with_the_warehouse_owners (6).jpeg",
+        alt: "Alma checking brown leather hides beside a finished brown crossbody bag sample with brass hardware",
         caption:
-          "Alma and a tailor draping and pinning a garment sample on the form in our studio in India to verify balance and fall.",
+          "Checking brown hides beside a finished crossbody sample with brass hardware. Even when a piece looks ready, I look for what needs fixing before bulk.",
       },
     ],
+    spanishPairAlts: [
+      "Alma revisando una muestra de piel oscura sobre una mesa de cristal mientras un especialista del taller consulta una carta de pieles",
+      "Alma comprobando pieles marrones junto a un bolso bandolera de muestra terminado con herrajes en latón",
+    ],
     spanishPairCaptions: [
-      "Revisando el gramaje de la lona y la regularidad del tejido en el taller antes del marcado.",
-      "Alma y una sastre ajustando con alfileres una muestra sobre el maniquí en nuestro estudio en la India para comprobar su caída y equilibrio.",
+      "Comparando muestras de piel sobre la mesa del taller antes de cortar el primer prototipo.",
+      "Revisando pieles marrones junto a un bolso bandolera de muestra con herrajes en latón. Aunque la pieza parezca lista, busco qué hay que corregir antes de producir.",
     ],
     pairSlots: [
       {
-        title: "Stitch density and hardware check",
+        title: "Leather swatch review",
         description:
-          "Portrait photo (4:5): close-up of hands inspecting seam tension, edge finish, and hardware attachment on a prototype.",
+          "Portrait photo (4:5): comparing leather swatches across the workshop table before cutting the first prototype.",
       },
       {
-        title: "Material swatch verification",
+        title: "Hide and sample inspection",
         description:
-          "Portrait photo (4:5): approved dye swatch resting beside fresh incoming leather hides or woven textile bolts.",
+          "Portrait photo (4:5): checking brown leather hides beside a finished crossbody sample with brass hardware.",
       },
     ],
     sections: [
       {
-        heading: "Testing the physical prototype in India",
+        heading: "From four rough lines to a bag that works in real life",
         paragraphs: [
-          "Drawings and spec sheets establish measurements, but they cannot tell you if a bag loses its posture when packed or if a garment pulls across the shoulders. Sampling exists to answer those questions before bulk leather hides, fabrics, or custom hardware are purchased.",
-          "In our studio and on site at our partner workshops across India, Alma and Shirish inspect every prototype by hand, checking stitch density, edge finishing, lining allowance, hardware weight, and structural balance under real use.",
+          "When a Client comes to us to manufacture for the first time, they usually know what their customers buy, not what breaks between a rough sketch and a packed carton. When we developed a leather bag collection for a leather-goods boutique in Donostia, the owner picked silhouettes from his own sales history, and Shirish still laughs that the starting sketch for the signature backpack was literally four rough lines.",
+          "We never do a copy-paste of another brand's piece sitting on a shop shelf, and we never follow a drawing blindly. Looking at that boxy rectangle as a woman who carries a bag every day, we tapered it into a subtle pyramid, narrower at the top and wider at the bottom, so it sits cleanly on a woman's back without swallowing her whole torso. We watched every gram because leather already has weight and nobody wants a heavy bag anymore. We integrated a top grab handle so you can lift the bag or hold it open with one hand without it collapsing, removed the four metal bottom studs, upgraded the hardware to antique brass, and swapped the usual dark lining for a light lining so you can actually see your keys inside. After a few cloth drafts, it took only two leather samples to lock that shape in.",
+          'Because first-time founders cannot predict where production slips, I also ask the awkward questions before a single hide or bolt of cloth is cut. What happens if a deadline moves by a week? What is your real margin before a seasonal window? And I prefer calling anything that goes wrong during sampling an issue rather than a problem. "Problems" sounds terrible, as if the whole run is ruined, when most of the time what you actually have is a specific issue on a seam, a dye lot, or a strap that needs a clear fix before bulk begins.',
         ],
       },
       {
-        heading: "Turning sample feedback into a binding benchmark",
+        heading:
+          'Japanese plastic zippers, a "too small" bag, and the flaws you missed',
         paragraphs: [
-          "A first prototype almost always reveals refinements: shifting a strap anchor by ten millimetres, upgrading to a firmer interlining, or adjusting a dye lot to match the original swatch under daylight.",
-          "Once those revisions are approved by the Client, we update the written Product Brief and seal a tagged counter-sample that stays on the production floor as the physical reference for the entire Bulk Order.",
+          "Real sample approval is where honest pushback saves a Client from complaints six months later. On that same backpack, we used top-grade Japanese zippers, yet I advised the boutique owner to choose moulded plastic teeth instead of metal teeth. Metal teeth look smart on a bench, until a woman reaches into her bag and scratches the back of her hand. Put a metal zipper on a rear back pocket and it rubs against a wool coat all winter until it ruins the fabric, or scratches bare skin in summer. I told him plainly: we will do whatever you prefer, but I suggest plastic teeth, otherwise your shoppers will love the bag and complain about the zip.",
+          'Something similar happened with two smaller styles that were supposed to be the same size, first sampled in black while we waited longer for the tan hides. When I walked into his shop with the samples, he measured the second one immediately and said, "This is too small." I told him it was smaller, yes, not too small, and that I would happily order another sample if he wanted. Then I asked him to look at how women actually wear them. One was sporty and casual; the other was dressier, for evenings out when you carry less. Why stock two bags in the exact same size when two different uses give the same shopper a reason to buy both? He agreed and kept the smaller size.',
+          'Most of my filtering happens even earlier, before a Client ever holds a piece in their hands. Whenever a workshop finishes a sample, I examine it first. If I am not happy with how it hangs, feels, or closes, I do not even show it to the Client. It goes straight back to the bench. And even when a pre-production sample moves from the sample room onto the real production line with bulk hides, linings, and hardware, I never settle for a quick "yes." Clients are often relieved to see their idea made real and miss tiny physical flaws my eye goes straight to: two panels cut from slightly different dye lots, a snap pulling on soft leather because backing reinforcement was skipped, or a seam puckering on a faster line machine.',
+          'When I spot anything like that, even if the Client did not see it, I point it out myself: "I am not 100% happy with this, and this will be changed." I want complete transparency from day one. If tomorrow something slips past me that I genuinely did not catch, no Client will ever believe I tried to hide it.',
+        ],
+        images: [
+          {
+            url: "/images/alma_at_the_warehouse (3).jpeg",
+            alt: "Alma inspecting stacked natural canvas fabric on a cutting table in an Indian workshop",
+            caption:
+              "Checking natural canvas weight and weave on the workshop floor before approving the sample run.",
+            aspectRatio: "4:5",
+          },
+          {
+            url: "/images/alam_with_the_warehouse_owners (2).jpeg",
+            alt: "Alma and two workshop specialists examining the drape and colour of a purple leather hide",
+            caption:
+              "Checking leather drape and dye tone in person with our workshop partners. You cannot match an exact shade through a screen.",
+            aspectRatio: "4:5",
+          },
+        ],
+      },
+      {
+        heading:
+          "Why you cannot match a colour on a screen, and why Europe blames India faster",
+        paragraphs: [
+          "That same run gave us a permanent onboarding rule we now enforce with every Client before dyeing begins: never match a colour through a screen. It does not matter how sharp a photograph or video looks, you cannot match an exact leather dye shade digitally. Because we could not send a physical reference in the exact tan tone he wanted until August, dyeing the leather was delayed when it could have happened months earlier. Today, at zero extra cost to us, every Client hands over a physical colour reference upfront, whether a purse, a belt, or a garment from their shop or home, unless they specifically want us to experiment with a new tone.",
+          'I will not pretend there were no sleepless nights on that order. Leather bags were a new category for us too, and we were learning every nuance on the floor alongside our Manufacturing Partners. Even if a Client has spoken with me for ten meetings or ten months, on their first Bulk Order they still do not truly know how we perform until the cartons land. Too many people in sourcing say "yes, I do, I do, I do" to win a deposit and then fail at the end.',
+          "I also feel a sharper hesitation in Europe whenever India is on the table. Years ago, before KarmaRise D Global, I helped European companies import from China. When China first opened up to global buyers, cheating and quiet material swaps happened all the time. Over the years that changed, largely because China built standardized high-volume export lines and reached a point where it could no longer afford to lose Europe. Growing European brands come to India for soft natural leathers, hand-finishing, and manageable runs of a few hundred pieces rather than massive Chinese minimums. Yet because smaller Indian workshops vary widely from one door to the next, India does not carry that same automatic credit in Europe. Whenever anything feels uncertain, it is very easy to blame India as a whole. Words never change that mindset. Proving someone wrong through delivery does.",
+        ],
+      },
+      {
+        heading:
+          'The inner label, five-time checks, and "I give my life before I fail a client"',
+        paragraphs: [
+          "Sample approval also catches the quiet compliance and finishing details that decide whether cartons clear customs cleanly and feel complete in a boutique. European rules for leather bags are simpler than for textiles, which require full stitched composition labels, yet for clean EU customs clearance you still need a small, undetachable label stitched inside stating genuine leather and Made in India. On top of that minimum, I worked with him on an eco-conscious Spanish hangtag, writing the text while he handled the layout, so the finished piece felt cared for the moment a shopper picked it up.",
+          "I will never promise a Client that weather, transport, or a dye batch will never nudge a schedule, because those are not always in my hands. What I promise is that every stage is checked double, triple, and five times over, from pre-production sample sign-off through the first pieces coming off the line and final packing, so that when bulk ships, there are zero errors inside the boxes.",
+          "From the Maratha stories Shirish has shared with me since I moved to India, I sometimes tell Clients: I am Maratha in a way. I give my life before I fail a client. Shirish holds that exact same line, and we expect it from every Manufacturing Partner we bring onto a Manufacturing Programme. Yesterday, when we met a new textile maker, I told him plainly: we open our door to anyone who wants to work transparently, clearly, and honestly. Anything less simply does not work for us.",
         ],
       },
     ],
     spanishSections: [
       {
-        heading: "Probar el prototipo físico sobre el terreno",
+        heading:
+          "De cuatro líneas en un papel a un bolso que funciona de verdad",
         paragraphs: [
-          "Los planos y fichas técnicas fijan las dimensiones, pero no revelan si un bolso pierde su estructura al llenarlo o si una prenda tira de sisa al moverse. La fase de muestreo sirve precisamente para resolver esas dudas antes de comprar las pieles, las telas o los herrajes definitivos.",
-          "En nuestro estudio y en los propios talleres de la India, Alma y Shirish revisan cada prototipo a mano: comprueban la densidad de puntada, el acabado de los cantos, la holgura de los forros, el peso de los herrajes y el comportamiento de la pieza en uso real.",
+          "Cuando un cliente viene a fabricar con nosotros por primera vez, suele saber muy bien qué compran sus clientas, pero muy poco sobre todo lo que puede fallar entre un boceto y una caja cerrada. Cuando desarrollamos la colección de bolsos de piel para una boutique de marroquinería en Donostia, el dueño eligió los modelos mirando su propio historial de ventas, y Shirish todavía se ríe recordando que el punto de partida para la mochila principal eran literalmente cuatro líneas.",
+          "Nunca hacemos un corta y pega de un bolso que ya esté en la tienda, ni seguimos un dibujo a ciegas. Mirando aquel rectángulo rígido como mujer que usa bolsos todos los días, le dimos una ligera forma de pirámide, más estrecha arriba y más ancha abajo, para que apoye bien en la espalda sin tapar todo el torso. Medimos cada gramo porque la piel ya pesa de por sí y hoy nadie quiere cargar con bolsos pesados. Integramos un asa superior para poder cogerla o sujetarla abierta con una mano sin que se venza, quitamos los cuatro topes metálicos de la base, subimos los herrajes a latón envejecido y cambiamos el típico forro oscuro por un forro claro para poder ver de verdad lo que llevas dentro. Tras varios borradores en tela, bastaron solo dos muestras en piel para clavar la forma.",
+          'Como quien fabrica por primera vez no puede adivinar dónde suelen atascarse los pedidos, también hago las preguntas incómodas antes de cortar una sola piel o un rollo de tela. ¿Qué pasa si una fecha se mueve una semana? ¿Qué margen real tienes antes de una campaña? Y prefiero hablar de incidencias en lugar de problemas cuando algo falla en esta fase. La palabra "problemas" suena fatal, como si el pedido entero estuviera perdido, cuando casi siempre lo que tienes delante es un ajuste concreto en una costura, un tinte o una correa antes de arrancar la producción.',
         ],
       },
       {
-        heading: "Convertir cada ajuste en una referencia firme",
+        heading:
+          'Cremalleras japonesas de plástico, un bolso "demasiado pequeño" y los fallos que no ves',
         paragraphs: [
-          "El primer prototipo casi siempre permite afinar detalles: desplazar un enganche diez milímetros, elegir una entretela con más cuerpo o ajustar el tinte para clavarlo a la carta de color bajo luz natural.",
-          "Una vez que el cliente aprueba esas mejoras, actualizamos el Product Brief y dejamos en la fábrica una muestra gemela etiquetada y firmada que sirve de guía física durante toda la producción.",
+          "En la aprobación de la muestra es donde llevar la contraria a tiempo le ahorra quejas a un cliente seis meses después. En esa misma mochila montamos cremalleras japonesas de primera calidad, pero le aconsejé al dueño poner dientes de plástico en lugar de metal. El metal queda muy bien sobre la mesa del taller, hasta que una mujer mete la mano en el bolso y se araña los nudillos. Si además va en el bolsillo trasero, en invierno roza contra el abrigo hasta estropear el tejido y en verano araña la espalda descubierta. Se lo dije claro: haremos lo que tú prefieras, pero yo te aconsejo plástico; si no, a tus clientas les encantará el bolso pero se quejarán de la cremallera.",
+          'Algo parecido pasó con dos modelos más pequeños que en principio iban a tener el mismo tamaño, y que primero sacamos en negro mientras esperábamos más tiempo por las pieles en tono tan. Al entrar en su tienda con las muestras, midió el segundo enseguida y dijo: "Esto es demasiado pequeño". Le contesté que era más pequeño, sí, no demasiado pequeño, y que si quería pedíamos otra muestra sin problema. Luego le pedí que mirara cómo los usan de verdad las mujeres. Uno tenía un aire más deportivo y diario; el otro era más de vestir, para salir por la tarde o la noche cuando llevas menos cosas. ¿Para qué tener dos bolsos del mismo tamaño si dos usos distintos le dan a la misma clienta un motivo para llevarse los dos? Me dio la razón y se quedó con el tamaño pequeño.',
+          'La mayor parte de mi filtro ocurre incluso antes de que el cliente toque la pieza. Cada vez que un taller termina una muestra, la reviso yo primero. Si no me convence cómo cae, cómo cierra o qué tacto tiene, ni siquiera se la enseño al cliente: vuelve directa al banco de trabajo. E incluso cuando la muestra de preproducción pasa de la sala de prototipos a la línea real del taller con las pieles, forros y herrajes definitivos del pedido, nunca doy por bueno un "sí" rápido. Muchas veces el cliente respira aliviado al ver su idea hecha realidad y pasa por alto fallos físicos pequeños a los que a mí se me va la vista enseguida: dos paneles cortados de partidas de tinte ligeramente distintas, un broche que tira de una piel blanda porque faltó refuerzo interior o una costura que frunce al pasar a una máquina rápida de producción.',
+          'Cuando veo algo así, aunque el cliente no lo haya notado, lo digo abiertamente: "No estoy al cien por cien contenta con esto y esto se va a cambiar". Quiero transparencia total desde el primer día. Si mañana se me escapa algo que de verdad no vi, ningún cliente podrá pensar jamás que intenté ocultárselo.',
+        ],
+        images: [
+          {
+            url: "/images/alma_at_the_warehouse (3).jpeg",
+            alt: "Alma revisando pilas de lona cruda sobre la mesa de corte en un taller de la India",
+            caption:
+              "Comprobando el gramaje y la trama de la lona cruda en el taller antes de dar el visto bueno a la muestra.",
+            aspectRatio: "4:5",
+          },
+          {
+            url: "/images/alam_with_the_warehouse_owners (2).jpeg",
+            alt: "Alma y dos especialistas del taller examinando la caída y el color de una piel morada",
+            caption:
+              "Comprobando en persona la caída y el tono del tinte junto al taller. Un color exacto nunca se iguala a través de una pantalla.",
+            aspectRatio: "4:5",
+          },
+        ],
+      },
+      {
+        heading:
+          "Por qué no se puede igualar un color en pantalla, y por qué Europa desconfía antes de la India",
+        paragraphs: [
+          "De aquel mismo pedido salió una norma fija que hoy aplicamos a todo cliente antes de teñir: nunca igualar un color a través de una pantalla. Da igual lo buena que sea la foto o el vídeo, un tono exacto de piel no se puede copiar en digital. Como no pudimos enviar una referencia física en el tono tan exacto que buscaba hasta agosto, el teñido de la piel se retrasó cuando habría podido estar listo meses antes. Hoy, sin ningún coste extra para nosotros, todo cliente nos entrega al principio una pieza física en el color que busca, ya sea un monedero, un cinturón o una prenda de su tienda o de su casa, salvo que quiera expresamente experimentar con un tono nuevo.",
+          'No voy a fingir que no pasé noches sin dormir en aquel pedido. Los bolsos de piel también eran una categoría nueva para nosotros y estábamos aprendiendo cada detalle sobre el terreno junto a los talleres. Aunque un cliente lleve diez reuniones o diez meses hablando conmigo, en su primer pedido grande no sabe de verdad cómo trabajamos hasta que llegan las cajas. Hay demasiada gente en este sector que dice "sí, sí, claro, yo lo hago" para cobrar una señal y luego falla al final.',
+          "También noto una desconfianza previa más rápida en Europa cada vez que se habla de la India. Hace años, antes de KarmaRise D Global, ayudé a empresas europeas a importar desde China. Cuando China empezó a fabricar para el mundo, los engaños y los cambios silenciosos de material eran constantes. Con los años eso cambió, sobre todo porque China montó líneas de exportación muy estandarizadas para grandes volúmenes y llegó un punto en que no podía permitirse perder a Europa. Muchas marcas europeas en crecimiento miran hoy hacia la India buscando pieles naturales suaves, acabados artesanales y tiradas asumibles de unos cientos de unidades en lugar de los mínimos enormes de China. Pero como los talleres pequeños en la India varían muchísimo de una puerta a otra, el país todavía no tiene ese crédito automático en Europa. En cuanto algo genera dudas, resulta muy fácil echarle la culpa a la India entera. Las palabras no cambian esa idea de nadie; lo único que la cambia es demostrar con hechos que se equivocan al entregar bien el pedido.",
+        ],
+      },
+      {
+        heading:
+          'La etiqueta interior, revisar cinco veces y "doy la vida antes que fallarle a un cliente"',
+        paragraphs: [
+          "Aprobar la muestra también atrapa los detalles discretos de normativa y acabado que deciden si las cajas pasan la aduana sin sustos y si la pieza llega redonda a la tienda. Las normas europeas para bolsos de piel son más sencillas que en textil, donde hace falta una etiqueta cosida completa con toda la composición, pero para entrar limpiamente por aduana en Europa conviene llevar cosida en el interior una pequeña etiqueta no desprendible que indique piel auténtica y Made in India. Por encima de ese mínimo, trabajé con él en una etiqueta colgante en español de corte más ecológico, escribiendo yo los textos mientras él se ocupaba del diseño, para que el bolso transmitiera cuidado desde el primer vistazo en tienda.",
+          "Nunca le prometeré a un cliente que el clima, el transporte o una partida de tinte jamás moverán una fecha, porque no siempre depende de mí. Lo que sí prometo es revisar cada fase dos, tres y hasta cinco veces, desde la muestra de preproducción hasta las primeras piezas que salen de la línea y el embalaje final, para que cuando salga el pedido no vaya ni un solo error dentro de las cajas.",
+          "Por las historias marathas que Shirish me ha contado desde que vivo en la India, a veces les digo a los clientes: en cierto modo soy maratha, doy la vida antes que fallarle a un cliente. Shirish mantiene exactamente esa misma línea, y se la exigimos a cada taller con el que trabajamos. Ayer mismo, al reunirnos con un nuevo fabricante textil, se lo dije claro: abrimos la puerta a quien quiera trabajar con transparencia, claridad y honestidad total. Todo lo que sea menos que eso simplemente no nos sirve.",
         ],
       },
     ],
-    takeaway:
-      "Rigorous physical sample testing and a signed factory counter-sample prevent costly surprises during bulk production.",
-    spanishTakeaway:
-      "Una revisión exigente de la muestra física y un prototipo firmado en planta evitan sorpresas costosas cuando arranca la producción en serie.",
+    takeaway: "",
+    spanishTakeaway: "",
     seo: {
-      title: "Why Pre-Production Sample Approval Decides Bulk Quality",
+      title: "Why Sample Approval Decides Bulk Quality",
       description:
-        "How Alma and Shirish inspect physical prototypes in India before ordering bulk materials.",
+        "Alma shares real sample decisions from India: switching to Japanese plastic-tooth zippers, requiring physical colour references, hiding bad samples, and checking production five times over.",
+      spanishTitle:
+        "Por qué la aprobación de la muestra decide la calidad final",
+      spanishDescription:
+        "Alma cuenta decisiones reales de muestreo en la India: cremalleras japonesas de plástico, referencias físicas de color, filtrar muestras malas y revisar cinco veces antes de enviar.",
     },
   },
   {
@@ -1235,12 +1430,14 @@ export const stories: StoryEntry[] = [
         alt: "Maharashtrian woman laughing outdoors in a crimson silk saree with gold zari borders, Paithani peacock pallu, pearl nath, gold thushi, and green glass bangles",
         caption:
           "Festive dress in Maharashtra: a crimson silk saree with woven gold zari borders and Paithani peacock motifs on the pallu, worn with a fitted choli, pearl nath on the left nostril, gold thushi choker, and green glass bangles.",
+        aspectRatio: "4:3",
       },
       {
         url: "/images/alma_with_a_woman (2).jpeg",
         alt: "Alma inside a Maharashtra home beside a local woman holding a folded orange saree with a purple and gold zari border",
         caption:
           "Alma inside a home here in Maharashtra with a woman holding one of her kept family sarees, woven with a purple and gold zari border.",
+        aspectRatio: "4:5",
       },
     ],
     spanishPairAlts: [
@@ -1309,7 +1506,7 @@ export const stories: StoryEntry[] = [
             alt: "Weaver's hands working wooden shuttles and metallic gold zari spools across silk warp threads on a wooden handloom",
             caption:
               "Silk warp threads, wooden shuttles, and metallic zari spools on a wooden handloom, building a denser woven border along the edge of the cloth.",
-            aspectRatio: "4:5",
+            aspectRatio: "4:3",
           },
           {
             url: "/images/alma_with_diid.jpeg",
@@ -1375,7 +1572,7 @@ export const stories: StoryEntry[] = [
             alt: "Manos de un tejedor manejando lanzaderas de madera y bobinas de hilo dorado zari sobre urdimbre de seda en un telar manual",
             caption:
               "Urdimbre de seda, lanzaderas de madera y bobinas de hilo metálico zari en un telar manual, formando la cenefa más tupida del borde.",
-            aspectRatio: "4:5",
+            aspectRatio: "4:3",
           },
           {
             url: "/images/alma_with_diid.jpeg",
@@ -1403,6 +1600,10 @@ export const stories: StoryEntry[] = [
         "Maharashtra Behind the Monuments: Basalt Forts, Modi Script, and Woven Borders",
       description:
         "Shirish shares how Maharashtra's Maratha forts, Modi script, progressive reformers, Paithani looms, and treasured cupboard sarees shape KarmaRise D Global and Almarise.",
+      spanishTitle:
+        "El Maharashtra detrás de los monumentos: fuertes de basalto, escritura modi y cenefas tejidas",
+      spanishDescription:
+        "Shirish cuenta cómo los fuertes marathas, la escritura modi, los reformadores sociales, los telares Paithani y los saris guardados en casa dan forma a KarmaRise D Global y Almarise.",
     },
   },
   {
@@ -1412,25 +1613,25 @@ export const stories: StoryEntry[] = [
     language: "en",
     issueNumber: "01",
     publishedAt: "2026-10-22",
-    readingTimeMinutes: 4,
+    readingTimeMinutes: 6,
     category: "Inside KarmaRise",
     location: "India & Spain",
     spanishLocation: "India y España",
     title:
-      "Building the foundation in India for our planned Women's Training Initiative",
+      "Why we walked away from charity, and why our Women's Training Initiative has not started yet",
     spanishTitle:
-      "Sentando las bases en la India para nuestra futura iniciativa de formación para mujeres",
+      "Por qué nos alejamos de la caridad y por qué nuestra iniciativa de formación para mujeres aún no ha empezado",
     summary:
-      "Inside our studio in India, we are laying the commercial and practical groundwork for a programme to train women in garment design and stitching.",
+      "Before we open a single training seat in India, we want to be plain about two things: our Women's Training Initiative is still in preparation, and a month in Rajasthan taught me why pity and handouts never last.",
     spanishSummary:
-      "Desde nuestro estudio en la India estamos preparando el terreno comercial y técnico para formar a mujeres en diseño de prendas y confección.",
+      "Antes de abrir una sola plaza de formación en la India, prefiero dejar dos cosas claras: nuestra iniciativa para mujeres todavía está en preparación, y un mes en Rajastán me enseñó por qué la lástima y la limosna nunca construyen nada duradero.",
     author: {
-      name: "Alma & Shirish",
-      role: "Co-founders, KarmaRise D Global",
-      spanishRole: "Cofundadores de KarmaRise D Global",
+      name: "Alma",
+      role: "Co-founder, KarmaRise D Global",
+      spanishRole: "Cofundadora de KarmaRise D Global",
       location: "India & Spain",
       spanishLocation: "India y España",
-      portraitUrl: "/images/alma-and-shirish-founders.jpg",
+      portraitUrl: "/images/alma.jpeg",
     },
     tags: [
       "Women's Training Initiative",
@@ -1446,97 +1647,164 @@ export const stories: StoryEntry[] = [
     ],
     leadImage: {
       url: "/images/warehouse_reference.jpeg",
-      alt: "Wide view of the sunlit studio space in India with sewing tables and dress form",
+      alt: "Sunlit studio room in India with two industrial sewing tables and a dress form under protective plastic covers and an open travel suitcase on the floor",
       caption:
-        "Our studio space in India, equipped for garment development and sample reviews.",
+        "Our studio room in India while everything is still in preparation: sewing tables and a dress form under dust covers, fabric bundles waiting on the benches, and my suitcase still open on the floor.",
     },
+    spanishLeadAlt:
+      "Habitación soleada de nuestro estudio en la India con dos mesas de máquinas de coser industriales y un maniquí bajo plásticos protectores y una maleta abierta en el suelo",
     spanishLeadCaption:
-      "Nuestro estudio en la India, equipado para el desarrollo de prendas y la revisión de muestras.",
+      "Nuestro estudio en la India todavía en plena preparación: las mesas de costura y el maniquí aún bajo fundas, bultos de tela esperando y mi maleta abierta en el suelo.",
     leadSlot: {
       kind: "Photo",
       ratio: "4:3 horizontal",
-      title: "Sewing machines and pattern tools in India",
+      title: "Studio room in India in preparation",
       description:
-        "4:3 daylight photograph of sewing machines, pattern paper, shears, and measuring tape in our studio space in India.",
+        "4:3 daylight photograph of our studio room in India with industrial sewing tables and dress form under dust covers while groundwork is underway.",
     },
     pullQuote: {
-      text: "Training only creates real independence when it leads to steady, paid work. That is why we are building commercial demand through our Manufacturing Programmes and Almarise first.",
-      attribution: "Alma & Shirish · KarmaRise D Global",
+      text: "We are not here to hand out food to anyone. We are here to teach women how to fish, put the rod in their hands, and make sure real paid work is waiting when they finish.",
+      attribution: "Alma",
     },
     spanishPullQuote: {
-      text: "La formación solo genera independencia real cuando desemboca en un empleo estable y remunerado. Por eso estamos consolidando primero la demanda comercial con nuestros programas de fabricación y con Almarise.",
-      attribution: "Alma y Shirish · KarmaRise D Global",
+      text: "No estamos aquí para repartir comida a nadie. Queremos enseñar a pescar, entregar la caña y asegurarnos de que haya trabajo real y pagado al terminar.",
+      attribution: "Alma",
     },
     pairImages: [
       {
-        url: "/images/shirish_and_alma.jpeg",
-        alt: "Alma, Shirish, and a colleague together in India",
+        url: "/images/alma_with_a_woman (3).jpeg",
+        alt: "Alma smiling face to face with an Indian woman holding a folded stack of green, orange, and magenta silk sarees inside a home near Mumbai",
         caption:
-          "Alma and Shirish working alongside our team in India as we build the commercial foundation for the initiative.",
+          "Standing face to face with a woman in her home near Mumbai over a stack of her kept sarees. For me, working with women starts as equals, never from pity.",
       },
       {
-        url: "/images/snoby_order (1).jpeg",
-        alt: "Strapped and wrapped export cartons stacked in the warehouse ready for dispatch",
+        url: "/images/shirish_with_workers_at_warehouse (3).jpeg",
+        alt: "Shirish standing beside a woman artisan preparing stacks of yellow-and-white striped cotton bag linings and cut black panels on an assembly table in India",
         caption:
-          "Completed Bulk Order cartons strapped and ready for dispatch, building the commercial foundation for our next steps.",
+          "Shirish beside a woman artisan preparing striped cotton linings during a commercial run. Paid, steady work on real orders is what we want our planned training to lead toward.",
       },
     ],
+    spanishPairAlts: [
+      "Alma sonriendo frente a frente con una mujer india que sostiene una pila doblada de saris de seda verde, naranja y magenta en una casa cerca de Bombay",
+      "Shirish junto a una artesana preparando pilas de forros de algodón a rayas amarillas y blancas y paneles negros cortados sobre una mesa de montaje en la India",
+    ],
     spanishPairCaptions: [
-      "Alma y Shirish junto a nuestro equipo en la India mientras construimos la base comercial de la iniciativa.",
-      "Cajas de un pedido completado listas para su envío, consolidando la base comercial para nuestros próximos pasos.",
+      "Frente a frente con una mujer en su casa cerca de Bombay, con una pila de sus saris guardados entre las dos. Para mí, trabajar con mujeres empieza siempre de igual a igual, nunca desde la lástima.",
+      "Shirish junto a una artesana preparando forros de algodón a rayas durante un pedido real. Un trabajo estable y remunerado es la meta a la que queremos que conduzca nuestra futura formación.",
     ],
     pairSlots: [
       {
-        title: "Machine stitching bench",
+        title: "Meeting women as equals",
         description:
-          "Portrait photo (4:5): close study of a clean studio sewing machine and fabric feed in warm natural light.",
+          "Portrait photo (4:5): Alma face to face with a woman in India holding folded sarees.",
       },
       {
-        title: "Pattern drafting area",
+        title: "Paid skilled work on the floor",
         description:
-          "Portrait photo (4:5): pattern curve, ruler, chalk, and draped cotton fabric.",
+          "Portrait photo (4:5): Shirish beside a woman artisan preparing striped cotton linings during a commercial production run.",
       },
     ],
     sections: [
       {
-        heading: "Connecting skills directly to paid employment",
+        heading: "First, the honest update: we have not started yet",
         paragraphs: [
-          "The Women's Training Initiative is a planned programme by KarmaRise D Global in India designed to train women in both garment design and stitching, with long-term paid employment as the goal.",
-          "We feel a clear responsibility to give back to the society around us, and training creates lasting independence when the pattern-making and construction skills women learn connect directly to real garment standards and steady work.",
+          "If you have seen our planned Women's Training Initiative mentioned elsewhere on this website, I want to clear one thing up straight away: we have not started yet. Not a single trainee has walked through our door for a class.",
+          "Right now, our studio room in India holds industrial sewing tables, a dress form, and stacks of fabric used between Almarise sample runs. Most days those machines sit under dust covers while we focus on commercial production and paperwork. Nothing has been dressed up for a brochure.",
+          "Too many projects talk about a future plan as if it were already running. Shirish and I refuse to do that. We are building our commercial work first and laying the legal and practical groundwork slowly, because I already saw firsthand what happens when good intentions run ahead of reality.",
         ],
       },
       {
-        heading: "Where the work stands today",
+        heading: "Three houses in Spain, and one month in Rajasthan",
         paragraphs: [
-          "We are deliberate about stating what is operating today and what is in preparation. Right now, our focus is on expanding our Manufacturing Programmes for Spanish and European Clients and developing Almarise so that future trainees step into a business with established demand.",
-          "In our studio in India, our sewing machines, dress forms, and pattern area are already active for garment development and prototype reviews, forming the physical base for the programme ahead.",
+          "By training, I am a certified English-as-a-foreign-language teacher. Years before I ever set foot in India, I volunteered in Spain with a small organisation that ran three transitional houses for single immigrant mothers, including women from Morocco and one woman from India. What worked there was simple and unsentimental. Each woman had a roof for a year, learned Spanish, trained in a practical trade, and got help stepping into a real job. Nobody kept them dependent. The whole point was giving them a bridge to stand on their own feet.",
+          "In January 2023, I made my first trip to India to visit my friend Virginia in Pushkar, in Rajasthan. Virginia has been coming to India for more than twenty-five years and ran a small desert project working with Dalit and nomadic families and tiny rural schools. When I walked into those classrooms and saw that neither the children nor their English teachers spoke fluent English, I slipped straight into teacher mode. I offered to write a proper English syllabus, stay three months, and raise money for a screen and a router so I could keep teaching online once I flew back to Spain.",
+          'Virginia sat me down and gave me the truth I could not see as a newcomer. In rural Rajasthan, caste walls still blocked those children from reaching college even if their English improved. Meanwhile, the children who needed cash for their families already spoke sharper street English than any classroom textbook, walking up to travellers saying, "I will come with you and bargain for you," to earn commissions from local shops. Worse, I saw a public school Virginia had paid to refurbish, complete with clean toilets and proper desks, stripped bare and ruined shortly afterward. I spent nearly a month pushing to find a way around those walls before I finally accepted that the project could not work.',
+        ],
+      },
+      {
+        heading: "The 100-rupee milk lesson, and why I want to work with women",
+        paragraphs: [
+          'That month also cured me of any patience for Western pity. I get goosebumps, in the bad sense, whenever I hear foreigners talk about India in that soft voice: "Oh, poor people, let us give them food, let us hand out money."',
+          "Virginia gave me a rule on the street that stayed with me. Never buy milk for someone carrying a baby outside a shop. You hand over a hundred rupees, walk away feeling pleased with yourself, and five minutes later they take the milk straight back to the shopkeeper and pocket ninety rupees in cash. Your charity becomes a steady side business for the shop. Saying no face to face is genuinely hard, I will not pretend otherwise, so I settled on a clear line instead: exchange, not handouts. Come learn something real, put in honest work, and earn your own pay in return. We are not here to hand out food to anyone. We are here to teach people how to fish and put the rod in their hands.",
+          "Rajasthan forced one more honest admission out of me, a personal one. That project meant teaching children, and I am simply not cut out for it. I adore babies, truly, yet I get bored trying to entertain kids all day. Working with adult women is a completely different world. You sit across from another adult, speak plainly, and build a skill together. I have believed all my life that there is no age limit for learning. There is only will, or no will.",
+        ],
+      },
+      {
+        heading:
+          "Commercial work first, Section 8 paperwork next, then the training room",
+        paragraphs: [
+          "When I got to know Shirish well after we began working together, one of the things that convinced me we could build something serious was how genuinely he cares about women standing on their own. I tease him that he is 150% Indian and 190% Marathi, stubborn about doing things properly and unwilling to cut corners. When he talks about Almarise, he puts the whole purpose into one line: the saree belonged to a woman, a woman cuts and stitches it in our studio, and a woman wears it on the other side of the world.",
+          "That is the circle our planned Women's Training Initiative is meant to join. It is not an NGO handing out certificates that lead nowhere, and it is not charity. Our aim is to train women in garment design, pattern work, and stitching to real commercial standards, with steady paid employment as the long-term goal.",
+          "Two foundations have to be solid before we invite a single woman to enrol. The first is real commercial demand: growing our Manufacturing Programmes for Clients in Spain and across Europe, and building Almarise so there is paid garment work waiting when trainees are ready. The second is the legal structure. Shirish, who is a lawyer here in India, is steering the setup of a formal Section 8 non-profit foundation for the training work. Because I am a Spanish national joining as a co-founder, the compliance takes extra steps and patience, from Indian director registrations to apostilled Spanish paperwork, and we are taking the time to do every piece by the book.",
+          "For now, the sewing machines in that sunlit room remain part of our studio setup while commercial orders and Almarise grow, and while the legal papers move forward step by step. The day we pull the dust covers off for our first group of women, we will tell you right here. Until then, we would rather show you what is real today than sell you a programme that has not begun.",
+        ],
+        images: [
+          {
+            url: "/images/alma_and_shirish_sitting_at_table (2).jpeg",
+            alt: "Shirish and Alma sitting face to face across a small table with a tablet in front of a bright window in India discussing company plans",
+            caption:
+              "Talking through our plans with Shirish by the window in India. Commercial orders and legal groundwork come first, before we promise a single training seat.",
+            aspectRatio: "4:3",
+          },
         ],
       },
     ],
     spanishSections: [
       {
-        heading: "Vincular el aprendizaje con el empleo remunerado",
+        heading: "Primero, la verdad por delante: todavía no hemos empezado",
         paragraphs: [
-          "La iniciativa de formación para mujeres es un programa planificado por KarmaRise D Global en la India con el propósito de enseñar tanto diseño de prendas como patronaje y costura, orientado a crear oportunidades reales de empleo a largo plazo.",
-          "Sentimos el deber de devolver parte de lo recibido a la sociedad que nos rodea, y sabemos que la formación genera verdadera independencia cuando el patronaje y la confección que aprenden las mujeres conectan directamente con estándares profesionales y trabajo estable.",
+          "Si has visto mencionada nuestra futura iniciativa de formación para mujeres en algún rincón de esta web, quiero dejar una cosa clara desde la primera línea: todavía no ha empezado. A día de hoy no ha entrado ninguna alumna a dar clase.",
+          "Ahora mismo, nuestro estudio en la India reúne mesas de máquinas de coser industriales, un maniquí y pilas de tela que usamos entre prueba y prueba de Almarise. Muchos días esas máquinas siguen tapadas con fundas mientras nos centramos en la producción comercial y el papeleo. Aquí no hemos maquillado nada para un folleto.",
+          "Demasiados proyectos hablan de un plan futuro como si ya estuviera en marcha. Shirish y yo nos negamos a hacer eso. Primero estamos consolidando la actividad comercial y resolviendo despacio la base legal y técnica, porque yo ya vi con mis propios ojos lo que pasa cuando las buenas intenciones corren más que la realidad.",
         ],
       },
       {
-        heading: "En qué punto nos encontramos hoy",
+        heading: "Tres pisos en España y un mes en Rajastán",
         paragraphs: [
-          "Nos gusta ser siempre transparentes sobre qué está hoy en pleno funcionamiento y qué se encuentra en fase de preparación. En este momento estamos centrados en impulsar nuestros programas de fabricación para clientes en España y Europa y el desarrollo de Almarise, de modo que las futuras alumnas cuenten con una carga de trabajo sólida.",
-          "En nuestro estudio en la India, el equipamiento de costura, los maniquíes y el área de patronaje ya están activos para el desarrollo de muestras, preparando el espacio donde crecerá la iniciativa.",
+          "Por formación soy profesora titulada de inglés como lengua extranjera. Años antes de pisar la India, fui voluntaria en España en una pequeña asociación que llevaba tres pisos de acogida para madres solteras inmigrantes, entre ellas mujeres marroquíes y una mujer india. Lo que funcionaba allí era sencillo y sin dramatismos: un año de vivienda, clases de español, un oficio práctico y acompañamiento para encontrar un empleo real. Nadie las mantenía dependientes. El objetivo era tender un puente para que pudieran valerse por sí mismas.",
+          "En enero de 2023 viajé por primera vez a la India para visitar a mi amiga Virginia en Pushkar, en Rajastán. Virginia lleva más de veinticinco años viniendo a la India y llevaba un pequeño proyecto en el desierto con familias dalit y nómadas y escuelitas rurales. Al entrar en aquellas aulas y comprobar que ni los niños ni sus profesores hablaban inglés con soltura, me salió enseguida el instinto de profesora. Me ofrecí a preparar un temario en condiciones, quedarme tres meses y reunir dinero para comprar una pantalla y un router y seguir dándoles clase online cuando volviera a España.",
+          'Virginia se sentó conmigo y me contó la realidad que una recién llegada no ve. En el Rajastán rural, el muro de las castas seguía cerrando a esos niños el acceso a la universidad por mucho inglés que aprendieran. Mientras tanto, los chavales que necesitaban llevar dinero a casa ya dominaban un inglés de calle más afilado que cualquier libro de texto, acercándose a los viajeros con un "vengo contigo y regateo por ti" para llevarse comisión en las tiendas. Peor todavía: vi una escuela pública que Virginia había pagado para rehabilitar, con baños nuevos y pupitres en condiciones, desmantelada y destrozada al poco tiempo. Pasé casi un mes intentando buscarle una vuelta hasta que tuve que aceptar que aquel proyecto no era viable.',
+        ],
+      },
+      {
+        heading:
+          "La lección de la leche de cien rupias y por qué quiero trabajar con mujeres",
+        paragraphs: [
+          'Aquel mes también me quitó cualquier paciencia con la lástima occidental. Se me pone la piel de gallina, y no para bien, cada vez que oigo a extranjeros hablar de la India con ese tono lastimero de "pobrecitos, vamos a darles comida o dinero".',
+          "Virginia me dio en la calle una norma que no he olvidado. Nunca compres leche para alguien que te la pida con un bebé en brazos a la puerta de una tienda. Pagas cien rupias, te marchas pensando que has hecho una buena obra y cinco minutos después devuelven la leche al tendero y se quedan noventa rupias en mano. Tu caridad acaba convertida en un negocio paralelo para la tienda. Decir que no a la cara cuesta muchísimo, no voy a fingir que sea fácil, así que me fijé otra regla: intercambio, no limosna. Ven a aprender un oficio de verdad, haz un trabajo honesto y gana tu propio sueldo a cambio. No estamos aquí para repartir comida a nadie; estamos para enseñar a pescar y poner la caña en sus manos.",
+          "Rajastán me obligó además a reconocer otra verdad muy personal. Aquel proyecto consistía en enseñar a niños, y yo no sirvo para eso. Los bebés me encantan, de verdad, pero entretener a niños todo el día me aburre. Trabajar con mujeres adultas es otro mundo. Te sientas frente a otra adulta, hablas claro y construyes una habilidad juntas. Llevo toda la vida convencida de que no hay edad para aprender; solo existen las ganas o la falta de ganas.",
+        ],
+      },
+      {
+        heading:
+          "Primero el trabajo comercial, luego la Fundación Section 8 y después el aula",
+        paragraphs: [
+          "Cuando empecé a conocer bien a Shirish trabajando juntos, una de las cosas que me convenció de que podíamos levantar algo serio fue ver cuánto le importa de verdad que las mujeres salgan adelante. Siempre bromeo con que es 150% indio y 190% maratí, cabezota para hacer las cosas bien y enemigo de los atajos. Cuando habla de Almarise resume el sentido de todo en una frase: el sari perteneció a una mujer, otra mujer lo corta y lo cose en nuestro estudio y otra mujer lo viste al otro lado del mundo.",
+          "Ese es el círculo al que queremos sumar nuestra futura iniciativa de formación para mujeres. No es una ONG que reparte diplomas sin salida, ni es caridad. Nuestro objetivo es formar a mujeres en diseño de prendas, patronaje y confección con estándares profesionales reales, con el empleo remunerado y estable como meta a largo plazo.",
+          "Antes de invitar a una sola mujer a apuntarse, tienen que estar firmes dos pilares. El primero es una demanda comercial constante: hacer crecer nuestros programas de fabricación para clientes en España y Europa y consolidar Almarise para que haya trabajo textil pagado esperando al terminar la formación. El segundo es la estructura legal. Shirish, que es abogado aquí en la India, está dirigiendo la constitución de una fundación sin ánimo de lucro bajo el marco Section 8 para esta labor formativa. Como soy ciudadana española y entro como cofundadora, el expediente lleva trámites adicionales y mucha paciencia, desde registros de dirección en la India hasta documentación española apostillada, y estamos dedicando el tiempo necesario para hacerlo todo conforme a la ley.",
+          "De momento, las máquinas de coser de aquella habitación soleada siguen formando parte de nuestro estudio mientras crecen los pedidos comerciales y Almarise, y mientras el papeleo legal avanza paso a paso. El día que quitemos los plásticos para recibir al primer grupo de mujeres, te lo contaremos aquí mismo. Hasta entonces, preferimos enseñarte lo que es real hoy antes que venderte un programa que aún no ha empezado.",
+        ],
+        images: [
+          {
+            url: "/images/alma_and_shirish_sitting_at_table (2).jpeg",
+            alt: "Shirish y Alma sentados frente a frente ante una pequeña mesa con una tableta junto a una ventana luminosa en la India repasando planes",
+            caption:
+              "Repasando planes con Shirish junto a la ventana en la India. Primero consolidamos los pedidos comerciales y el papeleo legal, antes de prometer una sola plaza de formación.",
+            aspectRatio: "4:3",
+          },
         ],
       },
     ],
-    takeaway:
-      "Establishing strong commercial demand first ensures that our planned training programme in India can offer women lasting, dignified employment.",
-    spanishTakeaway:
-      "Consolidar primero una actividad comercial sólida es la mejor garantía para que nuestra futura formación en la India ofrezca a las mujeres un empleo digno y duradero.",
+    takeaway: "",
+    spanishTakeaway: "",
     seo: {
-      title: "Preparing the Women's Training Initiative in India",
+      title: "Why Our Planned Women's Training Initiative Has Not Started Yet",
       description:
-        "Follow the groundwork in India as Alma and Shirish prepare KarmaRise D Global's planned garment design and stitching training programme.",
+        "Alma explains why a month in Rajasthan turned her away from handout charity, how commercial orders and Section 8 legal groundwork come first, and where KarmaRise D Global's planned Women's Training Initiative stands today.",
+      spanishTitle:
+        "Por qué nuestra iniciativa de formación para mujeres aún no ha empezado",
+      spanishDescription:
+        "Alma cuenta por qué un mes en Rajastán la alejó de la caridad asistencial, por qué el trabajo comercial y la fundación Section 8 van primero y en qué punto real está la futura formación textil de KarmaRise D Global.",
     },
   },
 ];

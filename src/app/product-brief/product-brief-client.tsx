@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { ProductBriefForm } from "@/components/product-brief-form";
+import { SectionBridge } from "@/components/section-bridge";
 import { SiteFooter } from "@/components/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 
@@ -118,9 +119,11 @@ export function ProductBriefPageClient() {
           </div>
         </section>
 
+        <SectionBridge from="paper" to="wood" />
+
         <section className="bg-[var(--color-wood)] py-[var(--section-gap)] text-[var(--color-paper)]">
-          <div className="container grid items-start gap-[var(--space-2xl)] lg:grid-cols-12">
-            <div className="grid gap-[var(--space-xl)] lg:col-span-5">
+          <div className="container grid items-start gap-[var(--gap-columns)] lg:grid-cols-12">
+            <div className="grid min-w-0 gap-[var(--space-xl)] lg:col-span-5">
               <div className="grid gap-4">
                 <h2 className="text-[length:var(--text-display-s)] leading-[1.04] font-medium text-[var(--color-paper)]">
                   {isEs ? "Qué conviene incluir" : "What to include"}
@@ -144,7 +147,7 @@ export function ProductBriefPageClient() {
               </p>
             </div>
 
-            <div className="lg:col-span-7">
+            <div className="min-w-0 lg:col-span-7">
               <h2 className="mb-6 text-[length:var(--text-2xl)] font-medium text-[var(--color-paper)]">
                 {isEs ? "Tu Product Brief" : "Your Product Brief"}
               </h2>
@@ -152,6 +155,8 @@ export function ProductBriefPageClient() {
             </div>
           </div>
         </section>
+
+        <SectionBridge from="wood" to="pale-sage" />
 
         <section className="bg-[var(--color-pale-sage)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
           <div className="container grid gap-[var(--space-xl)]">
@@ -182,6 +187,8 @@ export function ProductBriefPageClient() {
           </div>
         </section>
 
+        <SectionBridge from="pale-sage" to="dune" />
+
         <section className="bg-[var(--color-paper-2)] py-[var(--space-2xl)] text-[var(--color-forest-deep)]">
           <div className="container flex flex-wrap items-center justify-between gap-6">
             <div className="grid gap-1">
@@ -197,13 +204,15 @@ export function ProductBriefPageClient() {
               </p>
             </div>
             <Link
-              className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+              className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
               href={localizeHref("/contact")}
             >
               {isEs ? "Ver datos de contacto" : "View contact details"}
             </Link>
           </div>
         </section>
+
+        <SectionBridge from="dune" to="night" />
       </main>
 
       <SiteFooter />

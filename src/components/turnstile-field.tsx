@@ -233,7 +233,7 @@ export function TurnstileField({
       {!hasError && appearance === "interaction-only" ? (
         <p
           aria-live="polite"
-          className={`inline-flex items-center gap-1.5 text-[11px] leading-tight ${
+          className={`inline-flex items-center gap-1.5 text-xs leading-tight ${
             theme === "dark"
               ? "text-[var(--color-paper-2)]/70"
               : "text-[var(--color-muted)]"

@@ -28,7 +28,10 @@ const nextConfig: NextConfig = {
     styledComponents: true,
   },
   images: {
-    unoptimized: true,
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
+    deviceSizes: [640, 750, 828, 1080, 1200, 1600, 1920],
+    imageSizes: [64, 128, 256, 384, 512],
     remotePatterns: [
       {
         protocol: "https",
@@ -68,10 +71,37 @@ const nextConfig: NextConfig = {
         : []),
     ];
 
+    const mediaCacheHeaders = [
+      {
+        key: "Cache-Control",
+        value: "public, max-age=2592000, stale-while-revalidate=86400",
+      },
+    ];
+
     return [
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/brand/:path*",
+        headers: mediaCacheHeaders,
+      },
+      {
+        source: "/images/:path*",
+        headers: mediaCacheHeaders,
+      },
+      {
+        source: "/media/:path*",
+        headers: mediaCacheHeaders,
+      },
+      {
+        source: "/phases/:path*",
+        headers: mediaCacheHeaders,
+      },
+      {
+        source: "/references/:path*",
+        headers: mediaCacheHeaders,
       },
       {
         source: "/api/:path*",

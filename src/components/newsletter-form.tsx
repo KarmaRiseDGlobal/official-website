@@ -124,7 +124,7 @@ export function NewsletterForm({
 
   if (isJournal) {
     return (
-      <div className="rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] p-6 sm:p-8">
+      <div className="rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] p-4 sm:p-6 lg:p-8">
         <div className="mb-5 grid gap-1 border-b border-[var(--color-rule)] pb-4">
           <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.05em] text-[var(--color-clay-ink)] uppercase">
             {isEs ? "Historias por correo" : "Stories by email"}
@@ -166,10 +166,10 @@ export function NewsletterForm({
               placeholder={isEs ? "tu@correo.com" : "your@email.com"}
               required
               disabled={isSubmitting}
-              className="min-h-[var(--control-height)] w-full flex-1 rounded-[0.75rem] border border-[var(--color-rule)] bg-[var(--color-paper)] px-4 text-[var(--color-forest-deep)] transition-colors placeholder:text-[var(--color-muted)] focus-visible:border-[var(--color-clay-ink)] focus-visible:outline-none disabled:opacity-55"
+              className="min-h-[var(--control-height)] w-full min-w-0 flex-1 rounded-[0.75rem] border border-[var(--color-rule)] bg-[var(--color-paper)] px-4 text-[var(--color-forest-deep)] transition-colors placeholder:text-[var(--color-muted)] focus-visible:border-[var(--color-clay-ink)] focus-visible:outline-none disabled:opacity-55"
             />
             <button
-              className="primary-button shrink-0"
+              className="primary-button shrink-0 sm:w-auto"
               type="submit"
               disabled={isSubmitting}
               data-newsletter-submit-btn
@@ -250,13 +250,13 @@ export function NewsletterForm({
           disabled={isSubmitting}
           className={
             isLight
-              ? "min-h-[var(--control-height)] w-full flex-1 rounded-[0.75rem] border border-[var(--color-rule)] bg-[var(--color-paper)] px-4 text-[var(--color-forest-deep)] transition-colors placeholder:text-[var(--color-muted)] focus-visible:border-[var(--color-clay-ink)] focus-visible:outline-none disabled:opacity-55"
-              : "min-h-[var(--control-height)] w-full flex-1 rounded-[0.75rem] border border-[var(--color-paper)]/20 bg-[var(--color-paper)]/10 px-4 text-[var(--color-paper)] transition-colors placeholder:text-[var(--color-paper-2)]/65 hover:border-[var(--color-paper-2)]/50 focus-visible:border-[var(--color-gold)] focus-visible:outline-none disabled:opacity-55"
+              ? "min-h-[var(--control-height)] w-full min-w-0 flex-1 rounded-[0.75rem] border border-[var(--color-rule)] bg-[var(--color-paper)] px-4 text-[var(--color-forest-deep)] transition-colors placeholder:text-[var(--color-muted)] focus-visible:border-[var(--color-clay-ink)] focus-visible:outline-none disabled:opacity-55"
+              : "min-h-[var(--control-height)] w-full min-w-0 flex-1 rounded-[0.75rem] border border-[var(--color-paper)]/20 bg-[var(--color-paper)]/10 px-4 text-[var(--color-paper)] transition-colors placeholder:text-[var(--color-paper-2)]/65 hover:border-[var(--color-paper-2)]/50 focus-visible:border-[var(--color-gold)] focus-visible:outline-none disabled:opacity-55"
           }
         />
 
         <button
-          className="primary-button shrink-0"
+          className="primary-button shrink-0 sm:w-auto"
           type="submit"
           disabled={isSubmitting}
         >

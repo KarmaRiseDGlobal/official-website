@@ -40,14 +40,19 @@ export function MediaPlaceholder({
       ? "text-[var(--color-paper-2)]"
       : "text-[var(--color-muted)]";
 
+  const paddingClass =
+    shape === "arch"
+      ? "px-6 pt-12 pb-6 sm:px-8 sm:pt-14 sm:pb-8"
+      : "p-6 sm:p-8";
+
   const radiusClass =
     shape === "arch"
-      ? "rounded-t-[16rem] rounded-b-[var(--radius-card)]"
+      ? "overflow-hidden rounded-t-[16rem] rounded-b-[var(--radius-card)]"
       : "rounded-[var(--radius-card)]";
 
   return (
     <figure
-      className={`m-0 flex w-full min-w-0 flex-col justify-between border p-6 sm:p-8 ${aspectClass} ${radiusClass} ${toneClasses} ${className}`}
+      className={`m-0 flex w-full min-w-0 flex-col justify-between border ${paddingClass} ${aspectClass} ${radiusClass} ${toneClasses} ${className}`}
     >
       <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-2 border-b border-current/15 pb-3 text-[length:var(--text-xs)] font-semibold tracking-[0.04em] uppercase">
         <span className={metaClass}>{kind}</span>

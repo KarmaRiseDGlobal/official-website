@@ -8,6 +8,7 @@ import {
   useId,
   useRef,
   useState,
+  type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
@@ -137,22 +138,45 @@ function notifyTooltipOpened(currentDismiss: () => void): void {
 }
 
 interface TooltipCoords {
+  readonly mode: "popover" | "sheet";
   readonly left: number;
-  readonly top?: number;
-  readonly bottom?: number;
+  readonly top: number;
   readonly arrowLeft: number;
   readonly placement: "above" | "below";
 }
 
 const CARD_WIDTH_PX = 288;
 const VIEWPORT_MARGIN_PX = 12;
+const TOP_SAFE_PX = 124;
+const BOTTOM_SAFE_PX = 16;
+
+function isSheetViewport(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  return (
+    window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches
+  );
+}
 
 function measureTooltipCoords(
   anchor: HTMLElement,
   hasVisual: boolean,
+  measuredHeight?: number,
 ): TooltipCoords {
+  if (isSheetViewport()) {
+    return {
+      mode: "sheet",
+      left: 0,
+      top: 0,
+      arrowLeft: 0,
+      placement: "below",
+    };
+  }
+
   const clientRect =
     anchor.getClientRects()[0] ?? anchor.getBoundingClientRect();
+  const vh = window.innerHeight;
   const centerX = clientRect.left + clientRect.width / 2;
   const maxLeft = Math.max(
     VIEWPORT_MARGIN_PX,
@@ -167,22 +191,41 @@ function measureTooltipCoords(
     CARD_WIDTH_PX - 18,
   );
 
-  // Flip below the word if too close to the top viewport / fixed header
-  const minTopSpace = hasVisual ? 320 : 165;
-  if (clientRect.top < minTopSpace) {
-    return {
-      left: clampedLeft,
-      top: clientRect.bottom + 10,
-      arrowLeft,
-      placement: "below",
-    };
-  }
+  // Respect fixed header clearance (TOP_SAFE_PX = 124) and clamp rendered card height within the viewport
+  const maxCardH = Math.max(160, vh - 160);
+  const cardH = Math.min(
+    measuredHeight && measuredHeight > 0
+      ? measuredHeight
+      : hasVisual
+        ? 380
+        : 196,
+    maxCardH,
+  );
+
+  const availableAbove = clientRect.top - TOP_SAFE_PX - 10;
+  const availableBelow = vh - clientRect.bottom - BOTTOM_SAFE_PX - 10;
+  const placement: "above" | "below" =
+    availableAbove >= cardH
+      ? "above"
+      : availableBelow >= cardH
+        ? "below"
+        : availableBelow >= availableAbove
+          ? "below"
+          : "above";
+
+  const rawTop =
+    placement === "below"
+      ? clientRect.bottom + 10
+      : clientRect.top - cardH - 10;
+  const maxTop = Math.max(TOP_SAFE_PX, vh - cardH - BOTTOM_SAFE_PX);
+  const clampedTop = Math.min(Math.max(TOP_SAFE_PX, rawTop), maxTop);
 
   return {
+    mode: "popover",
     left: clampedLeft,
-    bottom: window.innerHeight - clientRect.top + 10,
+    top: clampedTop,
     arrowLeft,
-    placement: "above",
+    placement,
   };
 }
 
@@ -204,7 +247,7 @@ function renderReferenceVisual(
             fill
             unoptimized
             loading="eager"
-            sizes="288px"
+            sizes="(max-width: 767px) 100vw, 480px"
             className="object-cover"
           />
         </div>
@@ -224,7 +267,7 @@ function renderReferenceVisual(
             fill
             unoptimized
             loading="eager"
-            sizes="288px"
+            sizes="(max-width: 767px) 100vw, 480px"
             style={
               isContain
                 ? undefined
@@ -236,26 +279,6 @@ function renderReferenceVisual(
       );
     }
 
-    default: {
-      const _exhaustive: never = visual;
-      return _exhaustive;
-    }
-  }
-}
-
-function getTopArrowSurfaceClass(
-  visual: StoryReferenceVisual | undefined,
-): string {
-  if (!visual) {
-    return "bg-[var(--color-white)]";
-  }
-  switch (visual.kind) {
-    case "map":
-      return "bg-[#e6dfd1]";
-    case "photo":
-      return visual.fit === "contain"
-        ? "bg-[#f4ede0]"
-        : "bg-[var(--color-paper-2)]";
     default: {
       const _exhaustive: never = visual;
       return _exhaustive;
@@ -280,6 +303,7 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
   const lastHoverOpenAtRef = useRef(0);
   const tooltipId = useId();
   const hasVisual = entry.visual !== undefined;
+  const isSpanish = lang === "es";
 
   const clearCloseTimer = useCallback(() => {
     if (closeTimerRef.current !== null) {
@@ -300,7 +324,9 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
       return;
     }
     notifyTooltipOpened(closeNow);
-    setCoords(measureTooltipCoords(el, hasVisual));
+    setCoords(
+      measureTooltipCoords(el, hasVisual, cardRef.current?.offsetHeight),
+    );
     setIsOpen(true);
   }, [clearCloseTimer, closeNow, hasVisual]);
 
@@ -325,10 +351,31 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
     }
 
     const updatePosition = () => {
-      if (anchorRef.current) {
-        setCoords(measureTooltipCoords(anchorRef.current, hasVisual));
+      const anchor = anchorRef.current;
+      if (!anchor) {
+        return;
       }
+      const rect = anchor.getBoundingClientRect();
+      if (rect.bottom < TOP_SAFE_PX - 12 || rect.top > window.innerHeight) {
+        closeNow();
+        return;
+      }
+      setCoords(
+        measureTooltipCoords(anchor, hasVisual, cardRef.current?.offsetHeight),
+      );
     };
+
+    const rafId = window.requestAnimationFrame(() => {
+      if (anchorRef.current && cardRef.current) {
+        setCoords(
+          measureTooltipCoords(
+            anchorRef.current,
+            hasVisual,
+            cardRef.current.offsetHeight,
+          ),
+        );
+      }
+    });
 
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target;
@@ -356,6 +403,7 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
     document.addEventListener("keydown", handleEscape);
 
     return () => {
+      window.cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", updatePosition);
       window.removeEventListener("resize", updatePosition);
       document.removeEventListener("pointerdown", handlePointerDown);
@@ -389,6 +437,16 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
     }
   };
 
+  const handleBlur = (event: FocusEvent<HTMLSpanElement>) => {
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && cardRef.current?.contains(nextTarget)) {
+      return;
+    }
+    if (!isSheetViewport()) {
+      scheduleClose();
+    }
+  };
+
   const handleClick = (event: MouseEvent<HTMLSpanElement>) => {
     event.stopPropagation();
     if (Date.now() - lastHoverOpenAtRef.current < 450) {
@@ -416,6 +474,8 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
     }
   };
 
+  const isSheet = coords?.mode === "sheet";
+
   return (
     <>
       <span
@@ -423,15 +483,19 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
         role="button"
         tabIndex={0}
         aria-expanded={isOpen}
-        aria-describedby={isOpen ? tooltipId : undefined}
+        aria-controls={isOpen ? tooltipId : undefined}
         onPointerDown={handlePointerDownTrigger}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
         onFocus={handleFocus}
-        onBlur={scheduleClose}
+        onBlur={handleBlur}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        className="cursor-help underline decoration-[var(--color-clay)] decoration-dotted decoration-2 underline-offset-[0.26em] transition-colors hover:bg-[var(--color-clay)]/14 hover:text-[var(--color-forest-deep)] focus-visible:rounded-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+        className={`cursor-help rounded-xs underline decoration-[var(--color-clay)] decoration-2 underline-offset-[0.26em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] ${
+          isOpen
+            ? "bg-[var(--color-clay)]/20 text-[var(--color-forest-deep)] decoration-solid"
+            : "decoration-dotted hover:bg-[var(--color-clay)]/14 hover:text-[var(--color-forest-deep)]"
+        }`}
       >
         {text}
       </span>
@@ -441,28 +505,55 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
             <div
               ref={cardRef}
               id={tooltipId}
-              role="tooltip"
-              onMouseEnter={clearCloseTimer}
-              onMouseLeave={scheduleClose}
-              style={{
-                position: "fixed",
-                left: `${coords.left}px`,
-                top: coords.top !== undefined ? `${coords.top}px` : undefined,
-                bottom:
-                  coords.bottom !== undefined
-                    ? `${coords.bottom}px`
-                    : undefined,
-                width: `${CARD_WIDTH_PX}px`,
-              }}
-              className="z-[var(--z-tooltip)] rounded-[1rem] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[0_18px_44px_rgba(24,45,32,0.2)]"
+              role="dialog"
+              aria-label={entry.title[lang]}
+              onMouseEnter={isSheet ? undefined : clearCloseTimer}
+              onMouseLeave={isSheet ? undefined : scheduleClose}
+              style={
+                isSheet
+                  ? undefined
+                  : {
+                      position: "fixed",
+                      left: `${coords.left}px`,
+                      top: `${coords.top}px`,
+                      width: `${CARD_WIDTH_PX}px`,
+                    }
+              }
+              className={
+                isSheet
+                  ? "fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[var(--z-tooltip)] mx-auto max-h-[68dvh] max-w-[30rem] overflow-y-auto rounded-[1rem] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[0_18px_44px_rgba(24,45,32,0.28)]"
+                  : "z-[var(--z-tooltip)] rounded-[1rem] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[0_18px_44px_rgba(24,45,32,0.2)]"
+              }
             >
-              <div className="overflow-hidden rounded-[calc(1rem-1px)]">
-                {renderReferenceVisual(entry.visual, lang)}
-
-                <div className="grid gap-1 p-3.5">
+              <div
+                className={
+                  isSheet
+                    ? "rounded-[calc(1rem-1px)]"
+                    : "max-h-[calc(100dvh-10rem)] overflow-y-auto rounded-[calc(1rem-1px)]"
+                }
+              >
+                <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-[var(--color-rule)]/70 bg-[var(--color-white)] py-0.5 pr-1 pl-3.5">
                   <p className="m-0 text-[0.68rem] font-semibold tracking-[0.06em] text-[var(--color-clay-ink)] uppercase">
                     {REFERENCE_KIND_LABELS[entry.category][lang]}
                   </p>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      closeNow();
+                    }}
+                    aria-label={
+                      isSpanish ? "Cerrar referencia" : "Close reference"
+                    }
+                    className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-[1.25rem] leading-none text-[var(--color-forest-deep)] transition-colors hover:bg-[var(--color-paper-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+
+                {renderReferenceVisual(entry.visual, lang)}
+
+                <div className="grid gap-1.5 p-3.5">
                   <p className="m-0 font-[family-name:var(--font-display)] text-[1rem] leading-[1.2] font-medium text-[var(--color-forest-deep)]">
                     {entry.title[lang]}
                   </p>
@@ -472,15 +563,17 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
                 </div>
               </div>
 
-              <span
-                aria-hidden="true"
-                style={{ left: `${coords.arrowLeft}px` }}
-                className={`pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-[var(--color-rule)] ${
-                  coords.placement === "above"
-                    ? "-bottom-[6px] border-r border-b bg-[var(--color-white)]"
-                    : `-top-[6px] border-t border-l ${getTopArrowSurfaceClass(entry.visual)}`
-                }`}
-              />
+              {!isSheet ? (
+                <span
+                  aria-hidden="true"
+                  style={{ left: `${coords.arrowLeft}px` }}
+                  className={`pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-[var(--color-rule)] bg-[var(--color-white)] ${
+                    coords.placement === "above"
+                      ? "-bottom-[6px] border-r border-b"
+                      : "-top-[6px] border-t border-l"
+                  }`}
+                />
+              ) : null}
             </div>,
             document.body,
           )

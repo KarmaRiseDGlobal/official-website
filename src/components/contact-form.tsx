@@ -169,7 +169,7 @@ export function ContactForm() {
 
   return (
     <form
-      className="brief-form"
+      className="brief-form min-w-0"
       data-endpoint="/api/contact"
       noValidate
       onSubmit={handleSubmit}
@@ -185,7 +185,7 @@ export function ContactForm() {
         />
       </div>
       <div className="field-row">
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="contact-name">
             {isEs ? "Tu nombre" : "Your name"}
           </label>
@@ -197,7 +197,7 @@ export function ContactForm() {
             disabled={isSubmitting}
           />
         </div>
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="contact-email">
             {isEs ? "Correo electrónico" : "Email"}
           </label>
@@ -213,7 +213,7 @@ export function ContactForm() {
         </div>
       </div>
 
-      <div className="field">
+      <div className="field min-w-0">
         <label htmlFor="contact-topic">{isEs ? "Asunto" : "Topic"}</label>
         <select
           id="contact-topic"
@@ -221,6 +221,7 @@ export function ContactForm() {
           defaultValue=""
           required
           disabled={isSubmitting}
+          className="min-w-0"
         >
           <option value="" disabled>
             {isEs ? "Selecciona un asunto" : "Select a topic"}
@@ -245,7 +246,7 @@ export function ContactForm() {
         </select>
       </div>
 
-      <div className="field">
+      <div className="field min-w-0">
         <label htmlFor="contact-note">{isEs ? "Mensaje" : "Message"}</label>
         <textarea
           id="contact-note"
@@ -279,7 +280,9 @@ export function ContactForm() {
         </button>
         <div
           className={
-            isError ? "form-message text-[var(--color-gold)]" : "form-message"
+            isError
+              ? "form-message min-w-0 text-[var(--color-gold)]"
+              : "form-message min-w-0"
           }
           aria-live="polite"
         >
@@ -287,7 +290,7 @@ export function ContactForm() {
           {mailtoFallback ? (
             <p className="mt-2">
               <a
-                className="font-semibold text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)]"
+                className="inline-flex min-h-[44px] items-center font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)]"
                 href={mailtoFallback.href}
               >
                 {isEs

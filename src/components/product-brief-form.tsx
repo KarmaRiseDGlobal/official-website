@@ -375,7 +375,7 @@ export function ProductBriefForm() {
 
   return (
     <form
-      className="brief-form"
+      className="brief-form min-w-0"
       data-endpoint="/api/product-brief"
       noValidate
       onSubmit={handleSubmit}
@@ -391,7 +391,7 @@ export function ProductBriefForm() {
         />
       </div>
       <div className="field-row">
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-name">{isEs ? "Tu nombre" : "Your name"}</label>
           <input
             id="brief-name"
@@ -401,7 +401,7 @@ export function ProductBriefForm() {
             disabled={isSubmitting}
           />
         </div>
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-company">
             {isEs ? "Empresa o marca" : "Company or brand"}
           </label>
@@ -416,7 +416,7 @@ export function ProductBriefForm() {
       </div>
 
       <div className="field-row">
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-profile">
             {isEs ? "Perfil de empresa" : "Company profile"}
           </label>
@@ -426,6 +426,7 @@ export function ProductBriefForm() {
             defaultValue=""
             required
             disabled={isSubmitting}
+            className="min-w-0"
           >
             <option value="" disabled>
               {isEs ? "Selecciona una opción" : "Select one"}
@@ -444,7 +445,7 @@ export function ProductBriefForm() {
             </option>
           </select>
         </div>
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-email">
             {isEs ? "Correo profesional" : "Work email"}
           </label>
@@ -461,7 +462,7 @@ export function ProductBriefForm() {
       </div>
 
       <div className="field-row">
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-language">
             {isEs ? "Idioma preferido" : "Preferred language"}
           </label>
@@ -472,12 +473,13 @@ export function ProductBriefForm() {
             defaultValue={isEs ? "Spanish" : "English"}
             required
             disabled={isSubmitting}
+            className="min-w-0"
           >
             <option value="Spanish">{isEs ? "Español" : "Spanish"}</option>
             <option value="English">{isEs ? "Inglés" : "English"}</option>
           </select>
         </div>
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-product">
             {isEs ? "Tipo de producto" : "Product type"}
           </label>
@@ -487,6 +489,7 @@ export function ProductBriefForm() {
             defaultValue=""
             required
             disabled={isSubmitting}
+            className="min-w-0"
           >
             <option value="" disabled>
               {isEs ? "Selecciona una opción" : "Select one"}
@@ -505,7 +508,7 @@ export function ProductBriefForm() {
       </div>
 
       <div className="field-row">
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-readiness">
             {isEs ? "Fase actual del proyecto" : "Current stage"}
           </label>
@@ -515,6 +518,7 @@ export function ProductBriefForm() {
             defaultValue=""
             required
             disabled={isSubmitting}
+            className="min-w-0"
           >
             <option value="" disabled>
               {isEs ? "Selecciona una opción" : "Select one"}
@@ -539,7 +543,7 @@ export function ProductBriefForm() {
             </option>
           </select>
         </div>
-        <div className="field">
+        <div className="field min-w-0">
           <label htmlFor="brief-quantity">
             {isEs
               ? "Cantidad estimada del pedido (opcional)"
@@ -558,7 +562,7 @@ export function ProductBriefForm() {
         </div>
       </div>
 
-      <div className="field">
+      <div className="field min-w-0">
         <label htmlFor="brief-reference-url">
           {isEs
             ? "Enlace de referencia (opcional)"
@@ -604,7 +608,7 @@ export function ProductBriefForm() {
         />
         <label
           htmlFor="brief-files"
-          className={`flex flex-wrap items-center justify-between gap-3 rounded-[0.75rem] border border-[var(--color-paper)]/25 bg-[var(--color-paper)]/10 px-4 py-3 text-[length:var(--text-sm)] text-[var(--color-paper)] transition-colors peer-focus-visible:border-[var(--color-gold)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-gold)]/40 ${
+          className={`flex min-h-[44px] flex-wrap items-center justify-between gap-3 rounded-[0.75rem] border border-[var(--color-paper)]/25 bg-[var(--color-paper)]/10 px-4 py-3 text-[length:var(--text-sm)] text-[var(--color-paper)] transition-colors peer-focus-visible:border-[var(--color-gold)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-gold)]/40 ${
             isSubmitting || selectedFiles.length >= MAX_UPLOAD_FILES
               ? "cursor-not-allowed opacity-55"
               : "cursor-pointer hover:border-[var(--color-paper-2)]"
@@ -643,7 +647,7 @@ export function ProductBriefForm() {
             {selectedFiles.map((file, index) => (
               <li
                 key={`${file.name}-${file.size}-${index}`}
-                className="flex items-center justify-between gap-3 rounded-[0.6rem] border border-[var(--color-paper)]/20 bg-[var(--color-paper)]/8 px-3 py-2 text-[length:var(--text-xs)] text-[var(--color-paper)]"
+                className="flex items-center justify-between gap-3 rounded-[0.6rem] border border-[var(--color-paper)]/20 bg-[var(--color-paper)]/8 py-1 pr-1 pl-3 text-[length:var(--text-xs)] text-[var(--color-paper)]"
               >
                 <span className="min-w-0 truncate">
                   {file.name}{" "}
@@ -658,7 +662,7 @@ export function ProductBriefForm() {
                   aria-label={
                     isEs ? `Quitar ${file.name}` : `Remove ${file.name}`
                   }
-                  className="shrink-0 font-semibold text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)] disabled:opacity-55"
+                  className="inline-flex min-h-[44px] shrink-0 cursor-pointer items-center px-3 font-semibold text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)] disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   {isEs ? "Quitar" : "Remove"}
                 </button>
@@ -668,7 +672,7 @@ export function ProductBriefForm() {
         ) : null}
       </div>
 
-      <div className="field">
+      <div className="field min-w-0">
         <label htmlFor="brief-notes">
           {isEs ? "¿Qué quieres fabricar?" : "What do you want to make?"}
         </label>
@@ -709,15 +713,29 @@ export function ProductBriefForm() {
         </button>
         <div
           className={
-            isError ? "form-message text-[var(--color-gold)]" : "form-message"
+            isError
+              ? "form-message min-w-0 text-[var(--color-gold)]"
+              : "form-message min-w-0"
           }
           aria-live="polite"
         >
           {message ? <p>{message}</p> : null}
+          {message && !isError ? (
+            <p className="mt-2">
+              <Link
+                className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)]"
+                href={localizeHref("/book-a-call")}
+              >
+                {isEs
+                  ? "Si prefieres comentarlo en directo, reserva una videollamada con Alma."
+                  : "Want to talk it through live? Book a video call with Alma."}
+              </Link>
+            </p>
+          ) : null}
           {mailtoHref ? (
             <p className="mt-2">
               <a
-                className="font-semibold text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)]"
+                className="inline-flex min-h-[44px] items-center font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-gold)] underline underline-offset-4 hover:text-[var(--color-paper)]"
                 href={mailtoHref}
               >
                 {isEs

@@ -3,14 +3,14 @@ import { notFound } from "next/navigation";
 
 import { SiteFooter } from "@/components/site-footer";
 import { StoryDetailClient } from "@/components/story-detail-client";
-import { getStories, getStoryBySlug } from "@/lib/sanity";
+import { getStoryBySlug, getStorySummaries } from "@/lib/sanity";
 import { getStoryMetadata } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const stories = await getStories();
+  const stories = await getStorySummaries();
   return stories.map((story) => ({ slug: story.slug }));
 }
 
@@ -32,7 +32,7 @@ export default async function StoryDetailPage({
   const { slug } = await params;
   const [story, allStories] = await Promise.all([
     getStoryBySlug(slug),
-    getStories(),
+    getStorySummaries(),
   ]);
 
   if (!story) {

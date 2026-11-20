@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 
-import { getStories } from "@/lib/sanity";
+import { getStorySummaries } from "@/lib/sanity";
 import { localizePath, siteUrl, STATIC_ROUTES } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function parseLastModified(value: string | undefined, fallback: Date): Date {
   if (!value) {
@@ -19,7 +19,7 @@ function toAbsoluteUrl(path: string): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const stories = await getStories();
+  const stories = await getStorySummaries();
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.flatMap(
     (route) => {

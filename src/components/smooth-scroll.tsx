@@ -20,6 +20,39 @@ export function SmoothScroll() {
       ignoreMobileResize: true,
     });
     ScrollTrigger.refresh();
+
+    let isMounted = true;
+    let orientationTimer: number | null = null;
+
+    const handleOrientationChange = () => {
+      if (orientationTimer !== null) {
+        window.clearTimeout(orientationTimer);
+      }
+      orientationTimer = window.setTimeout(() => {
+        orientationTimer = null;
+        if (isMounted) {
+          ScrollTrigger.refresh();
+        }
+      }, 250);
+    };
+
+    window.addEventListener("orientationchange", handleOrientationChange);
+
+    if (document.fonts?.ready) {
+      void document.fonts.ready.then(() => {
+        if (isMounted) {
+          ScrollTrigger.refresh();
+        }
+      });
+    }
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("orientationchange", handleOrientationChange);
+      if (orientationTimer !== null) {
+        window.clearTimeout(orientationTimer);
+      }
+    };
   }, []);
 
   useEffect(() => {
