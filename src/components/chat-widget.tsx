@@ -22,7 +22,11 @@ interface StoredChatState {
 }
 
 const STORAGE_KEY = "karmarise_chat_thread_v1";
-const WHATSAPP_HREF = "https://wa.me/34611722276";
+const WHATSAPP_BASE = "https://wa.me/34611722276";
+const WHATSAPP_HREF: Record<SiteLanguage, string> = {
+  en: `${WHATSAPP_BASE}?text=${encodeURIComponent("Hello Alma and Shirish, I would like to chat about manufacturing with KarmaRise D Global.")}`,
+  es: `${WHATSAPP_BASE}?text=${encodeURIComponent("Hola Alma y Shirish, me gustaría hablar sobre fabricación con KarmaRise D Global.")}`,
+};
 const CONTACT_EMAIL = "hola@karmarisedglobal.com";
 const MAX_STORED_MESSAGES = 24;
 const MAX_MESSAGE_CHARS = 600;
@@ -556,6 +560,7 @@ export function ChatWidget() {
   }
 
   const presetQuestions = PRESET_QUESTIONS[language];
+  const whatsappHref = WHATSAPP_HREF[language];
   const effectiveSiteKey = runtimeTurnstileSiteKey || BUILD_TURNSTILE_SITE_KEY;
   const needsTurnstile =
     Boolean(effectiveSiteKey) &&
@@ -568,23 +573,56 @@ export function ChatWidget() {
       className="fixed right-4 bottom-4 z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-6"
     >
       {!isOpen ? (
-        <button
-          ref={launcherRef}
-          type="button"
-          onClick={openDrawer}
-          aria-expanded="false"
-          aria-controls="karmarise-chat-drawer"
-          className="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] pr-5 pl-3.5 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-        >
-          <Image
-            src="/brand/main-logo-transparent.png"
-            alt=""
-            width={701}
-            height={815}
-            className="h-7 w-6 object-contain"
-          />
-          <span>{isEs ? "¿Alguna duda?" : "Questions?"}</span>
-        </button>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={
+              isEs
+                ? "Hablar con Alma o Shirish por WhatsApp"
+                : "Chat with Alma or Shirish on WhatsApp"
+            }
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] px-4 text-[length:var(--text-sm)] font-medium text-[var(--color-forest-deep)] no-underline shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          >
+            <span
+              aria-hidden="true"
+              className="inline-block h-4 w-4 shrink-0 bg-current"
+              style={{
+                maskImage: "url(/brand/icons/whatsapp.svg)",
+                WebkitMaskImage: "url(/brand/icons/whatsapp.svg)",
+                maskRepeat: "no-repeat",
+                WebkitMaskRepeat: "no-repeat",
+                maskPosition: "center",
+                WebkitMaskPosition: "center",
+                maskSize: "contain",
+                WebkitMaskSize: "contain",
+              }}
+            />
+            <span className="sm:hidden">WhatsApp</span>
+            <span className="hidden sm:inline">
+              {isEs ? "WhatsApp · Alma / Shirish" : "WhatsApp · Alma / Shirish"}
+            </span>
+          </a>
+
+          <button
+            ref={launcherRef}
+            type="button"
+            onClick={openDrawer}
+            aria-expanded="false"
+            aria-controls="karmarise-chat-drawer"
+            className="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] pr-5 pl-3.5 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          >
+            <Image
+              src="/brand/main-logo-transparent.png"
+              alt=""
+              width={701}
+              height={815}
+              className="h-7 w-6 object-contain"
+            />
+            <span>{isEs ? "¿Alguna duda?" : "Questions?"}</span>
+          </button>
+        </div>
       ) : (
         <section
           id="karmarise-chat-drawer"
@@ -733,12 +771,14 @@ export function ChatWidget() {
                   {isEs ? "Contacto" : "Contact"}
                 </Link>
                 <a
-                  href={WHATSAPP_HREF}
+                  href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)]/80 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-ink)] no-underline"
                 >
-                  WhatsApp
+                  {isEs
+                    ? "WhatsApp con Alma o Shirish"
+                    : "WhatsApp Alma or Shirish"}
                 </a>
               </div>
             ) : null}
@@ -833,12 +873,14 @@ export function ChatWidget() {
                 {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
               </Link>
               <a
-                href={WHATSAPP_HREF}
+                href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline underline-offset-2 hover:text-[var(--color-ink)]"
               >
-                {isEs ? "Hablar por WhatsApp" : "Message on WhatsApp"}
+                {isEs
+                  ? "WhatsApp con Alma o Shirish"
+                  : "WhatsApp Alma or Shirish"}
               </a>
             </div>
           </form>
