@@ -837,29 +837,27 @@ export function ChatWidget() {
               </div>
             ) : null}
 
-            {!isSending ? (
-              <div className="divide-y divide-[var(--color-rule)]/55 overflow-hidden rounded-xl border border-[var(--color-rule)]/80 bg-[var(--color-white)]/65">
-                {presetQuestions.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    disabled={isSending}
-                    onClick={() => {
-                      void sendMessage(prompt);
-                    }}
-                    className="group flex w-full cursor-pointer items-center justify-between gap-3 px-3.5 py-2.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-white)] disabled:opacity-50"
+            <div className="divide-y divide-[var(--color-rule)]/55 overflow-hidden rounded-xl border border-[var(--color-rule)]/80 bg-[var(--color-white)]/65">
+              {presetQuestions.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  disabled={isSending}
+                  onClick={() => {
+                    void sendMessage(prompt);
+                  }}
+                  className="group flex w-full cursor-pointer items-center justify-between gap-3 px-3.5 py-2.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-white)] disabled:cursor-not-allowed disabled:opacity-55"
+                >
+                  <span>{prompt}</span>
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-[var(--color-muted)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-wood)]"
                   >
-                    <span>{prompt}</span>
-                    <span
-                      aria-hidden="true"
-                      className="shrink-0 text-[var(--color-muted)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-wood)]"
-                    >
-                      →
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
+                    →
+                  </span>
+                </button>
+              ))}
+            </div>
 
             {assistantReplyCount >= 4 && !isSending && !showFallbackActions ? (
               <div className="grid gap-2 border-t border-[var(--color-rule)]/60 pt-3 text-[length:var(--text-xs)] leading-relaxed text-[var(--color-ink-2)]">
