@@ -211,7 +211,11 @@ export function TurnstileField({
     >
       <div
         ref={containerRef}
-        className="min-h-[65px] max-w-full overflow-x-auto"
+        className={
+          appearance === "interaction-only"
+            ? "max-w-full overflow-x-auto"
+            : "min-h-[65px] max-w-full overflow-x-auto"
+        }
       />
       {hasError ? (
         <p

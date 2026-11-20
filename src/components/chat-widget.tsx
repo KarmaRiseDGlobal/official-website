@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
@@ -39,16 +40,20 @@ const KNOWN_INTERNAL_ROUTES = new Set([
   "/contact",
 ]);
 
-const STARTER_PROMPTS: Record<SiteLanguage, readonly string[]> = {
+const PRESET_QUESTIONS: Record<SiteLanguage, readonly string[]> = {
   en: [
-    "How does a Manufacturing Programme work?",
-    "What goes into a Product Brief?",
-    "Tell me about Almarise",
+    "What kinds of pieces can you manufacture across India?",
+    "What do we need before starting a Product Brief?",
+    "How do Alma and Shirish oversee samples and quality in person?",
+    "How do minimum quantities and launch dates work for a Bulk Order?",
+    "How do Almarise and the Women's Training Initiative connect to KarmaRise?",
   ],
   es: [
-    "¿Cómo funciona un Programa de fabricación?",
-    "¿Qué incluye un Product Brief?",
-    "Cuéntame sobre Almarise",
+    "¿Qué tipo de piezas podéis fabricar en la India?",
+    "¿Qué necesitamos definir antes de empezar un Product Brief?",
+    "¿Cómo supervisan Alma y Shirish las muestras y la calidad en persona?",
+    "¿Cómo funcionan las cantidades mínimas y los plazos de un pedido?",
+    "¿Cómo encajan Almarise y la formación para mujeres en KarmaRise?",
   ],
 };
 
@@ -186,6 +191,7 @@ export function ChatWidget() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [allowCustomInput, setAllowCustomInput] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -202,9 +208,30 @@ export function ChatWidget() {
   const [statusError, setStatusError] = useState("");
 
   const launcherRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasSyncedConfigRef = useRef(false);
+  const turnstileTokenRef = useRef("");
+
+  function handleTurnstileTokenChange(token: string) {
+    turnstileTokenRef.current = token;
+    setTurnstileToken(token);
+  }
+
+  async function waitForTurnstileToken(timeoutMs = 2500): Promise<string> {
+    if (turnstileTokenRef.current) {
+      return turnstileTokenRef.current;
+    }
+    const maxAttempts = Math.max(1, Math.ceil(timeoutMs / 120));
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      if (turnstileTokenRef.current) {
+        return turnstileTokenRef.current;
+      }
+    }
+    return turnstileTokenRef.current;
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -222,6 +249,10 @@ export function ChatWidget() {
 
   useEffect(() => {
     if (!isOpen || !scrollRef.current) return;
+    if (messages.length === 0 && !isSending) {
+      scrollRef.current.scrollTop = 0;
+      return;
+    }
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [isOpen, messages, isSending]);
 
@@ -289,7 +320,13 @@ export function ChatWidget() {
     );
     setIsOpen(true);
     void syncChatConfig();
-    requestAnimationFrame(() => inputRef.current?.focus());
+    requestAnimationFrame(() => {
+      if (allowCustomInput) {
+        inputRef.current?.focus();
+      } else {
+        closeRef.current?.focus();
+      }
+    });
   }
 
   function closeDrawer() {
@@ -299,12 +336,19 @@ export function ChatWidget() {
 
   function clearConversation() {
     setMessages([]);
+    setAllowCustomInput(false);
+    setInputValue("");
     setShowFallbackActions(false);
     setStatusError("");
     writeStoredChatState({
       messages: [],
       sessionVerified,
     });
+    requestAnimationFrame(() => closeRef.current?.focus());
+  }
+
+  function enableCustomInput() {
+    setAllowCustomInput(true);
     requestAnimationFrame(() => inputRef.current?.focus());
   }
 
@@ -342,13 +386,20 @@ export function ChatWidget() {
       return;
     }
 
-    if (mustCheckTurnstile && !turnstileToken) {
-      setStatusError(
-        isEs
-          ? "Completa la verificación de seguridad antes de enviar tu primera pregunta."
-          : "Please complete the security check before sending your first question.",
-      );
-      return;
+    let activeTurnstileToken = turnstileTokenRef.current || turnstileToken;
+    if (mustCheckTurnstile && !activeTurnstileToken) {
+      setStatusError("");
+      setIsSending(true);
+      activeTurnstileToken = await waitForTurnstileToken();
+      if (!activeTurnstileToken) {
+        setIsSending(false);
+        setStatusError(
+          isEs
+            ? "Completa la verificación de seguridad antes de enviar tu primera pregunta."
+            : "Please complete the security check before sending your first question.",
+        );
+        return;
+      }
     }
 
     const userMessage: ChatMessage = {
@@ -382,7 +433,7 @@ export function ChatWidget() {
           currentPath: pathname,
           history: historyForApi,
           companyWebsite,
-          turnstileToken: sessionVerified ? "" : turnstileToken,
+          turnstileToken: effectiveVerified ? "" : activeTurnstileToken,
         }),
       });
 
@@ -418,7 +469,7 @@ export function ChatWidget() {
         payload?.code === "turnstile_failed"
       ) {
         setSessionVerified(false);
-        setTurnstileToken("");
+        handleTurnstileTokenChange("");
         setTurnstileResetSignal((prev) => prev + 1);
         setStatusError(
           payload.error ||
@@ -489,7 +540,7 @@ export function ChatWidget() {
     }
   }
 
-  const starterPrompts = STARTER_PROMPTS[language];
+  const presetQuestions = PRESET_QUESTIONS[language];
   const effectiveSiteKey = runtimeTurnstileSiteKey || BUILD_TURNSTILE_SITE_KEY;
   const needsTurnstile =
     Boolean(effectiveSiteKey) &&
@@ -497,7 +548,7 @@ export function ChatWidget() {
     !sessionVerified;
 
   return (
-    <div className="fixed right-4 bottom-4 z-[var(--z-sticky)] sm:right-6 sm:bottom-6">
+    <div className="fixed right-4 bottom-4 z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-6">
       {!isOpen ? (
         <button
           ref={launcherRef}
@@ -505,13 +556,16 @@ export function ChatWidget() {
           onClick={openDrawer}
           aria-expanded="false"
           aria-controls="karmarise-chat-drawer"
-          className="inline-flex min-h-[46px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-paper)]/20 bg-[var(--color-forest-deep)] px-5 py-2.5 text-[length:var(--text-sm)] font-medium text-[var(--color-paper)] shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:bg-[var(--color-forest)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] pr-5 pl-3.5 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
-          <span
-            aria-hidden="true"
-            className="inline-block h-2 w-2 rounded-full bg-[var(--color-clay-light)]"
+          <Image
+            src="/brand/main-logo-transparent.png"
+            alt=""
+            width={701}
+            height={815}
+            className="h-7 w-6 object-contain"
           />
-          <span>{isEs ? "Pregunta a KarmaRise" : "Ask KarmaRise"}</span>
+          <span>{isEs ? "¿Alguna duda?" : "Questions?"}</span>
         </button>
       ) : (
         <section
@@ -519,38 +573,46 @@ export function ChatWidget() {
           role="dialog"
           aria-modal="false"
           aria-label={
-            isEs
-              ? "Asistente de KarmaRise D Global"
-              : "KarmaRise D Global assistant"
+            isEs ? "Guía de KarmaRise D Global" : "KarmaRise D Global guide"
           }
-          className="flex max-h-[min(620px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
+          className="flex max-h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
         >
-          <header className="flex items-start justify-between gap-3 border-b border-[var(--color-paper)]/15 bg-[var(--color-forest-deep)] px-5 py-4 text-[var(--color-paper)]">
-            <div className="grid gap-0.5">
-              <p className="font-[family-name:var(--font-display)] text-[length:var(--text-lg)] leading-tight font-normal">
-                KarmaRise D Global
-              </p>
-              <p className="text-[length:var(--text-xs)] text-[var(--color-paper-2)]/85">
-                {isEs
-                  ? "Fabricación en la India para España y Europa"
-                  : "Manufacturing across India for Spain and Europe"}
-              </p>
+          <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)] bg-[var(--color-paper-2)]/85 px-4 py-3.5 text-[var(--color-ink)]">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <Image
+                src="/brand/main-logo-transparent.png"
+                alt=""
+                width={701}
+                height={815}
+                className="h-8 w-7 shrink-0 object-contain"
+              />
+              <div className="grid min-w-0 gap-0.5">
+                <p className="font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-tight font-normal text-[var(--color-ink)]">
+                  KarmaRise D Global
+                </p>
+                <p className="truncate text-[length:var(--text-xs)] text-[var(--color-muted)]">
+                  {isEs
+                    ? "India y España · Fabricación y Product Briefs"
+                    : "India & Spain · Product Briefs & Manufacturing"}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex shrink-0 items-center gap-1.5">
               {messages.length > 0 ? (
                 <button
                   type="button"
                   onClick={clearConversation}
-                  className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-paper)]/25 px-2.5 py-1 text-[length:var(--text-xs)] text-[var(--color-paper-2)] transition-colors hover:bg-[var(--color-paper)]/10"
+                  className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] px-2.5 py-1 text-[length:var(--text-xs)] font-medium text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]"
                 >
                   {isEs ? "Limpiar" : "Clear"}
                 </button>
               ) : null}
               <button
+                ref={closeRef}
                 type="button"
                 onClick={closeDrawer}
                 aria-label={isEs ? "Cerrar chat" : "Close chat"}
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-paper)]/25 text-[var(--color-paper)] transition-colors hover:bg-[var(--color-paper)]/10"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule-2)] bg-[var(--color-paper)] text-[var(--color-ink)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]"
               >
                 <span aria-hidden="true" className="text-base leading-none">
                   ×
@@ -562,38 +624,20 @@ export function ChatWidget() {
           <div
             ref={scrollRef}
             data-lenis-prevent
-            className="grid flex-1 gap-3 overflow-y-auto overscroll-contain px-4 py-4"
+            className="grid flex-1 content-start gap-2.5 overflow-y-auto overscroll-contain px-4 py-3.5"
           >
-            <div className="rounded-2xl border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-3.5 py-3 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-ink)]">
+            <div className="rounded-2xl border border-[var(--color-rule)] bg-[var(--color-white)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-snug text-[var(--color-ink)]">
               {isEs
-                ? "Hola. Pregúntanos cómo funciona un Programa de fabricación, qué incluir en un Product Brief, sobre Almarise o cómo Alma y Shirish coordinan la producción en la India."
-                : "Hello. Ask us how a Manufacturing Programme works, what goes into a Product Brief, about Almarise, or how Alma and Shirish coordinate production across India."}
+                ? "Hola. Elige una pregunta para ver cómo trabajamos desde el Product Brief hasta el pedido en serie, o abre el teclado si quieres preguntarnos algo concreto."
+                : "Hello. Pick a question below to see how we work from Product Brief to Bulk Order, or open the text box if you want to ask something specific."}
             </div>
-
-            {messages.length === 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {starterPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    disabled={isSending}
-                    onClick={() => {
-                      void sendMessage(prompt);
-                    }}
-                    className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] px-3 py-1.5 text-left text-[length:var(--text-xs)] font-medium text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-paper-2)] disabled:opacity-50"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            ) : null}
 
             {messages.map((item) => (
               <div
                 key={item.id}
                 className={
                   item.role === "user"
-                    ? "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-[var(--color-forest-deep)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
+                    ? "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-[var(--color-wood)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
                     : "mr-auto max-w-[90%] rounded-2xl rounded-bl-sm border border-[var(--color-rule)] bg-[var(--color-white)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)]"
                 }
               >
@@ -614,19 +658,59 @@ export function ChatWidget() {
               </div>
             ) : null}
 
+            {!isSending ? (
+              <div className="grid gap-1.5 rounded-2xl border border-[var(--color-rule)]/90 bg-[var(--color-paper-2)]/55 p-2.5">
+                <p className="text-[length:var(--text-xs)] font-semibold tracking-wide text-[var(--color-muted)]">
+                  {messages.length === 0
+                    ? isEs
+                      ? "Preguntas rápidas"
+                      : "Suggested questions"
+                    : isEs
+                      ? "Haz otra pregunta"
+                      : "Ask another question"}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {presetQuestions.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      disabled={isSending}
+                      onClick={() => {
+                        void sendMessage(prompt);
+                      }}
+                      className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] px-3 py-1 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-paper-2)] disabled:opacity-50"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                  {!allowCustomInput ? (
+                    <button
+                      type="button"
+                      onClick={enableCustomInput}
+                      className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-clay-ink)]/60 bg-[var(--color-paper)] px-3 py-1 text-left text-[length:var(--text-xs)] leading-snug font-semibold text-[var(--color-clay-ink)] transition-colors hover:border-[var(--color-clay-ink)] hover:bg-[var(--color-white)]"
+                    >
+                      {isEs
+                        ? "Escribir mi propia pregunta"
+                        : "Write my own question"}
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
             {showFallbackActions ? (
               <div className="flex flex-wrap gap-2 rounded-2xl border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-3">
                 <Link
                   href={localizeHref("/product-brief")}
                   onClick={() => setIsOpen(false)}
-                  className="rounded-[var(--radius-pill)] bg-[var(--color-forest-deep)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
+                  className="rounded-[var(--radius-pill)] bg-[var(--color-wood)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
                 >
                   {isEs ? "Iniciar Product Brief" : "Start Product Brief"}
                 </Link>
                 <Link
                   href={localizeHref("/contact")}
                   onClick={() => setIsOpen(false)}
-                  className="rounded-[var(--radius-pill)] border border-[var(--color-forest-deep)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-forest-deep)] no-underline"
+                  className="rounded-[var(--radius-pill)] border border-[var(--color-wood)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-wood)] no-underline"
                 >
                   {isEs ? "Contacto" : "Contact"}
                 </Link>
@@ -644,7 +728,7 @@ export function ChatWidget() {
 
           <form
             onSubmit={handleFormSubmit}
-            className="grid gap-2.5 border-t border-[var(--color-rule)] bg-[var(--color-paper-2)] px-4 py-3"
+            className="grid gap-2.5 border-t border-[var(--color-rule)] bg-[var(--color-paper-2)]/70 px-4 py-3"
           >
             <input
               type="text"
@@ -662,10 +746,10 @@ export function ChatWidget() {
                 siteKey={effectiveSiteKey}
                 language={language}
                 theme="light"
-                appearance="always"
+                appearance="interaction-only"
                 size="flexible"
                 resetSignal={turnstileResetSignal}
-                onTokenChange={setTurnstileToken}
+                onTokenChange={handleTurnstileTokenChange}
               />
             ) : null}
 
@@ -678,39 +762,55 @@ export function ChatWidget() {
               </p>
             ) : null}
 
-            <div className="flex items-end gap-2">
-              <label htmlFor="karmarise-chat-input" className="sr-only">
-                {isEs ? "Escribe tu pregunta" : "Write your question"}
-              </label>
-              <textarea
-                ref={inputRef}
-                id="karmarise-chat-input"
-                rows={2}
-                maxLength={MAX_MESSAGE_CHARS}
-                value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
-                onKeyDown={handleTextareaKeyDown}
-                placeholder={
-                  isEs
-                    ? "Escribe tu consulta..."
-                    : "Ask about manufacturing or Product Briefs..."
-                }
-                className="min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--color-rule-2)] bg-[var(--color-white)] px-3 py-2 text-[length:var(--text-sm)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:border-[var(--color-forest-deep)] focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={isSending || !inputValue.trim()}
-                className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-xl bg-[var(--color-forest-deep)] px-4 text-[length:var(--text-sm)] font-semibold text-[var(--color-paper)] transition-colors hover:bg-[var(--color-forest)] disabled:cursor-not-allowed disabled:opacity-45"
-              >
-                {isEs ? "Enviar" : "Send"}
-              </button>
-            </div>
+            {allowCustomInput ? (
+              <div className="grid gap-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  <label
+                    htmlFor="karmarise-chat-input"
+                    className="text-[length:var(--text-xs)] font-medium text-[var(--color-muted)]"
+                  >
+                    {isEs ? "Tu pregunta" : "Your question"}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setAllowCustomInput(false)}
+                    className="cursor-pointer text-[length:var(--text-xs)] text-[var(--color-muted)] underline underline-offset-2 hover:text-[var(--color-ink)]"
+                  >
+                    {isEs ? "Ocultar" : "Hide"}
+                  </button>
+                </div>
+                <div className="flex items-end gap-2">
+                  <textarea
+                    ref={inputRef}
+                    id="karmarise-chat-input"
+                    rows={2}
+                    maxLength={MAX_MESSAGE_CHARS}
+                    value={inputValue}
+                    onChange={(event) => setInputValue(event.target.value)}
+                    onKeyDown={handleTextareaKeyDown}
+                    placeholder={
+                      isEs
+                        ? "Escribe aquí tu consulta sobre fabricación o un Product Brief..."
+                        : "Ask about manufacturing across India or your Product Brief..."
+                    }
+                    className="min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--color-rule-2)] bg-[var(--color-white)] px-3 py-2 text-[length:var(--text-sm)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:border-[var(--color-wood)] focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSending || !inputValue.trim()}
+                    className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-xl bg-[var(--color-wood)] px-4 text-[length:var(--text-sm)] font-semibold text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    {isEs ? "Enviar" : "Send"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             <div className="flex items-center justify-between gap-2 text-[length:var(--text-xs)] text-[var(--color-muted)]">
               <Link
                 href={localizeHref("/product-brief")}
                 onClick={() => setIsOpen(false)}
-                className="underline underline-offset-2 hover:text-[var(--color-forest-deep)]"
+                className="underline underline-offset-2 hover:text-[var(--color-ink)]"
               >
                 {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
               </Link>
@@ -718,7 +818,7 @@ export function ChatWidget() {
                 href={WHATSAPP_HREF}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline underline-offset-2 hover:text-[var(--color-forest-deep)]"
+                className="underline underline-offset-2 hover:text-[var(--color-ink)]"
               >
                 {isEs ? "Hablar por WhatsApp" : "Message on WhatsApp"}
               </a>
