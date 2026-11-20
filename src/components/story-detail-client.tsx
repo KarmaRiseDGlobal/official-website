@@ -499,10 +499,10 @@ export function StoryDetailClient({
       <article className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-2xl))] pb-[var(--section-gap)] text-[var(--color-forest-deep)] lg:pt-[calc(var(--nav-height)+var(--space-3xl))]">
         <div className="container grid gap-[var(--space-xl)] lg:gap-[var(--space-2xl)]">
           {/* Top Hairline Breadcrumb & Reading Metadata */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-b border-[var(--color-rule)] py-4 text-[length:var(--text-xs)] font-medium tracking-[0.06em] uppercase">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-b border-[var(--color-rule)] py-2 text-[length:var(--text-xs)] font-medium tracking-[0.06em] uppercase">
             <div className="flex flex-wrap items-center gap-3">
               <Link
-                className="text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] items-center text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 href={localizeHref("/stories")}
               >
                 {isEs ? "Historias" : "Stories"}
@@ -561,7 +561,7 @@ export function StoryDetailClient({
             </div>
 
             <div className="grid gap-6 lg:col-span-7">
-              <h1 className="max-w-[17ch] text-[clamp(2.45rem,4.9vw,4.65rem)] leading-[1.02] font-normal tracking-[-0.015em] text-balance text-[var(--color-forest-deep)]">
+              <h1 className="max-w-[17ch] text-[clamp(1.85rem,3.8vw+0.75rem,4.65rem)] leading-[1.02] font-normal tracking-[-0.015em] text-balance text-[var(--color-forest-deep)]">
                 {localized.title}
               </h1>
 
@@ -594,7 +594,7 @@ export function StoryDetailClient({
                     ) : null}
                   </figcaption>
                   <div className="order-1 lg:order-2 lg:col-span-7">
-                    <div className="max-w-[34rem]">
+                    <div className="mx-auto w-full max-w-[34rem] lg:mx-0">
                       <StoryMedia
                         image={{
                           ...localized.leadImage,
@@ -756,7 +756,7 @@ export function StoryDetailClient({
                               key={paragraph.raw}
                               className={`max-w-[60ch] text-[1.0625rem] leading-[1.82] text-[var(--color-ink)] ${
                                 sectionIndex === 0 && pIndex === 0
-                                  ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[3.4rem] first-letter:leading-[0.86] first-letter:text-[var(--color-forest-deep)]"
+                                  ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[3.4rem] first-letter:leading-[0.94] first-letter:text-[var(--color-forest-deep)]"
                                   : ""
                               }`}
                             >
@@ -820,7 +820,7 @@ export function StoryDetailClient({
                         );
                       })()
                     ) : section.images && section.images.length > 1 ? (
-                      <div className="grid items-start gap-[var(--gap-columns)] md:grid-cols-2">
+                      <div className="grid items-start gap-[var(--gap-columns)] sm:grid-cols-2">
                         {section.images.map((img) => {
                           const { aspectClass, ratioLabel } = getAspectConfig(
                             resolveAspectRatio(img.url, img.aspectRatio),
@@ -834,7 +834,7 @@ export function StoryDetailClient({
                               aspectClass={aspectClass}
                               title={img.alt || `${localized.title} detail`}
                               description={img.caption || localized.summary}
-                              sizes="(max-width: 48rem) 100vw, 48vw"
+                              sizes="(max-width: 40rem) 100vw, 48vw"
                               variant="editorial"
                               showCaption
                             />
@@ -847,7 +847,7 @@ export function StoryDetailClient({
 
             {/* Paired Documentary Photographs */}
             {localized.pairImages && localized.pairImages.length > 0 ? (
-              <div className="grid items-start gap-[var(--gap-columns)] border-t border-[var(--color-rule)] pt-12 md:grid-cols-2 lg:pt-14">
+              <div className="grid items-start gap-[var(--gap-columns)] border-t border-[var(--color-rule)] pt-12 sm:grid-cols-2 lg:pt-14">
                 {localized.pairImages.map((img, index) => {
                   const { aspectClass, ratioLabel } = getAspectConfig(
                     resolveAspectRatio(img.url, img.aspectRatio),
@@ -869,7 +869,7 @@ export function StoryDetailClient({
                         story.pairSlots[index]?.description ||
                         localized.summary
                       }
-                      sizes="(max-width: 48rem) 100vw, 48vw"
+                      sizes="(max-width: 40rem) 100vw, 48vw"
                       variant="editorial"
                       showCaption
                     />
@@ -897,9 +897,9 @@ export function StoryDetailClient({
                   <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.1vw,1.85rem)] leading-[1.3] font-normal text-[var(--color-forest-deep)]">
                     {localized.takeaway}
                   </p>
-                  <div className="flex flex-wrap items-center gap-6 text-[length:var(--text-sm)] font-semibold">
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[length:var(--text-sm)] font-semibold">
                     <Link
-                      className="text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                      className="inline-flex min-h-[44px] items-center text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                       href={localizeHref("/contact")}
                     >
                       {isEs
@@ -908,8 +908,9 @@ export function StoryDetailClient({
                     </Link>
                     {nextStory && nextStoryLocalized ? (
                       <Link
-                        className="text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
+                        className="inline-flex min-h-[44px] items-center text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
                         href={localizeHref(`/stories/${nextStory.slug}`)}
+                        data-transition-title={nextStoryLocalized.title}
                       >
                         {isEs
                           ? `Siguiente: ${nextStoryLocalized.title}`
@@ -950,7 +951,7 @@ export function StoryDetailClient({
                     aria-label={
                       isEs ? "Compartir por WhatsApp" : "Share on WhatsApp"
                     }
-                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    className="inline-flex h-11 w-11 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
                     href={whatsappShareHref}
                     rel="noopener noreferrer"
                     target="_blank"
@@ -970,7 +971,7 @@ export function StoryDetailClient({
                     aria-label={
                       isEs ? "Compartir en LinkedIn" : "Share on LinkedIn"
                     }
-                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    className="inline-flex h-11 w-11 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
                     href={linkedinShareHref}
                     rel="noopener noreferrer"
                     target="_blank"
@@ -988,7 +989,7 @@ export function StoryDetailClient({
 
                   <a
                     aria-label={isEs ? "Compartir en X" : "Share on X"}
-                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    className="inline-flex h-11 w-11 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
                     href={xShareHref}
                     rel="noopener noreferrer"
                     target="_blank"
@@ -1008,7 +1009,7 @@ export function StoryDetailClient({
                     aria-label={
                       isEs ? "Compartir por correo" : "Share by email"
                     }
-                    className="inline-flex h-10 w-10 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    className="inline-flex h-11 w-11 items-center justify-center border border-[var(--color-rule-2)]/60 text-[var(--color-forest-deep)] transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
                     href={emailShareHref}
                     title={isEs ? "Correo electrónico" : "Email"}
                   >
@@ -1030,7 +1031,7 @@ export function StoryDetailClient({
                   <button
                     type="button"
                     onClick={() => void handleCopyLink()}
-                    className="inline-flex h-10 cursor-pointer items-center gap-2 border border-[var(--color-rule-2)]/60 bg-transparent px-3.5 text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-forest-deep)] uppercase transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
+                    className="inline-flex h-11 cursor-pointer items-center gap-2 border border-[var(--color-rule-2)]/60 bg-transparent px-3.5 text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-forest-deep)] uppercase transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-forest-deep)] hover:text-[var(--color-paper)]"
                   >
                     <svg
                       aria-hidden="true"
@@ -1059,7 +1060,7 @@ export function StoryDetailClient({
 
                 <Link
                   href={localizeHref("/product-brief")}
-                  className="text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  className="inline-flex min-h-[44px] items-center text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                 >
                   {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
                 </Link>
@@ -1091,13 +1092,13 @@ export function StoryDetailClient({
 
               <Link
                 href={localizeHref("/stories")}
-                className="text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-forest-deep)] uppercase underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                className="inline-flex min-h-[44px] items-center text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-forest-deep)] uppercase underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
               >
                 {isEs ? "Ver todas las historias" : "See all Stories"}
               </Link>
             </div>
 
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-3">
+            <div className="grid gap-[var(--gap-columns)] sm:grid-cols-2 lg:grid-cols-3">
               {orderedRelatedStories.map((entry) => {
                 const entryLocalized = getLocalizedStory(entry, language);
                 return (
@@ -1117,7 +1118,7 @@ export function StoryDetailClient({
                         aspectClass="aspect-[4/3]"
                         title={entry.leadSlot.title}
                         description={entry.leadSlot.description}
-                        sizes="(max-width: 48rem) 100vw, 33vw"
+                        sizes="(max-width: 40rem) 100vw, (max-width: 64rem) 50vw, 33vw"
                         variant="editorial"
                         interactive
                       />

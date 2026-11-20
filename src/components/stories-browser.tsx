@@ -939,7 +939,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
           </div>
         </div>
 
-        {/* 3. Tablet & Mobile Fallback (<= 64rem): Simple palette colors + watercolor wave SVG illustration + stacked editorial cards */}
+        {/* 3. Tablet & Mobile Fallback (< 80rem or touch devices): Simple palette colors + watercolor wave SVG illustration + editorial cards */}
         <div ref={mobileListTopRef} className="stories-mobile-fallback">
           <div className="stories-mobile-wave-divider" aria-hidden="true">
             <svg
@@ -995,7 +995,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         key={category}
                         type="button"
                         onClick={() => setActiveCategory(category)}
-                        className={`rounded-full border px-4 py-2 text-[length:var(--text-xs)] font-semibold transition-colors ${
+                        className={`inline-flex min-h-[44px] cursor-pointer items-center rounded-full border px-4 py-2 text-[length:var(--text-xs)] font-semibold transition-colors ${
                           isActive
                             ? "border-[var(--color-gold)] bg-[var(--color-gold)] text-[var(--color-night)]"
                             : "border-[var(--color-paper)]/25 bg-[var(--color-paper)]/10 text-[var(--color-paper)]"
@@ -1010,7 +1010,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
 
               <div
                 key={activeCategory}
-                className="stories-category-grid grid gap-8 md:grid-cols-2"
+                className="stories-category-grid grid grid-cols-1 gap-8 min-[720px]:grid-cols-2"
               >
                 {filteredStories.map((story) => {
                   const localized = getLocalizedStory(story, language);
@@ -1032,13 +1032,13 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                             aspectClass="aspect-[16/10]"
                             title={story.leadSlot.title}
                             description={story.leadSlot.description}
-                            sizes="(max-width: 64rem) 100vw, 50vw"
+                            sizes="(max-width: 719px) 100vw, 50vw"
                             interactive
                           />
                         </Link>
-                        <div className="flex items-center justify-between gap-2 text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-ink)] uppercase">
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-[length:var(--text-xs)] font-semibold tracking-[0.04em] text-[var(--color-clay-ink)] uppercase">
                           <span>{localized.categoryLabel}</span>
-                          <span className="num text-[var(--color-muted)]">
+                          <span className="num shrink-0 text-[var(--color-muted)]">
                             {isEs
                               ? `${story.readingTimeMinutes} min`
                               : `${story.readingTimeMinutes} min read`}
@@ -1057,7 +1057,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between border-t border-[var(--color-rule)] pt-3 text-[length:var(--text-xs)]">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-rule)] pt-3 text-[length:var(--text-xs)]">
                         <span className="text-[var(--color-muted)]">
                           {story.author.name} ·{" "}
                           {formatStoryDate(story.publishedAt, language)}
@@ -1065,7 +1065,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         <Link
                           href={localizeHref(`/stories/${story.slug}`)}
                           data-transition-title={localized.title}
-                          className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
+                          className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
                         >
                           {isEs ? "Leer historia" : "Read Story"}
                         </Link>
@@ -1151,12 +1151,12 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         src={pillar.coverImage}
                         alt={localized.coverAlt}
                         fill
-                        sizes="(max-width: 48rem) 100vw, (max-width: 75rem) 50vw, 33vw"
+                        sizes="(max-width: 40rem) 100vw, (max-width: 64rem) 50vw, 33vw"
                         className="object-cover transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.03]"
                       />
                     </div>
 
-                    <div className="flex items-baseline justify-between gap-2">
+                    <div className="flex items-baseline justify-between gap-3">
                       <h3
                         className={`text-[length:var(--text-xl)] font-medium ${
                           isSelected
@@ -1167,7 +1167,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                         {localized.title}
                       </h3>
                       <span
-                        className={`num text-[length:var(--text-xs)] font-semibold uppercase ${
+                        className={`num shrink-0 text-[length:var(--text-xs)] font-semibold whitespace-nowrap uppercase ${
                           isSelected
                             ? "text-[var(--color-clay-ink)]"
                             : "text-[var(--color-gold)]"
@@ -1195,7 +1195,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                   </div>
 
                   <div
-                    className={`border-t pt-3 ${
+                    className={`border-t pt-2 ${
                       isSelected
                         ? "border-[var(--color-rule)]"
                         : "border-[var(--color-paper)]/15"
@@ -1204,7 +1204,7 @@ export function StoriesBrowser({ stories }: StoriesBrowserProps) {
                     <button
                       type="button"
                       onClick={() => selectCategoryAndBrowse(pillar.title)}
-                      className={`cursor-pointer text-[length:var(--text-sm)] font-semibold underline underline-offset-4 ${
+                      className={`inline-flex min-h-[44px] cursor-pointer items-center text-left text-[length:var(--text-sm)] font-semibold underline underline-offset-4 ${
                         isSelected
                           ? "text-[var(--color-forest-deep)] decoration-[var(--color-clay)]"
                           : "text-[var(--color-gold)] decoration-[var(--color-gold)] hover:text-[var(--color-paper)]"

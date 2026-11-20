@@ -438,7 +438,23 @@ async function main() {
     cdp.close();
   } finally {
     browser.kill();
-    rmSync(profileDir, { recursive: true, force: true });
+    await new Promise((resolve) => {
+      if (browser.exitCode !== null) resolve();
+      else {
+        browser.once("exit", resolve);
+        setTimeout(resolve, 1500);
+      }
+    });
+    try {
+      rmSync(profileDir, {
+        recursive: true,
+        force: true,
+        maxRetries: 5,
+        retryDelay: 200,
+      });
+    } catch {
+      // ignore lingering OS file lock on temp profile dir
+    }
   }
 
   if (failures > 0) {

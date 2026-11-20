@@ -115,191 +115,193 @@ export function CookiePolicyPageClient() {
     <>
       <main id="main">
         <section className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-3xl))] pb-[var(--section-gap)] text-[var(--color-forest-deep)]">
-          <div className="container grid max-w-[76ch] gap-[var(--space-2xl)]">
-            <div className="grid gap-5">
-              <p className="section-index">
-                {isEs ? "Información legal" : "Legal notice"}
-              </p>
-              <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.02] font-normal">
-                {isEs ? "Política de cookies" : "Cookie policy"}
-              </h1>
-              <p className="lead text-[var(--color-ink-2)]">
-                {isEs
-                  ? "En cumplimiento de la Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), la normativa europea de protección de datos y la legislación aplicable en la India, esta página explica qué son las cookies, cómo se utilizan en el sitio web de KarmaRise D Global y cómo puedes gestionarlas."
-                  : "In compliance with Law 34/2002 on Information Society Services and Electronic Commerce (LSSI-CE), European Union data protection regulations, and applicable Indian law, this page explains what cookies are, how they are used on the KarmaRise D Global website, and how you can manage them."}
-              </p>
+          <div className="container">
+            <div className="mx-auto grid max-w-[76ch] gap-[var(--space-2xl)]">
+              <div className="grid gap-5">
+                <p className="section-index">
+                  {isEs ? "Información legal" : "Legal notice"}
+                </p>
+                <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.02] font-normal">
+                  {isEs ? "Política de cookies" : "Cookie policy"}
+                </h1>
+                <p className="lead text-[var(--color-ink-2)]">
+                  {isEs
+                    ? "En cumplimiento de la Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), la normativa europea de protección de datos y la legislación aplicable en la India, esta página explica qué son las cookies, cómo se utilizan en el sitio web de KarmaRise D Global y cómo puedes gestionarlas."
+                    : "In compliance with Law 34/2002 on Information Society Services and Electronic Commerce (LSSI-CE), European Union data protection regulations, and applicable Indian law, this page explains what cookies are, how they are used on the KarmaRise D Global website, and how you can manage them."}
+                </p>
 
-              <nav
-                aria-label={isEs ? "Documentos legales" : "Legal documents"}
-                className="flex flex-wrap gap-2 border-y border-[var(--color-rule)] py-4"
-              >
-                {legalNavLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={localizeHref(item.href)}
-                    aria-current={item.current ? "page" : undefined}
-                    className={
-                      item.current
-                        ? "rounded-full bg-[var(--color-forest-deep)] px-4 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
-                        : "rounded-full border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-4 py-1.5 text-[length:var(--text-xs)] font-medium text-[var(--color-forest-deep)] no-underline hover:border-[var(--color-forest-deep)]"
-                    }
-                  >
-                    {item.label[language]}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-
-            <section
-              className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
-              id="what-are-cookies"
-            >
-              <h2 className="text-[length:var(--text-2xl)] font-normal">
-                {isEs ? "1. ¿Qué son las cookies?" : "1. What are cookies?"}
-              </h2>
-              <p className="text-[var(--color-muted)]">
-                {isEs
-                  ? "Una cookie es un pequeño archivo de texto que un sitio web descarga y almacena en tu ordenador, tableta o teléfono móvil al visitar determinadas páginas. Permite recordar información básica sobre la sesión de navegación, reconocer el navegador entre páginas y garantizar que el sitio funcione con seguridad y fluidez. Las cookies no dañan tu dispositivo ni pueden leer archivos personales almacenados en él."
-                  : "A cookie is a small text file that a website downloads and stores on your computer, tablet, or mobile device when you visit certain pages. Cookies allow a website to store and retrieve basic information about your browsing session, recognize your browser across pages, and ensure the website functions smoothly and securely. Cookies do not damage your device and cannot read personal files stored on your computer."}
-              </p>
-            </section>
-
-            <section
-              className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
-              id="types-of-cookies"
-            >
-              <h2 className="text-[length:var(--text-2xl)] font-normal">
-                {isEs
-                  ? "2. Tipos de cookies utilizadas en este sitio web"
-                  : "2. Types of cookies used on this website"}
-              </h2>
-              <p className="text-[var(--color-muted)]">
-                {isEs
-                  ? "Este sitio web utiliza cookies y almacenamiento local exclusivamente para garantizar una navegación fluida, la seguridad y el recuerdo de tu idioma preferido. No utilizamos cookies para recopilar información personal sensible ni para mostrar publicidad comportamental de terceros."
-                  : "This website uses cookies and local storage solely to ensure smooth navigation, security, and language preference persistence. We do not use cookies to collect sensitive personal information or to serve third-party behavioral advertising."}
-              </p>
-
-              <div className="grid gap-4">
-                {cookieCategories.map((item) => (
-                  <div
-                    key={item.id}
-                    className="grid gap-2 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-6 text-[length:var(--text-sm)]"
-                  >
-                    <p className="font-semibold text-[var(--color-forest-deep)]">
-                      {item.title[language]}
-                    </p>
-                    <p className="text-[var(--color-muted)]">
-                      {item.body[language]}
-                    </p>
-                  </div>
-                ))}
+                <nav
+                  aria-label={isEs ? "Documentos legales" : "Legal documents"}
+                  className="flex flex-wrap gap-2 border-y border-[var(--color-rule)] py-4"
+                >
+                  {legalNavLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={localizeHref(item.href)}
+                      aria-current={item.current ? "page" : undefined}
+                      className={
+                        item.current
+                          ? "inline-flex min-h-[44px] items-center rounded-full bg-[var(--color-forest-deep)] px-4 py-2.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
+                          : "inline-flex min-h-[44px] items-center rounded-full border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-4 py-2.5 text-[length:var(--text-xs)] font-medium text-[var(--color-forest-deep)] no-underline hover:border-[var(--color-forest-deep)]"
+                      }
+                    >
+                      {item.label[language]}
+                    </Link>
+                  ))}
+                </nav>
               </div>
-            </section>
 
-            <section
-              className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
-              id="browser-settings"
-            >
-              <h2 className="text-[length:var(--text-2xl)] font-normal">
-                {isEs
-                  ? "3. Cómo desactivar, bloquear o eliminar las cookies"
-                  : "3. How to disable, block, or delete cookies"}
-              </h2>
-              <p className="text-[var(--color-muted)]">
-                {isEs
-                  ? "Puedes permitir, bloquear o eliminar las cookies instaladas en tu dispositivo en cualquier momento configurando las opciones de tu navegador web. Ten en cuenta que desactivar las cookies técnicas puede afectar al funcionamiento de algunas secciones del sitio."
-                  : "You can allow, block, or delete the cookies installed on your device at any time by configuring the options in your web browser. Please note that disabling technical cookies may affect the proper functioning of certain sections of the website."}
-              </p>
-
-              <dl className="m-0 grid gap-3 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-6 text-[length:var(--text-sm)] sm:grid-cols-2">
-                {browserGuides.map((item) => (
-                  <div key={item.browser} className="grid gap-1">
-                    <dt className="font-semibold text-[var(--color-forest-deep)]">
-                      {item.browser}
-                    </dt>
-                    <dd className="m-0 text-[var(--color-muted)]">
-                      {item.steps[language]}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-
-            <section
-              className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
-              id="updates-and-contact"
-            >
-              <h2 className="text-[length:var(--text-2xl)] font-normal">
-                {isEs
-                  ? "4. Actualizaciones y contacto"
-                  : "4. Updates and contact"}
-              </h2>
-              <p className="text-[var(--color-muted)]">
-                {isEs ? (
-                  <>
-                    Karmarise Global LLP puede actualizar esta Política de
-                    cookies para reflejar cambios normativos o técnicos en el
-                    sitio web. Si tienes cualquier duda sobre el uso de cookies,
-                    escríbenos a{" "}
-                    <a
-                      className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
-                      href="mailto:support@karmarisedglobal.com"
-                    >
-                      support@karmarisedglobal.com
-                    </a>{" "}
-                    o a{" "}
-                    <a
-                      className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
-                      href="mailto:hola@karmarisedglobal.com"
-                    >
-                      hola@karmarisedglobal.com
-                    </a>
-                    .
-                  </>
-                ) : (
-                  <>
-                    Karmarise Global LLP may update this Cookie Policy to
-                    reflect regulatory requirements or changes to the website.
-                    If you have any questions about our use of cookies, please
-                    contact us at{" "}
-                    <a
-                      className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
-                      href="mailto:support@karmarisedglobal.com"
-                    >
-                      support@karmarisedglobal.com
-                    </a>{" "}
-                    or{" "}
-                    <a
-                      className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
-                      href="mailto:hola@karmarisedglobal.com"
-                    >
-                      hola@karmarisedglobal.com
-                    </a>
-                    .
-                  </>
-                )}
-              </p>
-            </section>
-
-            <div className="flex flex-wrap gap-6 border-t border-[var(--color-rule)] pt-6">
-              <Link
-                className="font-semibold underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                href={localizeHref("/privacy-policy")}
+              <section
+                className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
+                id="what-are-cookies"
               >
-                {isEs ? "Ver Política de privacidad" : "View Privacy Policy"}
-              </Link>
-              <Link
-                className="font-semibold underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                href={localizeHref("/legal-notice")}
+                <h2 className="text-[length:var(--text-2xl)] font-normal">
+                  {isEs ? "1. ¿Qué son las cookies?" : "1. What are cookies?"}
+                </h2>
+                <p className="text-[var(--color-muted)]">
+                  {isEs
+                    ? "Una cookie es un pequeño archivo de texto que un sitio web descarga y almacena en tu ordenador, tableta o teléfono móvil al visitar determinadas páginas. Permite recordar información básica sobre la sesión de navegación, reconocer el navegador entre páginas y garantizar que el sitio funcione con seguridad y fluidez. Las cookies no dañan tu dispositivo ni pueden leer archivos personales almacenados en él."
+                    : "A cookie is a small text file that a website downloads and stores on your computer, tablet, or mobile device when you visit certain pages. Cookies allow a website to store and retrieve basic information about your browsing session, recognize your browser across pages, and ensure the website functions smoothly and securely. Cookies do not damage your device and cannot read personal files stored on your computer."}
+                </p>
+              </section>
+
+              <section
+                className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
+                id="types-of-cookies"
               >
-                {isEs ? "Ver Aviso legal" : "View Corporate & Legal Notice"}
-              </Link>
-              <Link
-                className="font-semibold underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                href={localizeHref("/terms")}
+                <h2 className="text-[length:var(--text-2xl)] font-normal">
+                  {isEs
+                    ? "2. Tipos de cookies utilizadas en este sitio web"
+                    : "2. Types of cookies used on this website"}
+                </h2>
+                <p className="text-[var(--color-muted)]">
+                  {isEs
+                    ? "Este sitio web utiliza cookies y almacenamiento local exclusivamente para garantizar una navegación fluida, la seguridad y el recuerdo de tu idioma preferido. No utilizamos cookies para recopilar información personal sensible ni para mostrar publicidad comportamental de terceros."
+                    : "This website uses cookies and local storage solely to ensure smooth navigation, security, and language preference persistence. We do not use cookies to collect sensitive personal information or to serve third-party behavioral advertising."}
+                </p>
+
+                <div className="grid gap-4">
+                  {cookieCategories.map((item) => (
+                    <div
+                      key={item.id}
+                      className="grid gap-2 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-6 text-[length:var(--text-sm)]"
+                    >
+                      <p className="font-semibold text-[var(--color-forest-deep)]">
+                        {item.title[language]}
+                      </p>
+                      <p className="text-[var(--color-muted)]">
+                        {item.body[language]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section
+                className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
+                id="browser-settings"
               >
-                {isEs ? "Ver Condiciones de uso" : "View Website Terms"}
-              </Link>
+                <h2 className="text-[length:var(--text-2xl)] font-normal">
+                  {isEs
+                    ? "3. Cómo desactivar, bloquear o eliminar las cookies"
+                    : "3. How to disable, block, or delete cookies"}
+                </h2>
+                <p className="text-[var(--color-muted)]">
+                  {isEs
+                    ? "Puedes permitir, bloquear o eliminar las cookies instaladas en tu dispositivo en cualquier momento configurando las opciones de tu navegador web. Ten en cuenta que desactivar las cookies técnicas puede afectar al funcionamiento de algunas secciones del sitio."
+                    : "You can allow, block, or delete the cookies installed on your device at any time by configuring the options in your web browser. Please note that disabling technical cookies may affect the proper functioning of certain sections of the website."}
+                </p>
+
+                <dl className="m-0 grid gap-3 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] p-6 text-[length:var(--text-sm)] sm:grid-cols-2">
+                  {browserGuides.map((item) => (
+                    <div key={item.browser} className="grid gap-1">
+                      <dt className="font-semibold text-[var(--color-forest-deep)]">
+                        {item.browser}
+                      </dt>
+                      <dd className="m-0 text-[var(--color-muted)]">
+                        {item.steps[language]}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+
+              <section
+                className="grid gap-4 border-t border-[var(--color-rule)] pt-8"
+                id="updates-and-contact"
+              >
+                <h2 className="text-[length:var(--text-2xl)] font-normal">
+                  {isEs
+                    ? "4. Actualizaciones y contacto"
+                    : "4. Updates and contact"}
+                </h2>
+                <p className="text-[var(--color-muted)]">
+                  {isEs ? (
+                    <>
+                      Karmarise Global LLP puede actualizar esta Política de
+                      cookies para reflejar cambios normativos o técnicos en el
+                      sitio web. Si tienes cualquier duda sobre el uso de
+                      cookies, escríbenos a{" "}
+                      <a
+                        className="font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
+                        href="mailto:support@karmarisedglobal.com"
+                      >
+                        support@karmarisedglobal.com
+                      </a>{" "}
+                      o a{" "}
+                      <a
+                        className="font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
+                        href="mailto:hola@karmarisedglobal.com"
+                      >
+                        hola@karmarisedglobal.com
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    <>
+                      Karmarise Global LLP may update this Cookie Policy to
+                      reflect regulatory requirements or changes to the website.
+                      If you have any questions about our use of cookies, please
+                      contact us at{" "}
+                      <a
+                        className="font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
+                        href="mailto:support@karmarisedglobal.com"
+                      >
+                        support@karmarisedglobal.com
+                      </a>{" "}
+                      or{" "}
+                      <a
+                        className="font-semibold [overflow-wrap:anywhere] break-words text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4"
+                        href="mailto:hola@karmarisedglobal.com"
+                      >
+                        hola@karmarisedglobal.com
+                      </a>
+                      .
+                    </>
+                  )}
+                </p>
+              </section>
+
+              <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-[var(--color-rule)] pt-4">
+                <Link
+                  className="inline-flex min-h-[44px] items-center font-semibold underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  href={localizeHref("/privacy-policy")}
+                >
+                  {isEs ? "Ver Política de privacidad" : "View Privacy Policy"}
+                </Link>
+                <Link
+                  className="inline-flex min-h-[44px] items-center font-semibold underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  href={localizeHref("/legal-notice")}
+                >
+                  {isEs ? "Ver Aviso legal" : "View Corporate & Legal Notice"}
+                </Link>
+                <Link
+                  className="inline-flex min-h-[44px] items-center font-semibold underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                  href={localizeHref("/terms")}
+                >
+                  {isEs ? "Ver Condiciones de uso" : "View Website Terms"}
+                </Link>
+              </div>
             </div>
           </div>
         </section>
