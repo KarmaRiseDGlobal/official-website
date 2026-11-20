@@ -216,6 +216,8 @@ export function ChatWidget() {
   const closeRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const latestAnswerRef = useRef<HTMLDivElement>(null);
+  const lastFocusedAnswerIdRef = useRef<string | null>(null);
   const hasSyncedConfigRef = useRef(false);
   const turnstileTokenRef = useRef("");
 
@@ -272,6 +274,30 @@ export function ChatWidget() {
       scrollRef.current.scrollTop = 0;
       return;
     }
+
+    if (isSending) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      return;
+    }
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === "assistant" && latestAnswerRef.current) {
+      const container = scrollRef.current;
+      const targetTop = Math.max(
+        0,
+        latestAnswerRef.current.offsetTop - container.offsetTop - 12,
+      );
+      container.scrollTop = targetTop;
+
+      if (lastFocusedAnswerIdRef.current !== lastMessage.id) {
+        lastFocusedAnswerIdRef.current = lastMessage.id;
+        if (document.activeElement !== inputRef.current) {
+          latestAnswerRef.current.focus({ preventScroll: true });
+        }
+      }
+      return;
+    }
+
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [isOpen, messages, isSending]);
 
@@ -688,29 +714,47 @@ export function ChatWidget() {
                 : "Hello. Pick a question below to see how we work from Product Brief to Bulk Order, or open the text box if you want to ask something specific."}
             </p>
 
-            {messages.map((item) => (
-              <div
-                key={item.id}
-                className={
-                  item.role === "user"
-                    ? "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-[var(--color-wood)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
-                    : "mr-auto max-w-[92%] rounded-2xl rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)]"
-                }
-              >
-                {item.role === "assistant"
-                  ? renderMessageContent(item.content, localizeHref, () =>
-                      setIsOpen(false),
-                    )
-                  : item.content}
-              </div>
-            ))}
+            {messages.map((item, index) => {
+              const isLatestAssistant =
+                item.role === "assistant" && index === messages.length - 1;
+              return (
+                <div
+                  key={item.id}
+                  ref={isLatestAssistant ? latestAnswerRef : undefined}
+                  tabIndex={isLatestAssistant ? -1 : undefined}
+                  className={
+                    item.role === "user"
+                      ? "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-[var(--color-wood)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
+                      : "mr-auto max-w-[92%] rounded-2xl rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)] focus:outline-none"
+                  }
+                >
+                  {item.role === "assistant"
+                    ? renderMessageContent(item.content, localizeHref, () =>
+                        setIsOpen(false),
+                      )
+                    : item.content}
+                </div>
+              );
+            })}
 
             {isSending ? (
               <div
                 role="status"
-                className="mr-auto rounded-2xl rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2 text-[length:var(--text-xs)] text-[var(--color-muted)]"
+                className="mr-auto inline-flex items-center gap-2 rounded-2xl rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-xs)] text-[var(--color-muted)]"
               >
-                {isEs ? "Escribiendo respuesta..." : "Writing reply..."}
+                <span
+                  aria-hidden="true"
+                  className="inline-flex items-center gap-1"
+                >
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)]" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)] [animation-delay:180ms]" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)] [animation-delay:360ms]" />
+                </span>
+                <span>
+                  {isEs
+                    ? "Revisando nuestros apuntes..."
+                    : "Checking our studio notes..."}
+                </span>
               </div>
             ) : null}
 
