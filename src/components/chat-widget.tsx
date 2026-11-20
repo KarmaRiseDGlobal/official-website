@@ -25,9 +25,8 @@ const WHATSAPP_HREF = "https://wa.me/34611722276";
 const CONTACT_EMAIL = "hola@karmarisedglobal.com";
 const MAX_STORED_MESSAGES = 24;
 const MAX_MESSAGE_CHARS = 600;
-const IS_TURNSTILE_ENABLED = Boolean(
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim(),
-);
+const BUILD_TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
 
 const KNOWN_INTERNAL_ROUTES = new Set([
   "/product-brief",
@@ -192,6 +191,12 @@ export function ChatWidget() {
   const [isSending, setIsSending] = useState(false);
   const [showFallbackActions, setShowFallbackActions] = useState(false);
   const [sessionVerified, setSessionVerified] = useState(false);
+  const [runtimeTurnstileSiteKey, setRuntimeTurnstileSiteKey] = useState(
+    BUILD_TURNSTILE_SITE_KEY,
+  );
+  const [turnstileRequired, setTurnstileRequired] = useState(
+    Boolean(BUILD_TURNSTILE_SITE_KEY),
+  );
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
   const [statusError, setStatusError] = useState("");
@@ -199,6 +204,7 @@ export function ChatWidget() {
   const launcherRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasSyncedConfigRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -219,6 +225,61 @@ export function ChatWidget() {
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [isOpen, messages, isSending]);
 
+  async function syncChatConfig(): Promise<{
+    turnstileRequired: boolean;
+    turnstileSiteKey: string;
+    sessionVerified: boolean;
+  } | null> {
+    try {
+      const response = await fetch("/api/chat", {
+        method: "GET",
+        cache: "no-store",
+      });
+      if (!response.ok) return null;
+
+      const data = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        turnstileRequired?: boolean;
+        turnstileSiteKey?: string;
+        sessionVerified?: boolean;
+      } | null;
+
+      if (!data?.ok) return null;
+
+      hasSyncedConfigRef.current = true;
+      const nextSiteKey =
+        typeof data.turnstileSiteKey === "string" && data.turnstileSiteKey
+          ? data.turnstileSiteKey
+          : runtimeTurnstileSiteKey;
+      const nextRequired =
+        typeof data.turnstileRequired === "boolean"
+          ? data.turnstileRequired
+          : turnstileRequired;
+      const nextVerified =
+        typeof data.sessionVerified === "boolean"
+          ? data.sessionVerified
+          : sessionVerified;
+
+      if (nextSiteKey !== runtimeTurnstileSiteKey) {
+        setRuntimeTurnstileSiteKey(nextSiteKey);
+      }
+      if (nextRequired !== turnstileRequired) {
+        setTurnstileRequired(nextRequired);
+      }
+      if (nextVerified !== sessionVerified) {
+        setSessionVerified(nextVerified);
+      }
+
+      return {
+        turnstileRequired: nextRequired,
+        turnstileSiteKey: nextSiteKey,
+        sessionVerified: nextVerified,
+      };
+    } catch {
+      return null;
+    }
+  }
+
   function openDrawer() {
     const stored = readStoredChatState();
     setMessages(stored.messages);
@@ -227,6 +288,7 @@ export function ChatWidget() {
       Boolean(stored.messages[stored.messages.length - 1]?.isFallbackNotice),
     );
     setIsOpen(true);
+    void syncChatConfig();
     requestAnimationFrame(() => inputRef.current?.focus());
   }
 
@@ -252,7 +314,35 @@ export function ChatWidget() {
       return;
     }
 
-    if (IS_TURNSTILE_ENABLED && !sessionVerified && !turnstileToken) {
+    let synced: {
+      turnstileRequired: boolean;
+      turnstileSiteKey: string;
+      sessionVerified: boolean;
+    } | null = null;
+    if (!hasSyncedConfigRef.current) {
+      synced = await syncChatConfig();
+    }
+
+    const effectiveSiteKey =
+      synced?.turnstileSiteKey ||
+      runtimeTurnstileSiteKey ||
+      BUILD_TURNSTILE_SITE_KEY;
+    const effectiveRequired = synced?.turnstileRequired ?? turnstileRequired;
+    const effectiveVerified = synced?.sessionVerified ?? sessionVerified;
+    const mustCheckTurnstile =
+      (effectiveRequired || Boolean(effectiveSiteKey)) && !effectiveVerified;
+
+    if (mustCheckTurnstile && !effectiveSiteKey) {
+      setStatusError(
+        isEs
+          ? "La verificación de seguridad no está configurada en este entorno. Usa Product Brief, Contacto o WhatsApp."
+          : "Security verification is not configured on this environment. Please use Product Brief, Contact, or WhatsApp.",
+      );
+      setShowFallbackActions(true);
+      return;
+    }
+
+    if (mustCheckTurnstile && !turnstileToken) {
       setStatusError(
         isEs
           ? "Completa la verificación de seguridad antes de enviar tu primera pregunta."
@@ -400,7 +490,11 @@ export function ChatWidget() {
   }
 
   const starterPrompts = STARTER_PROMPTS[language];
-  const needsTurnstile = IS_TURNSTILE_ENABLED && !sessionVerified;
+  const effectiveSiteKey = runtimeTurnstileSiteKey || BUILD_TURNSTILE_SITE_KEY;
+  const needsTurnstile =
+    Boolean(effectiveSiteKey) &&
+    (turnstileRequired || Boolean(BUILD_TURNSTILE_SITE_KEY)) &&
+    !sessionVerified;
 
   return (
     <div className="fixed right-4 bottom-4 z-[var(--z-sticky)] sm:right-6 sm:bottom-6">
@@ -565,9 +659,10 @@ export function ChatWidget() {
 
             {needsTurnstile ? (
               <TurnstileField
+                siteKey={effectiveSiteKey}
                 language={language}
                 theme="light"
-                appearance="interaction-only"
+                appearance="always"
                 size="flexible"
                 resetSignal={turnstileResetSignal}
                 onTokenChange={setTurnstileToken}

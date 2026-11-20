@@ -81,6 +81,7 @@ function loadTurnstileScript(): Promise<void> {
     script.onerror = () => {
       turnstileScriptPromise = null;
       delete window.__karmaTurnstileOnLoad;
+      script.remove();
       reject(new Error("Failed to load Cloudflare Turnstile script."));
     };
     document.head.appendChild(script);
@@ -91,6 +92,7 @@ function loadTurnstileScript(): Promise<void> {
 
 export interface TurnstileFieldProps {
   onTokenChange: (token: string) => void;
+  siteKey?: string;
   language?: SiteLanguage;
   resetSignal?: number;
   theme?: "auto" | "light" | "dark";
@@ -101,6 +103,7 @@ export interface TurnstileFieldProps {
 
 export function TurnstileField({
   onTokenChange,
+  siteKey,
   language = "en",
   resetSignal,
   theme = "auto",
@@ -108,12 +111,13 @@ export function TurnstileField({
   size = "flexible",
   className,
 }: TurnstileFieldProps) {
+  const resolvedSiteKey = siteKey?.trim() || TURNSTILE_SITE_KEY;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
   const prevResetSignalRef = useRef(resetSignal);
 
-  const configKey = `${language}:${theme}:${appearance}:${size}`;
+  const configKey = `${resolvedSiteKey}:${language}:${theme}:${appearance}:${size}`;
   const [errorConfigKey, setErrorConfigKey] = useState<string | null>(null);
   const hasError = errorConfigKey === configKey;
 
@@ -122,7 +126,7 @@ export function TurnstileField({
   }, [onTokenChange]);
 
   useEffect(() => {
-    if (!TURNSTILE_SITE_KEY) {
+    if (!resolvedSiteKey) {
       return;
     }
 
@@ -142,7 +146,7 @@ export function TurnstileField({
 
         setErrorConfigKey(null);
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
+          sitekey: resolvedSiteKey,
           language: language === "es" ? "es" : "en",
           theme,
           appearance,
@@ -177,10 +181,10 @@ export function TurnstileField({
         widgetIdRef.current = null;
       }
     };
-  }, [appearance, configKey, language, size, theme]);
+  }, [appearance, configKey, language, resolvedSiteKey, size, theme]);
 
   useEffect(() => {
-    if (!TURNSTILE_SITE_KEY) {
+    if (!resolvedSiteKey) {
       return;
     }
 
@@ -191,9 +195,9 @@ export function TurnstileField({
         window.turnstile.reset(widgetIdRef.current);
       }
     }
-  }, [resetSignal]);
+  }, [resetSignal, resolvedSiteKey]);
 
-  if (!TURNSTILE_SITE_KEY) {
+  if (!resolvedSiteKey) {
     return null;
   }
 

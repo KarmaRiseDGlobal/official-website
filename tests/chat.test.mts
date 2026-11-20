@@ -16,7 +16,7 @@ const {
   verifyChatSessionToken,
 } = await import("@/lib/chat");
 const { resetRateLimitStore } = await import("@/lib/security");
-const { POST: chatPost } = await import("@/app/api/chat/route");
+const { GET: chatGet, POST: chatPost } = await import("@/app/api/chat/route");
 
 const CLOUDFLARE_CONTEXT_SYMBOL = Symbol.for("__cloudflare-context__");
 
@@ -345,5 +345,53 @@ test("POST /api/chat enforces edge rate limiter and handles Workers AI quota err
       process.env.TURNSTILE_SECRET_KEY = prevTurnstile;
     if (prevSession !== undefined)
       process.env.CHAT_SESSION_SECRET = prevSession;
+  }
+});
+
+test("GET /api/chat exposes runtime Turnstile site key and verifies cookie session state", async () => {
+  const prevSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const prevSecret = process.env.TURNSTILE_SECRET_KEY;
+  const prevSession = process.env.CHAT_SESSION_SECRET;
+
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "0x-runtime-site-key";
+  process.env.TURNSTILE_SECRET_KEY = "turnstile-runtime-secret";
+  process.env.CHAT_SESSION_SECRET = "chat-runtime-hmac";
+
+  try {
+    const anonRes = await chatGet(
+      new Request("https://karmarisedglobal.com/api/chat", { method: "GET" }),
+    );
+    assert.equal(anonRes.status, 200);
+    const anonJson = (await anonRes.json()) as {
+      ok: boolean;
+      turnstileRequired: boolean;
+      turnstileSiteKey: string;
+      sessionVerified: boolean;
+    };
+    assert.equal(anonJson.ok, true);
+    assert.equal(anonJson.turnstileRequired, true);
+    assert.equal(anonJson.turnstileSiteKey, "0x-runtime-site-key");
+    assert.equal(anonJson.sessionVerified, false);
+
+    const validCookie = createChatSessionToken(
+      { sid: "valid-sid", turns: 2 },
+      "chat-runtime-hmac",
+    );
+    const cookieRes = await chatGet(
+      new Request("https://karmarisedglobal.com/api/chat", {
+        method: "GET",
+        headers: { cookie: `${CHAT_SESSION_COOKIE}=${validCookie}` },
+      }),
+    );
+    const cookieJson = (await cookieRes.json()) as { sessionVerified: boolean };
+    assert.equal(cookieJson.sessionVerified, true);
+  } finally {
+    if (prevSiteKey === undefined)
+      delete process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    else process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = prevSiteKey;
+    if (prevSecret === undefined) delete process.env.TURNSTILE_SECRET_KEY;
+    else process.env.TURNSTILE_SECRET_KEY = prevSecret;
+    if (prevSession === undefined) delete process.env.CHAT_SESSION_SECRET;
+    else process.env.CHAT_SESSION_SECRET = prevSession;
   }
 });

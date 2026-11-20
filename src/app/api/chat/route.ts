@@ -80,6 +80,30 @@ function getLocalizedError(
   }
 }
 
+export async function GET(request: Request) {
+  const turnstileSiteKey =
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim() ?? "";
+  const sessionSecret = resolveChatSessionSecret();
+
+  let sessionVerified = false;
+  if (sessionSecret) {
+    const rawCookie = readCookieFromHeader(
+      request.headers.get("cookie"),
+      CHAT_SESSION_COOKIE,
+    );
+    const session = verifyChatSessionToken(rawCookie, sessionSecret);
+    sessionVerified = Boolean(session && session.turns < MAX_SESSION_TURNS);
+  }
+
+  return NextResponse.json({
+    ok: true,
+    turnstileRequired: Boolean(turnstileSecret),
+    turnstileSiteKey,
+    sessionVerified,
+  });
+}
+
 export async function POST(request: Request) {
   const parsed = await readJsonObject(request, 16 * 1024);
   if (!parsed.ok) {
