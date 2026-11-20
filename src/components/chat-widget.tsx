@@ -61,6 +61,57 @@ const PRESET_QUESTIONS: Record<SiteLanguage, readonly string[]> = {
   ],
 };
 
+const LOADING_MESSAGES: Record<SiteLanguage, readonly string[]> = {
+  en: [
+    "Checking our studio notes...",
+    "Looking through the Product Brief notes...",
+    "Pulling up the workshop details...",
+    "Checking how we handle that in India...",
+    "Reviewing our sampling steps...",
+    "Checking what Alma and Shirish look for...",
+    "Looking over the material notes...",
+    "Checking our Bulk Order timeline notes...",
+    "Pulling up the production sequence...",
+    "Checking how we coordinate across Spain and India...",
+    "Looking into the Manufacturing Partner criteria...",
+    "Checking the quality check details...",
+    "Reviewing our leather and garment notes...",
+    "Looking through the Almarise notes...",
+    "Checking the delivery and packing details...",
+    "Pulling up what goes into a brief...",
+    "Checking our notes on small and full runs...",
+    "Reviewing how samples move to production...",
+    "Checking our studio guidelines...",
+    "Looking over the workshop checklist...",
+    "Gathering the details for you...",
+    "Putting a clear answer together...",
+  ],
+  es: [
+    "Revisando nuestros apuntes del estudio...",
+    "Repasando los detalles del Product Brief...",
+    "Consultando las notas de taller...",
+    "Comprobando cómo lo trabajamos en la India...",
+    "Revisando los pasos de muestreo...",
+    "Mirando qué revisan Alma y Shirish...",
+    "Repasando las notas sobre materiales...",
+    "Comprobando los plazos de pedido en serie...",
+    "Consultando el orden de producción...",
+    "Revisando cómo coordinamos España y la India...",
+    "Mirando los criterios para elegir taller...",
+    "Repasando los controles de calidad...",
+    "Consultando nuestras notas de piel y confección...",
+    "Revisando los apuntes sobre Almarise...",
+    "Comprobando los detalles de envío y embalaje...",
+    "Mirando qué conviene definir en el brief...",
+    "Repasando tiradas cortas y pedidos en serie...",
+    "Revisando el paso de muestra a producción...",
+    "Consultando la guía del estudio...",
+    "Repasando la lista de comprobación del taller...",
+    "Reuniendo los detalles para ti...",
+    "Preparando una respuesta clara...",
+  ],
+};
+
 function createMessageId(): string {
   if (
     typeof crypto !== "undefined" &&
@@ -69,6 +120,71 @@ function createMessageId(): string {
     return crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function BrandMarkBadge({ size = "md" }: { size?: "sm" | "md" }) {
+  const boxClass = size === "sm" ? "h-7 w-7 p-1" : "h-9 w-9 p-1.5";
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-[var(--color-forest)]/30 bg-[var(--color-forest-deep)] ${boxClass}`}
+    >
+      <Image
+        src="/brand/main-logo-transparent.png"
+        alt=""
+        width={701}
+        height={815}
+        className="h-full w-full object-contain [filter:brightness(0)_invert(96%)_sepia(12%)_saturate(349%)_hue-rotate(344deg)_brightness(103%)_contrast(93%)]"
+      />
+    </span>
+  );
+}
+
+function WhatsAppBrandIcon({
+  className = "h-3.5 w-3.5",
+}: {
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`inline-block shrink-0 bg-current ${className}`}
+      style={{
+        maskImage: "url(/brand/icons/whatsapp.svg)",
+        WebkitMaskImage: "url(/brand/icons/whatsapp.svg)",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+      }}
+    />
+  );
+}
+
+function ProductBriefIcon({
+  className = "h-3.5 w-3.5",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 ${className}`}
+    >
+      <path d="M5.5 3.25h6.25L15.5 7v9.75a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-12.5a1 1 0 0 1 1-1Z" />
+      <path d="M11.75 3.25V7h3.75" />
+      <path d="M7.5 10.5h5" />
+      <path d="M7.5 13.5h3.5" />
+    </svg>
+  );
 }
 
 function readStoredChatState(): StoredChatState {
@@ -199,6 +315,7 @@ export function ChatWidget() {
   const [inputValue, setInputValue] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [showFallbackActions, setShowFallbackActions] = useState(false);
   const [sessionVerified, setSessionVerified] = useState(false);
   const [runtimeTurnstileSiteKey, setRuntimeTurnstileSiteKey] = useState(
@@ -267,6 +384,15 @@ export function ChatWidget() {
       document.removeEventListener("pointerdown", onPointerDownOutside);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isSending) return;
+    const count = LOADING_MESSAGES[language].length;
+    const intervalId = window.setInterval(() => {
+      setLoadingMessageIndex((prev) => (prev + 1) % count);
+    }, 2400);
+    return () => window.clearInterval(intervalId);
+  }, [isSending, language]);
 
   useEffect(() => {
     if (!isOpen || !scrollRef.current) return;
@@ -457,6 +583,9 @@ export function ChatWidget() {
     setMessages(nextMessages);
     setInputValue("");
     setStatusError("");
+    setLoadingMessageIndex(
+      (prev) => (prev + 1) % LOADING_MESSAGES[language].length,
+    );
     setIsSending(true);
     writeStoredChatState({
       messages: nextMessages,
@@ -586,7 +715,14 @@ export function ChatWidget() {
   }
 
   const presetQuestions = PRESET_QUESTIONS[language];
+  const loadingMessages = LOADING_MESSAGES[language];
+  const activeLoadingMessage =
+    loadingMessages[loadingMessageIndex % loadingMessages.length] ??
+    loadingMessages[0];
   const whatsappHref = WHATSAPP_HREF[language];
+  const assistantReplyCount = messages.filter(
+    (item) => item.role === "assistant" && !item.isFallbackNotice,
+  ).length;
   const effectiveSiteKey = runtimeTurnstileSiteKey || BUILD_TURNSTILE_SITE_KEY;
   const needsTurnstile =
     Boolean(effectiveSiteKey) &&
@@ -599,56 +735,17 @@ export function ChatWidget() {
       className="fixed right-4 bottom-4 z-[calc(var(--z-modal)+50)] sm:right-6 sm:bottom-6"
     >
       {!isOpen ? (
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={
-              isEs
-                ? "Hablar con Alma o Shirish por WhatsApp"
-                : "Chat with Alma or Shirish on WhatsApp"
-            }
-            className="inline-flex min-h-[48px] items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] px-4 text-[length:var(--text-sm)] font-medium text-[var(--color-forest-deep)] no-underline shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-          >
-            <span
-              aria-hidden="true"
-              className="inline-block h-4 w-4 shrink-0 bg-current"
-              style={{
-                maskImage: "url(/brand/icons/whatsapp.svg)",
-                WebkitMaskImage: "url(/brand/icons/whatsapp.svg)",
-                maskRepeat: "no-repeat",
-                WebkitMaskRepeat: "no-repeat",
-                maskPosition: "center",
-                WebkitMaskPosition: "center",
-                maskSize: "contain",
-                WebkitMaskSize: "contain",
-              }}
-            />
-            <span className="sm:hidden">WhatsApp</span>
-            <span className="hidden sm:inline">
-              {isEs ? "WhatsApp · Alma / Shirish" : "WhatsApp · Alma / Shirish"}
-            </span>
-          </a>
-
-          <button
-            ref={launcherRef}
-            type="button"
-            onClick={openDrawer}
-            aria-expanded="false"
-            aria-controls="karmarise-chat-drawer"
-            className="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] pr-5 pl-3.5 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-          >
-            <Image
-              src="/brand/main-logo-transparent.png"
-              alt=""
-              width={701}
-              height={815}
-              className="h-7 w-6 object-contain"
-            />
-            <span>{isEs ? "¿Alguna duda?" : "Questions?"}</span>
-          </button>
-        </div>
+        <button
+          ref={launcherRef}
+          type="button"
+          onClick={openDrawer}
+          aria-expanded="false"
+          aria-controls="karmarise-chat-drawer"
+          className="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] pr-4 pl-2.5 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] transition-transform duration-[var(--dur-short)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+        >
+          <BrandMarkBadge size="sm" />
+          <span>{isEs ? "¿Alguna duda?" : "Questions?"}</span>
+        </button>
       ) : (
         <section
           id="karmarise-chat-drawer"
@@ -660,14 +757,8 @@ export function ChatWidget() {
           className="flex max-h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
         >
           <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)]/70 px-5 py-3.5">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <Image
-                src="/brand/main-logo-transparent.png"
-                alt=""
-                width={701}
-                height={815}
-                className="h-7 w-6 shrink-0 object-contain"
-              />
+            <div className="flex min-w-0 items-center gap-3">
+              <BrandMarkBadge size="md" />
               <div className="grid min-w-0 gap-0.5">
                 <p className="font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-tight font-normal text-[var(--color-ink)]">
                   KarmaRise D Global
@@ -750,11 +841,7 @@ export function ChatWidget() {
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)] [animation-delay:180ms]" />
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)] [animation-delay:360ms]" />
                 </span>
-                <span>
-                  {isEs
-                    ? "Revisando nuestros apuntes..."
-                    : "Checking our studio notes..."}
-                </span>
+                <span>{activeLoadingMessage}</span>
               </div>
             ) : null}
 
@@ -798,14 +885,54 @@ export function ChatWidget() {
               </div>
             ) : null}
 
+            {assistantReplyCount >= 4 && !isSending && !showFallbackActions ? (
+              <div className="grid gap-2 border-t border-[var(--color-rule)]/60 pt-3 text-[length:var(--text-xs)] leading-relaxed text-[var(--color-ink-2)]">
+                <p>
+                  {isEs
+                    ? "Cuando quieras comentar una pieza directamente, puedes escribir a Alma o Shirish por WhatsApp o compartirnos un Product Brief."
+                    : "Whenever you are ready to talk a piece through directly, you can message Alma or Shirish on WhatsApp or send us a Product Brief."}
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-forest)]/35 bg-[var(--color-white)]/85 px-3 py-1.5 font-medium text-[var(--color-forest-deep)] no-underline transition-colors hover:border-[var(--color-forest-deep)] hover:bg-[var(--color-white)]"
+                  >
+                    <WhatsAppBrandIcon className="h-3.5 w-3.5 text-[var(--color-forest)]" />
+                    <span>
+                      {isEs
+                        ? "WhatsApp con Alma o Shirish"
+                        : "WhatsApp Alma or Shirish"}
+                    </span>
+                  </a>
+                  <Link
+                    href={localizeHref("/product-brief")}
+                    onClick={() => setIsOpen(false)}
+                    className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-clay)]/45 bg-[var(--color-white)]/85 px-3 py-1.5 font-medium text-[var(--color-clay-ink)] no-underline transition-colors hover:border-[var(--color-clay-ink)] hover:bg-[var(--color-white)]"
+                  >
+                    <ProductBriefIcon className="h-3.5 w-3.5 text-[var(--color-clay-ink)]" />
+                    <span>
+                      {isEs
+                        ? "Iniciar un Product Brief"
+                        : "Start a Product Brief"}
+                    </span>
+                  </Link>
+                </div>
+              </div>
+            ) : null}
+
             {showFallbackActions ? (
               <div className="flex flex-wrap gap-2 pt-1">
                 <Link
                   href={localizeHref("/product-brief")}
                   onClick={() => setIsOpen(false)}
-                  className="rounded-[var(--radius-pill)] bg-[var(--color-wood)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
+                  className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] bg-[var(--color-wood)] px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
                 >
-                  {isEs ? "Iniciar Product Brief" : "Start Product Brief"}
+                  <ProductBriefIcon className="h-3.5 w-3.5 text-[var(--color-clay-light)]" />
+                  <span>
+                    {isEs ? "Iniciar Product Brief" : "Start Product Brief"}
+                  </span>
                 </Link>
                 <Link
                   href={localizeHref("/contact")}
@@ -818,11 +945,14 @@ export function ChatWidget() {
                   href={whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)]/80 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-ink)] no-underline"
+                  className="inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-forest)]/35 bg-[var(--color-white)]/85 px-3 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-forest-deep)] no-underline"
                 >
-                  {isEs
-                    ? "WhatsApp con Alma o Shirish"
-                    : "WhatsApp Alma or Shirish"}
+                  <WhatsAppBrandIcon className="h-3.5 w-3.5 text-[var(--color-forest)]" />
+                  <span>
+                    {isEs
+                      ? "WhatsApp con Alma o Shirish"
+                      : "WhatsApp Alma or Shirish"}
+                  </span>
                 </a>
               </div>
             ) : null}
@@ -912,20 +1042,20 @@ export function ChatWidget() {
               <Link
                 href={localizeHref("/product-brief")}
                 onClick={() => setIsOpen(false)}
-                className="underline underline-offset-2 hover:text-[var(--color-ink)]"
+                className="inline-flex items-center gap-1.5 text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-2 hover:text-[var(--color-wood)]"
               >
-                {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
+                <ProductBriefIcon className="h-3.5 w-3.5" />
+                <span>
+                  {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
+                </span>
               </Link>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href={localizeHref("/contact")}
+                onClick={() => setIsOpen(false)}
                 className="underline underline-offset-2 hover:text-[var(--color-ink)]"
               >
-                {isEs
-                  ? "WhatsApp con Alma o Shirish"
-                  : "WhatsApp Alma or Shirish"}
-              </a>
+                {isEs ? "Contacto directo" : "Contact us"}
+              </Link>
             </div>
           </form>
         </section>
