@@ -107,7 +107,7 @@ export function TurnstileField({
   language = "en",
   resetSignal,
   theme = "auto",
-  appearance = "always",
+  appearance = "interaction-only",
   size = "flexible",
   className,
 }: TurnstileFieldProps) {
@@ -118,12 +118,20 @@ export function TurnstileField({
   const prevResetSignalRef = useRef(resetSignal);
 
   const configKey = `${resolvedSiteKey}:${language}:${theme}:${appearance}:${size}`;
+  const activeKey = `${configKey}:${resetSignal ?? 0}`;
+  const activeKeyRef = useRef(activeKey);
   const [errorConfigKey, setErrorConfigKey] = useState<string | null>(null);
+  const [verifiedKey, setVerifiedKey] = useState<string | null>(null);
   const hasError = errorConfigKey === configKey;
+  const isVerified = verifiedKey === activeKey;
 
   useEffect(() => {
     onTokenChangeRef.current = onTokenChange;
   }, [onTokenChange]);
+
+  useEffect(() => {
+    activeKeyRef.current = activeKey;
+  }, [activeKey]);
 
   useEffect(() => {
     if (!resolvedSiteKey) {
@@ -153,15 +161,19 @@ export function TurnstileField({
           size,
           callback: (token) => {
             setErrorConfigKey(null);
+            setVerifiedKey(activeKeyRef.current);
             onTokenChangeRef.current(token);
           },
           "expired-callback": () => {
+            setVerifiedKey(null);
             onTokenChangeRef.current("");
           },
           "timeout-callback": () => {
+            setVerifiedKey(null);
             onTokenChangeRef.current("");
           },
           "error-callback": () => {
+            setVerifiedKey(null);
             onTokenChangeRef.current("");
             setErrorConfigKey(configKey);
           },
@@ -169,6 +181,7 @@ export function TurnstileField({
       })
       .catch(() => {
         if (!cancelled) {
+          setVerifiedKey(null);
           onTokenChangeRef.current("");
           setErrorConfigKey(configKey);
         }
@@ -217,6 +230,36 @@ export function TurnstileField({
             : "min-h-[65px] max-w-full overflow-x-auto"
         }
       />
+      {!hasError && appearance === "interaction-only" ? (
+        <p
+          aria-live="polite"
+          className={`inline-flex items-center gap-1.5 text-[11px] leading-tight ${
+            theme === "dark"
+              ? "text-[var(--color-paper-2)]/70"
+              : "text-[var(--color-muted)]"
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className={`inline-block h-1.5 w-1.5 rounded-full transition-colors ${
+              isVerified
+                ? "bg-[var(--color-sage)]"
+                : theme === "dark"
+                  ? "bg-[var(--color-paper-2)]/40"
+                  : "bg-[var(--color-muted)]/45"
+            }`}
+          />
+          <span>
+            {isVerified
+              ? language === "es"
+                ? "Verificado · Cloudflare"
+                : "Verified · Cloudflare"
+              : language === "es"
+                ? "Protegido por Cloudflare"
+                : "Protected by Cloudflare"}
+          </span>
+        </p>
+      ) : null}
       {hasError ? (
         <p
           role="status"
