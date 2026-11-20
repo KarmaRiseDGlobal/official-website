@@ -331,7 +331,7 @@ export function ChatWidget() {
   const containerRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const latestAnswerRef = useRef<HTMLDivElement>(null);
   const lastFocusedAnswerIdRef = useRef<string | null>(null);
@@ -705,15 +705,6 @@ export function ChatWidget() {
     void sendMessage(inputValue);
   }
 
-  function handleTextareaKeyDown(
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
-  ) {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      void sendMessage(inputValue);
-    }
-  }
-
   const presetQuestions = PRESET_QUESTIONS[language];
   const loadingMessages = LOADING_MESSAGES[language];
   const activeLoadingMessage =
@@ -757,18 +748,11 @@ export function ChatWidget() {
           className="flex max-h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
         >
           <header className="flex items-center justify-between gap-3 border-b border-[var(--color-rule)]/70 px-5 py-3.5">
-            <div className="flex min-w-0 items-center gap-3">
-              <BrandMarkBadge size="md" />
-              <div className="grid min-w-0 gap-0.5">
-                <p className="font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-tight font-normal text-[var(--color-ink)]">
-                  KarmaRise D Global
-                </p>
-                <p className="truncate text-[length:var(--text-xs)] text-[var(--color-muted)]">
-                  {isEs
-                    ? "India y España · Fabricación y Product Briefs"
-                    : "India & Spain · Product Briefs & Manufacturing"}
-                </p>
-              </div>
+            <div className="flex min-w-0 items-center gap-2.5">
+              <BrandMarkBadge size="sm" />
+              <p className="font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-none font-normal text-[var(--color-ink)]">
+                KarmaRise D Global
+              </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               {messages.length > 0 ? (
@@ -785,11 +769,19 @@ export function ChatWidget() {
                 type="button"
                 onClick={closeDrawer}
                 aria-label={isEs ? "Cerrar chat" : "Close chat"}
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/60"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/70 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
               >
-                <span aria-hidden="true" className="text-base leading-none">
-                  ×
-                </span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  className="h-3.5 w-3.5"
+                >
+                  <path d="M4 4l8 8M12 4l-8 8" />
+                </svg>
               </button>
             </div>
           </header>
@@ -797,12 +789,12 @@ export function ChatWidget() {
           <div
             ref={scrollRef}
             data-lenis-prevent
-            className="grid flex-1 content-start gap-3 overflow-y-auto overscroll-contain px-5 py-4"
+            className="grid flex-1 content-start gap-3.5 overflow-y-auto overscroll-contain px-5 py-4"
           >
             <p className="text-[length:var(--text-sm)] leading-relaxed text-[var(--color-ink-2)]">
               {isEs
-                ? "Hola. Elige una pregunta para ver cómo trabajamos desde el Product Brief hasta el pedido en serie, o abre el teclado si quieres preguntarnos algo concreto."
-                : "Hello. Pick a question below to see how we work from Product Brief to Bulk Order, or open the text box if you want to ask something specific."}
+                ? "Hola, desde la India y España. ¿Qué pieza tienes en mente?"
+                : "Hello, from India and Spain. What are you looking to make?"}
             </p>
 
             {messages.map((item, index) => {
@@ -846,42 +838,26 @@ export function ChatWidget() {
             ) : null}
 
             {!isSending ? (
-              <div className="grid gap-2 pt-1">
-                <p className="text-[length:var(--text-xs)] font-medium text-[var(--color-muted)]">
-                  {messages.length === 0
-                    ? isEs
-                      ? "Preguntas frecuentes"
-                      : "Common questions"
-                    : isEs
-                      ? "Siguiente pregunta"
-                      : "Next question"}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {presetQuestions.map((prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      disabled={isSending}
-                      onClick={() => {
-                        void sendMessage(prompt);
-                      }}
-                      className="cursor-pointer rounded-[var(--radius-pill)] border border-[var(--color-rule)] bg-[var(--color-white)]/80 px-3 py-1.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] disabled:opacity-50"
+              <div className="divide-y divide-[var(--color-rule)]/55 overflow-hidden rounded-xl border border-[var(--color-rule)]/80 bg-[var(--color-white)]/65">
+                {presetQuestions.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    disabled={isSending}
+                    onClick={() => {
+                      void sendMessage(prompt);
+                    }}
+                    className="group flex w-full cursor-pointer items-center justify-between gap-3 px-3.5 py-2.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-white)] disabled:opacity-50"
+                  >
+                    <span>{prompt}</span>
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 text-[var(--color-muted)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-wood)]"
                     >
-                      {prompt}
-                    </button>
-                  ))}
-                  {!allowCustomInput ? (
-                    <button
-                      type="button"
-                      onClick={enableCustomInput}
-                      className="cursor-pointer rounded-[var(--radius-pill)] border border-dashed border-[var(--color-rule-2)] bg-transparent px-3 py-1.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/60 hover:text-[var(--color-ink)]"
-                    >
-                      {isEs
-                        ? "Escribir mi propia pregunta"
-                        : "Write my own question"}
-                    </button>
-                  ) : null}
-                </div>
+                      →
+                    </span>
+                  </button>
+                ))}
               </div>
             ) : null}
 
@@ -995,68 +971,83 @@ export function ChatWidget() {
             ) : null}
 
             {allowCustomInput ? (
-              <div className="grid gap-1.5">
-                <div className="flex items-center justify-between gap-2">
-                  <label
-                    htmlFor="karmarise-chat-input"
-                    className="text-[length:var(--text-xs)] font-medium text-[var(--color-muted)]"
+              <div className="flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] pr-1.5 pl-3.5 focus-within:border-[var(--color-wood)]">
+                <label htmlFor="karmarise-chat-input" className="sr-only">
+                  {isEs ? "Escribe tu pregunta" : "Write your question"}
+                </label>
+                <input
+                  ref={inputRef}
+                  id="karmarise-chat-input"
+                  type="text"
+                  maxLength={MAX_MESSAGE_CHARS}
+                  value={inputValue}
+                  onChange={(event) => setInputValue(event.target.value)}
+                  placeholder={
+                    isEs ? "Escribe tu pregunta..." : "Ask a question..."
+                  }
+                  className="h-10 min-w-0 flex-1 bg-transparent text-[length:var(--text-sm)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setAllowCustomInput(false)}
+                  aria-label={isEs ? "Ocultar teclado" : "Close text input"}
+                  className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--color-muted)] transition-colors hover:bg-[var(--color-paper)] hover:text-[var(--color-ink)]"
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    className="h-3 w-3"
                   >
-                    {isEs ? "Tu pregunta" : "Your question"}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setAllowCustomInput(false)}
-                    className="cursor-pointer text-[length:var(--text-xs)] text-[var(--color-muted)] underline underline-offset-2 hover:text-[var(--color-ink)]"
+                    <path d="M4 4l8 8M12 4l-8 8" />
+                  </svg>
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSending || !inputValue.trim()}
+                  aria-label={isEs ? "Enviar" : "Send"}
+                  className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-wood)] text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3.5 w-3.5"
                   >
-                    {isEs ? "Ocultar" : "Hide"}
-                  </button>
-                </div>
-                <div className="flex items-end gap-2">
-                  <textarea
-                    ref={inputRef}
-                    id="karmarise-chat-input"
-                    rows={2}
-                    maxLength={MAX_MESSAGE_CHARS}
-                    value={inputValue}
-                    onChange={(event) => setInputValue(event.target.value)}
-                    onKeyDown={handleTextareaKeyDown}
-                    placeholder={
-                      isEs
-                        ? "Escribe aquí tu consulta sobre fabricación o un Product Brief..."
-                        : "Ask about manufacturing across India or your Product Brief..."
-                    }
-                    className="min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--color-rule-2)] bg-[var(--color-white)] px-3 py-2 text-[length:var(--text-sm)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:border-[var(--color-wood)] focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isSending || !inputValue.trim()}
-                    className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-xl bg-[var(--color-wood)] px-4 text-[length:var(--text-sm)] font-semibold text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-45"
-                  >
-                    {isEs ? "Enviar" : "Send"}
-                  </button>
-                </div>
+                    <path d="M3 8h10M9 4l4 4-4 4" />
+                  </svg>
+                </button>
               </div>
-            ) : null}
-
-            <div className="flex items-center justify-between gap-2 text-[length:var(--text-xs)] text-[var(--color-muted)]">
-              <Link
-                href={localizeHref("/product-brief")}
-                onClick={() => setIsOpen(false)}
-                className="inline-flex items-center gap-1.5 text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-2 hover:text-[var(--color-wood)]"
-              >
-                <ProductBriefIcon className="h-3.5 w-3.5" />
-                <span>
-                  {isEs ? "Iniciar un Product Brief" : "Start a Product Brief"}
-                </span>
-              </Link>
-              <Link
-                href={localizeHref("/contact")}
-                onClick={() => setIsOpen(false)}
-                className="underline underline-offset-2 hover:text-[var(--color-ink)]"
-              >
-                {isEs ? "Contacto directo" : "Contact us"}
-              </Link>
-            </div>
+            ) : (
+              <div className="flex items-center justify-between gap-3 text-[length:var(--text-xs)]">
+                <button
+                  type="button"
+                  onClick={enableCustomInput}
+                  className="cursor-pointer font-medium text-[var(--color-ink-2)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
+                >
+                  {isEs ? "Escribir otra pregunta" : "Ask something else"}
+                </button>
+                <Link
+                  href={localizeHref("/product-brief")}
+                  onClick={() => setIsOpen(false)}
+                  className="inline-flex items-center gap-1.5 font-medium text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-4 hover:text-[var(--color-wood)]"
+                >
+                  <ProductBriefIcon className="h-3.5 w-3.5" />
+                  <span>
+                    {isEs
+                      ? "Iniciar un Product Brief"
+                      : "Start a Product Brief"}
+                  </span>
+                </Link>
+              </div>
+            )}
           </form>
         </section>
       )}
