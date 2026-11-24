@@ -1,4 +1,4 @@
-import type { StoryLanguage } from "@/data/stories";
+import type { StoryLanguage } from "@/data/story-types";
 
 export type StoryReferenceKind =
   | "place"
@@ -1141,7 +1141,7 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
     visual: {
       kind: "photo",
-      src: "/food and culture/pexels-saveurssecretes-5992263.jpg",
+      src: "/images/culture/diwali-spiral-chakli-masala-chai.jpg",
       objectPosition: "50% 55%",
       alt: {
         en: "Crisp spiral chakli snacks served beside hot chai",
@@ -1180,12 +1180,12 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
       es: "Pastelitos al vapor de masa fermentada con grano integral o mijo, de sabor más tostado que el idli blanco.",
     },
     terms: {
-      en: ["brown idlis", "idli brown"],
+      en: ["brown idlis", "brown idli", "idli brown"],
       es: ["idlis oscuros", "idli oscuro"],
     },
     visual: {
       kind: "photo",
-      src: "/food and culture/image.png_aa5ceb44_2K.jpg",
+      src: "/images/culture/steamed-brown-idli-spiced-chutney.jpg",
       objectPosition: "50% 50%",
       alt: {
         en: "Steamed brown idlis served with spiced chutney",
@@ -1249,8 +1249,8 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
       es: "Master-ji (Maestro patronista)",
     },
     description: {
-      en: "Respectful title used in Indian workshops for the head pattern master who translates a design into stiff cutting templates.",
-      es: "Tratamiento respetuoso que se da en los talleres indios al maestro patronista encargado de pasar un diseño a plantillas físicas de corte.",
+      en: "Respectful title used in Indian tailoring and leather ateliers for the head pattern master who translates a design into stiff cutting templates.",
+      es: "Tratamiento respetuoso en marroquinería y confección en la India para el maestro patronista encargado de pasar un diseño a plantillas físicas de corte.",
     },
     terms: {
       en: ["master-ji"],
@@ -1324,8 +1324,8 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
       es: "Karigar (Artesano de taller)",
     },
     description: {
-      en: "Skilled craftsperson on an Indian workshop floor specialising in hand cutting, edge skiving, or heavy-duty stitching.",
-      es: "Artesano especializado en los talleres de la India dedicado al corte manual, al rebaje de cantos o al cosido pesado de piel y prendas.",
+      en: "Skilled craftsperson in India specialising in hand cutting, edge skiving, or heavy-duty stitching.",
+      es: "Artesano especializado en la India dedicado al corte manual, al rebaje de cantos o al cosido pesado de piel y prendas.",
     },
     terms: {
       en: ["karigars", "karigar"],
@@ -1422,3 +1422,105 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
   },
 ];
+
+export type TextSegment =
+  | { readonly kind: "text"; readonly text: string }
+  | {
+      readonly kind: "ref";
+      readonly text: string;
+      readonly entry: StoryReferenceEntry;
+    };
+
+interface CompiledLanguageMatcher {
+  readonly regex: RegExp;
+  readonly byExactPhrase: ReadonlyMap<string, StoryReferenceEntry>;
+}
+
+function escapeRegex(literal: string): string {
+  return literal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function compileMatcher(lang: StoryLanguage): CompiledLanguageMatcher {
+  const pairs: Array<{ phrase: string; entry: StoryReferenceEntry }> = [];
+  for (const entry of STORY_REFERENCES) {
+    for (const phrase of entry.terms[lang]) {
+      if (phrase.trim().length > 0) {
+        pairs.push({ phrase, entry });
+      }
+    }
+  }
+
+  pairs.sort((a, b) => b.phrase.length - a.phrase.length);
+
+  const byExactPhrase = new Map<string, StoryReferenceEntry>();
+  const escapedPhrases: string[] = [];
+
+  for (const pair of pairs) {
+    if (!byExactPhrase.has(pair.phrase)) {
+      byExactPhrase.set(pair.phrase, pair.entry);
+      escapedPhrases.push(escapeRegex(pair.phrase));
+    }
+  }
+
+  const pattern = `(?<![\\p{L}\\p{N}])(${escapedPhrases.join("|")})(?![\\p{L}\\p{N}])`;
+  return {
+    regex: new RegExp(pattern, "gu"),
+    byExactPhrase,
+  };
+}
+
+const MATCHERS: Readonly<Record<StoryLanguage, CompiledLanguageMatcher>> = {
+  en: compileMatcher("en"),
+  es: compileMatcher("es"),
+};
+
+/**
+ * Purely segments a paragraph into plain text and first-occurrence reference triggers.
+ * Pass a shared `seenIds` Set within a single pure pass across an article's paragraphs
+ * so each reference term is highlighted only on its first appearance.
+ */
+export function segmentParagraphWithReferences(
+  paragraph: string,
+  lang: StoryLanguage,
+  seenIds: Set<string>,
+): TextSegment[] {
+  const matcher = MATCHERS[lang];
+  const segments: TextSegment[] = [];
+  let lastIndex = 0;
+
+  for (const match of paragraph.matchAll(matcher.regex)) {
+    const matchedText = match[0];
+    const matchIndex = match.index ?? 0;
+    const entry = matcher.byExactPhrase.get(matchedText);
+
+    if (!entry || seenIds.has(entry.id)) {
+      continue;
+    }
+
+    seenIds.add(entry.id);
+
+    if (matchIndex > lastIndex) {
+      segments.push({
+        kind: "text",
+        text: paragraph.slice(lastIndex, matchIndex),
+      });
+    }
+
+    segments.push({
+      kind: "ref",
+      text: matchedText,
+      entry,
+    });
+
+    lastIndex = matchIndex + matchedText.length;
+  }
+
+  if (lastIndex < paragraph.length) {
+    segments.push({
+      kind: "text",
+      text: paragraph.slice(lastIndex),
+    });
+  }
+
+  return segments.length > 0 ? segments : [{ kind: "text", text: paragraph }];
+}

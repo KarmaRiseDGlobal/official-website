@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { WomensTrainingInitiativePageClient } from "@/app/womens-training-initiative/womens-training-initiative-client";
+import { WomensTrainingInitiativePageClient } from "@/views/womens-training-initiative-client";
 import { getRouteMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = getRouteMetadata(
@@ -9,5 +9,5 @@ export const metadata: Metadata = getRouteMetadata(
 );
 
 export default function WomensTrainingInitiativePage() {
-  return <WomensTrainingInitiativePageClient />;
+  return <WomensTrainingInitiativePageClient lang="en" />;
 }

@@ -1,0 +1,13 @@
+{
+  "status": "approved",
+  "approved_by": "Project owner (KarmaRise D Global) via 2026-11-24 AlmaRise D Brand directive",
+  "approved_at": "2026-11-24T15:00:00Z",
+  "context_sha256": {
+    "project-brief.md": "69e2ed2392e107e7a2e6b70460b1f517c568be36cdef8dc831b869f2f78cad17",
+    "locales.yaml": "026235a8feb7a79bb0afdfe21f431ff3958a69c2d1312f922d8b2d905df200e5",
+    "glossary.csv": "95a95481f93e669a8404a7f166d15492b2fbda918c44963af4bcf5e3389c43db",
+    "style-guide.md": "657e9ee548dd2d6b04ceec913d47eed9b463f226cbb42e8c7f68d0b8da73ba37",
+    "protected-terms.txt": "085944a1c7faa95ba935e073a3138bdc0ae86bacefa21810760e3b33f450f027"
+  },
+  "approved_empty": []
+}

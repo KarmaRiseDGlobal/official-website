@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-import type { SiteLanguage } from "@/context/language-context";
+import {
+  localizeOptionForConfirmation,
+  MAX_FILE_BYTES,
+  MAX_TOTAL_UPLOAD_BYTES,
+  MAX_UPLOAD_FILES,
+} from "@/data/product-brief-options";
 import { sendResendEmail, type ResendAttachment } from "@/lib/resend";
 import {
   escapeHtml,
@@ -9,13 +14,11 @@ import {
   readJsonObject,
   validateUploadedFile,
 } from "@/lib/security";
+import type { SiteLanguage } from "@/lib/urls";
 import { isValidEmail, readTrimmedString } from "@/lib/validation";
 
 const MAX_JSON_BYTES = 64 * 1024;
 const MAX_MULTIPART_BYTES = 11 * 1024 * 1024;
-const MAX_UPLOAD_FILES = 3;
-const MAX_FILE_BYTES = 4 * 1024 * 1024;
-const MAX_TOTAL_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 interface ParsedBriefFields {
   name: string;
@@ -29,33 +32,6 @@ interface ParsedBriefFields {
   quantity: string;
   referenceUrl: string;
   brief: string;
-}
-
-const SPANISH_OPTION_LABELS = new Map<string, string>([
-  ["Retail chain", "Cadena comercial"],
-  ["Independent retailer", "Comercio independiente"],
-  ["Fashion brand", "Marca de moda"],
-  ["Other business", "Otra empresa de producto"],
-  ["Bags and accessories", "Bolsos y accesorios"],
-  ["Garments and clothing", "Prendas y confección"],
-  ["Another product", "Otro producto"],
-  ["Concept or reference items only", "Idea inicial o piezas de referencia"],
-  ["Sketches or early tech pack", "Bocetos o ficha técnica preliminar"],
-  ["Physical sample ready", "Muestra física lista"],
-  [
-    "Existing product moving to India",
-    "Producto existente que pasa a fabricarse en la India",
-  ],
-]);
-
-function localizeOptionForConfirmation(
-  value: string,
-  confirmationLanguage: SiteLanguage,
-): string {
-  if (confirmationLanguage === "es") {
-    return SPANISH_OPTION_LABELS.get(value) ?? value;
-  }
-  return value;
 }
 
 function resolveConfirmationLanguage(
@@ -224,7 +200,8 @@ function buildConfirmationEmail({
   recipientEmail: string;
 }): { subject: string; text: string; html: string } {
   const safeName = escapeHtml(fields.name);
-  const safeCompany = escapeHtml(fields.company);
+  const safeCompany = fields.company ? escapeHtml(fields.company) : "";
+  const subjectLabel = fields.company || fields.name;
   const localizedProduct = localizeOptionForConfirmation(
     fields.product,
     confirmationLanguage,
@@ -240,19 +217,23 @@ function buildConfirmationEmail({
     ? escapeHtml(fields.referenceUrl)
     : "";
   const safeRecipient = escapeHtml(recipientEmail);
-  const safeBriefHtml = escapeHtml(fields.brief).replaceAll("\n", "<br />");
+  const safeBriefHtml = fields.brief
+    ? escapeHtml(fields.brief).replaceAll("\n", "<br />")
+    : "";
   const safeAttachmentNames = attachmentNames.map((item) => escapeHtml(item));
 
   if (confirmationLanguage === "es") {
-    const subject = `Hemos recibido tu Product Brief (${fields.company}) · KarmaRise D Global`;
+    const subject = `Hemos recibido tu Product Brief (${subjectLabel}) · KarmaRise D Global`;
     const text = [
       `Hola ${fields.name},`,
       "",
-      `Gracias por enviarnos tu Product Brief para ${fields.company}. Lo hemos recibido en ${recipientEmail}.`,
+      fields.company
+        ? `Gracias por enviarnos tu Product Brief para ${fields.company}. Lo hemos recibido en ${recipientEmail}.`
+        : `Gracias por enviarnos tu Product Brief. Lo hemos recibido en ${recipientEmail}.`,
       "",
       "Alma revisará tus detalles en primer lugar y, junto con Shirish, preparará los siguientes pasos antes de responderte directamente a este correo.",
       "",
-      `Empresa: ${fields.company}`,
+      fields.company ? `Empresa: ${fields.company}` : null,
       `Tipo de producto: ${localizedProduct}`,
       `Fase actual: ${localizedReadiness}`,
       fields.quantity ? `Cantidad estimada: ${fields.quantity}` : null,
@@ -262,9 +243,9 @@ function buildConfirmationEmail({
       attachmentNames.length > 0
         ? `Archivos adjuntos (${attachmentNames.length}): ${attachmentNames.join(", ")}`
         : null,
-      "",
-      "Resumen de tu Product Brief:",
-      fields.brief,
+      ...(fields.brief
+        ? ["", "Resumen de tu Product Brief:", fields.brief]
+        : []),
       "",
       "Si quieres añadir alguna aclaración o enviar referencias adicionales, puedes responder directamente a este correo.",
       "",
@@ -286,7 +267,11 @@ function buildConfirmationEmail({
         Hemos recibido tu Product Brief, ${safeName}.
       </h1>
       <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:#182D20;">
-        Gracias por compartir los detalles para <strong>${safeCompany}</strong>. Tu Product Brief ha quedado registrado en <a href="mailto:${safeRecipient}" style="color:#833E28;">${safeRecipient}</a>.
+        ${
+          safeCompany
+            ? `Gracias por compartir los detalles para <strong>${safeCompany}</strong>.`
+            : "Gracias por compartir los detalles de tu proyecto."
+        } Tu Product Brief ha quedado registrado en <a href="mailto:${safeRecipient}" style="color:#833E28;">${safeRecipient}</a>.
       </p>
       <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#182D20;">
         Alma revisará tus referencias y te escribirá directamente a este correo. Si quieres añadir algo más mientras lo evaluamos, puedes responder a este mismo mensaje.
@@ -295,13 +280,13 @@ function buildConfirmationEmail({
         <p style="margin:0 0 10px;font-size:13px;font-family:Arial,sans-serif;color:#833E28;font-weight:700;">
           Resumen del Product Brief
         </p>
-        <p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Empresa:</strong> ${safeCompany}</p>
+        ${safeCompany ? `<p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Empresa:</strong> ${safeCompany}</p>` : ""}
         <p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Producto:</strong> ${safeProduct}</p>
         <p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Fase actual:</strong> ${safeReadiness}</p>
         ${safeQuantity ? `<p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Cantidad estimada:</strong> ${safeQuantity}</p>` : ""}
         ${safeReferenceUrl ? `<p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Enlace de referencia:</strong> <a href="${safeReferenceUrl}" target="_blank" rel="noopener noreferrer" style="color:#833E28;">${safeReferenceUrl}</a></p>` : ""}
         ${safeAttachmentNames.length > 0 ? `<p style="margin:0 0 10px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Archivos adjuntos:</strong> ${safeAttachmentNames.join(", ")}</p>` : ""}
-        <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#182D20;">${safeBriefHtml}</p>
+        ${safeBriefHtml ? `<p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#182D20;">${safeBriefHtml}</p>` : ""}
       </div>
       <p style="margin:0;font-size:15px;line-height:1.6;color:#182D20;">
         Un saludo cercano,<br />
@@ -315,15 +300,17 @@ function buildConfirmationEmail({
     return { subject, text, html };
   }
 
-  const subject = `We received your Product Brief (${fields.company}) · KarmaRise D Global`;
+  const subject = `We received your Product Brief (${subjectLabel}) · KarmaRise D Global`;
   const text = [
     `Hello ${fields.name},`,
     "",
-    `Thank you for sending your Product Brief for ${fields.company}. We have received it at ${recipientEmail}.`,
+    fields.company
+      ? `Thank you for sending your Product Brief for ${fields.company}. We have received it at ${recipientEmail}.`
+      : `Thank you for sending your Product Brief. We have received it at ${recipientEmail}.`,
     "",
     "Alma will review your brief first and reply directly to your email address. If you want to add any clarification or extra references in the meantime, simply reply to this message.",
     "",
-    `Company: ${fields.company}`,
+    fields.company ? `Company: ${fields.company}` : null,
     `Product type: ${localizedProduct}`,
     `Current stage: ${localizedReadiness}`,
     fields.quantity
@@ -333,9 +320,7 @@ function buildConfirmationEmail({
     attachmentNames.length > 0
       ? `Attached files (${attachmentNames.length}): ${attachmentNames.join(", ")}`
       : null,
-    "",
-    "Product Brief notes:",
-    fields.brief,
+    ...(fields.brief ? ["", "Product Brief notes:", fields.brief] : []),
     "",
     "Warm regards,",
     "Alma and Shirish",
@@ -355,7 +340,11 @@ function buildConfirmationEmail({
         We received your Product Brief, ${safeName}.
       </h1>
       <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:#182D20;">
-        Thank you for sharing the details for <strong>${safeCompany}</strong>. Your Product Brief has been received at <a href="mailto:${safeRecipient}" style="color:#833E28;">${safeRecipient}</a>.
+        ${
+          safeCompany
+            ? `Thank you for sharing the details for <strong>${safeCompany}</strong>.`
+            : "Thank you for sharing your project details."
+        } Your Product Brief has been received at <a href="mailto:${safeRecipient}" style="color:#833E28;">${safeRecipient}</a>.
       </p>
       <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#182D20;">
         Alma will review your references and reply directly to your email address. If you would like to add anything while we evaluate it, feel free to reply to this message.
@@ -364,13 +353,13 @@ function buildConfirmationEmail({
         <p style="margin:0 0 10px;font-size:13px;font-family:Arial,sans-serif;color:#833E28;font-weight:700;">
           Product Brief summary
         </p>
-        <p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Company:</strong> ${safeCompany}</p>
+        ${safeCompany ? `<p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Company:</strong> ${safeCompany}</p>` : ""}
         <p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Product type:</strong> ${safeProduct}</p>
         <p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Current stage:</strong> ${safeReadiness}</p>
         ${safeQuantity ? `<p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Estimated Bulk Order quantity:</strong> ${safeQuantity}</p>` : ""}
         ${safeReferenceUrl ? `<p style="margin:0 0 6px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Reference link:</strong> <a href="${safeReferenceUrl}" target="_blank" rel="noopener noreferrer" style="color:#833E28;">${safeReferenceUrl}</a></p>` : ""}
         ${safeAttachmentNames.length > 0 ? `<p style="margin:0 0 10px;font-size:14px;line-height:1.5;color:#182D20;"><strong>Attached files:</strong> ${safeAttachmentNames.join(", ")}</p>` : ""}
-        <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#182D20;">${safeBriefHtml}</p>
+        ${safeBriefHtml ? `<p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#182D20;">${safeBriefHtml}</p>` : ""}
       </div>
       <p style="margin:0;font-size:15px;line-height:1.6;color:#182D20;">
         Warm regards,<br />
@@ -501,24 +490,17 @@ export async function POST(request: Request) {
     language,
     siteLanguage,
   );
+  const resolvedLanguage =
+    language || (confirmationLanguage === "es" ? "Spanish" : "English");
 
-  if (
-    !name ||
-    !company ||
-    !profile ||
-    !isValidEmail(email) ||
-    !language ||
-    !product ||
-    !readiness ||
-    !brief
-  ) {
+  if (!name || !isValidEmail(email) || !product || !readiness) {
     return NextResponse.json(
       {
         ok: false,
         error:
           confirmationLanguage === "es"
-            ? "Completa los campos obligatorios antes de enviar tu Product Brief."
-            : "Complete the required fields before sending.",
+            ? "Completa tu nombre, correo electrónico, tipo de producto y fase actual antes de enviar."
+            : "Complete your name, email, product type, and current stage before sending.",
       },
       { status: 400 },
     );
@@ -622,12 +604,13 @@ export async function POST(request: Request) {
 
   const attachmentNames = resendAttachments.map((item) => item.filename);
 
+  const internalSubjectTarget = company || name;
   const internalText = [
     `Name: ${name}`,
-    `Company: ${company}`,
-    `Profile: ${profile}`,
-    `Work email: ${email}`,
-    `Preferred language: ${language}`,
+    company ? `Company: ${company}` : null,
+    profile ? `Profile: ${profile}` : null,
+    `Email: ${email}`,
+    `Preferred language: ${resolvedLanguage}`,
     `Product type: ${product}`,
     `Current stage: ${readiness}`,
     quantity ? `Estimated Bulk Order quantity: ${quantity}` : null,
@@ -635,9 +618,7 @@ export async function POST(request: Request) {
     attachmentNames.length > 0
       ? `Attachments (${attachmentNames.length}): ${attachmentNames.join(", ")}`
       : null,
-    "",
-    "Project notes:",
-    brief,
+    ...(brief ? ["", "Project notes:", brief] : []),
   ]
     .filter((line): line is string => line !== null)
     .join("\n");
@@ -648,25 +629,29 @@ export async function POST(request: Request) {
   <body style="font-family:Arial,sans-serif;color:#182D20;line-height:1.6;">
     <h2 style="margin:0 0 12px;color:#182D20;">New Product Brief</h2>
     <p style="margin:0 0 6px;"><strong>Name:</strong> ${escapeHtml(name)}</p>
-    <p style="margin:0 0 6px;"><strong>Company:</strong> ${escapeHtml(company)}</p>
-    <p style="margin:0 0 6px;"><strong>Profile:</strong> ${escapeHtml(profile)}</p>
-    <p style="margin:0 0 6px;"><strong>Work email:</strong> ${escapeHtml(email)}</p>
-    <p style="margin:0 0 6px;"><strong>Preferred language:</strong> ${escapeHtml(language)}</p>
+    ${company ? `<p style="margin:0 0 6px;"><strong>Company:</strong> ${escapeHtml(company)}</p>` : ""}
+    ${profile ? `<p style="margin:0 0 6px;"><strong>Profile:</strong> ${escapeHtml(profile)}</p>` : ""}
+    <p style="margin:0 0 6px;"><strong>Email:</strong> ${escapeHtml(email)}</p>
+    <p style="margin:0 0 6px;"><strong>Preferred language:</strong> ${escapeHtml(resolvedLanguage)}</p>
     <p style="margin:0 0 6px;"><strong>Product type:</strong> ${escapeHtml(product)}</p>
     <p style="margin:0 0 6px;"><strong>Current stage:</strong> ${escapeHtml(readiness)}</p>
     ${quantity ? `<p style="margin:0 0 6px;"><strong>Estimated Bulk Order quantity:</strong> ${escapeHtml(quantity)}</p>` : ""}
     ${safeReferenceUrl ? `<p style="margin:0 0 6px;"><strong>Reference URL:</strong> <a href="${safeReferenceUrl}" target="_blank" rel="noopener noreferrer">${safeReferenceUrl}</a></p>` : ""}
     ${attachmentNames.length > 0 ? `<p style="margin:0 0 12px;"><strong>Attachments:</strong> ${attachmentNames.map((item) => escapeHtml(item)).join(", ")}</p>` : ""}
-    <div style="margin-top:12px;padding:14px;background:#F2ECDF;border-left:3px solid #833E28;">
+    ${
+      brief
+        ? `<div style="margin-top:12px;padding:14px;background:#F2ECDF;border-left:3px solid #833E28;">
       ${escapeHtml(brief).replaceAll("\n", "<br />")}
-    </div>
+    </div>`
+        : ""
+    }
   </body>
 </html>`;
 
   const internalResult = await sendResendEmail({
     to: recipient,
     replyTo: email,
-    subject: `Product Brief: ${company} (${product})`,
+    subject: `Product Brief: ${internalSubjectTarget} (${product})`,
     text: internalText,
     html: internalHtml,
     attachments: resendAttachments.length > 0 ? resendAttachments : undefined,
@@ -684,7 +669,7 @@ export async function POST(request: Request) {
     company,
     profile,
     email,
-    language,
+    language: resolvedLanguage,
     siteLanguage,
     product,
     readiness,

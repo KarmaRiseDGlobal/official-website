@@ -42,6 +42,13 @@ export function registerTestModuleHooks(): void {
 
   registerHooks({
     resolve(specifier, context, nextResolve) {
+      if (specifier === "server-only") {
+        return {
+          shortCircuit: true,
+          url: "data:text/javascript,export {};",
+        };
+      }
+
       if (specifier === "next/server") {
         return nextResolve("next/server.js", context);
       }

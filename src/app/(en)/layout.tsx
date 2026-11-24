@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
-import { RootShell } from "@/components/root-shell";
+import { RootShell } from "@/components/shell/root-shell";
 import { getLayoutMetadata } from "@/lib/seo";
 
 import "../globals.css";

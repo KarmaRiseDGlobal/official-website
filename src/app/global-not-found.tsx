@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { NotFoundView } from "@/components/not-found-view";
-import { RootShell } from "@/components/root-shell";
+import { NotFoundView } from "@/components/shell/not-found-view";
+import { RootShell } from "@/components/shell/root-shell";
 
 import "./globals.css";
 

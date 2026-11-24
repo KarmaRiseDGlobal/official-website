@@ -14,7 +14,7 @@ export const newsletterIssueType = defineType({
     defineField({
       name: "internalName",
       title: "Internal campaign name",
-      description: "Example: Newsletter Issue #001 - Heritage & Craft",
+      description: "Example: Issue #01 · Three states for one leather bag",
       type: "string",
       group: "editorial",
       validation: (rule) => rule.required(),
@@ -22,11 +22,71 @@ export const newsletterIssueType = defineType({
     defineField({
       name: "issueNumber",
       title: "Issue number",
-      description: "Example: Issue #001",
+      description: "Example: Issue #01",
       type: "string",
       group: "editorial",
-      initialValue: "Issue #001",
+      initialValue: "Issue #01",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "track",
+      title: "Recipient list scope",
+      description:
+        "Default sends to the unified KarmaRise Stories (EN) and Historias de KarmaRise (ES) lists. Optional topic lists remain available for future targeted sends.",
+      type: "string",
+      group: ["editorial", "delivery"],
+      initialValue: "all",
+      options: {
+        list: [
+          {
+            title: "Unified KarmaRise Stories (EN / ES)",
+            value: "all",
+          },
+          {
+            title: "Manufacturing only (optional future split)",
+            value: "manufacturing",
+          },
+          {
+            title: "AlmaRise D Brand & Culture only (optional future split)",
+            value: "almarise",
+          },
+        ],
+        layout: "radio",
+      },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "format",
+      title: "Email layout format",
+      description:
+        "Use Personal letter for the single-narrator human format, or Story digest for multi-card recaps.",
+      type: "string",
+      group: "editorial",
+      initialValue: "letter",
+      options: {
+        list: [
+          { title: "Personal letter (1 narrator, 1 photo)", value: "letter" },
+          { title: "Story digest (multiple Story cards)", value: "digest" },
+        ],
+        layout: "radio",
+      },
+    }),
+    defineField({
+      name: "narrator",
+      title: "Narrator / sender voice",
+      description:
+        "One founder narrates each personal letter in first person, including the photo caption and signature.",
+      type: "string",
+      group: ["editorial", "delivery"],
+      initialValue: "alma",
+      options: {
+        list: [
+          { title: "Alma", value: "alma" },
+          { title: "Shirish", value: "shirish" },
+          { title: "Alma & Shirish (joint)", value: "both" },
+        ],
+        layout: "radio",
+      },
     }),
     defineField({
       name: "status",
@@ -60,7 +120,7 @@ export const newsletterIssueType = defineType({
     }),
     defineField({
       name: "targetAudience",
-      title: "Target audience",
+      title: "Target language edition",
       type: "string",
       group: ["editorial", "delivery"],
       initialValue: "both",
@@ -77,26 +137,43 @@ export const newsletterIssueType = defineType({
     }),
     defineField({
       name: "heroImage",
-      title: "Hero image",
+      title: "Issue photograph (at most one candid photo)",
       type: "image",
       group: "editorial",
       options: { hotspot: true },
       fields: [
         defineField({
           name: "alt",
-          title: "Alt text",
+          title: "Alt text (English)",
+          type: "string",
+        }),
+        defineField({
+          name: "spanishAlt",
+          title: "Alt text (Spanish)",
           type: "string",
         }),
       ],
     }),
     defineField({
+      name: "heroImageCaptionEn",
+      title: "Photo caption (English, first person)",
+      type: "string",
+      group: "english",
+    }),
+    defineField({
+      name: "heroImageCaptionEs",
+      title: "Photo caption (Spanish, first person)",
+      type: "string",
+      group: "spanish",
+    }),
+    defineField({
       name: "selectedStories",
-      title: "Selected Stories (2 to 4 recommended)",
+      title: "Linked Stories (optional in letter mode; 2 to 4 in digest mode)",
       description:
-        "Curate published Stories from the website to include in this newsletter issue.",
+        "Link the matching website Story so the email can invite readers to explore the full piece.",
       type: "array",
       group: "editorial",
-      validation: (rule) => rule.min(1).max(6),
+      validation: (rule) => rule.max(6),
       of: [
         defineArrayMember({
           type: "reference",
@@ -113,7 +190,7 @@ export const newsletterIssueType = defineType({
     }),
     defineField({
       name: "subjectEn",
-      title: "Email subject line (English)",
+      title: "Email subject line (English, under 50 characters)",
       type: "string",
       group: "english",
       validation: (rule) => rule.required(),
@@ -125,25 +202,60 @@ export const newsletterIssueType = defineType({
       group: "english",
     }),
     defineField({
+      name: "narratorLocationEn",
+      title: "Writing from line (English)",
+      description: "Example: Writing from our studio near Mumbai",
+      type: "string",
+      group: "english",
+    }),
+    defineField({
       name: "introEn",
-      title: "Editorial introduction (English)",
+      title: "Cold open / introduction (English)",
+      description:
+        "Used as the opening note in letter mode or the intro paragraph in digest mode.",
       type: "text",
       rows: 4,
       group: "english",
     }),
     defineField({
+      name: "bodyEn",
+      title: "Letter body (English, separate paragraphs with a blank line)",
+      description:
+        "300 to 450 words total. Use **bold** sparingly for turning points. The photo appears automatically after the opening paragraphs.",
+      type: "text",
+      rows: 12,
+      group: "english",
+    }),
+    defineField({
+      name: "replyPromptEn",
+      title: "Single reply question (English)",
+      description: "One direct question inviting the reader to hit reply.",
+      type: "text",
+      rows: 2,
+      group: "english",
+    }),
+    defineField({
+      name: "psEn",
+      title: "P.S. note (English)",
+      description:
+        "2 to 3 lines for a personal aside, full Story link, or soft cross-link to the other track.",
+      type: "text",
+      rows: 3,
+      group: "english",
+    }),
+    defineField({
       name: "closingEn",
-      title: "Closing message (English)",
+      title: "Digest closing message (English, legacy digest mode)",
       type: "text",
       rows: 3,
       group: "english",
     }),
     defineField({
       name: "ctaTextEn",
-      title: "Primary button label (English)",
+      title: "Story link / button label (English)",
       type: "string",
       group: "english",
-      initialValue: "Explore KarmaRise Stories",
+      initialValue: "Read the full Story on our website",
     }),
     defineField({
       name: "titleEs",
@@ -153,7 +265,7 @@ export const newsletterIssueType = defineType({
     }),
     defineField({
       name: "subjectEs",
-      title: "Email subject line (Spanish)",
+      title: "Email subject line (Spanish, under 50 characters)",
       type: "string",
       group: "spanish",
     }),
@@ -164,32 +276,70 @@ export const newsletterIssueType = defineType({
       group: "spanish",
     }),
     defineField({
+      name: "narratorLocationEs",
+      title: "Writing from line (Spanish)",
+      description: "Ejemplo: Escrito desde nuestro estudio cerca de Bombay",
+      type: "string",
+      group: "spanish",
+    }),
+    defineField({
       name: "introEs",
-      title: "Editorial introduction (Spanish)",
+      title: "Cold open / introduction (Spanish)",
       type: "text",
       rows: 4,
       group: "spanish",
     }),
     defineField({
+      name: "bodyEs",
+      title: "Letter body (Spanish, separate paragraphs with a blank line)",
+      type: "text",
+      rows: 12,
+      group: "spanish",
+    }),
+    defineField({
+      name: "replyPromptEs",
+      title: "Single reply question (Spanish)",
+      type: "text",
+      rows: 2,
+      group: "spanish",
+    }),
+    defineField({
+      name: "psEs",
+      title: "P.D. note (Spanish)",
+      type: "text",
+      rows: 3,
+      group: "spanish",
+    }),
+    defineField({
       name: "closingEs",
-      title: "Closing message (Spanish)",
+      title: "Digest closing message (Spanish, legacy digest mode)",
       type: "text",
       rows: 3,
       group: "spanish",
     }),
     defineField({
       name: "ctaTextEs",
-      title: "Primary button label (Spanish)",
+      title: "Story link / button label (Spanish)",
+      description:
+        "Etiqueta del enlace principal para Historias de KarmaRise en español.",
       type: "string",
       group: "spanish",
       initialValue: "Explorar las historias de KarmaRise",
     }),
     defineField({
       name: "ctaUrl",
-      title: "Primary CTA destination URL",
+      title: "Primary Story or destination URL (English)",
       type: "url",
       group: ["editorial", "delivery"],
       initialValue: "https://karmarisedglobal.com/stories",
+    }),
+    defineField({
+      name: "ctaUrlEs",
+      title: "Primary Story or destination URL (Spanish, optional)",
+      description:
+        "If omitted, English /stories/... URLs automatically localize to /es/stories/... for Spanish readers.",
+      type: "url",
+      group: ["editorial", "delivery"],
     }),
     defineField({
       name: "brevoCampaignIdEn",
@@ -267,13 +417,35 @@ export const newsletterIssueType = defineType({
       issueNumber: "issueNumber",
       titleEn: "titleEn",
       internalName: "internalName",
+      track: "track",
+      narrator: "narrator",
       status: "status",
       media: "heroImage",
     },
-    prepare({ issueNumber, titleEn, internalName, status, media }) {
+    prepare({
+      issueNumber,
+      titleEn,
+      internalName,
+      track,
+      narrator,
+      status,
+      media,
+    }) {
+      const trackTag =
+        track === "manufacturing"
+          ? "Track A"
+          : track === "almarise"
+            ? "Track B"
+            : "All";
+      const voiceTag =
+        narrator === "alma"
+          ? "Alma"
+          : narrator === "shirish"
+            ? "Shirish"
+            : "Alma & Shirish";
       return {
         title: `${issueNumber ? `${issueNumber} · ` : ""}${titleEn || internalName || "Newsletter Issue"}`,
-        subtitle: `Status: ${status ?? "draft"}`,
+        subtitle: `${trackTag} · ${voiceTag} · ${status ?? "draft"}`,
         media,
       };
     },

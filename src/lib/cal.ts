@@ -1,4 +1,6 @@
-import type { SiteLanguage } from "@/lib/seo";
+import "server-only";
+
+import type { SiteLanguage } from "@/lib/urls";
 
 const CAL_API_BASE = "https://api.cal.com/v2";
 const CAL_SLOTS_API_VERSION = "2024-09-04";

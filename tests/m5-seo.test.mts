@@ -55,7 +55,7 @@ registerHooks({
     if (specifier === "@/lib/sanity") {
       return {
         shortCircuit: true,
-        url: "data:text/javascript,export function getStories(){return globalThis.__m5SanityGetStories();}",
+        url: "data:text/javascript,export function getStories(){return globalThis.__m5SanityGetStories();}export function getStorySummaries(){return globalThis.__m5SanityGetStories();}",
       };
     }
     return nextResolve(specifier, context);
@@ -72,6 +72,23 @@ const {
   siteUrl,
   stripLocalePrefix,
 } = await import("@/lib/seo");
+const {
+  getAboutStructuredData,
+  getAlmariseStructuredData,
+  getBookACallStructuredData,
+  getContactStructuredData,
+  getHomeStructuredData,
+  getHowWeWorkStructuredData,
+  getManufacturingProgrammeStructuredData,
+  getProductBriefStructuredData,
+  getStoriesIndexStructuredData,
+  getStoryDetailStructuredData,
+  serializeJsonLd,
+} = await import("@/lib/structured-data");
+const { buildStoriesRssXml } = await import("@/lib/rss");
+const { default: nextConfig } = (await import(
+  pathToFileURL(path.join(REPO_ROOT, "next.config.ts")).href
+)) as typeof import("../next.config");
 const { default: sitemap } = await import("@/app/sitemap");
 const { POST: revalidatePost } =
   await import("@/app/api/sanity/revalidate/route");
@@ -278,7 +295,12 @@ test("getStoryMetadata prioritizes Spanish SEO/story fields on ES and handles mi
     },
   };
   const esFallbackMeta = getStoryMetadata(withoutSpanishSeo, "es");
-  assert.equal(esFallbackMeta.title, baseStory.spanishTitle);
+  const esFallbackTitle =
+    typeof esFallbackMeta.title === "string"
+      ? esFallbackMeta.title
+      : (esFallbackMeta.title as { absolute?: string } | undefined)?.absolute ||
+        "";
+  assert.ok(esFallbackTitle.includes(baseStory.spanishTitle!));
   assert.equal(esFallbackMeta.description, baseStory.spanishSummary);
 
   const enMeta = getStoryMetadata(withoutSpanishSeo, "en");
@@ -309,6 +331,22 @@ test("every story defines EN and ES SEO metadata without duplicating the brand s
       story.seo.spanishTitle.includes("KarmaRise D Global"),
       false,
       `${story.slug} seo.spanishTitle must not duplicate brand suffix`,
+    );
+    assert.ok(
+      story.seo.title.length <= 50,
+      `${story.slug} seo.title exceeds 50 chars (${story.seo.title.length})`,
+    );
+    assert.ok(
+      story.seo.spanishTitle.length <= 50,
+      `${story.slug} seo.spanishTitle exceeds 50 chars (${story.seo.spanishTitle.length})`,
+    );
+    assert.ok(
+      story.seo.description.length <= 165,
+      `${story.slug} seo.description exceeds 165 chars (${story.seo.description.length})`,
+    );
+    assert.ok(
+      story.seo.spanishDescription.length <= 165,
+      `${story.slug} seo.spanishDescription exceeds 165 chars (${story.seo.spanishDescription.length})`,
     );
     if (story.leadImage) {
       assert.ok(
@@ -541,7 +579,7 @@ test("sitemap skips empty or whitespace slugs and deduplicates duplicate story s
 
 test("site footer and root layouts enforce no-social-media-links compliance", () => {
   const footerSource = readFileSync(
-    path.join(REPO_ROOT, "src/components/site-footer.tsx"),
+    path.join(REPO_ROOT, "src/components/shell/site-footer.tsx"),
     "utf8",
   );
   assert.equal(SOCIAL_PATTERN.test(footerSource), false);
@@ -560,4 +598,363 @@ test("site footer and root layouts enforce no-social-media-links compliance", ()
   );
   assert.match(enLayoutSource, /getLayoutMetadata\("en"\)/);
   assert.match(esLayoutSource, /getLayoutMetadata\("es"\)/);
+});
+
+test("getManufacturingProgrammeStructuredData emits compliant EN and ES graphs with BreadcrumbList, Service, 6-step HowTo, and 9-item FAQPage", () => {
+  for (const lang of ["en", "es"] as const) {
+    const data = getManufacturingProgrammeStructuredData(lang);
+    const serialized = serializeJsonLd(data);
+    assert.equal(
+      FORBIDDEN_COPY_PATTERN.test(serialized),
+      false,
+      `Manufacturing structured data (${lang}) violated copy compliance`,
+    );
+    assert.equal(
+      SOCIAL_PATTERN.test(serialized),
+      false,
+      `Manufacturing structured data (${lang}) violated no-social-links rule`,
+    );
+
+    const graph = data["@graph"] as Array<Record<string, unknown>>;
+    assert.ok(Array.isArray(graph));
+
+    const types = new Set(graph.map((node) => node["@type"]));
+    for (const requiredType of [
+      "Organization",
+      "WebPage",
+      "BreadcrumbList",
+      "Service",
+      "HowTo",
+      "FAQPage",
+    ]) {
+      assert.ok(
+        types.has(requiredType),
+        `Missing ${requiredType} node in ${lang} structured data`,
+      );
+    }
+
+    const howTo = graph.find((node) => node["@type"] === "HowTo");
+    assert.equal((howTo?.step as unknown[]).length, 6);
+
+    const faq = graph.find((node) => node["@type"] === "FAQPage");
+    assert.equal((faq?.mainEntity as unknown[]).length, 9);
+
+    const homeData = getHomeStructuredData(lang);
+    assert.ok(Array.isArray(homeData["@graph"]));
+  }
+});
+
+test("getHowWeWorkStructuredData emits compliant EN and ES graphs with BreadcrumbList, 5-step HowTo, and 6-item FAQPage", () => {
+  for (const lang of ["en", "es"] as const) {
+    const data = getHowWeWorkStructuredData(lang);
+    const serialized = serializeJsonLd(data);
+    assert.equal(
+      FORBIDDEN_COPY_PATTERN.test(serialized),
+      false,
+      `How We Work structured data (${lang}) violated copy compliance`,
+    );
+    assert.equal(
+      /snoby|pedido en serie|socios de fabricaci/i.test(serialized),
+      false,
+      `How We Work structured data (${lang}) contained confidential or banned terminology`,
+    );
+    assert.equal(
+      SOCIAL_PATTERN.test(serialized),
+      false,
+      `How We Work structured data (${lang}) violated no-social-links rule`,
+    );
+
+    const graph = data["@graph"] as Array<Record<string, unknown>>;
+    assert.ok(Array.isArray(graph));
+
+    const types = new Set(graph.map((node) => node["@type"]));
+    for (const requiredType of [
+      "Organization",
+      "WebSite",
+      "WebPage",
+      "BreadcrumbList",
+      "HowTo",
+      "FAQPage",
+    ]) {
+      assert.ok(
+        types.has(requiredType),
+        `Missing ${requiredType} node in How We Work ${lang} structured data`,
+      );
+    }
+
+    const howTo = graph.find((node) => node["@type"] === "HowTo");
+    assert.equal((howTo?.step as unknown[]).length, 5);
+
+    const faq = graph.find((node) => node["@type"] === "FAQPage");
+    assert.equal((faq?.mainEntity as unknown[]).length, 6);
+  }
+});
+
+test("getAboutStructuredData emits compliant EN and ES graphs with AboutPage, Organization, two Person founders, BreadcrumbList, and 6-item FAQPage", () => {
+  for (const lang of ["en", "es"] as const) {
+    const data = getAboutStructuredData(lang);
+    const serialized = serializeJsonLd(data);
+    assert.equal(
+      FORBIDDEN_COPY_PATTERN.test(serialized),
+      false,
+      `About structured data (${lang}) violated copy compliance`,
+    );
+    assert.equal(
+      /snoby|pedido en serie|producci[oó]n en serie|socios? de fabricaci/i.test(
+        serialized,
+      ),
+      false,
+      `About structured data (${lang}) contained confidential or banned terminology`,
+    );
+    assert.equal(
+      SOCIAL_PATTERN.test(serialized),
+      false,
+      `About structured data (${lang}) violated no-social-links rule`,
+    );
+
+    const graph = data["@graph"] as Array<Record<string, unknown>>;
+    assert.ok(Array.isArray(graph));
+
+    const types = new Set(graph.map((node) => node["@type"]));
+    for (const requiredType of [
+      "Organization",
+      "WebSite",
+      "AboutPage",
+      "BreadcrumbList",
+      "FAQPage",
+      "Person",
+    ]) {
+      assert.ok(
+        types.has(requiredType),
+        `Missing ${requiredType} node in About ${lang} structured data`,
+      );
+    }
+
+    const persons = graph.filter((node) => node["@type"] === "Person");
+    assert.equal(persons.length, 2);
+    const alma = persons.find((node) => node.name === "Alma");
+    const shirish = persons.find((node) => node.name === "Shirish");
+    assert.deepEqual(alma?.knowsLanguage, ["es", "en", "pt"]);
+    assert.deepEqual(shirish?.knowsLanguage, ["en", "mr", "hi"]);
+    assert.match(String(shirish?.jobTitle ?? ""), /Bar Council/i);
+
+    const faq = graph.find((node) => node["@type"] === "FAQPage");
+    assert.equal((faq?.mainEntity as unknown[]).length, 6);
+  }
+});
+
+test("getAlmariseStructuredData emits compliant EN and ES graphs with Organization, WebSite, Brand, WebPage, and BreadcrumbList", () => {
+  for (const lang of ["en", "es"] as const) {
+    const data = getAlmariseStructuredData(lang);
+    const serialized = serializeJsonLd(data);
+    assert.equal(
+      FORBIDDEN_COPY_PATTERN.test(serialized),
+      false,
+      `AlmaRise structured data (${lang}) violated copy compliance`,
+    );
+    assert.equal(
+      SOCIAL_PATTERN.test(serialized),
+      false,
+      `AlmaRise structured data (${lang}) violated no-social-links rule`,
+    );
+    assert.match(serialized, /AlmaRise D Brand/);
+    assert.match(serialized, /AlmaRise D Reborn/);
+    assert.match(serialized, /AlmaRise D Organic/);
+    assert.equal(/(?<!\/)Almarise/.test(serialized), false);
+    assert.equal(
+      /AlmaRise(?! D (?:Brand|Reborn|Organic|Home Decor))/.test(serialized),
+      false,
+      `AlmaRise structured data (${lang}) contained standalone AlmaRise without D qualifier`,
+    );
+
+    const graph = data["@graph"] as Array<Record<string, unknown>>;
+    assert.ok(Array.isArray(graph));
+    const types = new Set(graph.map((node) => node["@type"]));
+    for (const requiredType of [
+      "Organization",
+      "WebSite",
+      "Brand",
+      "WebPage",
+      "BreadcrumbList",
+    ]) {
+      assert.ok(
+        types.has(requiredType),
+        `Missing ${requiredType} node in AlmaRise ${lang} structured data`,
+      );
+    }
+  }
+});
+
+test("conversion pages emit compliant EN and ES structured data (Product Brief, Book a Call, Contact)", () => {
+  for (const lang of ["en", "es"] as const) {
+    const briefData = getProductBriefStructuredData(lang);
+    const briefSerialized = serializeJsonLd(briefData);
+    assert.equal(FORBIDDEN_COPY_PATTERN.test(briefSerialized), false);
+    assert.equal(SOCIAL_PATTERN.test(briefSerialized), false);
+    const briefGraph = briefData["@graph"] as Array<Record<string, unknown>>;
+    const briefTypes = new Set(briefGraph.map((node) => node["@type"]));
+    for (const required of [
+      "Organization",
+      "WebSite",
+      "WebPage",
+      "BreadcrumbList",
+      "HowTo",
+    ]) {
+      assert.ok(
+        briefTypes.has(required),
+        `Missing ${required} on brief ${lang}`,
+      );
+    }
+    const briefHowTo = briefGraph.find((node) => node["@type"] === "HowTo");
+    assert.equal((briefHowTo?.step as unknown[]).length, 4);
+
+    const callData = getBookACallStructuredData(lang);
+    const callSerialized = serializeJsonLd(callData);
+    assert.equal(FORBIDDEN_COPY_PATTERN.test(callSerialized), false);
+    assert.equal(SOCIAL_PATTERN.test(callSerialized), false);
+    const callGraph = callData["@graph"] as Array<Record<string, unknown>>;
+    const callTypes = new Set(callGraph.map((node) => node["@type"]));
+    for (const required of [
+      "Organization",
+      "WebSite",
+      "WebPage",
+      "BreadcrumbList",
+      "FAQPage",
+    ]) {
+      assert.ok(callTypes.has(required), `Missing ${required} on call ${lang}`);
+    }
+    const callFaq = callGraph.find((node) => node["@type"] === "FAQPage");
+    assert.equal((callFaq?.mainEntity as unknown[]).length, 4);
+
+    const contactData = getContactStructuredData(lang);
+    const contactSerialized = serializeJsonLd(contactData);
+    assert.equal(SOCIAL_PATTERN.test(contactSerialized), false);
+    assert.equal(/\u2014|&mdash;|&#8212;/.test(contactSerialized), false);
+    const contactGraph = contactData["@graph"] as Array<
+      Record<string, unknown>
+    >;
+    const contactTypes = new Set(contactGraph.map((node) => node["@type"]));
+    for (const required of [
+      "Organization",
+      "WebSite",
+      "ContactPage",
+      "BreadcrumbList",
+    ]) {
+      assert.ok(
+        contactTypes.has(required),
+        `Missing ${required} on contact ${lang}`,
+      );
+    }
+    assert.match(contactSerialized, /inquiry@karmarisedglobal\.com/);
+    assert.match(contactSerialized, /partners@karmarisedglobal\.com/);
+    assert.match(contactSerialized, /accounts@karmarisedglobal\.com/);
+    assert.match(contactSerialized, /support@karmarisedglobal\.com/);
+  }
+});
+
+test("next.config.ts configures 301 redirects from /working-across-distance to /how-we-work in EN and ES", async () => {
+  assert.equal(typeof nextConfig.redirects, "function");
+  const redirects = await nextConfig.redirects!();
+  assert.ok(
+    redirects.some(
+      (rule) =>
+        rule.source === "/working-across-distance" &&
+        rule.destination === "/how-we-work" &&
+        rule.statusCode === 301,
+    ),
+    "Missing 301 redirect from /working-across-distance to /how-we-work",
+  );
+  assert.ok(
+    redirects.some(
+      (rule) =>
+        rule.source === "/es/working-across-distance" &&
+        rule.destination === "/es/how-we-work" &&
+        rule.statusCode === 301,
+    ),
+    "Missing 301 redirect from /es/working-across-distance to /es/how-we-work",
+  );
+});
+
+test("Stories index and Story detail emit compliant EN and ES structured data and RSS feeds", () => {
+  for (const lang of ["en", "es"] as const) {
+    const indexData = getStoriesIndexStructuredData(lang, stories);
+    const indexSerialized = serializeJsonLd(indexData);
+    assert.equal(
+      FORBIDDEN_COPY_PATTERN.test(indexSerialized),
+      false,
+      `Stories index structured data (${lang}) violated copy compliance`,
+    );
+    assert.equal(
+      SOCIAL_PATTERN.test(indexSerialized),
+      false,
+      `Stories index structured data (${lang}) violated no-social-links rule`,
+    );
+    const indexGraph = indexData["@graph"] as Array<Record<string, unknown>>;
+    const indexTypes = new Set(indexGraph.map((node) => node["@type"]));
+    for (const required of [
+      "Organization",
+      "WebSite",
+      "CollectionPage",
+      "ItemList",
+      "BreadcrumbList",
+    ]) {
+      assert.ok(
+        indexTypes.has(required),
+        `Missing ${required} on Stories index (${lang})`,
+      );
+    }
+    const itemList = indexGraph.find((node) => node["@type"] === "ItemList");
+    assert.equal(
+      (itemList?.itemListElement as unknown[]).length,
+      stories.length,
+    );
+
+    for (const story of stories) {
+      const detailData = getStoryDetailStructuredData(lang, story);
+      const detailSerialized = serializeJsonLd(detailData);
+      assert.equal(
+        FORBIDDEN_COPY_PATTERN.test(detailSerialized),
+        false,
+        `Story detail structured data (${lang}, ${story.slug}) violated copy compliance`,
+      );
+      assert.equal(
+        SOCIAL_PATTERN.test(detailSerialized),
+        false,
+        `Story detail structured data (${lang}, ${story.slug}) violated no-social-links rule`,
+      );
+      const detailGraph = detailData["@graph"] as Array<
+        Record<string, unknown>
+      >;
+      const detailTypes = new Set(detailGraph.map((node) => node["@type"]));
+      for (const required of [
+        "Organization",
+        "WebSite",
+        "Article",
+        "BreadcrumbList",
+        "Person",
+      ]) {
+        assert.ok(
+          detailTypes.has(required),
+          `Missing ${required} on Story detail (${lang}, ${story.slug})`,
+        );
+      }
+      const article = detailGraph.find((node) => node["@type"] === "Article");
+      assert.ok(
+        Number(article?.wordCount ?? 0) > 100,
+        `Story wordCount too low (${lang}, ${story.slug})`,
+      );
+    }
+
+    const rss = buildStoriesRssXml(lang, stories);
+    assert.match(rss, /<rss version="2\.0"/);
+    assert.match(
+      rss,
+      new RegExp(`<language>${lang === "es" ? "es-ES" : "en-GB"}</language>`),
+    );
+    assert.equal(
+      (rss.match(/<item>/g) ?? []).length,
+      stories.length,
+      `RSS item count mismatch (${lang})`,
+    );
+  }
 });

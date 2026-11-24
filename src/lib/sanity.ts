@@ -1,14 +1,17 @@
+import "server-only";
+
 import { cache } from "react";
 
-import {
-  stories as fallbackStories,
-  type StoryBodyBlock,
-  type StoryCategory,
-  type StoryEntry,
-  type StoryImage,
-  type StoryLanguage,
-  type StorySection,
-} from "@/data/stories";
+import { stories as fallbackStories } from "@/data/stories-fallback.server";
+import type {
+  StoryBodyBlock,
+  StoryCategory,
+  StoryEntry,
+  StoryImage,
+  StoryLanguage,
+  StorySection,
+  StorySummary,
+} from "@/data/story-types";
 
 const SANITY_API_VERSION = "2025-01-01";
 
@@ -78,6 +81,7 @@ export interface SanityRawStory {
   language?: string;
   issueNumber?: string;
   publishedAt?: string;
+  updatedAt?: string;
   readingTimeMinutes?: number;
   category?: string;
   location?: string;
@@ -134,6 +138,7 @@ export interface SanityRawStory {
   spanishPairCaptions?: string[];
   pairSlots?: Array<{ title?: string; description?: string }>;
   body?: SanityRawBodyBlock[];
+  spanishBody?: SanityRawBodyBlock[];
   sections?: SanityRawSection[];
   spanishSections?: SanityRawSection[];
   takeaway?: string;
@@ -150,23 +155,39 @@ export interface SanityNewsletterIssue {
   _id: string;
   internalName?: string;
   issueNumber?: string;
+  track?: "manufacturing" | "almarise" | "all";
+  format?: "letter" | "digest";
+  narrator?: "alma" | "shirish" | "both";
   status?: string;
   campaignDate?: string;
   targetAudience?: "both" | "en" | "es";
   titleEn?: string;
   subjectEn?: string;
   previewTextEn?: string;
+  narratorLocationEn?: string;
   introEn?: string;
+  bodyEn?: string;
+  replyPromptEn?: string;
+  psEn?: string;
   closingEn?: string;
   ctaTextEn?: string;
   titleEs?: string;
   subjectEs?: string;
   previewTextEs?: string;
+  narratorLocationEs?: string;
   introEs?: string;
+  bodyEs?: string;
+  replyPromptEs?: string;
+  psEs?: string;
   closingEs?: string;
   ctaTextEs?: string;
   ctaUrl?: string;
+  ctaUrlEs?: string;
   heroImageUrl?: string;
+  heroImageAltEn?: string;
+  heroImageAltEs?: string;
+  heroImageCaptionEn?: string;
+  heroImageCaptionEs?: string;
   brevoCampaignIdEn?: number;
   brevoCampaignIdEs?: number;
   selectedStories?: Array<{
@@ -190,6 +211,7 @@ export const STORY_PROJECTION = `{
   language,
   issueNumber,
   publishedAt,
+  "updatedAt": _updatedAt,
   readingTimeMinutes,
   category,
   location,
@@ -250,6 +272,22 @@ export const STORY_PROJECTION = `{
     text,
     attribution
   },
+  "spanishBody": spanishBody[]{
+    _key,
+    _type,
+    style,
+    listItem,
+    children,
+    markDefs,
+    "url": select(_type == "image" => asset->url),
+    alt,
+    caption,
+    aspectRatio,
+    objectPosition,
+    hotspot,
+    text,
+    attribution
+  },
   "sections": sections[]{
     _key,
     heading,
@@ -293,6 +331,7 @@ export const STORY_SUMMARY_PROJECTION = `{
   language,
   issueNumber,
   publishedAt,
+  "updatedAt": _updatedAt,
   readingTimeMinutes,
   category,
   location,
@@ -333,23 +372,39 @@ const NEWSLETTER_ISSUE_BY_ID_QUERY = `*[_type == "newsletterIssue" && _id == $id
   _id,
   internalName,
   issueNumber,
+  track,
+  format,
+  narrator,
   status,
   campaignDate,
   targetAudience,
   titleEn,
   subjectEn,
   previewTextEn,
+  narratorLocationEn,
   introEn,
+  bodyEn,
+  replyPromptEn,
+  psEn,
   closingEn,
   ctaTextEn,
   titleEs,
   subjectEs,
   previewTextEs,
+  narratorLocationEs,
   introEs,
+  bodyEs,
+  replyPromptEs,
+  psEs,
   closingEs,
   ctaTextEs,
   ctaUrl,
+  ctaUrlEs,
   "heroImageUrl": heroImage.asset->url,
+  "heroImageAltEn": heroImage.alt,
+  "heroImageAltEs": heroImage.spanishAlt,
+  heroImageCaptionEn,
+  heroImageCaptionEs,
   brevoCampaignIdEn,
   brevoCampaignIdEs,
   "selectedStories": selectedStories[]->{
@@ -730,6 +785,12 @@ export function normalizeStory(
     normalizeBodyBlocks(raw.body ?? undefined, raw.title) ??
     fallbackMatch?.body;
 
+  const spanishBody =
+    normalizeBodyBlocks(
+      raw.spanishBody ?? undefined,
+      raw.spanishTitle || raw.title,
+    ) ?? fallbackMatch?.spanishBody;
+
   const explicitSections = normalizeSectionList(
     raw.sections ?? undefined,
     fallbackMatch?.sections,
@@ -761,10 +822,16 @@ export function normalizeStory(
     fallbackMatch?.spanishSections,
     raw.spanishTitle || raw.title,
   );
+  const derivedFromSpanishBody =
+    explicitSpanishSections.length === 0
+      ? deriveSectionsFromBody(spanishBody)
+      : [];
   const spanishSections =
     explicitSpanishSections.length > 0
       ? explicitSpanishSections
-      : fallbackMatch?.spanishSections;
+      : derivedFromSpanishBody.length > 0
+        ? derivedFromSpanishBody
+        : fallbackMatch?.spanishSections;
 
   const rawTags = (raw.tags ?? []).filter(
     (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
@@ -834,6 +901,7 @@ export function normalizeStory(
       raw.publishedAt ||
       fallbackMatch?.publishedAt ||
       new Date().toISOString().slice(0, 10),
+    updatedAt: raw.updatedAt || fallbackMatch?.updatedAt || undefined,
     readingTimeMinutes:
       raw.readingTimeMinutes ?? fallbackMatch?.readingTimeMinutes ?? 5,
     category,
@@ -864,7 +932,7 @@ export function normalizeStory(
       portraitUrl:
         raw.author?.portraitUrl ||
         fallbackMatch?.author.portraitUrl ||
-        "/images/alma-and-shirish-avatar.jpg",
+        "/images/founders/alma-and-shirish-avatar.jpg",
     },
     tags,
     spanishTags,
@@ -911,6 +979,7 @@ export function normalizeStory(
       },
     ],
     body,
+    spanishBody,
     sections,
     spanishSections,
     takeaway: raw.takeaway ?? fallbackMatch?.takeaway ?? "",
@@ -944,7 +1013,10 @@ function getSanityProjectConfig(): {
   return { projectId, dataset };
 }
 
-function compareStoryPublishDatesDesc(a: StoryEntry, b: StoryEntry): number {
+function compareStoryPublishDatesDesc(
+  a: StorySummary,
+  b: StorySummary,
+): number {
   const timeA = Date.parse(a.publishedAt);
   const timeB = Date.parse(b.publishedAt);
   if (!Number.isNaN(timeA) && !Number.isNaN(timeB) && timeA !== timeB) {
@@ -1058,7 +1130,101 @@ export async function getNewsletterIssueById(
   );
 }
 
-function toStorySummary(story: StoryEntry): StoryEntry {
+export function normalizeStorySummary(
+  raw: SanityRawStory | null | undefined,
+): StorySummary | null {
+  if (!raw?.slug || !raw.title) {
+    return null;
+  }
+
+  const category = resolveCategory(raw.category ?? undefined);
+  const language: StoryLanguage = raw.language === "es" ? "es" : "en";
+  const summary =
+    raw.summary || "Stories from our work across India, Spain, and Europe.";
+  const location = raw.location || "India & Spain";
+
+  const leadImageUrl = raw.leadImage?.url;
+  const leadImage: StoryImage | undefined = leadImageUrl
+    ? {
+        url: leadImageUrl,
+        alt: raw.leadImage?.alt || raw.title,
+        caption: raw.leadImage?.caption ?? undefined,
+        objectPosition:
+          raw.leadImage?.objectPosition ??
+          hotspotToObjectPosition(raw.leadImage?.hotspot) ??
+          undefined,
+      }
+    : undefined;
+
+  const spanishLeadAlt =
+    raw.leadImage?.spanishAlt || raw.spanishLeadAlt || undefined;
+  const spanishLeadCaption =
+    raw.leadImage?.spanishCaption ?? raw.spanishLeadCaption ?? undefined;
+
+  const rawTags = (raw.tags ?? []).filter(
+    (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
+  );
+  const tags = rawTags.length > 0 ? rawTags : [category];
+
+  const rawSpanishTags = (raw.spanishTags ?? []).filter(
+    (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
+  );
+  const spanishTags = rawSpanishTags.length > 0 ? rawSpanishTags : undefined;
+
+  const firstSlot = raw.pairSlots?.[0];
+  const secondSlot = raw.pairSlots?.[1];
+
+  return {
+    slug: raw.slug,
+    featured: raw.featured ?? false,
+    newsletterEligible: raw.newsletterEligible ?? true,
+    language,
+    issueNumber: raw.issueNumber || "01",
+    publishedAt: raw.publishedAt || new Date().toISOString().slice(0, 10),
+    updatedAt: raw.updatedAt || undefined,
+    readingTimeMinutes: raw.readingTimeMinutes ?? 5,
+    category,
+    location,
+    spanishLocation: raw.spanishLocation ?? undefined,
+    title: raw.title,
+    spanishTitle: raw.spanishTitle ?? undefined,
+    summary,
+    spanishSummary: raw.spanishSummary ?? undefined,
+    author: {
+      name: raw.author?.name || "Alma & Shirish",
+      role: raw.author?.role || "Co-founders, KarmaRise D Global",
+      spanishRole: raw.author?.spanishRole ?? undefined,
+      location: raw.author?.location || location,
+      spanishLocation: raw.author?.spanishLocation ?? undefined,
+      portraitUrl:
+        raw.author?.portraitUrl ||
+        "/images/founders/alma-and-shirish-avatar.jpg",
+    },
+    tags,
+    spanishTags,
+    leadImage,
+    spanishLeadAlt,
+    spanishLeadCaption,
+    leadSlot: {
+      kind: raw.leadSlot?.kind ?? "Photo",
+      ratio: raw.leadSlot?.ratio ?? "16:10 horizontal",
+      title: raw.leadSlot?.title || raw.title,
+      description: raw.leadSlot?.description || summary,
+    },
+    pairSlots: [
+      {
+        title: firstSlot?.title || `${raw.title} detail one`,
+        description: firstSlot?.description || summary,
+      },
+      {
+        title: secondSlot?.title || `${raw.title} detail two`,
+        description: secondSlot?.description || summary,
+      },
+    ],
+  };
+}
+
+function toStorySummary(story: StorySummary): StorySummary {
   return {
     slug: story.slug,
     featured: story.featured,
@@ -1066,6 +1232,7 @@ function toStorySummary(story: StoryEntry): StoryEntry {
     language: story.language,
     issueNumber: story.issueNumber,
     publishedAt: story.publishedAt,
+    updatedAt: story.updatedAt,
     readingTimeMinutes: story.readingTimeMinutes,
     category: story.category,
     location: story.location,
@@ -1082,8 +1249,6 @@ function toStorySummary(story: StoryEntry): StoryEntry {
     spanishLeadCaption: story.spanishLeadCaption,
     leadSlot: story.leadSlot,
     pairSlots: story.pairSlots,
-    sections: [],
-    takeaway: "",
   };
 }
 
@@ -1124,7 +1289,7 @@ export const getStories = cache(async (): Promise<StoryEntry[]> => {
 });
 
 /** Fetches lightweight Story summaries (without body/sections) for index grids, related strips, and sitemaps. */
-export const getStorySummaries = cache(async (): Promise<StoryEntry[]> => {
+export const getStorySummaries = cache(async (): Promise<StorySummary[]> => {
   const rawStories = await fetchSanity<SanityRawStory[]>(
     ALL_STORY_SUMMARIES_QUERY,
   );
@@ -1133,14 +1298,14 @@ export const getStorySummaries = cache(async (): Promise<StoryEntry[]> => {
   }
 
   const normalized = rawStories
-    .map((entry) => normalizeStory(entry))
-    .filter((entry): entry is StoryEntry => entry !== null);
+    .map((entry) => normalizeStorySummary(entry))
+    .filter((entry): entry is StorySummary => entry !== null);
 
   if (normalized.length === 0) {
     return fallbackStories.map(toStorySummary);
   }
 
-  return mergeWithFallbackStories(normalized).map(toStorySummary);
+  return normalized;
 });
 
 /** Fetches one Story by slug from Sanity, falling back to static Stories if unavailable. */

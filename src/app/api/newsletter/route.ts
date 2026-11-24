@@ -5,6 +5,7 @@ import {
   resolveSubscriberLanguage,
   subscribeToBrevoNewsletter,
 } from "@/lib/brevo";
+import { normalizeNewsletterTracks } from "@/lib/newsletter-tracks";
 import { guardFormRequest, readJsonObject } from "@/lib/security";
 import { isValidEmail, readTrimmedString } from "@/lib/validation";
 
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
   const country = resolveCountryName(cfIpCountry);
   const interest = readTrimmedString(payload.interest, 100) || undefined;
   const source = readTrimmedString(payload.source, 80) || "Website";
+  const tracks = normalizeNewsletterTracks(payload.tracks ?? payload.track);
 
   const result = await subscribeToBrevoNewsletter({
     email,
@@ -71,6 +73,7 @@ export async function POST(request: Request) {
     country,
     interest,
     source,
+    ...(tracks.length > 0 ? { tracks } : {}),
   });
 
   if (!result.ok) {

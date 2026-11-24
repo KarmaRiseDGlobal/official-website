@@ -88,6 +88,14 @@ const VIEWPORTS = [
     touch: true,
   },
   {
+    id: "laptop-1280",
+    tier: "laptop",
+    width: 1280,
+    height: 720,
+    mobile: false,
+    touch: false,
+  },
+  {
     id: "laptop-1440",
     tier: "laptop",
     width: 1440,
@@ -102,9 +110,10 @@ const ROUTES = [
   "/es",
   "/about",
   "/es/about",
-  "/manufacturing-programme",
-  "/es/manufacturing-programme",
-  "/working-across-distance",
+  "/manufacturing",
+  "/es/manufacturing",
+  "/how-we-work",
+  "/es/how-we-work",
   "/almarise",
   "/womens-training-initiative",
   "/stories",
@@ -304,9 +313,36 @@ const EVAL_AUDIT = `(() => {
     }
   }
 
-  // Check Option A enhanced state
-  const showcaseEnhanced = document.querySelector('.horizontal-showcase')?.getAttribute('data-enhanced') || null;
+  // Check Option A enhanced state & HorizontalShowcase panel geometry
+  const showcase = document.querySelector('.horizontal-showcase');
+  const showcaseEnhanced = showcase?.getAttribute('data-enhanced') || null;
   const storiesEnhanced = document.querySelector('.stories-depth-runway')?.getAttribute('data-enhanced') || null;
+
+  const showcaseGeometryIssues = [];
+  if (showcase && showcaseEnhanced === 'true') {
+    const clientW = document.documentElement.clientWidth;
+    const panels = [...showcase.querySelectorAll('.horizontal-panel')];
+    for (let i = 0; i < panels.length; i++) {
+      const pw = Math.round(panels[i].offsetWidth);
+      if (Math.abs(pw - clientW) > 4) {
+        showcaseGeometryIssues.push('panel[' + i + '] width=' + pw + 'px expected ' + clientW + 'px');
+      }
+    }
+    const heading = showcase.querySelector('.concerns-header h2');
+    if (heading) {
+      const hr = heading.getBoundingClientRect();
+      if (hr.left < 0 || hr.right > vw + 2) {
+        showcaseGeometryIssues.push('concerns h2 out of viewport [' + Math.round(hr.left) + '..' + Math.round(hr.right) + ']');
+      }
+    }
+    const activeCard = showcase.querySelector('.concerns-slice-card[data-active="true"]');
+    if (activeCard) {
+      const cr = activeCard.getBoundingClientRect();
+      if (cr.left < -2 || cr.right > vw + 2 || cr.width < 300) {
+        showcaseGeometryIssues.push('active slice card misplaced [' + Math.round(cr.left) + '..' + Math.round(cr.right) + '] w=' + Math.round(cr.width));
+      }
+    }
+  }
 
   return {
     docOverflowX,
@@ -316,11 +352,22 @@ const EVAL_AUDIT = `(() => {
     headerOverlapH1,
     showcaseEnhanced,
     storiesEnhanced,
+    showcaseGeometryIssues,
   };
 })()`;
 
 async function main() {
   const { baseUrl, tier, port } = parseArgs(process.argv);
+  try {
+    const probe = await fetch(baseUrl, { method: "HEAD" });
+    if (!probe.ok) {
+      throw new Error(`HTTP ${probe.status}`);
+    }
+  } catch (error) {
+    throw new Error(
+      `Cannot reach ${baseUrl} (${error instanceof Error ? error.message : String(error)}). Start the server first (e.g. pnpm start).`,
+    );
+  }
   const browserPath = findBrowser();
   const profileDir = mkdtempSync(join(tmpdir(), "krdg-responsive-audit-"));
   const selectedViewports =
@@ -418,6 +465,29 @@ async function main() {
         ) {
           vpIssues.push(
             `${route}: desktop pinned mode active on touch iPad (showcase=${report.showcaseEnhanced}, stories=${report.storiesEnhanced})`,
+          );
+        }
+        if (
+          vp.tier === "laptop" &&
+          (route === "/" || route === "/es") &&
+          report.showcaseEnhanced !== "true"
+        ) {
+          vpIssues.push(
+            `${route}: desktop HorizontalShowcase not enhanced on laptop`,
+          );
+        }
+        if (
+          vp.tier === "laptop" &&
+          (route === "/stories" || route === "/es/stories") &&
+          report.storiesEnhanced !== "true"
+        ) {
+          vpIssues.push(
+            `${route}: desktop Stories corridor not enhanced on laptop`,
+          );
+        }
+        if (report.showcaseGeometryIssues?.length > 0) {
+          vpIssues.push(
+            `${route}: HorizontalShowcase geometry broken (${report.showcaseGeometryIssues.join("; ")})`,
           );
         }
       }

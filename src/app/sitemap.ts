@@ -5,6 +5,8 @@ import { localizePath, siteUrl, STATIC_ROUTES } from "@/lib/seo";
 
 export const revalidate = 300;
 
+const STATIC_ROUTE_LAST_MODIFIED = new Date("2026-11-24T00:00:00.000Z");
+
 function parseLastModified(value: string | undefined, fallback: Date): Date {
   if (!value) {
     return fallback;
@@ -18,13 +20,24 @@ function toAbsoluteUrl(path: string): string {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
   const stories = await getStorySummaries();
+
+  const latestStoryLastModified = stories.reduce<Date>((latest, story) => {
+    const candidate = parseLastModified(
+      story.updatedAt || story.publishedAt,
+      STATIC_ROUTE_LAST_MODIFIED,
+    );
+    return candidate.getTime() > latest.getTime() ? candidate : latest;
+  }, STATIC_ROUTE_LAST_MODIFIED);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.flatMap(
     (route) => {
       const enUrl = toAbsoluteUrl(localizePath(route.path, "en"));
       const esUrl = toAbsoluteUrl(localizePath(route.path, "es"));
+      const lastModified =
+        route.key === "stories"
+          ? latestStoryLastModified
+          : STATIC_ROUTE_LAST_MODIFIED;
       const alternates = {
         languages: {
           en: enUrl,
@@ -36,14 +49,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return [
         {
           url: enUrl,
-          lastModified: now,
+          lastModified,
           changeFrequency: route.changeFrequency,
           priority: route.priority,
           alternates,
         },
         {
           url: esUrl,
-          lastModified: now,
+          lastModified,
           changeFrequency: route.changeFrequency,
           priority: route.priority,
           alternates,
@@ -65,7 +78,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const storyPath = `/stories/${slug}`;
     const enUrl = toAbsoluteUrl(localizePath(storyPath, "en"));
     const esUrl = toAbsoluteUrl(localizePath(storyPath, "es"));
-    const lastModified = parseLastModified(story.publishedAt, now);
+    const lastModified = parseLastModified(
+      story.updatedAt || story.publishedAt,
+      STATIC_ROUTE_LAST_MODIFIED,
+    );
     const alternates = {
       languages: {
         en: enUrl,

@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { SiteFooter } from "@/components/site-footer";
-import { StoryDetailClient } from "@/components/story-detail-client";
+import { SiteFooter } from "@/components/shell/site-footer";
+import { StoryDetailClient } from "@/views/story-detail-client";
 import { getStoryBySlug, getStorySummaries } from "@/lib/sanity";
 import { getStoryMetadata } from "@/lib/seo";
+import {
+  getStoryDetailStructuredData,
+  serializeJsonLd,
+} from "@/lib/structured-data";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -39,13 +43,19 @@ export default async function StoryDetailPage({
     notFound();
   }
 
+  const structuredData = getStoryDetailStructuredData("en", story);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+      />
       <main id="main">
-        <StoryDetailClient story={story} allStories={allStories} />
+        <StoryDetailClient allStories={allStories} lang="en" story={story} />
       </main>
 
-      <SiteFooter />
+      <SiteFooter hideNewsletter />
     </>
   );
 }

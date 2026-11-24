@@ -16,6 +16,8 @@
     "studio:deploy": "sanity deploy",
     "sanity:seed": "node scripts/seed-sanity-stories.mjs",
     "brevo:setup": "node scripts/setup-brevo.mjs",
+    "newsletter:sync": "node scripts/seed-newsletter-issues.mjs",
+    "newsletter:preview": "node scripts/seed-newsletter-issues.mjs --preview-only",
     "audit:responsive": "node scripts/audit-responsive.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

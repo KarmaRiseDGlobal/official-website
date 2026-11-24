@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
-import type { SiteLanguage } from "@/context/language-context";
+import { CONTACT_TOPICS } from "@/data/conversion-content";
 import { sendResendEmail } from "@/lib/resend";
 import { escapeHtml, guardFormRequest, readJsonObject } from "@/lib/security";
+import type { SiteLanguage } from "@/lib/urls";
 import { isValidEmail, readTrimmedString } from "@/lib/validation";
 
 interface ContactTopicConfig {
@@ -10,68 +11,16 @@ interface ContactTopicConfig {
   labels: Record<SiteLanguage, string>;
 }
 
-const CONTACT_TOPIC_ROUTES = new Map<string, ContactTopicConfig>([
-  [
-    "Manufacturing Partner introduction",
+const CONTACT_TOPIC_ROUTES = new Map<string, ContactTopicConfig>(
+  CONTACT_TOPICS.map((topic) => [
+    topic.value,
     {
       resolveRecipient: () =>
-        process.env.CONTACT_PARTNERS_EMAIL?.trim() ||
-        "partners@karmarisedglobal.com",
-      labels: {
-        en: "Manufacturing Partner introduction",
-        es: "Presentación de taller o socio de fabricación",
-      },
+        process.env[topic.envOverrideKey]?.trim() || topic.directEmail,
+      labels: topic.emailLabels,
     },
-  ],
-  [
-    "Stories and editorial",
-    {
-      resolveRecipient: () =>
-        process.env.CONTACT_STORIES_EMAIL?.trim() ||
-        "stories@karmarisedglobal.com",
-      labels: {
-        en: "Stories and editorial",
-        es: "Historias y prensa",
-      },
-    },
-  ],
-  [
-    "Almarise",
-    {
-      resolveRecipient: () =>
-        process.env.CONTACT_STORIES_EMAIL?.trim() ||
-        "stories@karmarisedglobal.com",
-      labels: {
-        en: "Almarise",
-        es: "Almarise",
-      },
-    },
-  ],
-  [
-    "General enquiry",
-    {
-      resolveRecipient: () =>
-        process.env.CONTACT_INQUIRY_EMAIL?.trim() ||
-        "inquiry@karmarisedglobal.com",
-      labels: {
-        en: "General enquiry",
-        es: "Consulta general",
-      },
-    },
-  ],
-  [
-    "Women's Training Initiative",
-    {
-      resolveRecipient: () =>
-        process.env.CONTACT_INQUIRY_EMAIL?.trim() ||
-        "inquiry@karmarisedglobal.com",
-      labels: {
-        en: "Women's Training Initiative",
-        es: "Iniciativa de formación para mujeres",
-      },
-    },
-  ],
-]);
+  ]),
+);
 
 function normalizeLanguage(rawLanguage: unknown): SiteLanguage {
   const normalized = readTrimmedString(rawLanguage, 24, {

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -24,12 +25,6 @@ function loadEnvFile(filePath) {
 loadEnvFile(path.resolve(process.cwd(), ".env"));
 loadEnvFile(path.resolve(process.cwd(), ".env.local"));
 
-const apiKey = process.env.BREVO_API_KEY?.trim();
-if (!apiKey) {
-  console.error("BREVO_API_KEY is missing in .env");
-  process.exit(1);
-}
-
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://karmarisedglobal.com"
 ).replace(/\/$/, "");
@@ -38,18 +33,15 @@ const EMAIL_ASSET_BASE = SITE_URL.includes("localhost")
   ? "https://karmarisedglobal.com"
   : SITE_URL;
 
-const HEADERS = {
-  "api-key": apiKey,
-  "Content-Type": "application/json",
-  Accept: "application/json",
-};
-
-async function brevoRequest(endpoint, options = {}) {
+async function brevoRequest(endpoint, options = {}, customApiKey) {
+  const key = customApiKey || process.env.BREVO_API_KEY?.trim();
   const url = `https://api.brevo.com/v3${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers: {
-      ...HEADERS,
+      "api-key": key,
+      "Content-Type": "application/json",
+      Accept: "application/json",
       ...(options.headers || {}),
     },
   });
@@ -112,7 +104,7 @@ async function ensureAttributes() {
   }
 }
 
-// 2. Ensure Folder & Lists
+// 2. Ensure Folder & Lists (Master, EN, ES, plus 2 topic tracks x 2 languages)
 async function ensureFolderAndLists() {
   console.log("\n2. Checking folders and subscriber lists...");
   const folderName =
@@ -160,6 +152,32 @@ async function ensureFolderAndLists() {
       key: "es",
       envId: Number.parseInt(process.env.BREVO_LIST_ID_ES || "", 10),
       name: "KarmaRise Stories (ES)",
+    },
+    {
+      key: "manufacturingEn",
+      envId: Number.parseInt(
+        process.env.BREVO_LIST_ID_MANUFACTURING_EN || "",
+        10,
+      ),
+      name: "KarmaRise Stories - Manufacturing (EN)",
+    },
+    {
+      key: "manufacturingEs",
+      envId: Number.parseInt(
+        process.env.BREVO_LIST_ID_MANUFACTURING_ES || "",
+        10,
+      ),
+      name: "KarmaRise Stories - Manufacturing (ES)",
+    },
+    {
+      key: "almariseEn",
+      envId: Number.parseInt(process.env.BREVO_LIST_ID_ALMARISE_EN || "", 10),
+      name: "KarmaRise Stories - AlmaRise D Brand & Culture (EN)",
+    },
+    {
+      key: "almariseEs",
+      envId: Number.parseInt(process.env.BREVO_LIST_ID_ALMARISE_ES || "", 10),
+      name: "KarmaRise Stories - AlmaRise D Brand & Culture (ES)",
     },
   ];
 
@@ -223,10 +241,57 @@ async function ensureFolderAndLists() {
   return resolvedLists;
 }
 
+// 2b. Ensure internal editorial inbox is on the lists so Brevo campaign drafts bind to target lists even before public signups
+async function ensureInternalPreviewContact(lists) {
+  const email =
+    process.env.BREVO_REPLY_TO_EMAIL?.trim() ||
+    process.env.BREVO_SENDER_EMAIL?.trim() ||
+    "stories@karmarisedglobal.com";
+  const allListIds = Object.values(lists).filter(
+    (id) => typeof id === "number" && id > 0,
+  );
+  if (!email || allListIds.length === 0) {
+    return;
+  }
+
+  const res = await brevoRequest("/contacts", {
+    method: "POST",
+    body: JSON.stringify({
+      email,
+      attributes: {
+        FIRSTNAME: "KarmaRise Editorial",
+        LANGUAGE: "EN",
+        CUSTOMER_TYPE: "Internal Preview",
+        CONSENT_STATUS: "Yes",
+        SOURCE: "Brevo Setup",
+        INTEREST: "Manufacturing & AlmaRise D Brand",
+      },
+      listIds: allListIds,
+      updateEnabled: true,
+      emailBlacklisted: false,
+    }),
+  });
+
+  if (res.ok || res.status === 204) {
+    console.log(
+      `   + Linked internal inbox <${email}> to ${allListIds.length} lists for draft binding & previews.`,
+    );
+  } else {
+    console.warn(
+      `   ! Could not link internal inbox <${email}>:`,
+      res.status,
+      res.data,
+    );
+  }
+}
+
 // 3. Resolve Active Sender
 async function resolveSender() {
   console.log("\n3. Checking verified senders in Brevo...");
-  const sendersRes = await brevoRequest("/senders");
+  const senderKey =
+    process.env.BREVO_FULLACESS_API_KEY?.trim() ||
+    process.env.BREVO_API_KEY?.trim();
+  const sendersRes = await brevoRequest("/senders", {}, senderKey);
   const allSenders = sendersRes.data?.senders || [];
   const activeSenders = allSenders.filter((s) => s.active);
 
@@ -257,7 +322,7 @@ async function resolveSender() {
 }
 
 // 3b. Upload email brand assets to Sanity CDN so Brevo previews & emails load them immediately
-async function ensureEmailAssetsOnCdn() {
+export async function ensureEmailAssetsOnCdn() {
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID?.trim();
   const dataset =
     process.env.NEXT_PUBLIC_SANITY_DATASET?.trim() || "production";
@@ -265,7 +330,7 @@ async function ensureEmailAssetsOnCdn() {
 
   const fallbackAssets = {
     logoUrl: `${EMAIL_ASSET_BASE}/brand/main-logo-transparent.png`,
-    heroImageUrl: `${EMAIL_ASSET_BASE}/images/alma-and-shirish-founders.jpg`,
+    heroImageUrl: `${EMAIL_ASSET_BASE}/images/founders/alma-and-shirish-founders.jpg`,
   };
 
   if (!projectId || !sanityToken) {
@@ -303,7 +368,7 @@ async function ensureEmailAssetsOnCdn() {
       "karmarise-main-logo.png",
     ),
     uploadAsset(
-      "public/images/alma-and-shirish-founders.jpg",
+      "public/images/founders/alma-and-shirish-founders.jpg",
       "image/jpeg",
       "alma-and-shirish-founders.jpg",
     ),
@@ -326,73 +391,81 @@ async function ensureEmailAssetsOnCdn() {
   };
 }
 
-// 4. Build Warm, Soothing Letter HTML for Welcome Templates
-function buildWelcomeHtml({ lang, assets }) {
+// 4. Build Human Letter HTML for Welcome Templates (matching the single-letter editorial design)
+export function buildWelcomeHtml({ lang, assets, previewTrackNote }) {
   const isEs = lang === "es";
+
+  const defaultTrackNote = isEs
+    ? "Cada carta sale firmada por uno de los dos, Alma o Shirish, centrada en una sola escena real: o bien cómo fabricamos bolsos y prendas en talleres de toda la India, o bien cómo transformamos saris antiguos con AlmaRise D Brand y vivimos entre España e India."
+    : "Each letter is written by one of us, Alma or Shirish, around a single real moment: either how we build leather goods and garments with workshops across India, or how we recut kept Indian sarees for AlmaRise D Brand and split everyday life between Spain and India.";
+
+  const trackNoteExpression = previewTrackNote
+    ? previewTrackNote
+    : `{{ params.TRACK_NOTE | default:"${defaultTrackNote}" }}`;
 
   const copy = isEs
     ? {
         preheader:
-          "De España a la India: qué alegría tenerte por aquí. Respóndenos y cuéntanos desde dónde nos lees.",
-        eyebrowNote: "Una carta de Alma y Shirish · España e India",
-        heading: "¡Pasa, estás en tu casa!",
-        greeting: '¡Hola {{ contact.FIRSTNAME | default:"" }}! ¿Qué tal todo?',
-        p1: "Nos ha hecho una ilusión enorme ver tu correo por aquí. Si te somos sinceros, todo esto empezó casi sin planearlo: nos conocimos, conectamos desde el minuto uno y, a los pocos meses, Alma ya estaba subiéndose a un avión rumbo a la India. Desde aquel viaje no hemos parado quietos ni un segundo.",
-        p2: "Hoy trabajamos entre España y toda la India, recorriendo talleres de piel y confección, revisando materiales sobre el terreno y rescatando saris antiguos para darles otra vida con Almarise. Queríamos un espacio cercano donde contarte cómo se hacen las cosas por dentro, sin filtros ni rollos corporativos.",
-        pillarsIntro:
-          "Por aquí nos va a encantar charlar contigo de todo lo que nos mueve:",
-        pillars: [
-          { title: "Cultura y raíces" },
-          { title: "Moda sostenible" },
-          { title: "Oficios y talleres" },
-          { title: "Diseño y materiales" },
-          { title: "Entre India y Europa" },
-          { title: "Día a día en KarmaRise" },
-        ],
-        p3: "Y oye, que esto no sea un monólogo. Antes de mandarte la próxima carta, nos morimos de curiosidad por saber quién anda al otro lado: dale a responder ahora mismo y cuéntanos desde dónde nos lees y qué te llamó la atención para apuntarte. ¿Te pierde el mundo textil, te tira la India o andas con ganas de dar forma a algo tuyo?",
-        p4: "Los correos nos llegan directamente a nosotros dos, así que te leemos y te contestamos seguro.",
-        primaryCta: "Ven a leer nuestras historias",
-        signoff: "Un abrazo enorme,",
+          "Gracias por pasarte por aquí. Cuéntanos desde dónde nos lees y qué te trajo hasta KarmaRise.",
+        brandTitle: "Historias de KarmaRise",
+        issueTag: "Bienvenida · España e India",
+        heading: "Qué alegría tenerte por aquí.",
+        dateline: "De Alma y Shirish · Desde nuestro estudio en la India",
+        greeting: 'Hola {{ contact.FIRSTNAME | default:"" }},',
+        p1: "Ver tu correo en nuestra lista nos alegra el día de verdad. Cuando Alma voló desde España a la India para levantar KarmaRise D Global junto a Shirish, nos prometimos una cosa muy sencilla: contar cómo funciona este trabajo de puertas adentro, sin humo corporativo ni fotos de catálogo.",
+        p2: trackNoteExpression,
+        photoCaption:
+          "Revisando muestras de piel y tejidos juntos en nuestro estudio en la India antes de salir a visitar talleres.",
+        p3: "No enviamos boletines llenos de enlaces ni correos de relleno cada semana. Escribimos una o dos veces al mes cuando hay una muestra que falló al tacto, un hallazgo en un taller, una historia detrás de un sari de AlmaRise D Brand o un avance honesto de nuestra futura formación textil.",
+        replyQuestion:
+          "Antes de nuestra próxima carta: ¿desde dónde nos lees, y qué fue lo que te llamó la atención para apuntarte?",
+        replyHelper:
+          "Dale a responder a este correo. Nos llega directamente a Alma y a Shirish y contestamos a todo el mundo.",
+        signoff: "Un abrazo,",
         founders: "Alma y Shirish",
         locations: "España · India",
+        psText:
+          "Si te apetece empezar ya, hemos publicado nuestras primeras historias en primera persona, desde tres biryanis seguidos en Eid hasta cómo dividimos un pedido de bolsos de piel entre dos estados de la India.",
+        ctaLabel: "Leer nuestras primeras historias",
         heroAlt:
-          "Alma y Shirish revisando muestras de tejido en nuestro estudio en la India",
+          "Alma y Shirish revisando muestras de piel y tejidos en nuestro estudio en la India",
         footerNote:
-          "Te escribimos porque te apuntaste para recibir nuestras historias en KarmaRise.",
+          "Te escribimos porque te apuntaste a Historias de KarmaRise.",
         unsubscribeLabel: "Darte de baja cuando quieras",
       }
     : {
         preheader:
-          "From Spain to India: we are thrilled you are here. Hit reply and tell us where you are reading from.",
-        eyebrowNote: "A note from Alma & Shirish · Spain & India",
-        heading: "You are in. Glad you are here.",
-        greeting: 'Hey {{ contact.FIRSTNAME | default:"there" }},',
-        p1: "Seeing your name pop up here honestly makes our day. A few months after we first connected, Alma got on a plane from Spain to India, and our lives have been a whirlwind of colours, workshops, and late-night ideas ever since.",
-        p2: "Working across Spain, Europe, and India, we spend our days visiting leather and garment workshops, selecting existing silk sarees for Almarise, and turning raw sketches into physical samples you can hold in your hands. Through these Stories, we bring you straight into that work.",
-        pillarsIntro:
-          "Over the coming weeks, we would love talking to you about:",
-        pillars: [
-          { title: "Heritage & Culture" },
-          { title: "Sustainable Fashion" },
-          { title: "People & Craftsmanship" },
-          { title: "Art & Design" },
-          { title: "India Meets Europe" },
-          { title: "Inside KarmaRise" },
-        ],
-        p3: "Before we send our next Story, we would love to know who is on the other side of this screen. Hit reply right now and tell us: where are you reading this from, and what drew you to our world? Was it Indian textiles, sustainable fashion, or making something of your own?",
-        p4: "Every reply lands straight in our inbox, and we read and answer every single one.",
-        primaryCta: "Read our first Stories",
-        signoff: "Can't wait to hear from you,",
+          "Glad you are here. Hit reply and tell us where you are reading from.",
+        brandTitle: "KarmaRise Stories",
+        issueTag: "Welcome · Spain & India",
+        heading: "Glad you are here.",
+        dateline: "From Alma & Shirish · Our studio in India",
+        greeting: 'Hi {{ contact.FIRSTNAME | default:"there" }},',
+        p1: "Seeing your name arrive here genuinely makes our day. When Alma flew from Spain to India to build KarmaRise D Global alongside Shirish, we made one plain rule: talk about the real work on the ground, without brochure filler or stock claims.",
+        p2: trackNoteExpression,
+        photoCaption:
+          "Reviewing leather hides and fabric swatches together in our studio in India before heading out to workshops.",
+        p3: "We do not send crowded link roundups or weekly filler. We write once or twice a month when a sample catches a real snag in the hand, a factory visit teaches us something concrete, a kept Indian saree turns into a new AlmaRise D Brand piece, or our planned training groundwork moves forward.",
+        replyQuestion:
+          "Before our next letter lands: where are you reading from, and what drew you to KarmaRise?",
+        replyHelper:
+          "Hit reply right now. Every answer lands straight in our inbox, and we read and answer each one.",
+        signoff: "Warmly,",
         founders: "Alma & Shirish",
         locations: "Spain · India",
+        psText:
+          "If you want to read now, our first Stories are live on the site, from three biryanis on Eid to splitting one leather bag run across Indian states.",
+        ctaLabel: "Read our first Stories",
         heroAlt:
-          "Alma and Shirish reviewing fabric swatches in our studio in India",
+          "Alma and Shirish reviewing fabric and leather swatches in our studio in India",
         footerNote:
           "You are receiving this letter because you signed up for KarmaRise Stories.",
         unsubscribeLabel: "Unsubscribe anytime",
       };
 
-  const storiesUrl = `${EMAIL_ASSET_BASE}/stories`;
+  const storiesUrl = isEs
+    ? `${EMAIL_ASSET_BASE}/es/stories`
+    : `${EMAIL_ASSET_BASE}/stories`;
   const prefEnUrl = `${EMAIL_ASSET_BASE}/api/newsletter/preferences?email={{ contact.EMAIL }}&lang=EN`;
   const prefEsUrl = `${EMAIL_ASSET_BASE}/api/newsletter/preferences?email={{ contact.EMAIL }}&lang=ES`;
   const logoUrl = assets.logoUrl;
@@ -402,28 +475,6 @@ function buildWelcomeHtml({ lang, assets }) {
     "'Lora', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
   const fontSans =
     "'Plus Jakarta Sans', 'Trebuchet MS', 'Gill Sans', Helvetica, sans-serif";
-
-  const pillarsLeft = copy.pillars.slice(0, 3);
-  const pillarsRight = copy.pillars.slice(3, 6);
-
-  const pillarsRowsHtml = pillarsLeft
-    .map((leftPillar, index) => {
-      const rightPillar = pillarsRight[index];
-      return `
-                <tr>
-                  <td valign="middle" width="50%" style="padding:6px 12px 6px 0;font-family:${fontSerif};font-size:16px;line-height:1.5;color:#182D20;">
-                    <span style="color:#BD7057;font-size:18px;padding-right:8px;">&bull;</span>${leftPillar.title}
-                  </td>
-                  <td valign="middle" width="50%" style="padding:6px 0 6px 12px;font-family:${fontSerif};font-size:16px;line-height:1.5;color:#182D20;">
-                    ${
-                      rightPillar
-                        ? `<span style="color:#BD7057;font-size:18px;padding-right:8px;">&bull;</span>${rightPillar.title}`
-                        : ""
-                    }
-                  </td>
-                </tr>`;
-    })
-    .join("");
 
   return `<!DOCTYPE html>
 <html lang="${lang}">
@@ -436,123 +487,125 @@ function buildWelcomeHtml({ lang, assets }) {
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body style="margin:0;padding:0;background-color:#D9DFD3;font-family:${fontSerif};color:#25201D;-webkit-font-smoothing:antialiased;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-    ${copy.preheader}
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
+    ${copy.preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
 
-  <!-- Pale sage outer canvas -->
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#D9DFD3;padding:40px 14px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#D9DFD3;padding:34px 14px 40px;">
     <tr>
       <td align="center">
-
-        <!-- Warm paper letter card (no top border strip) -->
-        <table role="presentation" width="580" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:580px;background-color:#F2ECDF;border-radius:24px;overflow:hidden;box-shadow:0 14px 38px rgba(24,45,32,0.08);">
-
-          <!-- Airy natural logo header on warm paper -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#F2ECDF;border:1px solid #DDD2BD;border-radius:20px;overflow:hidden;box-shadow:0 12px 34px rgba(24,45,32,0.08);">
           <tr>
-            <td align="center" style="padding:28px 36px 20px;background-color:#F2ECDF;">
-              <p style="margin:0 0 22px;font-family:${fontSans};font-size:12px;line-height:1.5;color:#584B44;">
-                ${
-                  isEs
-                    ? `Leyendo en español &nbsp;&middot;&nbsp; <a href="${prefEnUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">Prefer English? Switch in one click</a>`
-                    : `Reading in English &nbsp;&middot;&nbsp; <a href="${prefEsUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">¿Prefieres español? Cambia con un clic</a>`
-                }
-              </p>
-              <a href="${EMAIL_ASSET_BASE}" style="text-decoration:none;display:inline-block;">
-                <img src="${logoUrl}" alt="KarmaRise" width="84" style="display:block;width:84px;height:auto;margin:0 auto;border:0;" />
-              </a>
-              <p style="margin:14px 0 0;font-family:${fontSans};font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#BD7057;font-weight:600;">
-                ${copy.eyebrowNote}
-              </p>
-            </td>
-          </tr>
-
-          <!-- Greeting & opening personal note -->
-          <tr>
-            <td style="padding:10px 44px 32px;background-color:#F2ECDF;">
-              <h1 style="margin:0 0 24px;font-family:${fontSerif};font-size:31px;line-height:1.22;font-weight:400;font-style:italic;color:#182D20;text-align:center;">
-                ${copy.heading}
-              </h1>
-
-              <p style="margin:0 0 18px;font-family:${fontSerif};font-size:18px;line-height:1.75;color:#182D20;">
-                ${copy.greeting}
-              </p>
-              <p style="margin:0 0 18px;font-family:${fontSerif};font-size:17px;line-height:1.8;color:#25201D;">
-                ${copy.p1}
-              </p>
-              <p style="margin:0;font-family:${fontSerif};font-size:17px;line-height:1.8;color:#25201D;">
-                ${copy.p2}
-              </p>
-            </td>
-          </tr>
-
-          <!-- Full-bleed edge-to-edge photograph (no background box, no subtitle) -->
-          <tr>
-            <td style="padding:0;line-height:0;font-size:0;">
-              <a href="${storiesUrl}" style="display:block;text-decoration:none;">
-                <img src="${heroImageUrl}" alt="${copy.heroAlt}" width="580" style="display:block;width:100%;max-width:580px;height:auto;border:0;" />
-              </a>
-            </td>
-          </tr>
-
-          <!-- Warm dune & sage-tinted section for the short side-by-side Editorial Pillars -->
-          <tr>
-            <td style="padding:28px 44px;background-color:#E6DAC4;">
-              <p style="margin:0 0 14px;font-family:${fontSerif};font-size:17px;font-style:italic;line-height:1.6;color:#182D20;">
-                ${copy.pillarsIntro}
-              </p>
+            <td style="padding:22px 44px 18px;border-bottom:1px solid #DFD4BF;background-color:#F2ECDF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                ${pillarsRowsHtml}
+                <tr>
+                  <td align="left" valign="middle">
+                    <a href="${EMAIL_ASSET_BASE}" style="text-decoration:none;display:inline-block;">
+                      <img src="${logoUrl}" alt="KarmaRise D Global" width="52" style="display:block;width:52px;height:auto;border:0;" />
+                    </a>
+                  </td>
+                  <td align="right" valign="middle" style="font-family:${fontSans};font-size:11px;line-height:1.55;color:#584B44;">
+                    <span style="display:block;letter-spacing:1.5px;text-transform:uppercase;color:#833E28;font-weight:600;">${copy.brandTitle}</span>
+                    <span style="display:block;color:#584B44;">${copy.issueTag}</span>
+                  </td>
+                </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Closing paragraph, warm clay/gold button & personal sign-off on warm paper -->
           <tr>
-            <td style="padding:34px 44px 42px;background-color:#F2ECDF;">
-              <p style="margin:0 0 16px;font-family:${fontSerif};font-size:17px;line-height:1.8;color:#25201D;">
-                ${copy.p3}
-              </p>
-              <p style="margin:0 0 30px;font-family:${fontSerif};font-size:17px;font-style:italic;line-height:1.75;color:#833E28;">
-                ${copy.p4}
+            <td style="padding:32px 44px 36px;background-color:#F2ECDF;">
+              <h1 style="margin:0 0 12px;font-family:${fontSerif};font-size:30px;line-height:1.22;font-weight:400;font-style:italic;color:#182D20;">
+                ${copy.heading}
+              </h1>
+              <p style="margin:0 0 26px;padding-bottom:18px;border-bottom:1px solid #DFD4BF;font-family:${fontSans};font-size:12px;letter-spacing:0.3px;color:#584B44;">
+                ${copy.dateline}
               </p>
 
-              <!-- Warm terracotta clay pill button with pale cream text -->
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 36px;">
+              <p style="margin:0 0 18px;font-family:${fontSerif};font-size:17px;line-height:1.78;color:#182D20;">
+                ${copy.greeting}
+              </p>
+              <p style="margin:0 0 18px;font-family:${fontSerif};font-size:17px;line-height:1.78;color:#25201D;">
+                ${copy.p1}
+              </p>
+              <p style="margin:0 0 22px;font-family:${fontSerif};font-size:17px;line-height:1.78;color:#25201D;">
+                ${copy.p2}
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 26px;">
                 <tr>
-                  <td align="center" bgcolor="#BD7057" style="border-radius:999px;background-color:#BD7057;">
-                    <a href="${storiesUrl}" style="display:inline-block;padding:15px 36px;font-family:${fontSans};font-size:14px;font-weight:600;letter-spacing:0.4px;color:#FAF6EE;text-decoration:none;border-radius:999px;">
-                      ${copy.primaryCta}
+                  <td style="padding:0;line-height:0;">
+                    <a href="${storiesUrl}" style="display:block;text-decoration:none;">
+                      <img src="${heroImageUrl}" alt="${copy.heroAlt}" width="512" style="display:block;width:100%;max-width:512px;height:auto;border-radius:12px;border:0;" />
                     </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 4px 0;font-family:${fontSerif};font-size:13.5px;font-style:italic;line-height:1.58;color:#584B44;">
+                    ${copy.photoCaption}
                   </td>
                 </tr>
               </table>
 
-              <!-- Sign-off with warm gold divider rule -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #CDBB9C;padding-top:24px;">
+              <p style="margin:0 0 24px;font-family:${fontSerif};font-size:17px;line-height:1.78;color:#25201D;">
+                ${copy.p3}
+              </p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 28px;background-color:#E8DEC9;border-radius:12px;">
+                <tr>
+                  <td style="padding:20px 22px;border-left:3px solid #BD7057;border-radius:12px;">
+                    <p style="margin:0 0 8px;font-family:${fontSerif};font-size:17px;line-height:1.65;color:#182D20;font-weight:500;">
+                      ${copy.replyQuestion}
+                    </p>
+                    <p style="margin:0;font-family:${fontSans};font-size:12.5px;line-height:1.55;color:#584B44;">
+                      ${copy.replyHelper}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">
                 <tr>
                   <td>
-                    <p style="margin:0 0 6px;font-family:${fontSerif};font-size:16px;font-style:italic;color:#4D342F;">
+                    <p style="margin:0 0 4px;font-family:${fontSerif};font-size:16px;font-style:italic;color:#4D342F;">
                       ${copy.signoff}
                     </p>
-                    <p style="margin:0 0 4px;font-family:${fontSerif};font-size:22px;color:#182D20;">
+                    <p style="margin:0 0 4px;font-family:${fontSerif};font-size:23px;line-height:1.2;color:#182D20;">
                       ${copy.founders}
                     </p>
-                    <p style="margin:0;font-family:${fontSans};font-size:12px;letter-spacing:0.6px;color:#833E28;">
+                    <p style="margin:0;font-family:${fontSans};font-size:12px;letter-spacing:0.5px;color:#833E28;">
                       ${copy.locations}
                     </p>
                   </td>
                 </tr>
               </table>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:26px;border-top:1px solid #CDBB9C;">
+                <tr>
+                  <td style="padding-top:22px;font-family:${fontSerif};font-size:15.5px;line-height:1.72;color:#3E332C;">
+                    <p style="margin:0 0 12px;">
+                      <strong style="font-family:${fontSans};font-size:12px;letter-spacing:0.8px;color:#833E28;text-transform:uppercase;">${isEs ? "P.D." : "P.S."}</strong>&nbsp; ${copy.psText}
+                    </p>
+                    <p style="margin:0;font-family:${fontSans};font-size:13.5px;line-height:1.6;">
+                      <a href="${storiesUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">${copy.ctaLabel} &rarr;</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
-
         </table>
 
-        <!-- Minimal, friendly footer on the pale sage background -->
-        <table role="presentation" width="540" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:540px;padding:24px 20px 8px;">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;padding:22px 18px 6px;">
           <tr>
             <td align="center" style="font-family:${fontSans};font-size:12px;line-height:1.7;color:#29482F;">
+              <p style="margin:0 0 6px;">
+                ${
+                  isEs
+                    ? `Leyendo en español &nbsp;&middot;&nbsp; <a href="${prefEnUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">Prefer English? Switch here</a>`
+                    : `Reading in English &nbsp;&middot;&nbsp; <a href="${prefEsUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">¿Prefieres español? Cambia aquí</a>`
+                }
+              </p>
               <p style="margin:0 0 4px;">
                 ${copy.footerNote}
               </p>
@@ -564,7 +617,6 @@ function buildWelcomeHtml({ lang, assets }) {
             </td>
           </tr>
         </table>
-
       </td>
     </tr>
   </table>
@@ -587,7 +639,7 @@ async function ensureWelcomeTemplates(sender, assets) {
         10,
       ),
       templateName: "Welcome - KarmaRise Stories (EN)",
-      subject: "A warm welcome from Alma & Shirish",
+      subject: "Glad you are here · Alma & Shirish",
       htmlContent: buildWelcomeHtml({ lang: "en", assets }),
     },
     {
@@ -597,7 +649,7 @@ async function ensureWelcomeTemplates(sender, assets) {
         10,
       ),
       templateName: "Bienvenida - Historias KarmaRise (ES)",
-      subject: "¡Qué ilusión tenerte por aquí! · Alma y Shirish",
+      subject: "Qué alegría tenerte por aquí · Alma y Shirish",
       htmlContent: buildWelcomeHtml({ lang: "es", assets }),
     },
   ];
@@ -619,7 +671,7 @@ async function ensureWelcomeTemplates(sender, assets) {
       templateName: tpl.templateName,
       subject: tpl.subject,
       sender: {
-        name: sender.name || "Alma & Shirish · KarmaRise",
+        name: "Alma & Shirish · KarmaRise D Global",
         email: sender.email,
       },
       replyTo: sender.email,
@@ -667,43 +719,85 @@ async function ensureWelcomeTemplates(sender, assets) {
   return syncedIds;
 }
 
-const attributesPromise = ensureAttributes();
-await attributesPromise;
-const lists = await ensureFolderAndLists();
-const sender = await resolveSender();
-const assets = await ensureEmailAssetsOnCdn();
-const templates = await ensureWelcomeTemplates(sender, assets);
-
-console.log("\n--- Brevo Setup Summary ---");
-console.log(`Master List ID (BREVO_LIST_ID): ${lists.master ?? "N/A"}`);
-console.log(`English List ID (BREVO_LIST_ID_EN): ${lists.en ?? "N/A"}`);
-console.log(`Spanish List ID (BREVO_LIST_ID_ES): ${lists.es ?? "N/A"}`);
-console.log(`Welcome Template EN ID: ${templates.en ?? "N/A"}`);
-console.log(`Welcome Template ES ID: ${templates.es ?? "N/A"}`);
-
-const envFilePath = path.resolve(process.cwd(), ".env");
-if (fs.existsSync(envFilePath)) {
-  let envContent = fs.readFileSync(envFilePath, "utf8");
-  const envUpdates = {
-    ...(lists.master ? { BREVO_LIST_ID: String(lists.master) } : {}),
-    ...(lists.en ? { BREVO_LIST_ID_EN: String(lists.en) } : {}),
-    ...(lists.es ? { BREVO_LIST_ID_ES: String(lists.es) } : {}),
-    ...(templates.en
-      ? { BREVO_WELCOME_TEMPLATE_ID_EN: String(templates.en) }
-      : {}),
-    ...(templates.es
-      ? { BREVO_WELCOME_TEMPLATE_ID_ES: String(templates.es) }
-      : {}),
-  };
-
-  for (const [key, val] of Object.entries(envUpdates)) {
-    const regex = new RegExp(`^${key}=.*$`, "m");
-    if (regex.test(envContent)) {
-      envContent = envContent.replace(regex, `${key}=${val}`);
-    } else {
-      envContent = `${envContent.trimEnd()}\n${key}=${val}\n`;
-    }
+export async function runBrevoSetup() {
+  const apiKey = process.env.BREVO_API_KEY?.trim();
+  if (!apiKey) {
+    console.error("BREVO_API_KEY is missing in .env");
+    process.exit(1);
   }
-  fs.writeFileSync(envFilePath, envContent, "utf8");
-  console.log("Synced list and template IDs into .env.");
+
+  await ensureAttributes();
+  const lists = await ensureFolderAndLists();
+  await ensureInternalPreviewContact(lists);
+  const sender = await resolveSender();
+  const assets = await ensureEmailAssetsOnCdn();
+  const templates = await ensureWelcomeTemplates(sender, assets);
+
+  console.log("\n--- Brevo Setup Summary ---");
+  console.log(`Master List ID (BREVO_LIST_ID): ${lists.master ?? "N/A"}`);
+  console.log(`English List ID (BREVO_LIST_ID_EN): ${lists.en ?? "N/A"}`);
+  console.log(`Spanish List ID (BREVO_LIST_ID_ES): ${lists.es ?? "N/A"}`);
+  console.log(
+    `Manufacturing EN List ID (BREVO_LIST_ID_MANUFACTURING_EN): ${lists.manufacturingEn ?? "N/A"}`,
+  );
+  console.log(
+    `Manufacturing ES List ID (BREVO_LIST_ID_MANUFACTURING_ES): ${lists.manufacturingEs ?? "N/A"}`,
+  );
+  console.log(
+    `AlmaRise D Brand & Culture EN List ID (BREVO_LIST_ID_ALMARISE_EN): ${lists.almariseEn ?? "N/A"}`,
+  );
+  console.log(
+    `AlmaRise D Brand & Culture ES List ID (BREVO_LIST_ID_ALMARISE_ES): ${lists.almariseEs ?? "N/A"}`,
+  );
+  console.log(`Welcome Template EN ID: ${templates.en ?? "N/A"}`);
+  console.log(`Welcome Template ES ID: ${templates.es ?? "N/A"}`);
+
+  const envFilePath = path.resolve(process.cwd(), ".env");
+  if (fs.existsSync(envFilePath)) {
+    let envContent = fs.readFileSync(envFilePath, "utf8");
+    const envUpdates = {
+      ...(lists.master ? { BREVO_LIST_ID: String(lists.master) } : {}),
+      ...(lists.en ? { BREVO_LIST_ID_EN: String(lists.en) } : {}),
+      ...(lists.es ? { BREVO_LIST_ID_ES: String(lists.es) } : {}),
+      ...(lists.manufacturingEn
+        ? { BREVO_LIST_ID_MANUFACTURING_EN: String(lists.manufacturingEn) }
+        : {}),
+      ...(lists.manufacturingEs
+        ? { BREVO_LIST_ID_MANUFACTURING_ES: String(lists.manufacturingEs) }
+        : {}),
+      ...(lists.almariseEn
+        ? { BREVO_LIST_ID_ALMARISE_EN: String(lists.almariseEn) }
+        : {}),
+      ...(lists.almariseEs
+        ? { BREVO_LIST_ID_ALMARISE_ES: String(lists.almariseEs) }
+        : {}),
+      ...(templates.en
+        ? { BREVO_WELCOME_TEMPLATE_ID_EN: String(templates.en) }
+        : {}),
+      ...(templates.es
+        ? { BREVO_WELCOME_TEMPLATE_ID_ES: String(templates.es) }
+        : {}),
+    };
+
+    for (const [key, val] of Object.entries(envUpdates)) {
+      const regex = new RegExp(`^${key}=.*$`, "m");
+      if (regex.test(envContent)) {
+        envContent = envContent.replace(regex, `${key}=${val}`);
+      } else {
+        envContent = `${envContent.trimEnd()}\n${key}=${val}\n`;
+      }
+    }
+    fs.writeFileSync(envFilePath, envContent, "utf8");
+    console.log("Synced list and template IDs into .env.");
+  }
+
+  return { lists, sender, assets, templates };
+}
+
+const isDirectExecution =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isDirectExecution) {
+  await runBrevoSetup();
 }

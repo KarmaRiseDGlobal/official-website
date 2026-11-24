@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createHash, timingSafeEqual } from "node:crypto";
 
 const RATE_LIMIT_MAX_ENTRIES = 1000;

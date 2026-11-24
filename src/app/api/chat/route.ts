@@ -6,6 +6,7 @@ import {
   buildChatSystemPrompt,
   CHAT_SESSION_COOKIE,
   createChatSessionToken,
+  evaluateChatGuardrail,
   extractAiReplyText,
   getChatCloudflareBindings,
   isQuotaOrRateError,
@@ -54,11 +55,11 @@ function getLocalizedError(
       case "turnstile_failed":
         return "No pudimos validar la verificación de seguridad. Inténtalo de nuevo.";
       case "session_limit":
-        return "Has alcanzado el límite de mensajes de esta sesión. Continúa con nuestro equipo mediante un Product Brief, contacto o WhatsApp.";
+        return "Has alcanzado el límite de mensajes de esta sesión. Continúa con nuestro equipo mediante un briefing de producto, contacto o WhatsApp.";
       case "quota_exceeded":
-        return "El asistente ha alcanzado su límite diario. Puedes continuar directamente por WhatsApp, contacto o enviando un Product Brief.";
+        return "El asistente ha alcanzado su límite diario. Puedes continuar directamente por WhatsApp, contacto o enviando un briefing de producto.";
       case "ai_unavailable":
-        return "El asistente no está disponible en este momento. Puedes escribirnos por WhatsApp, usar la página de contacto o iniciar un Product Brief.";
+        return "El asistente no está disponible en este momento. Puedes escribirnos por WhatsApp, usar la página de contacto o empezar un briefing de producto.";
     }
   }
 
@@ -125,7 +126,7 @@ export async function POST(request: Request) {
       ok: true,
       reply:
         language === "es"
-          ? "Gracias por tu mensaje. Si quieres iniciar un Product Brief, visita /product-brief."
+          ? "Gracias por tu mensaje. Si quieres empezar un briefing de producto, visita /product-brief."
           : "Thank you for your message. To start a Product Brief, visit /product-brief.",
     });
   }
@@ -254,6 +255,44 @@ export async function POST(request: Request) {
     );
   }
 
+  const buildReplyResponse = (replyText: string) => {
+    const nextTurns = (activeSession?.turns ?? 0) + 1;
+    const remainingTurns = Math.max(0, MAX_SESSION_TURNS - nextTurns);
+
+    const response = NextResponse.json({
+      ok: true,
+      reply: replyText,
+      remainingTurns,
+    });
+
+    if (sessionSecret && activeSession) {
+      const signedCookie = createChatSessionToken(
+        {
+          sid: activeSession.sid,
+          turns: nextTurns,
+          exp: activeSession.exp,
+        },
+        sessionSecret,
+      );
+      response.cookies.set({
+        name: CHAT_SESSION_COOKIE,
+        value: signedCookie,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: SESSION_TTL_SECONDS,
+      });
+    }
+
+    return response;
+  };
+
+  const guardrailReply = evaluateChatGuardrail(message, language);
+  if (guardrailReply) {
+    return buildReplyResponse(guardrailReply);
+  }
+
   const currentPath = normalizeCurrentPath(payload.currentPath);
   const history = sanitizeChatHistory(payload.history);
   const systemPrompt = buildChatSystemPrompt(language, currentPath);
@@ -267,7 +306,7 @@ export async function POST(request: Request) {
         { role: "user", content: message },
       ],
       max_tokens: 320,
-      temperature: 0.3,
+      temperature: 0.2,
     });
   } catch (error) {
     console.error("Workers AI chat error:", error);
@@ -307,34 +346,5 @@ export async function POST(request: Request) {
     );
   }
 
-  const nextTurns = (activeSession?.turns ?? 0) + 1;
-  const remainingTurns = Math.max(0, MAX_SESSION_TURNS - nextTurns);
-
-  const response = NextResponse.json({
-    ok: true,
-    reply,
-    remainingTurns,
-  });
-
-  if (sessionSecret && activeSession) {
-    const signedCookie = createChatSessionToken(
-      {
-        sid: activeSession.sid,
-        turns: nextTurns,
-        exp: activeSession.exp,
-      },
-      sessionSecret,
-    );
-    response.cookies.set({
-      name: CHAT_SESSION_COOKIE,
-      value: signedCookie,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: SESSION_TTL_SECONDS,
-    });
-  }
-
-  return response;
+  return buildReplyResponse(reply);
 }

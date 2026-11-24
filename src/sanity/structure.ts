@@ -121,37 +121,9 @@ export const editorialStructure: StructureResolver = (S) =>
             ]),
         ),
 
-      // 04. Translations (EN / ES)
+      // 04. Campaign Archive & Settings
       S.listItem()
-        .title("04 · Translations (EN / ES)")
-        .child(
-          S.list()
-            .title("Translations")
-            .items([
-              S.listItem()
-                .title("English Stories (EN)")
-                .schemaType("story")
-                .child(
-                  S.documentList()
-                    .title("English Stories (EN)")
-                    .filter(
-                      '_type == "story" && coalesce(language, "en") == "en"',
-                    ),
-                ),
-              S.listItem()
-                .title("Spanish Stories (ES)")
-                .schemaType("story")
-                .child(
-                  S.documentList()
-                    .title("Spanish Stories (ES)")
-                    .filter('_type == "story" && language == "es"'),
-                ),
-            ]),
-        ),
-
-      // 05. Campaign Archive & Settings
-      S.listItem()
-        .title("05 · Campaign Archive & Settings")
+        .title("04 · Campaign Archive & Settings")
         .child(
           S.list()
             .title("Campaign Archive & Settings")

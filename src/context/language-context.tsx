@@ -11,8 +11,12 @@ import {
   type ReactNode,
 } from "react";
 
-import { markLanguageSwitchSkip, requestPageTransition } from "@/lib/loader";
-import { localizePath, stripLocalePrefix, type SiteLanguage } from "@/lib/seo";
+import {
+  markLanguageSwitchSkip,
+  requestPageTransition,
+  resolveRouteTone,
+} from "@/lib/loader";
+import { localizePath, stripLocalePrefix, type SiteLanguage } from "@/lib/urls";
 
 export type { SiteLanguage };
 
@@ -127,7 +131,7 @@ export function LanguageProvider({
             isLanguageSwitch: true,
           });
           if (!handled) {
-            markLanguageSwitchSkip();
+            markLanguageSwitchSkip(resolveRouteTone(targetUrl));
             router.push(targetUrl);
           }
         }

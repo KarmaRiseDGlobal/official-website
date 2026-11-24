@@ -1,10 +1,24 @@
 import type { Metadata } from "next";
 
-import { ProductBriefPageClient } from "@/app/product-brief/product-brief-client";
+import { ProductBriefPageClient } from "@/views/product-brief-client";
 import { getRouteMetadata } from "@/lib/seo";
+import {
+  getProductBriefStructuredData,
+  serializeJsonLd,
+} from "@/lib/structured-data";
 
 export const metadata: Metadata = getRouteMetadata("product-brief", "es");
 
 export default function SpanishProductBriefPage() {
-  return <ProductBriefPageClient />;
+  const structuredData = getProductBriefStructuredData("es");
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+      />
+      <ProductBriefPageClient lang="es" />
+    </>
+  );
 }

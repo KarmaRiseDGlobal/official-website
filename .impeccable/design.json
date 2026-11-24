@@ -1,0 +1,629 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-24T11:17:00+05:30",
+  "title": "Design System: KarmaRise D Global",
+  "extensions": {
+    "colorMeta": {
+      "gold": {
+        "role": "primary",
+        "displayName": "Antique Brass",
+        "canonical": "#b99a58",
+        "tonalRamp": [
+          "oklch(20% 0.03 82)",
+          "oklch(32% 0.055 82)",
+          "oklch(45% 0.075 82)",
+          "oklch(58% 0.088 82)",
+          "oklch(69% 0.092 82)",
+          "oklch(79% 0.072 82)",
+          "oklch(88% 0.045 82)",
+          "oklch(95% 0.018 82)"
+        ]
+      },
+      "forest-deep": {
+        "role": "primary",
+        "displayName": "Deep Forest",
+        "canonical": "#182d20",
+        "tonalRamp": [
+          "oklch(16% 0.025 152)",
+          "oklch(26% 0.038 152)",
+          "oklch(37% 0.048 152)",
+          "oklch(49% 0.052 152)",
+          "oklch(61% 0.046 152)",
+          "oklch(74% 0.035 152)",
+          "oklch(86% 0.022 152)",
+          "oklch(95% 0.01 152)"
+        ]
+      },
+      "forest": {
+        "role": "primary",
+        "displayName": "Botanical Forest",
+        "canonical": "#35563a",
+        "tonalRamp": [
+          "oklch(18% 0.032 148)",
+          "oklch(29% 0.048 148)",
+          "oklch(41% 0.058 148)",
+          "oklch(53% 0.06 148)",
+          "oklch(65% 0.05 148)",
+          "oklch(77% 0.036 148)",
+          "oklch(88% 0.02 148)",
+          "oklch(95% 0.008 148)"
+        ]
+      },
+      "forest-lush": {
+        "role": "primary",
+        "displayName": "Lush Forest",
+        "canonical": "#29482f",
+        "tonalRamp": [
+          "oklch(17% 0.03 149)",
+          "oklch(27% 0.046 149)",
+          "oklch(37% 0.056 149)",
+          "oklch(49% 0.058 149)",
+          "oklch(62% 0.048 149)",
+          "oklch(75% 0.034 149)",
+          "oklch(87% 0.02 149)",
+          "oklch(95% 0.008 149)"
+        ]
+      },
+      "clay": {
+        "role": "secondary",
+        "displayName": "Terracotta Clay",
+        "canonical": "#bd7057",
+        "tonalRamp": [
+          "oklch(20% 0.045 38)",
+          "oklch(32% 0.075 38)",
+          "oklch(44% 0.095 38)",
+          "oklch(57% 0.102 38)",
+          "oklch(68% 0.09 38)",
+          "oklch(79% 0.068 38)",
+          "oklch(88% 0.04 38)",
+          "oklch(95% 0.015 38)"
+        ]
+      },
+      "clay-ink": {
+        "role": "secondary",
+        "displayName": "Deep Terracotta Ink",
+        "canonical": "#833e28",
+        "tonalRamp": [
+          "oklch(19% 0.048 36)",
+          "oklch(31% 0.08 36)",
+          "oklch(43% 0.098 36)",
+          "oklch(55% 0.102 36)",
+          "oklch(67% 0.088 36)",
+          "oklch(78% 0.064 36)",
+          "oklch(88% 0.036 36)",
+          "oklch(95% 0.014 36)"
+        ]
+      },
+      "clay-light": {
+        "role": "secondary",
+        "displayName": "Pale Terracotta",
+        "canonical": "#eab099",
+        "tonalRamp": [
+          "oklch(22% 0.038 40)",
+          "oklch(34% 0.06 40)",
+          "oklch(47% 0.076 40)",
+          "oklch(60% 0.082 40)",
+          "oklch(73% 0.078 40)",
+          "oklch(82% 0.062 40)",
+          "oklch(90% 0.036 40)",
+          "oklch(96% 0.014 40)"
+        ]
+      },
+      "wood": {
+        "role": "tertiary",
+        "displayName": "Raw Wood",
+        "canonical": "#4d342f",
+        "tonalRamp": [
+          "oklch(17% 0.022 32)",
+          "oklch(28% 0.034 32)",
+          "oklch(39% 0.038 32)",
+          "oklch(51% 0.038 32)",
+          "oklch(64% 0.032 32)",
+          "oklch(76% 0.024 32)",
+          "oklch(87% 0.014 32)",
+          "oklch(95% 0.006 32)"
+        ]
+      },
+      "sage": {
+        "role": "tertiary",
+        "displayName": "Muted Sage",
+        "canonical": "#788d72",
+        "tonalRamp": [
+          "oklch(19% 0.02 138)",
+          "oklch(31% 0.03 138)",
+          "oklch(44% 0.036 138)",
+          "oklch(57% 0.04 138)",
+          "oklch(68% 0.036 138)",
+          "oklch(79% 0.028 138)",
+          "oklch(88% 0.018 138)",
+          "oklch(95% 0.008 138)"
+        ]
+      },
+      "pale-sage": {
+        "role": "tertiary",
+        "displayName": "Pale Sage",
+        "canonical": "#d9dfd3",
+        "tonalRamp": [
+          "oklch(20% 0.014 132)",
+          "oklch(32% 0.018 132)",
+          "oklch(45% 0.022 132)",
+          "oklch(58% 0.022 132)",
+          "oklch(71% 0.02 132)",
+          "oklch(82% 0.018 132)",
+          "oklch(89% 0.014 132)",
+          "oklch(96% 0.006 132)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Parchment",
+        "canonical": "#f2ecdf",
+        "tonalRamp": [
+          "oklch(20% 0.012 82)",
+          "oklch(33% 0.018 82)",
+          "oklch(46% 0.022 82)",
+          "oklch(60% 0.024 82)",
+          "oklch(73% 0.024 82)",
+          "oklch(84% 0.022 82)",
+          "oklch(91% 0.018 82)",
+          "oklch(96% 0.01 82)"
+        ]
+      },
+      "paper-2": {
+        "role": "neutral",
+        "displayName": "Warm Dune",
+        "canonical": "#e6dac4",
+        "tonalRamp": [
+          "oklch(20% 0.016 78)",
+          "oklch(33% 0.022 78)",
+          "oklch(47% 0.028 78)",
+          "oklch(60% 0.032 78)",
+          "oklch(73% 0.032 78)",
+          "oklch(84% 0.028 78)",
+          "oklch(90% 0.02 78)",
+          "oklch(96% 0.01 78)"
+        ]
+      },
+      "paper-3": {
+        "role": "neutral",
+        "displayName": "Natural Sand",
+        "canonical": "#cdbb9c",
+        "tonalRamp": [
+          "oklch(20% 0.02 76)",
+          "oklch(33% 0.028 76)",
+          "oklch(47% 0.036 76)",
+          "oklch(60% 0.04 76)",
+          "oklch(72% 0.04 76)",
+          "oklch(82% 0.032 76)",
+          "oklch(90% 0.02 76)",
+          "oklch(96% 0.008 76)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Warm Alabaster",
+        "canonical": "#fffdf8",
+        "tonalRamp": [
+          "oklch(22% 0.006 85)",
+          "oklch(36% 0.008 85)",
+          "oklch(50% 0.01 85)",
+          "oklch(64% 0.01 85)",
+          "oklch(77% 0.01 85)",
+          "oklch(88% 0.009 85)",
+          "oklch(94% 0.008 85)",
+          "oklch(99% 0.006 85)"
+        ]
+      },
+      "forest-ink": {
+        "role": "neutral",
+        "displayName": "Soft Cream Ink",
+        "canonical": "#f4f0e6",
+        "tonalRamp": [
+          "oklch(20% 0.01 84)",
+          "oklch(34% 0.014 84)",
+          "oklch(48% 0.016 84)",
+          "oklch(62% 0.018 84)",
+          "oklch(75% 0.016 84)",
+          "oklch(86% 0.014 84)",
+          "oklch(92% 0.012 84)",
+          "oklch(96% 0.008 84)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Espresso Ink",
+        "canonical": "#25201d",
+        "tonalRamp": [
+          "oklch(16% 0.01 48)",
+          "oklch(25% 0.012 48)",
+          "oklch(37% 0.014 48)",
+          "oklch(50% 0.014 48)",
+          "oklch(63% 0.012 48)",
+          "oklch(76% 0.01 48)",
+          "oklch(87% 0.008 48)",
+          "oklch(95% 0.004 48)"
+        ]
+      },
+      "accent-ink": {
+        "role": "neutral",
+        "displayName": "Dark Accent Ink",
+        "canonical": "#2d2522",
+        "tonalRamp": [
+          "oklch(17% 0.014 38)",
+          "oklch(27% 0.016 38)",
+          "oklch(39% 0.018 38)",
+          "oklch(52% 0.018 38)",
+          "oklch(65% 0.016 38)",
+          "oklch(77% 0.012 38)",
+          "oklch(88% 0.008 38)",
+          "oklch(95% 0.004 38)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Warm Umber Muted",
+        "canonical": "#584b44",
+        "tonalRamp": [
+          "oklch(18% 0.014 46)",
+          "oklch(29% 0.018 46)",
+          "oklch(42% 0.02 46)",
+          "oklch(54% 0.02 46)",
+          "oklch(66% 0.018 46)",
+          "oklch(78% 0.014 46)",
+          "oklch(88% 0.01 46)",
+          "oklch(95% 0.005 46)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Parchment Rule",
+        "canonical": "#d4c4aa",
+        "tonalRamp": [
+          "oklch(20% 0.018 74)",
+          "oklch(33% 0.024 74)",
+          "oklch(47% 0.03 74)",
+          "oklch(60% 0.034 74)",
+          "oklch(73% 0.034 74)",
+          "oklch(82% 0.03 74)",
+          "oklch(90% 0.018 74)",
+          "oklch(96% 0.008 74)"
+        ]
+      },
+      "rule-2": {
+        "role": "neutral",
+        "displayName": "Warm Bark Rule",
+        "canonical": "#9a816f",
+        "tonalRamp": [
+          "oklch(19% 0.02 52)",
+          "oklch(31% 0.028 52)",
+          "oklch(44% 0.034 52)",
+          "oklch(57% 0.038 52)",
+          "oklch(68% 0.034 52)",
+          "oklch(79% 0.026 52)",
+          "oklch(88% 0.016 52)",
+          "oklch(95% 0.006 52)"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Deep Night",
+        "canonical": "#111914",
+        "tonalRamp": [
+          "oklch(14% 0.014 150)",
+          "oklch(22% 0.018 150)",
+          "oklch(34% 0.02 150)",
+          "oklch(47% 0.02 150)",
+          "oklch(60% 0.018 150)",
+          "oklch(74% 0.014 150)",
+          "oklch(86% 0.01 150)",
+          "oklch(95% 0.005 150)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus Moss",
+        "canonical": "#44693d",
+        "tonalRamp": [
+          "oklch(19% 0.04 138)",
+          "oklch(31% 0.058 138)",
+          "oklch(44% 0.072 138)",
+          "oklch(56% 0.072 138)",
+          "oklch(68% 0.058 138)",
+          "oklch(79% 0.042 138)",
+          "oklch(88% 0.024 138)",
+          "oklch(95% 0.01 138)"
+        ]
+      },
+      "error": {
+        "role": "neutral",
+        "displayName": "Semantic Error",
+        "canonical": "oklch(52% 0.19 27)",
+        "tonalRamp": [
+          "oklch(22% 0.09 27)",
+          "oklch(34% 0.14 27)",
+          "oklch(45% 0.18 27)",
+          "oklch(52% 0.19 27)",
+          "oklch(64% 0.15 27)",
+          "oklch(76% 0.1 27)",
+          "oklch(87% 0.055 27)",
+          "oklch(95% 0.02 27)"
+        ]
+      },
+      "success": {
+        "role": "neutral",
+        "displayName": "Semantic Success",
+        "canonical": "oklch(50% 0.12 150)",
+        "tonalRamp": [
+          "oklch(20% 0.055 150)",
+          "oklch(32% 0.085 150)",
+          "oklch(42% 0.11 150)",
+          "oklch(50% 0.12 150)",
+          "oklch(63% 0.095 150)",
+          "oklch(76% 0.068 150)",
+          "oklch(87% 0.038 150)",
+          "oklch(95% 0.014 150)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Primary h1 hero headlines and marquee statements, capped at 20ch."
+      },
+      "display-sm": {
+        "displayName": "Display Small",
+        "purpose": "Secondary page titles, founder section headings, and Process headers."
+      },
+      "section": {
+        "displayName": "Section Headline",
+        "purpose": "Standard h2 section titles across landing, capability, and FAQ bands, capped at 30ch."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card headings (h3), FAQ questions, and Story subheadings, capped at 40ch."
+      },
+      "lead": {
+        "displayName": "Lead Paragraph",
+        "purpose": "Editorial introductory paragraphs (.lead), capped at 52ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default reading copy (16px), constrained to 62ch-65ch (--measure-copy)."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Navigation links, card summaries, form labels, and footer contact details (14px)."
+      },
+      "label": {
+        "displayName": "Label & Eyebrow",
+        "purpose": "Section indices, category chips, stage badges, hints, and legal footnotes (13px minimum)."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card",
+        "value": "0 2rem 5rem color-mix(in srgb, var(--color-wood) 12%, transparent)",
+        "purpose": "Diffuse warm-wood ambient lift for capability cards, booking scheduler, and floating chat chrome."
+      },
+      {
+        "name": "popover",
+        "value": "0 1rem 2.5rem color-mix(in srgb, var(--color-night) 24%, transparent)",
+        "purpose": "Short-range elevation for the scrolled floating header pill, language switcher menus, and inline Story reference popovers."
+      },
+      {
+        "name": "panel",
+        "value": "0 1.75rem 4.5rem color-mix(in srgb, var(--color-night) 32%, transparent)",
+        "purpose": "Deep ambient separation for active horizontal showcase slices and the dark enquiry panel card."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Primary deceleration curve for hovers, reveals, header contraction, and drawer transitions."
+      },
+      {
+        "name": "ease-in",
+        "value": "cubic-bezier(0.7, 0, 0.84, 0)",
+        "purpose": "Exit acceleration for dismissing overlays."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Symmetric curve for panel sweeps and state toggles."
+      },
+      {
+        "name": "dur-micro",
+        "value": "120ms",
+        "purpose": "Tactile active-press feedback on buttons."
+      },
+      {
+        "name": "dur-short",
+        "value": "220ms",
+        "purpose": "Default hover, focus, border, and color transitions."
+      },
+      {
+        "name": "dur-long",
+        "value": "420ms",
+        "purpose": "Header pill compaction, logo resize, and large editorial reveals."
+      },
+      {
+        "name": "dur-slow",
+        "value": "650ms",
+        "purpose": "Deliberate editorial media cross-fades and hover image scales."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "compact",
+        "value": "736px"
+      },
+      {
+        "name": "tablet",
+        "value": "1024px"
+      },
+      {
+        "name": "desktop-nav",
+        "value": "1152px"
+      },
+      {
+        "name": "laptop",
+        "value": "1280px"
+      },
+      {
+        "name": "container",
+        "value": "1440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button (Dark Surface)",
+      "kind": "button",
+      "refersTo": "button-primary-dark",
+      "description": "Primary conversion CTA on dark grounds (Hero, Enquiry, Product Brief, Footer newsletter).",
+      "html": "<div class=\"ds-dark-stage\"><button type=\"button\" class=\"ds-btn-primary-dark\">Share your product idea (1 min)</button></div>",
+      "css": ".ds-dark-stage { background: var(--color-wood, #4d342f); padding: 20px; border-radius: var(--radius-card, 1.25rem); display: inline-flex; } .ds-btn-primary-dark { display: inline-flex; min-height: var(--control-height, 54px); padding: var(--space-sm, 12px) var(--space-lg, 24px); align-items: center; justify-content: center; border: 1px solid var(--color-gold, #b99a58); border-radius: var(--radius-pill, 999px); background: var(--color-gold, #b99a58); color: var(--color-night, #111914); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-md, 1rem); font-weight: 600; cursor: pointer; transition: background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), border-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), transform var(--dur-micro, 120ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-btn-primary-dark:hover { background: var(--color-paper, #f2ecdf); border-color: var(--color-paper, #f2ecdf); } .ds-btn-primary-dark:active { transform: translateY(1px); } .ds-btn-primary-dark:focus-visible { outline: 2px solid var(--color-gold, #b99a58); outline-offset: 3px; }"
+    },
+    {
+      "name": "Primary Button (Light Surface)",
+      "kind": "button",
+      "refersTo": "button-primary-light",
+      "description": "Primary conversion CTA on Parchment and Alabaster surfaces (Capabilities, Menu, FAQ, Booking).",
+      "html": "<button type=\"button\" class=\"ds-btn-primary-light\"><span>Start leather bags brief</span><svg aria-hidden=\"true\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 8h10M9 4l4 4-4 4\"/></svg></button>",
+      "css": ".ds-btn-primary-light { display: inline-flex; min-height: var(--control-height, 54px); padding: var(--space-sm, 12px) var(--space-lg, 24px); align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--color-forest-deep, #182d20); border-radius: var(--radius-pill, 999px); background: var(--color-forest-deep, #182d20); color: var(--color-paper, #f2ecdf); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-sm, 0.875rem); font-weight: 600; cursor: pointer; transition: background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), border-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), transform var(--dur-micro, 120ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-btn-primary-light:hover { background: var(--color-clay-ink, #833e28); border-color: var(--color-clay-ink, #833e28); } .ds-btn-primary-light:active { transform: translateY(1px); } .ds-btn-primary-light:focus-visible { outline: 2px solid var(--color-focus, #44693d); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Outline Button",
+      "kind": "button",
+      "refersTo": "button-secondary-light",
+      "description": "Paired secondary call to action on light surfaces, inverting cleanly to Deep Forest on hover.",
+      "html": "<button type=\"button\" class=\"ds-btn-secondary\">Book a free 15-min call</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; min-height: var(--control-height, 54px); padding: var(--space-sm, 12px) 20px; align-items: center; justify-content: center; border: 1px solid var(--color-forest-deep, #182d20); border-radius: var(--radius-pill, 999px); background: transparent; color: var(--color-forest-deep, #182d20); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-sm, 0.875rem); font-weight: 600; cursor: pointer; transition: background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-btn-secondary:hover { background: var(--color-forest-deep, #182d20); color: var(--color-paper, #f2ecdf); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-focus, #44693d); outline-offset: 2px; }"
+    },
+    {
+      "name": "Selection Chips & Stage Badge",
+      "kind": "chip",
+      "refersTo": "chip-active-light",
+      "description": "Full-pill interactive selection toggles (44px minimum height) and Pale Sage stage indicators.",
+      "html": "<div class=\"ds-chip-row\"><button type=\"button\" class=\"ds-chip ds-chip-active\" aria-pressed=\"true\">15 min · Quick intro</button><button type=\"button\" class=\"ds-chip\" aria-pressed=\"false\">30 min · Product Brief</button><span class=\"ds-stage-badge\">01 / 06</span></div>",
+      "css": ".ds-chip-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .ds-chip { display: inline-flex; min-height: var(--tap-min, 44px); padding: 8px 16px; align-items: center; border: 1px solid var(--color-rule, #d4c4aa); border-radius: var(--radius-pill, 999px); background: var(--color-paper, #f2ecdf); color: var(--color-forest-deep, #182d20); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-xs, 0.8125rem); font-weight: 600; cursor: pointer; transition: border-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-chip:hover { border-color: var(--color-forest, #35563a); } .ds-chip-active { border-color: var(--color-forest-deep, #182d20); background: var(--color-forest-deep, #182d20); color: var(--color-paper, #f2ecdf); } .ds-chip:focus-visible { outline: 2px solid var(--color-focus, #44693d); outline-offset: 2px; } .ds-stage-badge { display: inline-flex; padding: 5px 12px; border-radius: var(--radius-pill, 999px); background: var(--color-pale-sage, #d9dfd3); color: var(--color-forest-deep, #182d20); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-xs, 0.8125rem); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; }"
+    },
+    {
+      "name": "Editorial Surface Card",
+      "kind": "card",
+      "refersTo": "card-light",
+      "description": "Warm Alabaster capability or specification card with 20px corners, Parchment hairline rule, and diffuse warm-wood shadow.",
+      "html": "<article class=\"ds-card\"><p class=\"ds-card-eyebrow\">01 · Kolkata &amp; Kanpur</p><h3 class=\"ds-card-title\">Leather bags and small leather goods</h3><p class=\"ds-card-body\">Vegetable-tanned hides, light cotton linings, antique brass hardware, and high-quality Japanese plastic YKK zippers checked on site before cutting starts.</p></article>",
+      "css": ".ds-card { display: grid; gap: 12px; max-width: 360px; padding: var(--space-lg, 24px); border: 1px solid var(--color-rule, #d4c4aa); border-radius: var(--radius-card, 1.25rem); background: var(--color-white, #fffdf8); color: var(--color-ink, #25201d); box-shadow: var(--shadow-card, 0 2rem 5rem color-mix(in srgb, #4d342f 12%, transparent)); } .ds-card-eyebrow { margin: 0; color: var(--color-clay-ink, #833e28); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-xs, 0.8125rem); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; } .ds-card-title { margin: 0; color: var(--color-forest-deep, #182d20); font-family: var(--font-display, Georgia, serif); font-size: var(--text-xl, 1.5625rem); font-weight: 400; line-height: 1.15; letter-spacing: var(--tracking-display, -0.012em); } .ds-card-body { margin: 0; color: var(--color-ink-2, #4d342f); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-sm, 0.875rem); line-height: 1.62; }"
+    },
+    {
+      "name": "Form Input Field",
+      "kind": "input",
+      "refersTo": "input-light",
+      "description": "54px softened-corner (12px) input pairing Warm Parchment ground with Botanical Forest focus state.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-email\">Email address</label><input id=\"ds-email\" class=\"ds-input\" type=\"email\" placeholder=\"name@company.com\" /></div>",
+      "css": ".ds-field { display: grid; gap: 6px; max-width: 340px; } .ds-field-label { color: var(--color-ink-2, #4d342f); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-xs, 0.8125rem); font-weight: 600; } .ds-input { width: 100%; min-height: var(--control-height, 54px); padding: 0 var(--space-md, 16px); border: 1px solid var(--color-rule, #d4c4aa); border-radius: var(--radius-input, 0.75rem); background: var(--color-paper, #f2ecdf); color: var(--color-forest-deep, #182d20); font-family: var(--font-body, system-ui, sans-serif); font-size: var(--text-md, 1rem); transition: border-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-input::placeholder { color: var(--color-muted, #584b44); } .ds-input:hover { border-color: var(--color-rule-2, #9a816f); } .ds-input:focus-visible { border-color: var(--color-forest, #35563a); background: var(--color-white, #fffdf8); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #44693d) 18%, transparent); outline: 0; }"
+    },
+    {
+      "name": "Floating Pill Header (Scrolled)",
+      "kind": "nav",
+      "refersTo": "nav-scrolled",
+      "description": "Compacted 68px dark glass pill navigation bar with Clay-underlined active link, language toggle, and Antique Brass CTA.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Primary\"><span class=\"ds-nav-brand\">KarmaRise D Global</span><div class=\"ds-nav-links\"><a href=\"#\" class=\"ds-nav-link\" aria-current=\"page\">Manufacturing</a><a href=\"#\" class=\"ds-nav-link\">How we work</a><a href=\"#\" class=\"ds-nav-link\">Stories</a></div><div class=\"ds-nav-actions\"><button type=\"button\" class=\"ds-nav-lang\"><span>English</span><svg aria-hidden=\"true\" width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m4 6 4 4 4-4\"/></svg></button><a href=\"#\" class=\"ds-nav-cta\">Share your idea</a></div></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 68px; padding: 8px 16px; border-radius: var(--radius-pill, 999px); background: color-mix(in srgb, var(--color-night, #111914) 90%, transparent); color: var(--color-paper, #f2ecdf); box-shadow: var(--shadow-popover, 0 1rem 2.5rem color-mix(in srgb, #111914 24%, transparent)); backdrop-filter: blur(18px); font-family: var(--font-body, system-ui, sans-serif); } .ds-nav-brand { font-family: var(--font-display, Georgia, serif); font-size: var(--text-md, 1rem); white-space: nowrap; } .ds-nav-links { display: flex; align-items: center; gap: 20px; } .ds-nav-link { display: inline-flex; min-height: var(--tap-min, 44px); align-items: center; color: inherit; font-size: var(--text-sm, 0.875rem); font-weight: 500; text-decoration: none; opacity: 0.88; transition: opacity var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-nav-link:hover, .ds-nav-link[aria-current=\"page\"] { opacity: 1; text-decoration: underline; text-decoration-color: var(--color-clay, #bd7057); text-underline-offset: 6px; } .ds-nav-actions { display: flex; align-items: center; gap: 10px; } .ds-nav-lang { display: inline-flex; min-height: var(--tap-min, 44px); padding: 0 14px; align-items: center; gap: 6px; border: 0; border-radius: var(--radius-pill, 999px); background: color-mix(in srgb, currentColor 8%, transparent); color: inherit; font-size: var(--text-sm, 0.875rem); font-weight: 500; cursor: pointer; transition: background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-nav-lang:hover { background: var(--color-paper, #f2ecdf); color: var(--color-night, #111914); } .ds-nav-cta { display: inline-flex; min-height: var(--tap-min, 44px); padding: 0 16px; align-items: center; border: 1px solid var(--color-gold, #b99a58); border-radius: var(--radius-pill, 999px); background: var(--color-gold, #b99a58); color: var(--color-night, #111914); font-size: var(--text-sm, 0.875rem); font-weight: 600; text-decoration: none; transition: background-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), border-color var(--dur-short, 220ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-nav-cta:hover { background: var(--color-paper, #f2ecdf); border-color: var(--color-paper, #f2ecdf); } .ds-nav-link:focus-visible, .ds-nav-lang:focus-visible, .ds-nav-cta:focus-visible { outline: 2px solid var(--color-gold, #b99a58); outline-offset: 2px; }"
+    },
+    {
+      "name": "Arched Atelier Frame",
+      "kind": "custom",
+      "refersTo": "card-light",
+      "description": "Signature editorial photography frame with semicircular arch top corners echoing the KarmaRise D Global logo.",
+      "html": "<figure class=\"ds-arch\"><div class=\"ds-arch-meta\"><span>Photo</span><span>4:3</span></div><figcaption class=\"ds-arch-caption\">Physical colour swatches checked beside the stitching line in India</figcaption></figure>",
+      "css": ".ds-arch { position: relative; margin: 0; width: 280px; min-height: 320px; padding: 48px 20px 16px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; border: 1px solid var(--color-rule, #d4c4aa); border-radius: 140px 140px var(--radius-card, 1.25rem) var(--radius-card, 1.25rem); background: linear-gradient(160deg, var(--color-paper-2, #e6dac4), var(--color-paper-3, #cdbb9c)); color: var(--color-forest-deep, #182d20); font-family: var(--font-body, system-ui, sans-serif); } .ds-arch-meta { display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent); color: var(--color-clay-ink, #833e28); font-size: var(--text-xs, 0.8125rem); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; } .ds-arch-caption { margin-top: auto; padding: 8px 12px; border-radius: var(--radius-pill, 999px); background: color-mix(in srgb, var(--color-night, #111914) 78%, transparent); color: var(--color-paper, #f2ecdf); font-size: var(--text-xs, 0.8125rem); line-height: 1.35; backdrop-filter: blur(8px); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Sunlit Atelier",
+    "overview": "KarmaRise D Global connects independent retail boutiques, fashion brands, and retail chains in Spain and the rest of Europe with specialist production units across India. The visual system brings that direct, hands-on partnership onto the screen through warm natural craft: unbleached parchment canvases, botanical forest grounds, raw timber surfaces, terracotta clay accents, and antique brass calls to action. Rather than staging cold industrial capacity or distant corporate prestige, every screen feels like sitting across a sunlit table with Alma and Shirish, examining vegetable-tanned hides, physical colour swatches, and sewn samples in natural light.\n\nPages breathe at an editorial pace. Wide outer gutters, unhurried vertical section gaps, and calm 12-column grids let real photography of founders, artisans, leather, and natural fabrics lead the eye before structured forms or specifications ask for a decision. Surface tone shifts carry narrative transitions across long pages, moving organically between Warm Parchment, Warm Dune, Pale Sage, Deep Forest, Raw Wood, and Deep Night while keeping both English (`en-GB`) and Peninsular Spanish (`es-ES`) copy legible and balanced.\n\nThe visual system explicitly rejects sterile B2B agency gloss, cold factory stock grids, neon startup gradients, and loud luxury excess. No social media links appear in site chrome, and every visual token supports warm, grounded, professional clarity without decoration for its own sake.",
+    "keyCharacteristics": [
+      "Warm editorial craft anchored in real natural materials: parchment, dune, botanical forest, terracotta clay, raw timber, and antique brass.",
+      "Tonal layering first, using full-bleed surface shifts and hairline parchment rules for structure while reserving soft ambient shadows for elevated interactive controls and dialogs.",
+      "One tactile shape family derived directly from the KarmaRise D Global logo: full-pill CTAs and chips, generously rounded 20px cards, softened 12px inputs, and arched editorial photo frames.",
+      "Two-font editorial hierarchy pairing flared-serif Marcellus display headings (weight 400 only) with humanist-geometric Plus Jakarta Sans UI and body copy.",
+      "Bilingual layout resilience engineered for English (`en-GB`) and Spanish (`es-ES`) expansion, maintaining 44px minimum touch targets and WCAG AA contrast across every surface."
+    ],
+    "rules": [
+      {
+        "name": "The Adapted Clay Rule",
+        "body": "Raw Terracotta Clay (`#bd7057`) fails WCAG AA contrast for small text (3.2:1 on Warm Parchment, 2.7:1 on Pale Sage, 3.0:1 on Raw Wood). Restrict `#bd7057` strictly to underlines, dots, borders, and graphics. Use Deep Terracotta Ink (`#833e28`) for accent text on light surfaces and Pale Terracotta (`#eab099`) or Antique Brass (`#b99a58`) on dark surfaces.",
+        "section": "colors"
+      },
+      {
+        "name": "The Surface-Aware Primary Rule",
+        "body": "Primary conversion actions adapt to their surface contrast rather than forcing one flat fill everywhere: Antique Brass (`#b99a58`) with Deep Night (`#111914`) ink on dark grounds, and Deep Forest (`#182d20`) with Warm Parchment (`#f2ecdf`) ink on light grounds.",
+        "section": "colors"
+      },
+      {
+        "name": "The Organic Seam Rule",
+        "body": "Adjacent sections with contrasting grounds transition through calibrated surface gradients (`SectionBridge` or multi-stop surface melts using `color-mix()` over canonical surface tokens) so high-contrast shifts from Parchment to Forest or Night never turn muddy grey and never introduce undocumented hex stops.",
+        "section": "colors"
+      },
+      {
+        "name": "The Honest Regular Rule",
+        "body": "Marcellus loads strictly at weight `400` with `font-synthesis: none` declared on `h1, h2, h3`. Never apply `font-medium` (`500`) or `font-semibold` (`600`) to Marcellus elements; scale hierarchy through size (`--text-display`, `--text-section`, `--text-title`) and contrast instead of synthetic weight.",
+        "section": "typography"
+      },
+      {
+        "name": "The Two-Font Ceiling Rule",
+        "body": "All screens use Marcellus for display/editorial headings and Plus Jakarta Sans for UI, controls, and reading copy. Monospace is never added; tabular figures (`font-variant-numeric: tabular-nums`) handle dates, counters, and legal registration numbers cleanly inside Plus Jakarta Sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Scale Discipline Rule",
+        "body": "Choose typography sizes from the `tokens.css` modular scale (`--text-xs` through `--text-3xl` and fluid `--text-display`, `--text-display-s`, `--text-section`, `--text-title`, `--text-lead`). Live localhost capture (`output/localhost/DESIGN.md`) revealed over 35 computed text-size variants caused by one-off `clamp()` overrides and `0.68rem` micro-labels; consolidate off-scale values back onto the canonical scale.",
+        "section": "typography"
+      },
+      {
+        "name": "The Warm Shadow Rule",
+        "body": "Never cast pure `#000000` or neutral cool-grey shadows. Tint every shadow from `--color-wood`, `--color-forest-deep`, or `--color-night` using `color-mix()` so elevation blends with parchment and timber surfaces.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Tonal Plane First Rule",
+        "body": "Reach for a surface shift (`paper` to `paper-2` or `pale-sage`) and a `1px` `--color-rule` border before adding a drop shadow. Reserve `--shadow-card` for interactive surfaces, floating chrome, and key conversion cards.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Single Shape Family Rule",
+        "body": "Buttons, chips, and floating bars are full pills (`--radius-pill: 999px`); inputs, glossary cards, and nested controls are `12px` (`--radius-input: 0.75rem`); popovers and chat bubbles are `16px` (`--radius-panel: 1rem`); cards and drawers are `20px` (`--radius-card: 1.25rem`); showcase portraits use `--radius-arch`. Never introduce sharp `0px` interactive controls or arbitrary intermediate radii outside this ladder.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Concentric Nesting Rule",
+        "body": "Never place a `20px` card inside a `20px` card or a sharp square inside a `20px` rounded shell. Step inner radii down (`card 20px` -> `nested media or sub-card 12px`) so corners track cleanly.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do use CSS custom properties from `src/app/tokens.css` (`var(--color-*)`, `var(--text-*)`, `var(--space-*)`, `var(--radius-*)`, `var(--shadow-card)`, `var(--tap-min)`, `var(--control-height)`, `var(--z-*)`, `var(--dur-*)`, `var(--ease-*)`) across every component and stylesheet.",
+      "Do pair Antique Brass (`#b99a58`) primary buttons with Deep Night (`#111914`) text on dark grounds, and Deep Forest (`#182d20`) primary buttons with Warm Parchment (`#f2ecdf`) text on light grounds.",
+      "Do use Deep Terracotta Ink (`#833e28`) for small accent text on light surfaces and Pale Terracotta (`#eab099`) or Antique Brass (`#b99a58`) on dark surfaces (The Adapted Clay Rule).",
+      "Do enforce `44px` (`--tap-min`) minimum height on every interactive button, chip, link, and calendar cell, and `54px` (`--control-height`) on primary CTAs and form fields.",
+      "Do keep Marcellus strictly at weight `400` and apply `tabular-nums` (`.num`) to every counter, step number, date, and registration code.",
+      "Do unify all UI outline SVGs on `stroke=\"currentColor\"`, `strokeWidth=\"1.6\"`, `strokeLinecap=\"round\"`, and `strokeLinejoin=\"round\"`, and apply pill (`999px`) or rounded (`12px`/`20px`) corners consistently across all routes including Stories.",
+      "Do test every layout and button label in both English (`en-GB`) and Spanish (`es-ES`) down to `320px` width to catch wrapping and overflow before shipping."
+    ],
+    "donts": [
+      "Don't hardcode hex colors, `rgba()` strings, arbitrary `shadow-[...]` values, or uncalibrated intermediate gradient hex stops inside `src/components/`; compose blends with `color-mix()` over canonical surface tokens.",
+      "Don't use raw Terracotta Clay (`#bd7057`) for small text, labels, or error messages where contrast falls below WCAG AA 4.5:1.",
+      "Don't apply `font-medium` (`500`) or `font-semibold` (`600`) to Marcellus headings, and don't drop readable UI labels below `0.8125rem` (`--text-xs`).",
+      "Don't mix sharp `0px` buttons, cards, or chips into the rounded pill-and-card shape language, or invent arbitrary intermediate radii (`0.6rem`, `0.85rem`, `0.9rem`) outside the `--radius-input` / `--radius-panel` / `--radius-card` / `--radius-pill` ladder.",
+      "Don't add a third font family, pure `#000000` drop shadows, social media profile links in site chrome, or generic B2B SaaS gradients and icons.",
+      "Don't ship interactive pill controls at `34px`, `36px`, `38px`, `40px`, or `42px` height when `--tap-min` (`44px`) is the accessibility floor."
+    ]
+  }
+}

@@ -46,11 +46,19 @@
   --font-display: var(--font-marcellus), Georgia, serif;
   --font-body: var(--font-jakarta), system-ui, sans-serif;
   --font-technical: var(--font-jakarta), system-ui, sans-serif;
+  --radius-input: 0.75rem;
+  --radius-panel: 1rem;
   --radius-card: 1.25rem;
   --radius-pill: 999px;
   --shadow-card: 0 2rem 5rem
     color-mix(in srgb, var(--color-wood) 12%, transparent);
+  --shadow-popover: 0 1rem 2.5rem
+    color-mix(in srgb, var(--color-night) 24%, transparent);
+  --shadow-panel: 0 1.75rem 4.5rem
+    color-mix(in srgb, var(--color-night) 32%, transparent);
   --tracking-display: -0.012em;
+  --tracking-label: 0.06em;
+  --tracking-eyebrow: 0.1em;
 }
 :root {
   color-scheme: light;
@@ -67,6 +75,11 @@
   --dur-micro: 120ms;
   --dur-short: 220ms;
   --dur-long: 420ms;
+  --dur-slow: 650ms;
+  --radius-arch: 19rem;
+  --icon-stroke: 1.6;
+  --filter-logo-light: brightness(0) invert(96%) sepia(12%) saturate(349%)
+    hue-rotate(344deg) brightness(103%) contrast(93%);
   --container: 1440px;
   --gutter: 64px;
   --gap-columns: 32px;
@@ -94,6 +107,7 @@
     --section-gap-s: 96px;
     --section-gap: 112px;
     --section-gap-l: 136px;
+    --radius-arch: 12rem;
   }
 }
 @media (width < 64rem) {
@@ -103,6 +117,12 @@
     --section-gap-s: 76px;
     --section-gap: 92px;
     --section-gap-l: 112px;
+    --radius-arch: 10rem;
+  }
+}
+@media (width < 46rem) {
+  :root {
+    --radius-arch: 6rem;
   }
 }
 @media (width < 40rem) {

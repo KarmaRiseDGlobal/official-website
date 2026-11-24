@@ -14,6 +14,7 @@ out/
 # local environment
 .env*
 !.env.example
+/audio/
 
 # logs and coverage
 *.log

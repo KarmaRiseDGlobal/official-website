@@ -1,10 +1,24 @@
 import type { Metadata } from "next";
 
-import { AlmarisePageClient } from "@/app/almarise/almarise-client";
+import { AlmarisePageClient } from "@/views/almarise-client";
 import { getRouteMetadata } from "@/lib/seo";
+import {
+  getAlmariseStructuredData,
+  serializeJsonLd,
+} from "@/lib/structured-data";
 
 export const metadata: Metadata = getRouteMetadata("almarise", "es");
 
 export default function SpanishAlmarisePage() {
-  return <AlmarisePageClient />;
+  const structuredData = getAlmariseStructuredData("es");
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+      />
+      <AlmarisePageClient lang="es" />
+    </>
+  );
 }

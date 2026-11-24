@@ -41,7 +41,7 @@ The Parties wish to explore, evaluate, and potentially execute a **Manufacturing
 
 1. Each Party shall hold the other Party's Confidential Information in strict confidence and shall use it solely for the Purpose.
 2. **Controlled Workshop Disclosure:** KarmaRise shall disclose the Client's product specifications only to shortlisted Indian Manufacturing Partners on a strict need-to-know basis to evaluate feasibility, prepare sampling, or execute an approved Manufacturing Programme, ensuring such Manufacturing Partners are bound by confidentiality obligations no less protective than this Agreement.
-3. **Zero Third-Party Commercialization:** Neither KarmaRise nor any Manufacturing Partner introduced by KarmaRise shall manufacture, reproduce, display in a showroom, sell, or supply any product derived from the Client's proprietary designs, patterns, moulds, or tech packs for any third party or for KarmaRise's own brands (including Almarise) without the Client's express written consent.
+3. **Zero Third-Party Commercialization:** Neither KarmaRise nor any Manufacturing Partner introduced by KarmaRise shall manufacture, reproduce, display in a showroom, sell, or supply any product derived from the Client's proprietary designs, patterns, moulds, or tech packs for any third party or for KarmaRise's own brands (including AlmaRise D Brand) without the Client's express written consent.
 
 ---
 

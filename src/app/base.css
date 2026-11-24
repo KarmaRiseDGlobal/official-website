@@ -68,6 +68,10 @@ p {
   margin: 0;
   text-wrap: pretty;
 }
+dd,
+figcaption {
+  text-wrap: pretty;
+}
 p:not([class]) {
   max-width: 65ch;
 }
@@ -133,12 +137,7 @@ td.num {
   display: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  *:not(.keep-motion),
-  *:not(.keep-motion)::before,
-  *:not(.keep-motion)::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  html {
     scroll-behavior: auto !important;
   }
 }

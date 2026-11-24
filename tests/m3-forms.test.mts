@@ -365,7 +365,7 @@ test("POST /api/contact routes by strict topic allowlist and honors env override
         topic: "Stories and editorial",
         expectedTo: "stories@karmarisedglobal.com",
       },
-      { topic: "Almarise", expectedTo: "stories@karmarisedglobal.com" },
+      { topic: "AlmaRise D Brand", expectedTo: "stories@karmarisedglobal.com" },
       { topic: "General enquiry", expectedTo: "inquiry@karmarisedglobal.com" },
       {
         topic: "Women's Training Initiative",

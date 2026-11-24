@@ -74,10 +74,10 @@ registerHooks({
       };
     }
     if (
-      specifier === "@/components/site-footer" ||
-      specifier === "@/components/story-media" ||
-      specifier === "@/components/newsletter-form" ||
-      specifier === "@/components/turnstile-field"
+      specifier === "@/components/shell/site-footer" ||
+      specifier === "@/components/stories/story-media" ||
+      specifier === "@/components/forms/newsletter-form" ||
+      specifier === "@/components/forms/turnstile-field"
     ) {
       return {
         shortCircuit: true,
@@ -131,11 +131,11 @@ const { getNewsletterIssueById } = await import("@/lib/sanity");
 const { stories } = await import("@/data/stories");
 const { LanguageProvider } = await import("@/context/language-context");
 const { StoryDetailClient, sanitizePortableLinkHref } =
-  await import("@/components/story-detail-client");
-const { ProductBriefPageClient } =
-  await import("@/app/product-brief/product-brief-client");
-const { ProductBriefForm } = await import("@/components/product-brief-form");
-const { ContactForm } = await import("@/components/contact-form");
+  await import("@/views/story-detail-client");
+const { ProductBriefPageClient } = await import("@/views/product-brief-client");
+const { ProductBriefForm } =
+  await import("@/components/forms/product-brief-form");
+const { ContactForm } = await import("@/components/forms/contact-form");
 
 const FORBIDDEN_COPY_PATTERN =
   /\u2014|&mdash;|&#8212;|ulhasnagar|maharashtra|\bjournal\b|\bdiario\b|worktable|\bchai\b/i;
@@ -695,7 +695,7 @@ test("renderNewsletterHtml sanitizes URLs, escapes attributes, uses spanishLocat
     assert.match(unsafeHtml, /href="https:\/\/karmarisedglobal\.com\/stories"/);
     assert.match(
       unsafeHtml,
-      /src="https:\/\/karmarisedglobal\.com\/images\/alma-and-shirish-founders\.jpg"/,
+      /src="https:\/\/karmarisedglobal\.com\/images\/founders\/alma-and-shirish-founders\.jpg"/,
     );
     assert.match(unsafeHtml, /Por toda la India desde Madrid/);
     assertCleanVoiceAndCopy(unsafeHtml, "renderNewsletterHtml ES unsafe");

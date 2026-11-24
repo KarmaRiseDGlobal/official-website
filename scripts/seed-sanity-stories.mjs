@@ -2,11 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { stories } from "../src/data/stories-fallback.server.ts";
 import {
   getCategoryDetail,
-  stories,
   storyCategoryDetails,
-} from "../src/data/stories.ts";
+} from "../src/data/story-types.ts";
 
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -116,20 +116,197 @@ async function uploadPublicImageToSanity(
   return assetId;
 }
 
+const INLINE_MARKDOWN_LINK_PATTERN =
+  /\[([^[\]\r\n]+)\]\(((?:[^()\s]+|\([^()\s]*\))+)\)/g;
+
+function sanitizePortableLinkHref(rawHref) {
+  if (typeof rawHref !== "string") {
+    return null;
+  }
+
+  if (/[\u0000-\u001F\u007F]/.test(rawHref)) {
+    return null;
+  }
+
+  const trimmed = rawHref.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith("#")) {
+    return trimmed.length > 1 && !/\s/.test(trimmed) ? trimmed : null;
+  }
+
+  if (trimmed.startsWith("/")) {
+    if (trimmed.startsWith("//") || trimmed.startsWith("/\\")) {
+      return null;
+    }
+
+    try {
+      const resolved = new URL(trimmed, "https://karmarisedglobal.invalid");
+      return resolved.origin === "https://karmarisedglobal.invalid"
+        ? trimmed
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  if (/^mailto:/i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      if (
+        parsed.protocol === "mailto:" &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parsed.pathname)
+      ) {
+        return trimmed;
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      if (
+        (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+        Boolean(parsed.hostname) &&
+        !parsed.username &&
+        !parsed.password
+      ) {
+        return parsed.href;
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  }
+
+  return null;
+}
+
+export function parseParagraphWithInlineLinks(paragraph, keyPrefix) {
+  if (!paragraph.includes("](")) {
+    return {
+      children: [
+        {
+          _key: `${keyPrefix}-span-0`,
+          _type: "span",
+          text: paragraph,
+          marks: [],
+        },
+      ],
+      markDefs: [],
+    };
+  }
+
+  const children = [];
+  const markDefs = [];
+  let plainBuffer = "";
+  let lastIndex = 0;
+  let spanIndex = 0;
+  let linkIndex = 0;
+
+  const flushPlain = () => {
+    if (!plainBuffer) {
+      return;
+    }
+    children.push({
+      _key: `${keyPrefix}-span-${spanIndex}`,
+      _type: "span",
+      text: plainBuffer,
+      marks: [],
+    });
+    spanIndex += 1;
+    plainBuffer = "";
+  };
+
+  for (const match of paragraph.matchAll(INLINE_MARKDOWN_LINK_PATTERN)) {
+    const matchIndex = match.index ?? 0;
+    const label = match[1] ?? "";
+    const rawHref = match[2] ?? "";
+
+    if (matchIndex > lastIndex) {
+      plainBuffer += paragraph.slice(lastIndex, matchIndex);
+    }
+
+    const safeHref = sanitizePortableLinkHref(rawHref);
+    if (safeHref && label) {
+      flushPlain();
+      const markKey = `${keyPrefix}-link-${linkIndex}`;
+      linkIndex += 1;
+      const isExternal = /^https?:\/\//i.test(safeHref);
+      markDefs.push({
+        _key: markKey,
+        _type: "link",
+        href: safeHref,
+        blank: isExternal,
+      });
+      children.push({
+        _key: `${keyPrefix}-span-${spanIndex}`,
+        _type: "span",
+        text: label,
+        marks: [markKey],
+      });
+      spanIndex += 1;
+    } else {
+      plainBuffer += label || match[0];
+    }
+
+    lastIndex = matchIndex + match[0].length;
+  }
+
+  if (lastIndex < paragraph.length) {
+    plainBuffer += paragraph.slice(lastIndex);
+  }
+  flushPlain();
+
+  if (children.length === 0) {
+    return {
+      children: [
+        {
+          _key: `${keyPrefix}-span-0`,
+          _type: "span",
+          text: paragraph,
+          marks: [],
+        },
+      ],
+      markDefs: [],
+    };
+  }
+
+  return { children, markDefs };
+}
+
+function stripInlineMarkdownLinks(paragraph) {
+  if (!paragraph.includes("](")) {
+    return paragraph;
+  }
+  return paragraph.replace(INLINE_MARKDOWN_LINK_PATTERN, "$1");
+}
+
 export async function buildPortableBodyFromStory(
   story,
   uploadAsset = resolveDryRunAsset,
+  isSpanish = false,
 ) {
   const blocks = [];
+  const sourceSections = isSpanish
+    ? (story.spanishSections ?? [])
+    : story.sections;
+  const sourcePullQuote = isSpanish ? story.spanishPullQuote : story.pullQuote;
+  const keyPrefix = isSpanish ? "es-" : "";
 
-  for (const [sectionIdx, section] of story.sections.entries()) {
+  for (const [sectionIdx, section] of sourceSections.entries()) {
     blocks.push({
-      _key: `h2-${sectionIdx}`,
+      _key: `${keyPrefix}h2-${sectionIdx}`,
       _type: "block",
       style: "h2",
       children: [
         {
-          _key: `h2-span-${sectionIdx}`,
+          _key: `${keyPrefix}h2-span-${sectionIdx}`,
           _type: "span",
           text: section.heading,
           marks: [],
@@ -139,28 +316,26 @@ export async function buildPortableBodyFromStory(
     });
 
     section.paragraphs.forEach((paragraph, pIdx) => {
+      const blockKey = `${keyPrefix}p-${sectionIdx}-${pIdx}`;
+      const { children, markDefs } = parseParagraphWithInlineLinks(
+        paragraph,
+        blockKey,
+      );
       blocks.push({
-        _key: `p-${sectionIdx}-${pIdx}`,
+        _key: blockKey,
         _type: "block",
         style: "normal",
-        children: [
-          {
-            _key: `p-span-${sectionIdx}-${pIdx}`,
-            _type: "span",
-            text: paragraph,
-            marks: [],
-          },
-        ],
-        markDefs: [],
+        children,
+        markDefs,
       });
     });
 
-    if (sectionIdx === 0 && story.pullQuote?.text) {
+    if (sectionIdx === 0 && sourcePullQuote?.text) {
       blocks.push({
-        _key: `quote-${sectionIdx}`,
+        _key: `${keyPrefix}quote-${sectionIdx}`,
         _type: "pullQuoteBlock",
-        text: story.pullQuote.text,
-        attribution: story.pullQuote.attribution,
+        text: sourcePullQuote.text,
+        attribution: sourcePullQuote.attribution,
       });
     }
 
@@ -168,7 +343,7 @@ export async function buildPortableBodyFromStory(
       const imgAssetId = await uploadAsset(img.url);
       if (imgAssetId) {
         blocks.push({
-          _key: `sec-img-${sectionIdx}-${imgIdx}`,
+          _key: `${keyPrefix}sec-img-${sectionIdx}-${imgIdx}`,
           _type: "image",
           alt: img.alt,
           ...(img.caption ? { caption: img.caption } : {}),
@@ -210,7 +385,7 @@ async function mapSectionsForSanity(
     mapped.push({
       _key: `${keyPrefix}-${sectionIndex}`,
       heading: section.heading,
-      paragraphs: section.paragraphs,
+      paragraphs: section.paragraphs.map(stripInlineMarkdownLinks),
       ...(sectionImages.length > 0 ? { images: sectionImages } : {}),
     });
   }
@@ -249,10 +424,14 @@ export async function buildSeedMutations({
 
   // Upload author portraits
   const foundersPortraitId = await uploadAsset(
-    "/images/alma-and-shirish-founders.jpg",
+    "/images/founders/alma-and-shirish-founders.jpg",
   );
-  const almaPortraitId = await uploadAsset("/images/alma.jpeg");
-  const shirishPortraitId = await uploadAsset("/images/shirish.jpeg");
+  const almaPortraitId = await uploadAsset(
+    "/images/founders/alma-portrait.jpeg",
+  );
+  const shirishPortraitId = await uploadAsset(
+    "/images/founders/shirish-portrait.jpeg",
+  );
 
   const authorMutations = [
     {
@@ -265,7 +444,7 @@ export async function buildSeedMutations({
         spanishRole: "Cofundadores, KarmaRise D Global",
         location: "India & Spain",
         spanishLocation: "India y España",
-        bio: "Alma works with Clients in Spain and across Europe while living and working on the ground in India alongside Shirish to oversee Manufacturing Partners across the country.",
+        bio: "Alma works with Clients in Spain and the rest of Europe while living and working on the ground in India alongside Shirish to oversee audited production units across the country.",
         ...(foundersPortraitId
           ? {
               portrait: {
@@ -287,7 +466,7 @@ export async function buildSeedMutations({
         spanishRole: "Cofundadora de KarmaRise D Global",
         location: "Spain & India",
         spanishLocation: "España e India",
-        bio: "Between Spain and India, Alma guides Product Briefs, material selections, and the creative direction of Almarise.",
+        bio: "Between Spain and India, Alma guides Product Briefs, material selections, and the creative direction of AlmaRise D Brand.",
         ...(almaPortraitId
           ? {
               portrait: {
@@ -309,7 +488,7 @@ export async function buildSeedMutations({
         spanishRole: "Cofundador de KarmaRise D Global",
         location: "India",
         spanishLocation: "India",
-        bio: "A lawyer by profession in India, Shirish visits workshops across the country, reviews sample construction, and structures Manufacturing Partner agreements.",
+        bio: "A registered Bar Council advocate in India, Shirish visits audited production units and family-run factories across the country, reviews sample construction, and structures written Indian supplier contracts.",
         ...(shirishPortraitId
           ? {
               portrait: {
@@ -376,13 +555,21 @@ export async function buildSeedMutations({
           ? "author-shirish"
           : "author-alma-and-shirish";
 
-    const [body, mappedSections, mappedSpanishSections] = await Promise.all([
-      buildPortableBodyFromStory(story, uploadAsset),
-      mapSectionsForSanity(story.sections, "section", uploadAsset),
-      story.spanishSections?.length
-        ? mapSectionsForSanity(story.spanishSections, "es-section", uploadAsset)
-        : Promise.resolve(undefined),
-    ]);
+    const [body, spanishBody, mappedSections, mappedSpanishSections] =
+      await Promise.all([
+        buildPortableBodyFromStory(story, uploadAsset, false),
+        story.spanishSections?.length
+          ? buildPortableBodyFromStory(story, uploadAsset, true)
+          : Promise.resolve(undefined),
+        mapSectionsForSanity(story.sections, "section", uploadAsset),
+        story.spanishSections?.length
+          ? mapSectionsForSanity(
+              story.spanishSections,
+              "es-section",
+              uploadAsset,
+            )
+          : Promise.resolve(undefined),
+      ]);
 
     storyMutations.push({
       createOrReplace: {
@@ -450,6 +637,7 @@ export async function buildSeedMutations({
           ? { pairImages: pairImageObjects }
           : {}),
         body,
+        ...(spanishBody?.length ? { spanishBody } : {}),
         leadSlot: story.leadSlot,
         pullQuote: story.pullQuote,
         ...(story.spanishPullQuote
@@ -492,18 +680,18 @@ export async function buildSeedMutations({
       titleEn: "Giving Indian Sarees a Second Life",
       subjectEn: "From Spain to India: our latest Stories",
       previewTextEn:
-        "Vintage silk sarees, workshop visits across India, and how one Product Brief connects two continents.",
+        "Kept sarees, production site visits across India, and how one Product Brief connects two continents.",
       introEn:
-        "Here are three Stories from our work across Spain and India. We have been unrolling vintage sarees for Almarise, visiting workshops across the country, and refining how our Product Briefs travel from Europe to India.",
+        "Here are three Stories from our work across Spain and India. We have been unrolling kept sarees for AlmaRise D Brand, visiting audited production units across the country, and refining how our Product Briefs travel from Spain and the rest of Europe to India.",
       closingEn:
         "Hit reply anytime and tell us what caught your eye or what you are dreaming of making. Every message comes straight to the two of us.",
       ctaTextEn: "Read our latest Stories",
       titleEs: "Una segunda vida para los saris de la India",
       subjectEs: "Entre España y la India: nuestras últimas historias",
       previewTextEs:
-        "Saris antiguos con historia, visitas a talleres por toda la India y cómo trabajamos entre dos continentes.",
+        "Saris guardados con historia, visitas a puntos de producción por toda la India y cómo trabajamos entre dos continentes.",
       introEs:
-        "Queríamos compartir contigo tres historias que resumen muy bien nuestros últimos días entre España y la India: desde cómo elegimos saris antiguos para darles otra vida en Almarise hasta cómo trabajamos a pie de taller.",
+        "Queríamos compartir contigo tres historias que resumen muy bien nuestros últimos días entre España y la India: desde cómo elegimos saris guardados para darles otra vida en AlmaRise D Brand hasta cómo trabajamos sobre el terreno.",
       closingEs:
         "Y oye, dale a responder cuando quieras y cuéntanos qué te ha parecido o qué tienes en mente crear. Te leemos nosotros dos directamente.",
       ctaTextEs: "Ven a leer nuestras historias",

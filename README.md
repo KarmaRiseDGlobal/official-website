@@ -1,6 +1,6 @@
 # KarmaRise D Global website
 
-This is the bilingual website for KarmaRise D Global. It presents the Manufacturing Programmes alongside Stories, Almarise, the Women's Training Initiative, a Product Brief intake flow, and contact routing.
+This is the bilingual website for KarmaRise D Global. It presents the Manufacturing Programmes alongside Stories, AlmaRise D Brand, the Women's Training Initiative, a Product Brief intake flow, and contact routing.
 
 ## Local development
 

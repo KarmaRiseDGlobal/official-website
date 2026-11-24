@@ -39,6 +39,30 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/manufacturing-programme",
+        destination: "/manufacturing",
+        statusCode: 301,
+      },
+      {
+        source: "/es/manufacturing-programme",
+        destination: "/es/manufacturing",
+        statusCode: 301,
+      },
+      {
+        source: "/working-across-distance",
+        destination: "/how-we-work",
+        statusCode: 301,
+      },
+      {
+        source: "/es/working-across-distance",
+        destination: "/es/how-we-work",
+        statusCode: 301,
+      },
+    ];
+  },
   async headers() {
     const securityHeaders = [
       {
@@ -92,11 +116,7 @@ const nextConfig: NextConfig = {
         headers: mediaCacheHeaders,
       },
       {
-        source: "/media/:path*",
-        headers: mediaCacheHeaders,
-      },
-      {
-        source: "/phases/:path*",
+        source: "/videos/:path*",
         headers: mediaCacheHeaders,
       },
       {

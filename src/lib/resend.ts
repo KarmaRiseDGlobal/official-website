@@ -1,3 +1,5 @@
+import "server-only";
+
 import { sanitizeHeaderValue } from "@/lib/security";
 
 export { isValidEmail, readTrimmedString } from "@/lib/validation";

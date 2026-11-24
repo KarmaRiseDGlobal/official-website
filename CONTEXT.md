@@ -1,45 +1,67 @@
-# KarmaRise D Global
+# KarmaRise D Global domain and website context
 
-KarmaRise D Global is a fusion of India and Europe, focused primarily on Spain alongside wider European markets, connecting product businesses with manufacturing across all of India from the Product Brief through Bulk Order delivery. Almarise and the planned Women's Training Initiative belong to the wider company story alongside the core manufacturing offer.
+Canonical quick reference for business terminology, brand relationships, content standards, and website voice across `karmarisedglobal.com`. For full positioning, personas, objections, content types, and proof points, read [.agents/product-marketing.md](.agents/product-marketing.md). For founder voice profiles and `en-GB` / `es-ES` localization rules, read [LANGUAGE.md](LANGUAGE.md), [ALMA.md](ALMA.md), [SHIRISH.md](SHIRISH.md), and [.translation/project-brief.md](.translation/project-brief.md).
 
-## Manufacturing
+## Website content tone
 
-**Client**:
-A retail chain, independent retailer, or fashion brand in Spain or across Europe that commissions a bulk product.
-_Avoid_: Customer, shopowner, buyer
+All website copy must maintain a **warm, friendly, professional, and exciting tone throughout**. Pages should feel **engaging and welcoming**, capturing the real energy of turning a Client's idea into a finished own-brand collection across India while remaining grounded, transparent, and trustworthy.
 
-**Manufacturing Programme**:
-An end-to-end engagement in which KarmaRise D Global develops and delivers a client's bulk product through Indian manufacturing.
-_Avoid_: Deal, brokerage, sourcing job
+- Welcome independent shop owners, emerging brand founders, and established retail buyers as peers, never through stiff corporate jargon or cold agency distance.
+- Frame KarmaRise around what Clients get to offer their own buyers (for example, `ofrecer moda a medida` rather than ordering a garment for oneself) and around KarmaRise carrying the operational load (`Seguimos tu pedido`, door-to-door delivery `en la puerta de tu negocio`).
+- Show genuine enthusiasm for materials, craft, and the moment a physical sample or finished shipment arrives at a Client's door, without slipping into hollow hype, exclamation-point spam, or AI filler words.
+- Stay candid about real manufacturing steps (KarmaRise guiding Clients on what is needed and creating physical colour swatches for approval, sample reviews, in-person partner audits, on-site checks, EU labelling before export logistics) so warmth is always backed by professional competence.
+- Mention the languages Alma speaks (Spanish, English, Portuguese) **only where relevant or helpful**, such as FAQs/Q&A, call-booking pages (`/book-a-call`), or contact pages (`/contact`). Never repeat spoken languages across general Hero copy, positioning paragraphs, or every CTA footnote.
+- Follow the Unslop standard unconditionally: no em dashes, no AI filler words, sentence case headings, and concrete physical or operational detail over abstract adjectives.
 
-**Product Brief**:
-The agreed description of the product a client needs, including its design, materials, quantity, quality, and delivery expectations.
-_Avoid_: Idea, request, requirements list
+## Content types needed in English (`en-GB`) and Spanish (`es-ES`)
 
-**Manufacturing Partner**:
-An Indian factory selected from across India's specialist production clusters to produce a product under a Manufacturing Programme.
-_Avoid_: Vendor, supplier
+Every surface serves a distinct job and must be written natively in both languages rather than translated word for word from English:
 
-**Bulk Order**:
-The production quantity commissioned by a client under a Manufacturing Programme.
-_Avoid_: Purchase, shipment
+1. **Conversion and landing pages (`/`, `/manufacturing`, `/how-we-work`, `/product-brief`, `/book-a-call`):** Benefit-led, warm, and reassuring. Emphasize zero tech pack required, explicit mutual NDA confidentiality, physical samples approved in hand before cutting begins, and direct human guidance from Alma and Shirish. Keep UI prompts natural in `es-ES` (never English UI calques like `prerrellenar` or `deja tu categoría preseleccionada`). Keep spoken-language mentions out of general hero copy and reserve them for FAQs and booking/contact contexts.
+2. **Product and craft capability copy (4 core categories):** Cover all four KarmaRise manufacturing categories: (1) leather bags and other/small leather goods, (2) clothing in natural and varied fabrics and capsule collections, (3) custom sewn accessories and brand presentation, and (4) **home decor**. Use concrete retail and ergonomic terms (`strap drop` / `caída del asa`, light cotton linings, high-quality Japanese plastic YKK zippers, EU care labelling, named Indian craft hubs: Kolkata, Kanpur, Agra, Chennai, plus supervision from Maharashtra). Avoid overly technical `tejido plano` / `woven clothing` jargon in public copy unless technically required, use whichever of `piel` or `cuero` feels most natural in Spanish context, and keep material lists open-ended (`entre otros` / `among others`).
+3. **Founder and brand storytelling (`/about`, `/almarise`, `/stories`, biweekly newsletters):** First-person human accounts signed by Alma or Shirish. In Spanish, write from inside Spain (`de tú a tú`, natural retail idioms such as `subir el cierre de tu tienda cada día`), keeping emotional resonance grounded in real people and stories (for example, saris Indian women have kept that carry a story to tell).
+4. **Operational, legal, and FAQ reassurance (`/manufacturing#faq`, `/legal-notice`, `/privacy-policy`, `/terms`):** Plain, unambiguous accountability. Explain Shirish's Bar Council standing, enforceable Indian contracts, mutual NDA/NNN confidentiality, physical swatch sign-off, spoken languages for calls (FAQ/Q&A), and zero-exploitation audits without bureaucratic stiffness in marketing FAQs (reserve formal `usted` strictly for statutory legal pages).
+5. **Social, outreach, and direct communication (WhatsApp, email, call recaps):** Low-friction, peer-to-peer invites. Refer to post-call summaries warmly in public web copy (`conclusiones de la reunión` / `clear meeting notes`), reserving `acta` for formal documentation.
 
-## Company and brands
+## Brand relationships and core terms
 
-**KarmaRise D Global**:
-The parent brand and the provider of Manufacturing Programmes across India for Clients in Spain and Europe.
-_Avoid_: Karmarise D Global, Karmarise Global, Kamarise, Karma Rise D Global
+- **KarmaRise D Global** (legal entity `Karmarise Global LLP`, used only in statutory legal/postal disclosures): Bilingual Spain-India product development and managed manufacturing partner across India for Clients in Spain and the rest of Europe.
+- **Manufacturing Programme** (`Programa de producción` in `es-ES`; _Avoid_: `deal`, `brokerage`, `sourcing job`, `middleman`): End-to-end own-brand product development and manufacturing across India across **four core categories**: (1) leather bags and small/other leather goods, (2) clothing in natural and varied fabrics and capsule collections, (3) custom sewn accessories and brand presentation, and (4) **home decor** (`decoración del hogar`).
+- **Client** (`cliente` in `es-ES`; _Avoid_: `customer`, `shopowner`, `buyer`, `comprador`, `usuario`; use `comercios` alongside `marcas` and `tiendas` when referring to retail businesses in `es-ES`): Independent retail boutique, fashion brand, or retail chain in Spain or the rest of Europe commissioning production.
+- **Product Brief** (`briefing de producto` in `es-ES`, allowing `ficha de producto` in explanatory prose when clearer, and reserving `ficha técnica` strictly for final tech packs): Written specification of design, materials, physical colour reference, quantities, quality tolerances, and delivery expectations.
+- **Manufacturing Partner** (`unidad de producción` / `punto de producción` / `fábrica colaboradora` / `taller colaborador` in `es-ES`; _Avoid_: `socio`, `vendor`, `supplier` as a noun for makers, keeping `supplier` only in the fixed legal phrase `Indian supplier contracts`): Vetted Indian family-run factory (`fábricas de corte familiar`), production unit, leather atelier, tannery, garment maker, or women artisan collective audited in person.
+- **Bulk Order** (`pedido de producción` in `es-ES`; _Avoid_: `pedido en serie`, `purchase`, `shipment` for the commercial order): Production run commissioned only after the Client approves a physical sample in hand. In public headlines and process prose, avoid `bulk cutting`, `cutting bulk materials`, and `cortar la producción`; describe the real milestone instead (`before production begins`, `before cutting starts`, `antes de comenzar con el corte de las piezas`, `antes de proceder a la producción`).
+- **AlmaRise D Brand** (exact brand capitalization: `AlmaRise D Brand`, never standalone `AlmaRise` or `Almarise` in public copy; associated lines add `D`: `AlmaRise D Reborn`, `AlmaRise D Organic`, `AlmaRise D Home Decor`; preserve existing lowercase URL routes `/almarise` and `/es/almarise`): Fashion and lifestyle label owned by KarmaRise D Global spanning more than two lines: **AlmaRise D Reborn** (one-of-a-kind everyday garments, `prendas de uso diario`, cut from kept Indian sarees, _thevnitlya sadya_, that Indian women have treasured and that carry a story), **AlmaRise D Organic** (organic dyes and plant/fruit-waste fabrics such as sugarcane, orange, banana, and pineapple, among others), and **AlmaRise D Home Decor** (`decoración del hogar`).
+- **Women's Training Initiative** (`Iniciativa de formación para mujeres`; _Avoid_: `NGO`, `charity`, `caridad`): Planned social training programme in India (in preparation; applications are not yet open).
+- **Stories** (`Historias`; _Avoid_: `blog post`, `journal`, `diario`, `news`): First-person editorial accounts by Alma or Shirish from India and Spain.
 
-**Almarise**:
-A fashion brand owned by KarmaRise D Global that transforms existing Indian sarees into contemporary women's clothing for Spain and Europe.
-_Avoid_: Manufacturing service, NGO, separate company
+## Craft, partner, and on-ground vocabulary
 
-**Women's Training Initiative**:
-A planned programme in India to train women in garment design and stitching, with paid employment opportunities as a long-term aim.
-_Avoid_: NGO, charity, operating programme
+Use operational facility terms **alongside** craft-specific maker vocabulary, rather than repeating generic `workshop` / `taller` phrasing:
 
-## Publishing
+- **Makers and facilities (`en-GB`):** `production sites`, `production units`, `manufacturing units`, `facilities`, `Manufacturing Partners`, `family-run factories`, `leather ateliers`, `tanneries`, `garment makers`, `specialist makers`, `artisans`, `women artisan collectives`.
+- **Makers and facilities (`es-ES`):** `unidades de producción`, `puntos de producción`, `lugares de producción`, `fábricas de corte familiar`, `talleres colaboradores` (use sparingly, alongside facility and craft terms), `marroquineros`, `curtidurías`, `confeccionistas`, `artesanos`, `colectivos de artesanas`.
+- **Presence and supervision (`en-GB`):** `on the ground in India`, `at the production site`, `beside the stitching lines`, `in-person production supervision`, `on-site checks`, `partner matching`, `open doors`.
+- **Presence and supervision (`es-ES`):** `sobre el terreno en la India`, `a pie de obra`, `en el punto de producción`, `supervisión presencial de la producción`, `controles en planta`, `selección presencial`, `puertas abiertas`.
+- **Indian craft hubs:** Name the specialist cities rather than only broad states when describing production geography: **Kolkata** (`Calcuta`), **Kanpur**, **Agra**, and **Chennai**, with coordination and quality oversight from **Maharashtra** (never `Ulhasnagar` outside statutory legal/postal blocks).
+- **Geography rule (Spain and Europe):** Spain is part of Europe. Write `Spain and the rest of Europe` (`España y el resto de Europa`) or `Spain or elsewhere in Europe` (`España o en algún lugar de Europa`) rather than `Spain and Europe` / `España y Europa` wherever the pairing implies separation.
+- **Material and product phrasing:**
+  - **Zippers:** Always describe them accurately as one spec: **high-quality Japanese plastic YKK zippers** (`cremalleras japonesas YKK de plástico de alta calidad`), never splitting YKK and plastic into two separate items and never leaving "plastic" sounding cheap.
+  - **Apparel fabrics:** Prefer retail-friendly wording (`clothing in natural and varied fabrics`, `designer garments` / `prendas de diversos tejidos`, `ropa de tejidos naturales`, `prendas de diseño`, `tejidos con mezcla`) over overly technical `woven clothing` / `tejido plano` in general marketing copy.
+  - **Spanish leather wording (`piel` vs `cuero`):** Use whichever of `piel` or `cuero` sounds most natural in each sentence (for example, `bolsos de cuero` in punchy metadata or `bolsos de piel` / `pieles de curtido vegetal` in tactile craft copy). Always prefer `curtido vegetal` over `curtición vegetal`.
+- **Confidentiality and sample review phrasing:** Pair confidentiality promises with explicit NDA availability (`NDA` / `acuerdos mutuos NDA y NNN`). In Spanish, avoid `filtrar` / `muestra física filtrada` and secretive `en privado`; use `revisamos`, `muestra para valoración`, or `muestra física previamente revisada y aprobada por ti`.
+- **_Avoid_ `workshop floor`, `workshop floors`, `sales floor`, `worktable`, `a pie de taller`, `mesas de corte` (as a generic facility metaphor), and repetitive `workshops` / `talleres`:** Keep these out of headlines (`H1` to `H3`), UI pills, CTAs, HTML `<title>` and `<meta name="description">`, RSS feeds, JSON-LD descriptions, `llms.txt` prose, chat prompts, and email/newsletter templates (and avoid `table` in Brevo/newsletter handler prose).
+- **Avoid redundant language mentions and POV drift:** Mention Alma's spoken languages (Spanish, English, Portuguese) only in Q&A/FAQs and booking/contact contexts where needed, never as boilerplate across hero or general sections. Maintain consistent grammatical person within every sentence and paragraph (never mix 3rd-person `los dos fundadores` with 1st-person `trabajamos`, and never drift from `tú` to `su colección` in `es-ES`).
+- **Preserve URL slugs and section anchors:** Keep existing route slugs and HTML fragment IDs (`/almarise`, `#workshops`, `#artisans-and-workshops`, `/stories/matching-a-workshop-to-the-product`) unchanged so internal links, sitemap entries, canonicals, and structured data `@id` references stay intact.
 
-**Story**:
-An editorial account of manufacturing, materials, people, culture, completed work, or company progress across India, Spain, and Europe published by KarmaRise D Global. See `LANGUAGE.md` for the conversational tone, geographic framing, and native transcreation standards across English, Spanish, and other languages.
-_Avoid_: Blog post, news item
+## Non-negotiable public copy rules
+
+- Never publish public pricing, commission structures, or fixed minimum order quantities; every Manufacturing Programme is scoped individually per Product Brief.
+- Never print `Ulhasnagar` outside statutory legal/postal `<address>` blocks of `Karmarise Global LLP`.
+- Never name confidential Clients (such as `Snoby`) in public copy.
+- Never add social media links on the KarmaRise website.
+- Keep English (`/` in `en-GB`) and Peninsular Spanish (`/es` in `es-ES`, using `tú`/`vosotros`) in full parity.
+
+## Deferred feature note
+
+- **NDA upload/download workflow in `/product-brief`:** Deferred for a later release. Keep copy stating that designs stay confidential and mutual NDAs are available (`NDA`), without promising an interactive NDA upload control until built.

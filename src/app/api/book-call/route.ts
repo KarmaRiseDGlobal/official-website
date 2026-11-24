@@ -166,7 +166,7 @@ export async function POST(request: Request) {
         ok: false,
         code: result.code,
         error: isEs
-          ? "No pudimos confirmar la videollamada ahora mismo. Puedes escribirnos por WhatsApp o enviarnos un Product Brief."
+          ? "No pudimos confirmar la videollamada ahora mismo. Puedes escribirnos por WhatsApp o enviarnos un briefing de producto."
           : "Unable to confirm your video call right now. You can reach us on WhatsApp or send a Product Brief.",
       },
       { status: result.status },

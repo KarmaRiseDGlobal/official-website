@@ -80,6 +80,106 @@ function buildSectionMember(isSpanish: boolean) {
   });
 }
 
+function buildPortableBodyMembers() {
+  return [
+    defineArrayMember({
+      type: "block",
+      styles: [
+        { title: "Normal paragraph", value: "normal" },
+        { title: "Section heading (H2)", value: "h2" },
+        { title: "Subheading (H3)", value: "h3" },
+        { title: "Pull quote", value: "blockquote" },
+      ],
+      lists: [
+        { title: "Bullet list", value: "bullet" },
+        { title: "Numbered list", value: "number" },
+      ],
+      marks: {
+        decorators: [
+          { title: "Strong (Bold)", value: "strong" },
+          { title: "Emphasis (Italic)", value: "em" },
+        ],
+        annotations: [
+          {
+            name: "link",
+            type: "object",
+            title: "Link",
+            fields: [
+              defineField({
+                name: "href",
+                title: "URL or path (e.g. /product-brief or https://...)",
+                type: "string",
+                validation: (rule) => rule.required(),
+              }),
+              defineField({
+                name: "blank",
+                title: "Open in new tab",
+                type: "boolean",
+                initialValue: false,
+              }),
+            ],
+          },
+        ],
+      },
+    }),
+    defineArrayMember({
+      type: "image",
+      title: "Inline photograph",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+        }),
+        defineField({
+          name: "caption",
+          title: "Figure caption",
+          type: "string",
+        }),
+        defineField({
+          name: "aspectRatio",
+          title: "Display frame aspect ratio",
+          type: "string",
+          initialValue: "16:9",
+          options: {
+            list: [
+              { title: "16:9 wide horizontal", value: "16:9" },
+              { title: "4:3 classic horizontal", value: "4:3" },
+              { title: "4:5 editorial portrait", value: "4:5" },
+            ],
+          },
+        }),
+        defineField({
+          name: "objectPosition",
+          title: "CSS focal crop override (optional)",
+          type: "string",
+          hidden: true,
+        }),
+      ],
+    }),
+    defineArrayMember({
+      name: "pullQuoteBlock",
+      title: "Attributed pull quote",
+      type: "object",
+      fields: [
+        defineField({
+          name: "text",
+          title: "Quote text",
+          type: "text",
+          rows: 3,
+          validation: (rule) => rule.required(),
+        }),
+        defineField({
+          name: "attribution",
+          title: "Attribution (e.g. Alma & Shirish · Studio notes)",
+          type: "string",
+        }),
+      ],
+    }),
+  ];
+}
+
 export const storyType = defineType({
   name: "story",
   title: "Story",
@@ -195,103 +295,7 @@ export const storyType = defineType({
         "Write your Story naturally here. Use H2 for main section headings (they appear automatically in the sidebar contents list), Blockquote for pull quotes, and insert inline photographs anywhere.",
       type: "array",
       group: "editorial",
-      of: [
-        defineArrayMember({
-          type: "block",
-          styles: [
-            { title: "Normal paragraph", value: "normal" },
-            { title: "Section heading (H2)", value: "h2" },
-            { title: "Subheading (H3)", value: "h3" },
-            { title: "Pull quote", value: "blockquote" },
-          ],
-          lists: [
-            { title: "Bullet list", value: "bullet" },
-            { title: "Numbered list", value: "number" },
-          ],
-          marks: {
-            decorators: [
-              { title: "Strong (Bold)", value: "strong" },
-              { title: "Emphasis (Italic)", value: "em" },
-            ],
-            annotations: [
-              {
-                name: "link",
-                type: "object",
-                title: "Link",
-                fields: [
-                  defineField({
-                    name: "href",
-                    title: "URL or path (e.g. /product-brief or https://...)",
-                    type: "string",
-                    validation: (rule) => rule.required(),
-                  }),
-                  defineField({
-                    name: "blank",
-                    title: "Open in new tab",
-                    type: "boolean",
-                    initialValue: false,
-                  }),
-                ],
-              },
-            ],
-          },
-        }),
-        defineArrayMember({
-          type: "image",
-          title: "Inline photograph",
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: "alt",
-              title: "Alt text",
-              type: "string",
-            }),
-            defineField({
-              name: "caption",
-              title: "Figure caption",
-              type: "string",
-            }),
-            defineField({
-              name: "aspectRatio",
-              title: "Display frame aspect ratio",
-              type: "string",
-              initialValue: "16:9",
-              options: {
-                list: [
-                  { title: "16:9 wide horizontal", value: "16:9" },
-                  { title: "4:3 classic horizontal", value: "4:3" },
-                  { title: "4:5 editorial portrait", value: "4:5" },
-                ],
-              },
-            }),
-            defineField({
-              name: "objectPosition",
-              title: "CSS focal crop override (optional)",
-              type: "string",
-              hidden: true,
-            }),
-          ],
-        }),
-        defineArrayMember({
-          name: "pullQuoteBlock",
-          title: "Attributed pull quote",
-          type: "object",
-          fields: [
-            defineField({
-              name: "text",
-              title: "Quote text",
-              type: "text",
-              rows: 3,
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "attribution",
-              title: "Attribution (e.g. Alma & Shirish · Studio notes)",
-              type: "string",
-            }),
-          ],
-        }),
-      ],
+      of: buildPortableBodyMembers(),
     }),
     defineField({
       name: "pullQuote",
@@ -527,6 +531,15 @@ export const storyType = defineType({
       ],
     }),
     defineField({
+      name: "spanishBody",
+      title: "Spanish Story body (Rich text article editor)",
+      description:
+        "Rich text Spanish article body with H2/H3 headings, links, lists, pull quotes, and inline photographs in Peninsular Spanish (see LANGUAGE.md).",
+      type: "array",
+      group: "localization",
+      of: buildPortableBodyMembers(),
+    }),
+    defineField({
       name: "spanishSections",
       title: "Spanish structured sections",
       description:
@@ -542,15 +555,6 @@ export const storyType = defineType({
         "Closing reflection box in Spanish (1 to 2 sentences). Leave empty if the closing paragraph already lands.",
       type: "text",
       rows: 3,
-      group: "localization",
-    }),
-    defineField({
-      name: "translationOf",
-      title: "Linked translation document (optional)",
-      description:
-        "Link a full Spanish Story document to its English counterpart.",
-      type: "reference",
-      to: [{ type: "story" }],
       group: "localization",
     }),
     defineField({

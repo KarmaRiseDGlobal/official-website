@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 
-import type { StoryEntry } from "@/data/stories";
+import type { StoryEntry } from "@/data/story-types";
+import {
+  localizePath,
+  siteUrl,
+  stripLocalePrefix,
+  type SiteLanguage,
+} from "@/lib/urls";
 
-export type SiteLanguage = "en" | "es";
-
-export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://karmarisedglobal.com"
-).replace(/\/$/, "");
+export { localizePath, siteUrl, stripLocalePrefix, type SiteLanguage };
 
 export type StaticRouteKey =
   | "home"
@@ -16,13 +18,13 @@ export type StaticRouteKey =
   | "contact"
   | "cookie-policy"
   | "legal-notice"
-  | "manufacturing-programme"
+  | "manufacturing"
   | "privacy-policy"
   | "product-brief"
   | "stories"
   | "terms"
   | "womens-training-initiative"
-  | "working-across-distance";
+  | "how-we-work";
 
 export type RouteKey = StaticRouteKey | "story-detail";
 
@@ -36,14 +38,14 @@ export interface StaticRouteEntry {
 export const STATIC_ROUTES: readonly StaticRouteEntry[] = [
   { key: "home", path: "/", changeFrequency: "weekly", priority: 1 },
   {
-    key: "manufacturing-programme",
-    path: "/manufacturing-programme",
+    key: "manufacturing",
+    path: "/manufacturing",
     changeFrequency: "monthly",
-    priority: 0.8,
+    priority: 0.9,
   },
   {
-    key: "working-across-distance",
-    path: "/working-across-distance",
+    key: "how-we-work",
+    path: "/how-we-work",
     changeFrequency: "monthly",
     priority: 0.8,
   },
@@ -88,20 +90,20 @@ export const STATIC_ROUTES: readonly StaticRouteEntry[] = [
     key: "privacy-policy",
     path: "/privacy-policy",
     changeFrequency: "monthly",
-    priority: 0.8,
+    priority: 0.3,
   },
-  { key: "terms", path: "/terms", changeFrequency: "monthly", priority: 0.8 },
+  { key: "terms", path: "/terms", changeFrequency: "monthly", priority: 0.3 },
   {
     key: "cookie-policy",
     path: "/cookie-policy",
     changeFrequency: "monthly",
-    priority: 0.8,
+    priority: 0.3,
   },
   {
     key: "legal-notice",
     path: "/legal-notice",
     changeFrequency: "monthly",
-    priority: 0.8,
+    priority: 0.3,
   },
 ];
 
@@ -120,66 +122,86 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
   home: {
     path: "/",
     en: {
-      title: { absolute: "KarmaRise D Global | India & Spain" },
+      title: {
+        absolute: "Own-brand manufacturing in India | KarmaRise D Global",
+      },
       description:
-        "KarmaRise D Global develops and delivers own-brand products for Clients in Spain and across Europe through manufacturing across India, from Product Brief to Bulk Order.",
+        "Manufacture own-brand leather bags, clothing, sewn accessories, and home decor in India with Alma and Shirish on site. Samples first. Start your brief.",
     },
     es: {
-      title: { absolute: "KarmaRise D Global | India y España" },
+      title: {
+        absolute: "Fabricación de marca propia en la India | KarmaRise",
+      },
       description:
-        "KarmaRise D Global desarrolla y entrega productos de marca propia para empresas en España y Europa desde toda la India, del Product Brief al pedido en serie.",
+        "Fabrica en la India tus bolsos de piel, ropa, complementos y decoración del hogar con Alma y Shirish sobre el terreno. Muestra física primero. Empieza hoy.",
     },
   },
   about: {
     path: "/about",
     en: {
-      title: "About",
+      title: {
+        absolute: "Alma & Shirish: Spain-India Founders | KarmaRise",
+      },
       description:
-        "The story of Alma and Shirish, the two founders connecting Clients in Spain and Europe with manufacturing across India through KarmaRise D Global.",
+        "Meet Alma in Spain and Bar Council advocate Shirish in India, founders of KarmaRise D Global (Karmarise Global LLP). Book a free call or send your brief.",
     },
     es: {
-      title: "Quiénes somos",
+      title: {
+        absolute: "Quiénes somos: Alma y Shirish | KarmaRise D Global",
+      },
       description:
-        "Conoce a Alma y Shirish, fundadores de KarmaRise D Global, que conectan clientes en España y Europa con talleres especializados en toda la India.",
+        "Conoce a Alma en España y a Shirish, abogado del Bar Council en la India, fundadores de KarmaRise D Global (Karmarise Global LLP). Pide llamada o briefing.",
     },
   },
   almarise: {
     path: "/almarise",
     en: {
-      title: "Almarise",
+      title: {
+        absolute: "AlmaRise D Brand: D Reborn, D Organic & Decor | KarmaRise",
+      },
       description:
-        "Almarise is a fashion brand owned by KarmaRise D Global that transforms existing Indian sarees into contemporary women's clothing for Spain and Europe.",
+        "AlmaRise D Brand by KarmaRise D Global: AlmaRise D Reborn sarees, AlmaRise D Organic fabrics, and D Home Decor, made in India for Spain and the rest of Europe.",
     },
     es: {
-      title: "Almarise",
+      title: {
+        absolute: "AlmaRise D Brand: D Reborn, D Organic y hogar | KarmaRise",
+      },
       description:
-        "Almarise es una marca de moda de KarmaRise D Global que transforma saris existentes de la India en prendas femeninas contemporáneas para España y Europa.",
+        "AlmaRise D Brand de KarmaRise D Global: prendas AlmaRise D Reborn de saris, tejidos AlmaRise D Organic y decoración del hogar para España y el resto de Europa.",
     },
   },
   "book-a-call": {
     path: "/book-a-call",
     en: {
-      title: "Book a video call",
+      title: {
+        absolute: "Book an India Manufacturing Call with Alma | KarmaRise",
+      },
       description:
-        "Schedule a Google Meet video call with Alma at KarmaRise D Global in English, Spanish, or Portuguese to discuss your Product Brief and Indian manufacturing.",
+        "Book a free 15-min or 30-min Google Meet call with Alma in English, Spanish, or Portuguese to discuss your Product Brief and manufacturing in India.",
     },
     es: {
-      title: "Reservar videollamada",
+      title: {
+        absolute: "Reservar videollamada: fabricación en la India | KarmaRise",
+      },
       description:
-        "Reserva una videollamada por Google Meet con Alma de KarmaRise D Global en español, inglés o portugués para hablar sobre tu Product Brief y fabricación en la India.",
+        "Reserva una videollamada gratuita de 15 o 30 min por Google Meet con Alma en español, inglés o portugués para hablar de tu briefing de producto en la India.",
     },
   },
   contact: {
     path: "/contact",
     en: {
-      title: "Contact",
+      title: {
+        absolute: "Contact KarmaRise D Global | Spain & India Manufacturing",
+      },
       description:
-        "Reach KarmaRise D Global (operated by Karmarise Global LLP) in India, Spain, and across Europe in English or Spanish for Manufacturing Programmes, workshops, Almarise, or general enquiries.",
+        "Contact KarmaRise D Global (Karmarise Global LLP) in Spain and India in English or Spanish for Manufacturing Programmes, partners, or AlmaRise D Brand.",
     },
     es: {
-      title: "Contacto",
+      title: {
+        absolute: "Contacto KarmaRise D Global | España y la India",
+      },
       description:
-        "Contacta con KarmaRise D Global en español o inglés para Programas de fabricación, talleres colaboradores en la India, Almarise o consultas generales.",
+        "Contacta con KarmaRise D Global en español o inglés para Programas de producción, unidades en la India, AlmaRise D Brand o consultas generales.",
     },
   },
   "cookie-policy": {
@@ -208,17 +230,21 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         "Datos registrales e identificación legal de Karmarise Global LLP (titular de KarmaRise D Global) conforme a la LLP Act de la India y la LSSI-CE española.",
     },
   },
-  "manufacturing-programme": {
-    path: "/manufacturing-programme",
+  manufacturing: {
+    path: "/manufacturing",
     en: {
-      title: "Manufacturing Programme",
+      title: {
+        absolute: "Manufacturing in India for Europe | KarmaRise D Global",
+      },
       description:
-        "See how a KarmaRise D Global Manufacturing Programme moves from the Product Brief through design, sampling, partner selection, production, and delivery.",
+        "Develop own-brand leather goods, clothing, sewn accessories, and home decor in India. Product study, vetted production units, samples, and EU delivery.",
     },
     es: {
-      title: "Programa de fabricación",
+      title: {
+        absolute: "Diseño y fabricación en la India | KarmaRise D Global",
+      },
       description:
-        "Descubre cómo avanza un Programa de fabricación de KarmaRise D Global en la India desde el Product Brief hasta el muestreo, la producción y la entrega.",
+        "Diseña y fabrica bolsos de piel, ropa, complementos y decoración del hogar en la India. Unidades auditadas, muestra física y entrega en tu negocio.",
     },
   },
   "privacy-policy": {
@@ -231,33 +257,41 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     es: {
       title: "Política de privacidad",
       description:
-        "Cómo trata Karmarise Global LLP (KarmaRise D Global) los datos de contacto y consultas de Product Brief conforme al RGPD europeo, la LOPDGDD y la ley india.",
+        "Cómo trata Karmarise Global LLP (KarmaRise D Global) los datos de contacto y consultas de briefing de producto conforme al RGPD europeo, la LOPDGDD y la ley india.",
     },
   },
   "product-brief": {
     path: "/product-brief",
     en: {
-      title: "Start a Product Brief",
+      title: {
+        absolute: "Start a Product Brief: India Manufacturing | KarmaRise",
+      },
       description:
-        "Prepare and share a Product Brief with KarmaRise D Global to evaluate design, materials, Manufacturing Partner fit, quantity, and delivery.",
+        "Share your Product Brief in 3 quick steps to scope leather bags, clothing, sewn goods, or home decor in India. Alma replies within 1 to 2 business days.",
     },
     es: {
-      title: "Iniciar un Product Brief",
+      title: {
+        absolute: "Briefing de producto: fabricación en la India | KarmaRise",
+      },
       description:
-        "Prepara y comparte tu Product Brief con KarmaRise D Global para evaluar diseño, materiales, taller adecuado en la India, cantidades y plazos de entrega.",
+        "Comparte tu briefing de producto en 3 pasos para valorar bolsos de piel, ropa, complementos o decoración en la India. Alma responde en 1 o 2 días.",
     },
   },
   stories: {
     path: "/stories",
     en: {
-      title: "Stories",
+      title: {
+        absolute: "India Manufacturing & AlmaRise D Brand Stories | KarmaRise",
+      },
       description:
-        "Stories from Alma and Shirish on manufacturing across India, life between Spain and India, and vintage Indian sarees for Almarise.",
+        "First-person Stories by Alma and Shirish from Indian production sites, leather ateliers, AlmaRise D Reborn & D Organic, and shared tables in India and Spain.",
     },
     es: {
-      title: "Historias",
+      title: {
+        absolute: "Historias de fabricación y AlmaRise D Brand | KarmaRise",
+      },
       description:
-        "Historias de Alma y Shirish sobre fabricación en toda la India, la vida entre España y la India y los saris reutilizados de Almarise.",
+        "Historias de Alma y Shirish desde puntos de producción y marroquineros en la India, las líneas de AlmaRise D Brand y el día a día entre España y la India.",
     },
   },
   terms: {
@@ -270,7 +304,7 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     es: {
       title: "Condiciones de uso",
       description:
-        "Condiciones de uso del sitio web de KarmaRise D Global (Karmarise Global LLP), protección de propiedad intelectual del Product Brief y legislación aplicable.",
+        "Condiciones de uso del sitio web de KarmaRise D Global (Karmarise Global LLP), propiedad intelectual del briefing de producto y legislación aplicable.",
     },
   },
   "womens-training-initiative": {
@@ -286,83 +320,24 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         "Programa en preparación de KarmaRise D Global en la India para formar a mujeres en diseño de prendas y confección, con el empleo remunerado como meta.",
     },
   },
-  "working-across-distance": {
-    path: "/working-across-distance",
+  "how-we-work": {
+    path: "/how-we-work",
     en: {
-      title: "Working across distance",
+      title: {
+        absolute: "How We Work: Spain & India Manufacturing | KarmaRise",
+      },
       description:
-        "How Alma and Shirish keep Clients in Spain and across Europe connected to Indian Manufacturing Partners from the Product Brief through Bulk Order delivery.",
+        "See how Alma and Shirish manage India manufacturing for Europe: call conclusions, physical colour swatches, reviewed samples, on-site checks, and EU delivery.",
     },
     es: {
-      title: "Trabajar a distancia",
+      title: {
+        absolute: "Cómo trabajamos entre España y la India | KarmaRise",
+      },
       description:
-        "Cómo Alma y Shirish mantienen conectados a clientes de España y Europa con talleres en la India, del Product Brief a la entrega del pedido en serie.",
+        "Descubre cómo Alma y Shirish dirigen tu producción en la India: conclusiones de reunión, muestras de color, revisión previa, control en planta y envío.",
     },
   },
 };
-
-function splitPathParts(input: string): {
-  path: string;
-  search: string;
-  hash: string;
-} {
-  const hashIndex = input.indexOf("#");
-  const hash = hashIndex >= 0 ? input.slice(hashIndex) : "";
-  const beforeHash = hashIndex >= 0 ? input.slice(0, hashIndex) : input;
-
-  const queryIndex = beforeHash.indexOf("?");
-  const search = queryIndex >= 0 ? beforeHash.slice(queryIndex) : "";
-  const path = queryIndex >= 0 ? beforeHash.slice(0, queryIndex) : beforeHash;
-
-  return { path, search, hash };
-}
-
-function normalizeBasePath(rawPath: string): string {
-  const trimmed = rawPath.trim();
-  if (!trimmed) {
-    return "/";
-  }
-  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-  if (withLeadingSlash.length > 1) {
-    return withLeadingSlash.replace(/\/+$/, "") || "/";
-  }
-  return withLeadingSlash;
-}
-
-export function stripLocalePrefix(pathname: string): string {
-  const { path, search, hash } = splitPathParts(pathname);
-  const normalized = normalizeBasePath(path);
-
-  let stripped = normalized;
-  if (normalized === "/es") {
-    stripped = "/";
-  } else if (normalized.startsWith("/es/")) {
-    stripped = normalized.slice(3) || "/";
-  }
-
-  return `${stripped}${search}${hash}`;
-}
-
-export function localizePath(href: string, lang: SiteLanguage): string {
-  const trimmed = href.trim();
-  if (
-    !trimmed ||
-    trimmed.startsWith("#") ||
-    /^(mailto:|tel:|https?:\/\/)/i.test(trimmed) ||
-    trimmed === "/api" ||
-    trimmed.startsWith("/api/")
-  ) {
-    return href;
-  }
-
-  const { path, search, hash } = splitPathParts(trimmed);
-  const basePath = stripLocalePrefix(path);
-
-  const localizedBase =
-    lang === "es" ? (basePath === "/" ? "/es" : `/es${basePath}`) : basePath;
-
-  return `${localizedBase}${search}${hash}`;
-}
 
 export function buildAlternates(
   path: string,
@@ -377,17 +352,20 @@ export function buildAlternates(
       es: esPath,
       "x-default": enPath,
     },
+    types: {
+      "text/plain": "/llms.txt",
+    },
   };
 }
 
 export function getLayoutMetadata(lang: SiteLanguage): Metadata {
   const isEs = lang === "es";
   const title = isEs
-    ? "KarmaRise D Global · India y España"
-    : "KarmaRise D Global · India & Spain";
+    ? "KarmaRise D Global | India y España"
+    : "KarmaRise D Global | India & Spain";
   const description = isEs
-    ? "KarmaRise D Global conecta empresas de España y Europa con talleres especializados en toda la India, del Product Brief a la entrega del pedido en serie."
-    : "KarmaRise D Global connects product businesses in Spain and across Europe with manufacturing across India, from Product Brief through Bulk Order delivery.";
+    ? "KarmaRise D Global desarrolla y fabrica bolsos de piel, ropa en tejidos naturales y variados, complementos y decoración del hogar en unidades de producción auditadas de la India para España y el resto de Europa."
+    : "KarmaRise D Global develops and manufactures own-brand leather goods, clothing in natural and varied fabrics, sewn accessories, and home decor across vetted production units in India for Spain and the rest of Europe.";
 
   return {
     metadataBase: new URL(siteUrl),
@@ -396,6 +374,9 @@ export function getLayoutMetadata(lang: SiteLanguage): Metadata {
       template: "%s | KarmaRise D Global",
     },
     description,
+    other: {
+      "content-language": isEs ? "es-ES" : "en-GB",
+    },
     openGraph: {
       type: "website",
       siteName: "KarmaRise D Global",
@@ -424,10 +405,24 @@ export function getRouteMetadata(
       : localized.title.absolute;
   const isEs = lang === "es";
 
+  const baseAlternates = buildAlternates(config.path, lang);
+  const alternates: NonNullable<Metadata["alternates"]> =
+    routeKey === "stories"
+      ? {
+          ...baseAlternates,
+          types: {
+            ...baseAlternates.types,
+            "application/rss+xml": isEs
+              ? "/es/stories/rss.xml"
+              : "/stories/rss.xml",
+          },
+        }
+      : baseAlternates;
+
   return {
     title: localized.title,
     description: localized.description,
-    alternates: buildAlternates(config.path, lang),
+    alternates,
     openGraph: {
       type: "website",
       siteName: "KarmaRise D Global",
@@ -488,7 +483,7 @@ function buildStoryShareImage(
   }
 
   return {
-    url: encodeURI(trimmed),
+    url: encodeURI(trimmed).replace(/\(/g, "%28").replace(/\)/g, "%29"),
     alt,
   };
 }
@@ -524,18 +519,34 @@ export function getStoryMetadata(
     : story.seo?.description?.trim() || story.summary;
 
   const path = `/stories/${story.slug}`;
-  const ogTitle = `${title} | KarmaRise D Global`;
+  const titleField: Metadata["title"] =
+    title.length > 38 && !/karmarise/i.test(title)
+      ? { absolute: `${title} | KarmaRise` }
+      : title;
+  const ogTitle =
+    typeof titleField === "string"
+      ? `${titleField} | KarmaRise D Global`
+      : titleField.absolute;
   const shareImageAlt =
     (isEs ? story.spanishLeadAlt?.trim() : undefined) ||
     story.leadImage?.alt ||
     title;
   const shareImage = buildStoryShareImage(story.leadImage?.url, shareImageAlt);
   const storyTags = isEs ? story.spanishTags || story.tags : story.tags;
+  const baseAlternates = buildAlternates(path, lang);
 
   return {
-    title,
+    title: titleField,
     description,
-    alternates: buildAlternates(path, lang),
+    alternates: {
+      ...baseAlternates,
+      types: {
+        ...baseAlternates.types,
+        "application/rss+xml": isEs
+          ? "/es/stories/rss.xml"
+          : "/stories/rss.xml",
+      },
+    },
     openGraph: {
       type: "article",
       siteName: "KarmaRise D Global",
@@ -545,6 +556,7 @@ export function getStoryMetadata(
       locale: isEs ? "es_ES" : "en_GB",
       alternateLocale: [isEs ? "en_GB" : "es_ES"],
       publishedTime: story.publishedAt,
+      modifiedTime: story.updatedAt || story.publishedAt,
       authors: [story.author.name],
       tags: storyTags,
       images: [shareImage],

@@ -1,3 +1,12 @@
+import "server-only";
+
+import {
+  formatNewsletterInterest,
+  getWelcomeTrackCopy,
+  normalizeNewsletterTracks,
+  type NewsletterTrack,
+} from "@/lib/newsletter-tracks";
+
 const BREVO_CONTACTS_API_URL = "https://api.brevo.com/v3/contacts";
 const BREVO_SMTP_EMAIL_API_URL = "https://api.brevo.com/v3/smtp/email";
 
@@ -8,6 +17,7 @@ export interface BrevoSubscriberInput {
   country?: string;
   interest?: string;
   source?: string;
+  tracks?: readonly NewsletterTrack[];
 }
 
 type BrevoSubscribeResult =
@@ -151,6 +161,7 @@ async function sendBrevoWelcomeEmail(options: {
   email: string;
   firstName?: string;
   language: "EN" | "ES";
+  tracks: readonly NewsletterTrack[];
 }): Promise<boolean> {
   const sendWelcomeFlag = process.env.BREVO_SEND_WELCOME_EMAIL?.trim();
   if (sendWelcomeFlag && sendWelcomeFlag.toLowerCase() === "false") {
@@ -168,6 +179,7 @@ async function sendBrevoWelcomeEmail(options: {
   const senderEmail =
     process.env.BREVO_SENDER_EMAIL?.trim() || "stories@karmarisedglobal.com";
   const replyToEmail = process.env.BREVO_REPLY_TO_EMAIL?.trim() || senderEmail;
+  const trackCopy = getWelcomeTrackCopy(options.tracks, options.language);
 
   try {
     const response = await fetch(BREVO_SMTP_EMAIL_API_URL, {
@@ -198,6 +210,8 @@ async function sendBrevoWelcomeEmail(options: {
             options.firstName || (options.language === "ES" ? "" : "there"),
           LANGUAGE: options.language,
           EMAIL: options.email,
+          TRACK_LABEL: trackCopy.trackLabel,
+          TRACK_NOTE: trackCopy.trackNote,
         },
         tags: [
           "welcome-automation",
@@ -237,6 +251,18 @@ export async function subscribeToBrevoNewsletter(
   const masterListId = parsePositiveInt(process.env.BREVO_LIST_ID);
   const enListId = parsePositiveInt(process.env.BREVO_LIST_ID_EN);
   const esListId = parsePositiveInt(process.env.BREVO_LIST_ID_ES);
+  const mfgEnListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_MANUFACTURING_EN,
+  );
+  const mfgEsListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_MANUFACTURING_ES,
+  );
+  const almariseEnListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_ALMARISE_EN,
+  );
+  const almariseEsListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_ALMARISE_ES,
+  );
 
   if (!apiKey || !masterListId) {
     return {
@@ -247,6 +273,7 @@ export async function subscribeToBrevoNewsletter(
   }
 
   const language = subscriber.language === "ES" ? "ES" : "EN";
+  const resolvedTracks = normalizeNewsletterTracks(subscriber.tracks);
   const listIds = new Set<number>([masterListId]);
   if (language === "EN" && enListId) {
     listIds.add(enListId);
@@ -255,13 +282,34 @@ export async function subscribeToBrevoNewsletter(
     listIds.add(esListId);
   }
 
-  const removeListIds: number[] = [];
+  const removeListIds = new Set<number>();
   if (language === "EN" && esListId) {
-    removeListIds.push(esListId);
+    removeListIds.add(esListId);
   }
   if (language === "ES" && enListId) {
-    removeListIds.push(enListId);
+    removeListIds.add(enListId);
   }
+
+  if (resolvedTracks.length > 0) {
+    const wantsManufacturing = resolvedTracks.includes("manufacturing");
+    const wantsAlmarise = resolvedTracks.includes("almarise");
+
+    if (language === "EN") {
+      if (wantsManufacturing && mfgEnListId) listIds.add(mfgEnListId);
+      if (wantsAlmarise && almariseEnListId) listIds.add(almariseEnListId);
+      if (mfgEsListId) removeListIds.add(mfgEsListId);
+      if (almariseEsListId) removeListIds.add(almariseEsListId);
+    } else {
+      if (wantsManufacturing && mfgEsListId) listIds.add(mfgEsListId);
+      if (wantsAlmarise && almariseEsListId) listIds.add(almariseEsListId);
+      if (mfgEnListId) removeListIds.add(mfgEnListId);
+      if (almariseEnListId) removeListIds.add(almariseEnListId);
+    }
+  }
+
+  const unlinkListIds = Array.from(removeListIds).filter(
+    (id) => !listIds.has(id),
+  );
 
   const attributes: Record<string, string> = {
     LANGUAGE: language,
@@ -269,7 +317,11 @@ export async function subscribeToBrevoNewsletter(
     CONSENT_STATUS: "Yes",
     CONSENT_DATE: new Date().toISOString(),
     SOURCE: subscriber.source || "Website",
-    INTEREST: subscriber.interest || "KarmaRise Stories",
+    INTEREST:
+      subscriber.interest ||
+      (resolvedTracks.length > 0
+        ? formatNewsletterInterest(resolvedTracks)
+        : "KarmaRise Stories"),
   };
 
   if (subscriber.firstName) {
@@ -297,7 +349,7 @@ export async function subscribeToBrevoNewsletter(
         email: subscriber.email,
         attributes,
         listIds: Array.from(listIds),
-        ...(removeListIds.length > 0 ? { unlinkListIds: removeListIds } : {}),
+        ...(unlinkListIds.length > 0 ? { unlinkListIds } : {}),
         updateEnabled: true,
         emailBlacklisted: false,
       }),
@@ -350,6 +402,7 @@ export async function subscribeToBrevoNewsletter(
         email: subscriber.email,
         firstName: subscriber.firstName,
         language,
+        tracks: resolvedTracks,
       });
     }
 

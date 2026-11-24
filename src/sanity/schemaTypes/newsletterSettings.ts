@@ -41,6 +41,26 @@ export const newsletterSettingsType = defineType({
       type: "number",
     }),
     defineField({
+      name: "brevoManufacturingEnListId",
+      title: "Brevo Track A Manufacturing (EN) list ID",
+      type: "number",
+    }),
+    defineField({
+      name: "brevoManufacturingEsListId",
+      title: "Brevo Track A Manufacturing (ES) list ID",
+      type: "number",
+    }),
+    defineField({
+      name: "brevoAlmariseEnListId",
+      title: "Brevo Track B AlmaRise D Brand & Culture (EN) list ID",
+      type: "number",
+    }),
+    defineField({
+      name: "brevoAlmariseEsListId",
+      title: "Brevo Track B AlmaRise D Brand & Culture (ES) list ID",
+      type: "number",
+    }),
+    defineField({
       name: "defaultFooterEn",
       title: "Default email footer (English)",
       type: "text",
