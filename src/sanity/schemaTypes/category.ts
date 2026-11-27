@@ -51,6 +51,11 @@ export const categoryType = defineType({
           title: "Alt text",
           type: "string",
         }),
+        defineField({
+          name: "spanishAlt",
+          title: "Alt text (Spanish)",
+          type: "string",
+        }),
       ],
     }),
   ],

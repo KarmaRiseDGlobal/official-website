@@ -3,16 +3,21 @@ import { NextResponse } from "next/server";
 import { fetchSanity, patchSanityDocument } from "@/lib/sanity";
 import { readJsonObject, verifyWebhookSecret } from "@/lib/security";
 
-const EVENT_TO_COUNTER_FIELD = new Map<string, string>([
-  ["delivered", "analytics.deliveredCount"],
-  ["opened", "analytics.openedCount"],
-  ["unique_opened", "analytics.openedCount"],
-  ["click", "analytics.clickedCount"],
-  ["hard_bounce", "analytics.bouncedCount"],
-  ["soft_bounce", "analytics.bouncedCount"],
-  ["unsubscribed", "analytics.unsubscribedCount"],
-  ["spam", "analytics.spamCount"],
-  ["complaint", "analytics.spamCount"],
+/**
+ * Maps Brevo webhook events to Sanity `analytics.*` fields.
+ * Uses `unique_opened` for `openedCount` and `opened` for `totalOpenedCount`
+ * so repeat opens never inflate open counts past delivered totals.
+ */
+const EVENT_TO_COUNTER_KEY = new Map<string, string>([
+  ["delivered", "deliveredCount"],
+  ["unique_opened", "openedCount"],
+  ["opened", "totalOpenedCount"],
+  ["click", "clickedCount"],
+  ["hard_bounce", "bouncedCount"],
+  ["soft_bounce", "bouncedCount"],
+  ["unsubscribed", "unsubscribedCount"],
+  ["spam", "spamCount"],
+  ["complaint", "spamCount"],
 ]);
 
 function parsePositiveSafeInt(value: unknown): number | null {
@@ -57,8 +62,8 @@ export async function POST(request: Request) {
   const campIdRaw = payload.camp_id ?? payload["camp-id"] ?? payload.campaignId;
   const campId = parsePositiveSafeInt(campIdRaw);
 
-  const counterField = EVENT_TO_COUNTER_FIELD.get(event);
-  if (!counterField || !campId) {
+  const counterKey = EVENT_TO_COUNTER_KEY.get(event);
+  if (!counterKey || !campId) {
     return NextResponse.json({
       ok: true,
       ignored: true,
@@ -66,8 +71,12 @@ export async function POST(request: Request) {
     });
   }
 
-  const matchingIssue = await fetchSanity<{ _id: string }>(
-    `*[_type == "newsletterIssue" && (brevoCampaignIdEn == $campId || brevoCampaignIdEs == $campId)][0]{ _id }`,
+  const matchingIssue = await fetchSanity<{
+    _id: string;
+    brevoCampaignIdEn?: number;
+    brevoCampaignIdEs?: number;
+  }>(
+    `*[_type == "newsletterIssue" && (brevoCampaignIdEn == $campId || brevoCampaignIdEs == $campId)][0]{ _id, brevoCampaignIdEn, brevoCampaignIdEs }`,
     { campId },
     { cache: "no-store" },
   );
@@ -80,10 +89,22 @@ export async function POST(request: Request) {
     });
   }
 
+  const segmentKey =
+    matchingIssue.brevoCampaignIdEs === campId
+      ? "es"
+      : matchingIssue.brevoCampaignIdEn === campId
+        ? "en"
+        : null;
+
+  const incPatch: Record<string, number> = {
+    [`analytics.${counterKey}`]: 1,
+    ...(segmentKey ? { [`analytics.${segmentKey}.${counterKey}`]: 1 } : {}),
+  };
+
   const patched = await patchSanityDocument(
     matchingIssue._id,
     { "analytics.lastEventAt": new Date().toISOString() },
-    { [counterField]: 1 },
+    incPatch,
   );
 
   if (!patched) {
@@ -96,6 +117,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     issueId: matchingIssue._id,
+    segment: segmentKey,
     recordedEvent: event,
   });
 }

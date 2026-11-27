@@ -68,8 +68,8 @@ export async function GET(request: Request) {
       {
         ok: false,
         error: isEs
-          ? "Has consultado demasiados horarios seguidos. Espera un momento."
-          : "Too many schedule checks in a row. Please wait a moment.",
+          ? "Has consultado demasiados horarios seguidos. Espera un momento o escríbenos por WhatsApp o correo."
+          : "Too many schedule checks in a row. Wait a moment, or message us on WhatsApp or email.",
       },
       { status: 429, headers: { "Cache-Control": "no-store" } },
     );

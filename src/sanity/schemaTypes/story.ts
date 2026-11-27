@@ -38,7 +38,10 @@ function buildSectionMember(isSpanish: boolean) {
               defineField({
                 name: "caption",
                 title: isSpanish ? "Caption (Spanish)" : "Caption",
+                description:
+                  "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
                 type: "string",
+                hidden: true,
               }),
               defineField({
                 name: "aspectRatio",
@@ -134,8 +137,11 @@ function buildPortableBodyMembers() {
         }),
         defineField({
           name: "caption",
-          title: "Figure caption",
+          title: "Figure caption (deprecated)",
+          description:
+            "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
           type: "string",
+          hidden: true,
         }),
         defineField({
           name: "aspectRatio",
@@ -272,13 +278,19 @@ export const storyType = defineType({
         }),
         defineField({
           name: "caption",
-          title: "Editorial caption",
+          title: "Editorial caption (deprecated)",
+          description:
+            "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
           type: "string",
+          hidden: true,
         }),
         defineField({
           name: "spanishCaption",
-          title: "Editorial caption (Spanish)",
+          title: "Editorial caption (Spanish, deprecated)",
+          description:
+            "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
           type: "string",
+          hidden: true,
         }),
         defineField({
           name: "objectPosition",
@@ -292,7 +304,7 @@ export const storyType = defineType({
       name: "body",
       title: "Story body (Rich text article editor)",
       description:
-        "Write your Story naturally here. Use H2 for main section headings (they appear automatically in the sidebar contents list), Blockquote for pull quotes, and insert inline photographs anywhere.",
+        "Write your Story naturally here. Use H2 for main section headings (they appear as sticky chapter headings in the left column), Blockquote for pull quotes, and insert inline photographs anywhere.",
       type: "array",
       group: "editorial",
       of: buildPortableBodyMembers(),
@@ -343,13 +355,19 @@ export const storyType = defineType({
             }),
             defineField({
               name: "caption",
-              title: "Caption",
+              title: "Caption (deprecated)",
+              description:
+                "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
               type: "string",
+              hidden: true,
             }),
             defineField({
               name: "spanishCaption",
-              title: "Caption (Spanish)",
+              title: "Caption (Spanish, deprecated)",
+              description:
+                "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
               type: "string",
+              hidden: true,
             }),
             defineField({
               name: "objectPosition",
@@ -363,9 +381,9 @@ export const storyType = defineType({
     }),
     defineField({
       name: "takeaway",
-      title: "Key takeaway",
+      title: "Key takeaway (optional)",
       description:
-        "Closing reflection box at the end of the Story (1 to 2 sentences).",
+        "Optional closing reflection at the end of the Story (1 to 2 sentences). Leave empty if the closing paragraph already lands.",
       type: "text",
       rows: 3,
       group: "editorial",
@@ -561,7 +579,7 @@ export const storyType = defineType({
       name: "newsletterEligible",
       title: "Newsletter eligible",
       description:
-        "Allow this Story to be selected when curating a Newsletter Issue.",
+        "Allow this Story to be selected when assembling a Newsletter Issue.",
       type: "boolean",
       group: "distribution",
       initialValue: true,

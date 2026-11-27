@@ -115,7 +115,9 @@ const ROUTES = [
   "/how-we-work",
   "/es/how-we-work",
   "/almarise",
+  "/es/almarise",
   "/womens-training-initiative",
+  "/es/womens-training-initiative",
   "/stories",
   "/es/stories",
   "/contact",
@@ -124,8 +126,16 @@ const ROUTES = [
   "/es/product-brief",
   "/book-a-call",
   "/es/book-a-call",
-  "/privacy-policy",
+  "/legal-notice",
   "/es/legal-notice",
+  "/privacy-policy",
+  "/es/privacy-policy",
+  "/terms",
+  "/es/terms",
+  "/cookie-policy",
+  "/es/cookie-policy",
+  "/for/b2b-retail-podcast",
+  "/es/para/b2b-retail-podcast",
 ];
 
 function parseArgs(argv) {
@@ -313,10 +323,30 @@ const EVAL_AUDIT = `(() => {
     }
   }
 
-  // Check Option A enhanced state & HorizontalShowcase panel geometry
+  // Check HorizontalShowcase enhanced state & panel geometry, plus /stories asymmetric magazine grid integrity
   const showcase = document.querySelector('.horizontal-showcase');
   const showcaseEnhanced = showcase?.getAttribute('data-enhanced') || null;
-  const storiesEnhanced = document.querySelector('.stories-depth-runway')?.getAttribute('data-enhanced') || null;
+
+  const storiesGrid = document.querySelector('.stories-category-grid');
+  let storiesGridReport = null;
+  if (storiesGrid) {
+    const cards = [...storiesGrid.querySelectorAll('article')];
+    const gridRect = storiesGrid.getBoundingClientRect();
+    const overflowCards = [];
+    for (let i = 0; i < cards.length; i++) {
+      const r = cards[i].getBoundingClientRect();
+      if (r.right > vw + 2 || r.left < -2 || r.width < 180) {
+        overflowCards.push('card[' + i + '] [' + Math.round(r.left) + '..' + Math.round(r.right) + '] w=' + Math.round(r.width));
+      }
+    }
+    const cols = getComputedStyle(storiesGrid).gridTemplateColumns.split(' ').filter(Boolean).length;
+    storiesGridReport = {
+      cardCount: cards.length,
+      gridWidth: Math.round(gridRect.width),
+      cols,
+      overflowCards,
+    };
+  }
 
   const showcaseGeometryIssues = [];
   if (showcase && showcaseEnhanced === 'true') {
@@ -351,7 +381,7 @@ const EVAL_AUDIT = `(() => {
     minDayCell,
     headerOverlapH1,
     showcaseEnhanced,
-    storiesEnhanced,
+    storiesGridReport,
     showcaseGeometryIssues,
   };
 })()`;
@@ -398,7 +428,7 @@ async function main() {
     await cdp.send("Runtime.enable");
     await cdp.send("Page.addScriptToEvaluateOnNewDocument", {
       source:
-        "try { sessionStorage.setItem('krdg-loader-seen', '1'); document.documentElement.dataset.loaderSkip = 'true'; } catch {}",
+        "try { sessionStorage.setItem('karmarise-skip-loader-once', '1'); localStorage.setItem('karmarise_cookie_consent_v1', 'essential'); } catch {}",
     });
 
     for (const vp of selectedViewports) {
@@ -460,11 +490,11 @@ async function main() {
         }
         if (
           vp.tier === "ipad" &&
-          (report.showcaseEnhanced === "true" ||
-            report.storiesEnhanced === "true")
+          vp.width < 1024 &&
+          report.showcaseEnhanced === "true"
         ) {
           vpIssues.push(
-            `${route}: desktop pinned mode active on touch iPad (showcase=${report.showcaseEnhanced}, stories=${report.storiesEnhanced})`,
+            `${route}: desktop pinned mode active on portrait touch iPad (${vp.width}px, showcase=${report.showcaseEnhanced})`,
           );
         }
         if (
@@ -476,14 +506,24 @@ async function main() {
             `${route}: desktop HorizontalShowcase not enhanced on laptop`,
           );
         }
-        if (
-          vp.tier === "laptop" &&
-          (route === "/stories" || route === "/es/stories") &&
-          report.storiesEnhanced !== "true"
-        ) {
-          vpIssues.push(
-            `${route}: desktop Stories corridor not enhanced on laptop`,
-          );
+        if (route === "/stories" || route === "/es/stories") {
+          const grid = report.storiesGridReport;
+          if (!grid || grid.cardCount < 7) {
+            vpIssues.push(
+              `${route}: Stories asymmetric magazine grid missing or incomplete (cards=${grid?.cardCount ?? 0})`,
+            );
+          } else {
+            if (vp.width >= 768 && grid.cols < 12) {
+              vpIssues.push(
+                `${route}: Stories magazine grid expected 12 columns at ${vp.width}px, got ${grid.cols}`,
+              );
+            }
+            if (grid.overflowCards.length > 0) {
+              vpIssues.push(
+                `${route}: Stories magazine cards overflow (${grid.overflowCards.join("; ")})`,
+              );
+            }
+          }
         }
         if (report.showcaseGeometryIssues?.length > 0) {
           vpIssues.push(

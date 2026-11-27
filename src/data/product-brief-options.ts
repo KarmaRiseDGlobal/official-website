@@ -19,38 +19,48 @@ export const PRODUCT_OPTIONS: ReadonlyArray<{
   value: string;
   title: Record<SiteLanguage, string>;
   hint: Record<SiteLanguage, string>;
+  image: string;
+  imagePosition: string;
 }> = [
   {
     value: "Bags and accessories",
-    title: { en: "Bags & leather goods", es: "Bolsos y artículos de piel" },
+    title: { en: "Leather goods", es: "Bolsos y artículos de piel" },
     hint: {
-      en: "Leather bags, soft carryalls, backpacks, small leather goods",
-      es: "Bolsos de piel, bolsones, mochilas y pequeña marroquinería",
+      en: "Hobo bags, stylish backpacks, crossbodies, pouches, wallets, travel bags",
+      es: "Bolsos hobo, mochilas urbanas, bandoleras, estuches, carteras y bolsas de viaje",
     },
+    image: "/images/capabilities/leather-hides.jpg",
+    imagePosition: "50% 45%",
   },
   {
     value: "Garments and clothing",
-    title: { en: "Garments & clothing", es: "Prendas y confección" },
+    title: { en: "Clothing", es: "Ropa y prendas" },
     hint: {
-      en: "Dresses, shirts, kimonos, designer garments in natural and varied fabrics",
-      es: "Vestidos, camisas, kimonos y prendas en diversos tejidos naturales y con mezcla",
+      en: "Cotton and linen midi dresses and skirts, unique denim, blouses, jumpsuits, outerwear",
+      es: "Vestidos y faldas midi en algodón y lino, denim, blusas, monos y prendas exteriores",
     },
+    image: "/images/capabilities/natural-fabrics.jpg",
+    imagePosition: "50% 35%",
   },
   {
-    value: "Another product",
-    title: { en: "Custom sewn accessories", es: "Complementos a medida" },
+    value: "Textile accessories",
+    title: { en: "Textile accessories", es: "Complementos textiles" },
     hint: {
-      en: "Textile pouches, sewn accessories, branded dust bags, woven labels",
-      es: "Neceseres, complementos confeccionados, bolsas guardapolvo y etiquetas",
+      en: "Pashminas, scarves, canvas and quilted totes, clutches, toiletry cases, sleeves",
+      es: "Pashminas, pañuelos, totes de loneta y acolchados, clutches, neceseres y fundas",
     },
+    image: "/images/capabilities/textile-accessories.jpg",
+    imagePosition: "50% 45%",
   },
   {
-    value: "Home decor",
-    title: { en: "Home decor", es: "Decoración del hogar" },
+    value: "Textile home decor",
+    title: { en: "Textile home decor", es: "Decoración textil del hogar" },
     hint: {
-      en: "Own-brand home decor pieces crafted with vetted Indian production units",
-      es: "Artículos de decoración del hogar con unidades de producción auditadas en la India",
+      en: "Cushion covers, wall hangings, Kantha bedspreads, dhurries, table linens",
+      es: "Fundas de cojín, tapices, colchas estilo Kantha, alfombras dhurrie y ropa de mesa",
     },
+    image: "/images/culture/maharashtra-handloom-zari-border.jpg",
+    imagePosition: "50% 45%",
   },
 ];
 
@@ -66,7 +76,7 @@ export const STAGE_OPTIONS: ReadonlyArray<{
       es: "Solo una idea o piezas de referencia",
     },
     hint: {
-      en: "Photos, shop-floor notes, or an existing item you want to improve",
+      en: "Photos, shop notes, or an existing item you want to improve",
       es: "Fotos, notas de tienda o una pieza que quieres mejorar",
     },
   },
@@ -99,8 +109,8 @@ export const STAGE_OPTIONS: ReadonlyArray<{
       es: "Pasar un producto existente a la India",
     },
     hint: {
-      en: "Already selling well and looking for a vetted Indian workshop",
-      es: "Ya lo vendes bien y buscas un taller colaborador auditado en la India",
+      en: "Already selling well and looking for a reliable Indian production unit",
+      es: "Ya lo vendes bien y buscas una unidad de producción de confianza en la India",
     },
   },
 ];
@@ -112,10 +122,9 @@ export const QUANTITY_PRESETS: ReadonlyArray<{
   { value: "Under 100 units", label: { en: "Under 100", es: "Menos de 100" } },
   { value: "100 to 300 units", label: { en: "100 to 300", es: "100 a 300" } },
   {
-    value: "300 to 1,000 units",
-    label: { en: "300 to 1,000", es: "300 a 1.000" },
+    value: "300+ units",
+    label: { en: "300+ units", es: "Más de 300" },
   },
-  { value: "1,000+ units", label: { en: "1,000+", es: "Más de 1.000" } },
   {
     value: "Not sure yet",
     label: { en: "Not sure yet", es: "Aún no lo sé" },
@@ -127,12 +136,12 @@ export const PROFILE_OPTIONS: ReadonlyArray<{
   label: Record<SiteLanguage, string>;
 }> = [
   {
-    value: "Fashion brand",
-    label: { en: "Fashion brand", es: "Marca de moda" },
-  },
-  {
     value: "Independent retailer",
     label: { en: "Independent shop", es: "Tienda independiente" },
+  },
+  {
+    value: "Fashion brand",
+    label: { en: "Fashion brand", es: "Marca de moda" },
   },
   {
     value: "Retail chain",
@@ -142,42 +151,19 @@ export const PROFILE_OPTIONS: ReadonlyArray<{
     value: "Starting a new brand",
     label: { en: "Starting out", es: "Empezando marca" },
   },
-  { value: "Other business", label: { en: "Other", es: "Otro" } },
 ];
 
-export const NOTE_PROMPTS: ReadonlyArray<{
-  label: Record<SiteLanguage, string>;
-  snippet: Record<SiteLanguage, string>;
-}> = [
-  {
-    label: { en: "+ Materials", es: "+ Materiales" },
-    snippet: {
-      en: "Materials in mind: ",
-      es: "Materiales que tengo en mente: ",
-    },
-  },
-  {
-    label: { en: "+ Target date", es: "+ Fecha objetivo" },
-    snippet: {
-      en: "Target launch or delivery: ",
-      es: "Fecha prevista de entrega: ",
-    },
-  },
-  {
-    label: {
-      en: "+ Changes to an existing piece",
-      es: "+ Cambios sobre una pieza",
-    },
-    snippet: {
-      en: "What I want to improve: ",
-      es: "Qué me gustaría mejorar: ",
-    },
-  },
-];
+const ENGLISH_OPTION_LABELS = new Map<string, string>([
+  ...PRODUCT_OPTIONS.map((item) => [item.value, item.title.en] as const),
+  ...STAGE_OPTIONS.map((item) => [item.value, item.title.en] as const),
+  ...QUANTITY_PRESETS.map((item) => [item.value, item.label.en] as const),
+  ...PROFILE_OPTIONS.map((item) => [item.value, item.label.en] as const),
+]);
 
 const SPANISH_OPTION_LABELS = new Map<string, string>([
   ...PRODUCT_OPTIONS.map((item) => [item.value, item.title.es] as const),
   ...STAGE_OPTIONS.map((item) => [item.value, item.title.es] as const),
+  ...QUANTITY_PRESETS.map((item) => [item.value, item.label.es] as const),
   ...PROFILE_OPTIONS.map((item) => [item.value, item.label.es] as const),
 ]);
 
@@ -188,7 +174,21 @@ export function localizeOptionForConfirmation(
   if (confirmationLanguage === "es") {
     return SPANISH_OPTION_LABELS.get(value) ?? value;
   }
-  return value;
+  return ENGLISH_OPTION_LABELS.get(value) ?? value;
+}
+
+export function normalizeOptionalReferenceUrl(rawValue: string): string {
+  const trimmed = rawValue.trim();
+  if (!trimmed) {
+    return "";
+  }
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(trimmed)) {
+    return trimmed;
+  }
+  if (/^[^\s/]+\.[^\s/]+/.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+  return trimmed;
 }
 
 export function isClientSafeHttpUrl(rawValue: string): boolean {

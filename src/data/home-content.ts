@@ -2,7 +2,8 @@ import type { SiteLanguage } from "@/lib/urls";
 
 export interface HomeCapability {
   readonly id: string;
-  readonly querySlug: "bags" | "garments" | "other" | "home-decor";
+  readonly querySlug:
+    "bags" | "garments" | "textile-accessories" | "home-decor";
   readonly title: Record<SiteLanguage, string>;
   readonly summary: Record<SiteLanguage, string>;
   readonly ctaLabel: Record<SiteLanguage, string>;
@@ -28,12 +29,12 @@ export const HOME_CAPABILITIES: readonly HomeCapability[] = [
     id: "leather-bags",
     querySlug: "bags",
     title: {
-      en: "Leather bags and other leather goods",
-      es: "Bolsos y otros artículos de piel",
+      en: "Leather goods",
+      es: "Bolsos y artículos de piel",
     },
     summary: {
-      en: "Structured handbags, soft carryalls, backpacks, and small leather goods in vegetable-tanned hide, antique brass, and high-quality Japanese plastic YKK zippers.",
-      es: "Bolsos estructurados, bolsones, mochilas y pequeña marroquinería en piel de curtido vegetal, latón envejecido y cremalleras japonesas YKK de plástico de alta calidad.",
+      en: "Contemporary hobo bags, stylish everyday backpacks, small crossbodies, makeup pouches, wallets, and travel bags in supple vegetable-tanned leather.",
+      es: "Bolsos hobo actuales, mochilas urbanas, bandoleras pequeñas, estuches de maquillaje, carteras y bolsas de viaje en piel suave de curtido vegetal.",
     },
     ctaLabel: {
       en: "Start a leather brief",
@@ -49,12 +50,12 @@ export const HOME_CAPABILITIES: readonly HomeCapability[] = [
     id: "clothing-capsules",
     querySlug: "garments",
     title: {
-      en: "Clothing in varied fabrics",
-      es: "Prendas de diversos tejidos",
+      en: "Clothing",
+      es: "Ropa y prendas",
     },
     summary: {
-      en: "Shirts, dresses, kimonos, shrugs, light jackets, and seasonal capsules in cotton, linen, silk, blended, and plant-based fabrics.",
-      es: "Camisas, vestidos, kimonos, shrugs, chaquetas finas y colecciones cápsula en algodón, lino, seda, mezclas y fibras vegetales.",
+      en: "Cotton and linen midi dresses and skirts, unique denim pieces, blouses, jumpsuits, and outerwear made with family-run garment makers and artisan collectives.",
+      es: "Vestidos y faldas midi en algodón y lino, piezas singulares en denim, blusas, monos y prendas exteriores con confeccionistas familiares y colectivos de artesanas.",
     },
     ctaLabel: {
       en: "Start a clothing brief",
@@ -67,45 +68,45 @@ export const HOME_CAPABILITIES: readonly HomeCapability[] = [
     },
   },
   {
-    id: "custom-sewn-goods",
-    querySlug: "other",
+    id: "textile-accessories",
+    querySlug: "textile-accessories",
     title: {
-      en: "Custom sewn accessories",
-      es: "Complementos a medida",
+      en: "Textile accessories",
+      es: "Complementos textiles",
     },
     summary: {
-      en: "Textile pouches, sewn accessories, woven brand labels, cotton dust bags, and unbleached chemical-free recycled cardboard care hangtags.",
-      es: "Neceseres textiles, complementos a medida, etiquetas tejidas con tu marca, bolsas guardapolvo y cartón reciclado sin blanquear, libre de químicos.",
+      en: "Pashminas, scarves, shawls, thick canvas and quilted totes, embroidered clutches, toiletry cases, padded headbands, sashes, and fabric sleeves.",
+      es: "Pashminas, pañuelos, chales, totes de loneta y bolsos acolchados, clutches bordados, neceseres de viaje, diademas, fajines y fundas textiles.",
     },
     ctaLabel: {
       en: "Start an accessories brief",
       es: "Briefing de complementos",
     },
-    image: "/images/capabilities/sewn-accessories-machine.jpg",
+    image: "/images/capabilities/textile-accessories.jpg",
     imageAlt: {
-      en: "Cast-iron stitching machine in a sunlit sewing studio",
-      es: "Máquina de coser de hierro fundido en un espacio de confección soleado",
+      en: "Woven pashmina scarf, quilted cotton-linen tote bag, embroidered evening clutch, and padded linen headband on a sunlit stone surface",
+      es: "Pashmina tejida, tote acolchado de algodón y lino, clutch bordado y diadema de lino sobre una superficie de piedra soleada",
     },
   },
   {
     id: "home-decor",
     querySlug: "home-decor",
     title: {
-      en: "Home decor",
-      es: "Decoración del hogar",
+      en: "Textile home decor",
+      es: "Decoración textil del hogar",
     },
     summary: {
-      en: "Own-brand home decor in natural textiles, artisan trims, and custom finishes, prepared with EU labelling for export.",
-      es: "Decoración del hogar con tu marca en tejidos naturales, fornituras artesanas y acabados a medida con etiquetado europeo.",
+      en: "Cushion covers, wall hangings, Kantha-style bedspreads, recycled-cotton flat-weave dhurries, table runners, tablecloths, and placemats.",
+      es: "Fundas de cojín, tapices de pared, colchas estilo Kantha, alfombras dhurrie de algodón reciclado, caminos de mesa, manteles e individuales.",
     },
     ctaLabel: {
       en: "Start a home decor brief",
-      es: "Briefing de decoración",
+      es: "Briefing de decoración textil",
     },
-    image: "/images/capabilities/home-decor-ceramics.jpg",
+    image: "/images/culture/maharashtra-handloom-zari-border.jpg",
     imageAlt: {
-      en: "Matte ceramic vessels, dried grasses, and linen books on a sunlit table",
-      es: "Jarrones cerámicos mate, espigas secas y libros de lino sobre una mesa soleada",
+      en: "Artisan hands weaving a gold and crimson patterned cloth border on a wooden handloom with wooden shuttles beside skeins of natural yarn",
+      es: "Manos artesanas tejiendo una cenefa dorada y carmesí en un telar de madera con lanzaderas junto a madejas de hilo natural",
     },
   },
 ];
@@ -122,8 +123,8 @@ export const HOME_PROOF_ITEMS: readonly HomeProofItem[] = [
       es: "Tres estados de la India para una línea española de bolsos",
     },
     detail: {
-      en: "We vegetable-tanned hides in Kolkata, stitched the bags in Uttar Pradesh, and supervised quality from Maharashtra. All 11 export cartons reached the shop door, and all eight bags went straight into the main downtown window.",
-      es: "Curtimos la piel al vegetal en Calcuta, confeccionamos los bolsos en Uttar Pradesh y supervisamos la calidad desde Maharashtra. Las 11 cajas de exportación llegaron a la tienda y los ocho bolsos pasaron directos al escaparate principal.",
+      en: "We vegetable-tanned hides in Kolkata, stitched the bags in Uttar Pradesh, and checked every piece from Maharashtra. All 11 cartons reached the shop door, and all eight designs (four models in black and tan) went straight into the main window.",
+      es: "Curtimos la piel al vegetal en Calcuta, confeccionamos los bolsos en Uttar Pradesh y revisamos cada pieza desde Maharashtra. Las 11 cajas llegaron a la tienda y las ocho versiones (cuatro modelos en negro y cuero) pasaron directas al escaparate.",
     },
   },
   {
@@ -133,12 +134,12 @@ export const HOME_PROOF_ITEMS: readonly HomeProofItem[] = [
       es: "Cuidado real del producto",
     },
     value: {
-      en: "Details tested for daily wear",
-      es: "Detalles puestos a prueba en el uso diario",
+      en: "Small details fixed before production",
+      es: "Pequeños detalles resueltos a tiempo",
     },
     detail: {
-      en: "We catch friction before cutting starts: high-quality Japanese plastic YKK zippers that spare hands and winter coats, light cotton linings, and 10 to 15 days spent sourcing unbleached chemical-free recycled cardboard for hangtags.",
-      es: "Atajamos las molestias antes de comenzar con el corte de las piezas: cremalleras japonesas YKK de plástico de alta calidad que no arañan manos ni abrigos, forros claros de algodón y 10 a 15 días buscando cartón reciclado sin blanquear, libre de químicos.",
+      en: "We think like the person wearing the piece every day: comfortable straps, smooth closures that spare hands and winter coats, light linings so keys are easy to spot, and hangtags in unbleached recycled cardboard.",
+      es: "Pensamos en quien llevará la pieza cada día: asas cómodas, cierres suaves que no arañan manos ni abrigos, forros claros donde todo se ve y etiquetas de cartón reciclado sin blanquear.",
     },
   },
   {
@@ -148,24 +149,24 @@ export const HOME_PROOF_ITEMS: readonly HomeProofItem[] = [
       es: "Trato honesto y puertas abiertas",
     },
     value: {
-      en: "Enforceable contracts and audited units",
-      es: "Contratos claros y unidades auditadas",
+      en: "Written Indian contracts and open doors",
+      es: "Contratos bajo ley india y puertas abiertas",
     },
     detail: {
-      en: "Shirish structures Indian supplier contracts as a registered Bar Council advocate, while both founders audit production sites in person. Any facility that closes its doors or falls short of zero exploitation comes off our list.",
-      es: "Shirish redacta los contratos bajo legislación india como abogado colegiado en el Bar Council, y los dos fundadores auditan cada punto de producción en persona. Cualquier instalación opaca o fuera de nuestra tolerancia cero queda descartada.",
+      en: "Shirish is a registered Bar Council advocate who puts every maker's terms into a written Indian contract. We visit every atelier and family-run factory in person; if a door stays closed, we walk away.",
+      es: "Shirish es abogado colegiado en el Bar Council y recoge los compromisos de cada fabricante por escrito bajo ley india. Visitamos cada fábrica familiar y marroquinería en persona; si nos cierran una puerta, nos marchamos.",
     },
   },
 ];
 
 export const HOME_FOUNDERS_COPY = {
   heading: {
-    en: "Two founders, two countries, one team standing behind your collection.",
+    en: "Two founders, two countries, one team behind your collection.",
     es: "Dos fundadores, dos países y un solo equipo detrás de tu colección.",
   },
   coverSummary: {
-    en: "Alma works with Clients across Spain and the rest of Europe. Shirish leads contracts, audits, and production on the ground in India.",
-    es: "Alma acompaña a comercios y marcas en España y el resto de Europa. Shirish dirige contratos, auditorías y producción sobre el terreno en la India.",
+    en: "Alma works with shop owners and brands across Spain and the rest of Europe. Shirish leads contracts, visits, and production in India.",
+    es: "Alma acompaña a comercios y marcas en España y el resto de Europa. Shirish dirige contratos, visitas y producción en la India.",
   },
   imageSrc: "/images/client/client.jpg.jpeg",
   imageAlt: {
@@ -180,6 +181,14 @@ export const HOME_FOUNDERS_COPY = {
     en: "Explore AlmaRise D Brand",
     es: "Conoce AlmaRise D Brand",
   },
+  coverCue: {
+    en: "Read how we back every order",
+    es: "Cómo respaldamos cada pedido",
+  },
+  proofRegionAria: {
+    en: "How Alma and Shirish protect your production",
+    es: "Cómo Alma y Shirish protegen tu producción",
+  },
 } as const;
 
 export const HOME_FAQS: readonly HomeFaqItem[] = [
@@ -190,61 +199,47 @@ export const HOME_FAQS: readonly HomeFaqItem[] = [
       es: "¿Necesito tener una ficha técnica cerrada antes de escribiros?",
     },
     answer: {
-      en: "No. Start with a rough sketch, reference photos, an item from your shop, or a free 15-minute video call with Alma in English, Spanish, or Portuguese. We send clear written meeting notes right after and build your Product Brief and physical sample before production begins.",
-      es: "No. Empieza con un boceto a mano, fotos de referencia, una pieza de tu tienda o una videollamada gratuita de 15 minutos con Alma en español, inglés o portugués. Te enviamos las conclusiones de la reunión por escrito y preparamos tu briefing de producto y muestra física antes de producir.",
-    },
-  },
-  {
-    id: "what-we-manufacture",
-    question: {
-      en: "What kinds of products can KarmaRise manufacture in India?",
-      es: "¿Qué tipo de productos puede fabricar KarmaRise en la India?",
-    },
-    answer: {
-      en: "We produce own-brand leather bags and other leather goods, clothing in natural and varied fabrics, custom sewn accessories with branded labels, dust bags, and unbleached chemical-free recycled cardboard hangtags, and home decor, matching each Product Brief to audited production units across India.",
-      es: "Fabricamos con tu marca bolsos y otros artículos de piel, prendas de diversos tejidos, complementos confeccionados a medida con etiquetas tejidas, bolsas guardapolvo y etiquetas de cartón reciclado sin blanquear, libre de químicos, y decoración del hogar en unidades de producción auditadas de la India.",
+      en: "No. Start with a rough sketch, reference photos, or a piece from your shop. Book a free 15-minute video call with Alma in English, Spanish, or Portuguese, and we build the specification together.",
+      es: "No. Empieza con un boceto a mano, fotos de referencia o una pieza de tu tienda. Reserva una videollamada gratuita de 15 minutos con Alma en español, inglés o portugués y construimos juntos las especificaciones.",
     },
   },
   {
     id: "scoping-and-quantities",
     question: {
-      en: "How do you handle quantities, timelines, and proposals?",
-      es: "¿Cómo gestionáis las cantidades, los plazos y las propuestas?",
+      en: "Do you have fixed minimum orders or price lists?",
+      es: "¿Tenéis cantidades mínimas fijas o tarifas cerradas?",
     },
     answer: {
-      en: "Every Manufacturing Programme is scoped individually from your Product Brief. Because leather, garment, and home decor hubs across Kolkata, Kanpur, Agra, and Chennai operate at different scales, we match your collection to the right facility and lay out realistic timelines in a custom proposal.",
-      es: "Cada Programa de producción se valora a medida según tu briefing de producto. Como cada centro especialista en Calcuta, Kanpur, Agra o Chennai trabaja a su escala, conectamos tu colección con la unidad adecuada y detallamos plazos y condiciones en una propuesta personalizada.",
+      en: "No. Every project is quoted from your brief because a leather atelier and a cotton weaving house operate at very different scales. We handle first-time boutique capsules as well as repeat retail runs.",
+      es: "No. Cada proyecto se valora según tu idea porque una marroquinería y un tejedor de algodón trabajan a escalas muy distintas. Acompañamos tanto primeras cápsulas de comercio como reposiciones más amplias.",
     },
   },
   {
     id: "quality-and-colour-control",
     question: {
-      en: "How do you protect colour accuracy, confidentiality, and quality across distance?",
-      es: "¿Cómo protegéis el color, la confidencialidad y la calidad a distancia?",
+      en: "How do I trust colour and quality across continents?",
+      es: "¿Cómo puedo fiarme del color y la calidad a tanta distancia?",
     },
     answer: {
-      en: "Screens distort shades, so we guide what is needed for each dye batch and create a physical colour swatch for your approval. Production begins only after you approve a reviewed physical sample in your hands, backed by mutual NDA and NNN agreements and Shirish's written Indian supplier contracts.",
-      es: "Las pantallas distorsionan los tonos, así que te indicamos qué hace falta para cada tintada y preparamos un retal físico de color para tu aprobación. No procedemos a la producción hasta que apruebas una muestra revisada en tus manos, con acuerdos mutuos NDA y NNN y contratos escritos bajo ley india.",
+      en: "You approve a real colour swatch and hold the finished physical sample before production begins. Mutual NDA protection is ready whenever you want it, backed by written Indian contracts.",
+      es: "Apruebas una muestra física de color y tienes la muestra terminada en tus manos antes de producir. Dispones de acuerdo mutuo NDA cuando quieras y de contratos escritos bajo ley india.",
     },
   },
   {
     id: "ethical-workshops-and-export",
     question: {
-      en: "How do you verify ethical working conditions and manage export delivery?",
-      es: "¿Cómo comprobáis las condiciones éticas y gestionáis la exportación?",
+      en: "Do you handle ethical checks and delivery to Europe?",
+      es: "¿Os encargáis de las comprobaciones éticas y del envío a Europa?",
     },
     answer: {
-      en: "Both founders audit family-run factories, production units, and women artisan collectives in person, speaking directly with makers under a strict zero-exploitation standard. We verify EU labelling before packing and include export delivery to your business door in Spain or the rest of Europe in your proposal.",
-      es: "Los dos fundadores auditan en persona fábricas de corte familiar, unidades de producción y colectivos de artesanas bajo tolerancia cero ante la explotación. Verificamos el etiquetado europeo antes del embalaje e incluimos el envío hasta la puerta de tu negocio en España o el resto de Europa.",
+      en: "Yes. We visit every factory and artisan collective in person under a strict zero-exploitation standard, and your proposal includes EU labelling and door-to-door delivery across Spain and the rest of Europe.",
+      es: "Sí. Visitamos personalmente cada fábrica y colectivo de artesanas bajo tolerancia cero ante la explotación, y tu propuesta incluye el etiquetado europeo y la entrega hasta tu puerta en España o el resto de Europa.",
     },
   },
 ];
 
 export interface HomeWorkingPrinciple {
   readonly id: string;
-  readonly step: string;
-  readonly tag: Record<SiteLanguage, string>;
-  readonly locationPill: Record<SiteLanguage, string>;
   readonly title: Record<SiteLanguage, string>;
   readonly body: Record<SiteLanguage, string>;
   readonly image: string;
@@ -257,77 +252,50 @@ export interface HomeWorkingPrinciple {
 export const HOME_WORKING_PRINCIPLES: readonly HomeWorkingPrinciple[] = [
   {
     id: "talk-to-alma",
-    step: "01",
-    tag: {
-      en: "Direct conversation",
-      es: "Trato directo",
-    },
-    locationPill: {
-      en: "Spain & rest of Europe → India",
-      es: "España y resto de Europa → India",
-    },
     title: {
-      en: "Start with a face-to-face video call with Alma",
-      es: "Empieza con una videollamada cara a cara con Alma",
+      en: "Start with a face-to-face call with Alma",
+      es: "Empieza con una llamada cara a cara con Alma",
     },
     body: {
-      en: "Talk freely about the piece you have in mind. Alma sends clear meeting notes straight after and takes every detail with Shirish to the production unit.",
-      es: "Cuéntanos con libertad la pieza que tienes en mente. Alma te envía las conclusiones de la reunión nada más colgar y lleva cada detalle con Shirish a la unidad de producción.",
+      en: "Talk through your idea without a technical file. Alma sends clear meeting notes right after and takes every detail with Shirish to the makers.",
+      es: "Cuéntanos tu idea sin necesidad de ficha técnica. Alma te envía por escrito las conclusiones de la reunión nada más colgar y traslada cada detalle con Shirish al equipo en la India.",
     },
-    image: "/images/founders/alma-portrait.jpeg",
-    imagePosition: "68% 42%",
-    imageScale: 1.85,
-    imageOrigin: "89% 46%",
+    image: "/images/founders/alma-swing-laughing.jpeg",
+    imagePosition: "50% 42%",
     imageAlt: {
-      en: "Portrait of Alma, co-founder of KarmaRise D Global",
-      es: "Retrato de Alma, cofundadora de KarmaRise D Global",
+      en: "Alma laughing warmly on a wooden porch swing in India, ready for a face-to-face call",
+      es: "Alma riendo con cercanía en un columpio de madera en la India, lista para una videollamada cara a cara",
     },
   },
   {
     id: "clear-reference",
-    step: "02",
-    tag: {
-      en: "Written Product Brief",
-      es: "Briefing de producto",
-    },
-    locationPill: {
-      en: "Physical swatches & trims",
-      es: "Muestras físicas y fornituras",
-    },
     title: {
-      en: "Approve colour and texture with something you can touch",
-      es: "Aprueba el color y la textura en tus manos",
+      en: "Approve colour and texture in your hands",
+      es: "Aprueba color y textura en tus manos",
     },
     body: {
-      en: "We tell you what is needed for each dye batch and prepare a physical colour swatch alongside hardware, linings, and finishing so everyone works from one reference.",
-      es: "Te indicamos qué hace falta para cada tintada y preparamos un retal físico de color junto a herrajes, forro y acabados para que todo el equipo parta de la misma referencia.",
+      en: "Screens distort shades, so we prepare a real colour swatch alongside hardware and lining before dyeing starts.",
+      es: "Las pantallas distorsionan los tonos, así que preparamos una muestra física de color junto a herrajes y forro antes de teñir.",
     },
-    image: "/images/workshops/alma-dark-leather-swatch-binder-review.jpeg",
+    image: "/images/workshops/cognac-leather-bag-bodies-brass-zippers.jpg",
+    imagePosition: "50% 50%",
     imageAlt: {
-      en: "Alma and a production unit owner comparing leather colour swatch cards in India",
-      es: "Alma y el responsable de una unidad de producción comparando muestrarios de color de piel en la India",
+      en: "Stacked cognac vegetable-tanned leather bag panels stitched with zippers beside cut black leather straps",
+      es: "Paneles apilados de piel de curtido vegetal en tono coñac cosidos con cremalleras junto a correas de piel negra cortadas",
     },
   },
   {
     id: "approved-sample",
-    step: "03",
-    tag: {
-      en: "Reviewed samples",
-      es: "Muestras para valoración",
-    },
-    locationPill: {
-      en: "On the ground in India",
-      es: "Sobre el terreno en la India",
-    },
     title: {
-      en: "Approve the physical sample before cutting starts",
-      es: "Aprueba la muestra física antes de cortar",
+      en: "Sign off the sample before cutting starts",
+      es: "Aprueba la muestra antes de cortar",
     },
     body: {
-      en: "We inspect every sample first in India, rework weak prototypes early, and connect you by live video from the production site whenever a decision comes up.",
-      es: "Revisamos cada muestra primero en la India, descartamos prototipos flojos a tiempo y te llamamos en directo desde el punto de producción ante cualquier ajuste.",
+      en: "We inspect the first prototype ourselves in India, rework weak drafts early, and bring you on live video whenever a choice comes up.",
+      es: "Revisamos el primer prototipo en la India, corregimos fallos antes de enviártelo y te llamamos en directo ante cualquier decisión.",
     },
     image: "/images/workshops/shirish-tan-black-leather-bags-inspection.jpeg",
+    imagePosition: "50% 24%",
     imageAlt: {
       en: "Shirish inspecting a finished brown leather sample bag alongside production pieces in India",
       es: "Shirish revisando una muestra terminada de bolso de piel marrón junto a piezas de producción en la India",
@@ -335,27 +303,18 @@ export const HOME_WORKING_PRINCIPLES: readonly HomeWorkingPrinciple[] = [
   },
   {
     id: "dispatch-plan",
-    step: "04",
-    tag: {
-      en: "Export & delivery",
-      es: "Exportación y entrega",
-    },
-    locationPill: {
-      en: "India → Spain & rest of Europe",
-      es: "India → España y resto de Europa",
-    },
     title: {
-      en: "We follow your order to your shop door",
-      es: "Seguimos tu pedido hasta la puerta de tu tienda",
+      en: "Delivered ready for your shop window",
+      es: "Entregado listo para tu escaparate",
     },
     body: {
-      en: "EU care and leather labels, cotton dust bags, numbered export cartons, and customs documents are planned upfront so pieces arrive ready for your shop window.",
-      es: "Planificamos desde el inicio el etiquetado europeo, bolsas guardapolvo, cajas numeradas y aduanas para que tus piezas lleguen listas para el escaparate.",
+      en: "EU care labels, protective packing, and customs paperwork are planned upfront so cartons arrive ready to unpack and display.",
+      es: "Planificamos desde el inicio el etiquetado europeo, el embalaje protector y las aduanas para que las cajas lleguen listas para exponer.",
     },
     image: "/images/workshops/leather-bags-export-cartons.jpeg",
     imageAlt: {
-      en: "Numbered and wrapped export cartons prepared for dispatch in India",
-      es: "Cajas de exportación numeradas y retractiladas listas para su salida desde la India",
+      en: "Numbered and wrapped cartons prepared for dispatch in India",
+      es: "Cajas numeradas y retractiladas listas para su salida desde la India",
     },
   },
 ];
@@ -378,8 +337,8 @@ export const HOME_CLOSING_CONVERSATION = {
     es: "¿Todavía dándole vueltas? Empieza con una charla tranquila.",
   },
   confidentialityNote: {
-    en: "Your designs stay confidential under a mutual NDA. Zero obligation and no tech pack required.",
-    es: "Tus diseños son confidenciales (NDA). Sin compromiso ni ficha técnica previa.",
+    en: "Mutual NDA available from day one. Zero obligation and no tech pack needed.",
+    es: "Acuerdo NDA disponible desde el primer día. Sin compromiso ni ficha técnica previa.",
   },
   advanceCue: {
     en: "Choose how to start",
@@ -416,12 +375,12 @@ export const HOME_CLOSING_CONVERSATION = {
         es: "Prefieres hablarlo primero",
       },
       title: {
-        en: "Book a free 15-minute call with Alma",
-        es: "Reserva una llamada gratis de 15 min con Alma",
+        en: "Book a free call with Alma",
+        es: "Reserva una llamada gratis con Alma",
       },
       detail: {
-        en: "Zero obligation. Talk face to face and receive written meeting notes.",
-        es: "Sin compromiso. Habla cara a cara y recibe las conclusiones por escrito.",
+        en: "Free 15-minute video call face to face, with clear meeting notes sent right after.",
+        es: "Videollamada gratuita de 15 minutos cara a cara, con las conclusiones de la reunión por escrito justo después.",
       },
     },
     {
@@ -436,8 +395,8 @@ export const HOME_CLOSING_CONVERSATION = {
         es: "Cuéntanos tu idea",
       },
       detail: {
-        en: "1-minute brief from a sketch or reference. Confidential under a mutual NDA.",
-        es: "Briefing en 1 min desde un boceto o referencia. Confidencial bajo NDA.",
+        en: "Send a sketch, photo, or reference piece in three short steps.",
+        es: "Envíanos un boceto, foto o pieza de referencia en tres pasos breves.",
       },
     },
   ] as readonly HomeClosingOption[],

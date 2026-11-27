@@ -18,6 +18,7 @@ import {
   MANUFACTURING_LAST_REVIEWED,
   MANUFACTURING_STAGES,
 } from "@/data/manufacturing-content";
+import { OFFICIAL_SOCIALS } from "@/data/socials";
 import {
   getLocalizedStory,
   type StoryEntry,
@@ -40,6 +41,10 @@ function buildOrganizationNode(lang: SiteLanguage): Record<string, unknown> {
     alternateName: "KarmaRise",
     legalName: "Karmarise Global LLP",
     url: siteUrl,
+    sameAs: [
+      OFFICIAL_SOCIALS.karmariseLinkedIn,
+      OFFICIAL_SOCIALS.karmariseInstagram,
+    ],
     logo: {
       "@type": "ImageObject",
       url: `${siteUrl}/brand/main-logo-transparent.png`,
@@ -48,12 +53,13 @@ function buildOrganizationNode(lang: SiteLanguage): Record<string, unknown> {
     },
     foundingDate: "2025-05-15",
     description: isEs
-      ? "KarmaRise D Global desarrolla y fabrica bolsos de piel y otros artículos de piel, ropa en tejidos naturales y variados, complementos confeccionados a medida y decoración del hogar en unidades de producción auditadas de la India (Calcuta, Kanpur, Agra y Chennai, supervisados desde Maharashtra) para comercios y marcas de España y el resto de Europa."
-      : "KarmaRise D Global develops and manufactures own-brand leather bags and other leather goods, clothing in natural and varied fabrics, custom sewn accessories, and home decor across vetted production units in India (Kolkata, Kanpur, Agra, and Chennai, overseen from Maharashtra) for shops and brands in Spain and the rest of Europe.",
+      ? "KarmaRise D Global desarrolla y fabrica bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en unidades de producción auditadas de la India (Calcuta, Kanpur, Agra y Chennai, supervisados desde Maharashtra) para comercios y marcas de España y el resto de Europa."
+      : "KarmaRise D Global develops and manufactures own-brand leather goods, clothing, textile accessories, and textile home decor across vetted production units in India (Kolkata, Kanpur, Agra, and Chennai, overseen from Maharashtra) for shops and brands in Spain and the rest of Europe.",
     founder: [
       {
         "@type": "Person",
         name: "Alma",
+        sameAs: [OFFICIAL_SOCIALS.almaLinkedIn],
         jobTitle: isEs
           ? "Cofundadora, desarrollo de producto y relación con clientes en España y el resto de Europa"
           : "Co-founder, client alignment and product development across Spain and the rest of Europe",
@@ -62,6 +68,7 @@ function buildOrganizationNode(lang: SiteLanguage): Record<string, unknown> {
       {
         "@type": "Person",
         name: "Shirish",
+        sameAs: [OFFICIAL_SOCIALS.shirishLinkedIn],
         jobTitle: isEs
           ? "Cofundador, abogado colegiado en el Bar Council de la India y dirección de operaciones sobre el terreno"
           : "Co-founder, registered Bar Council advocate in India and operations lead",
@@ -85,7 +92,7 @@ function buildOrganizationNode(lang: SiteLanguage): Record<string, unknown> {
           "Diseño y desarrollo ergonómico de producto para marcas europeas",
           "Fabricación de ropa en tejidos naturales y variados en la India",
           "Fabricación de bolsos de piel y marroquinería en la India",
-          "Decoración del hogar y complementos confeccionados a medida",
+          "Complementos textiles y decoración textil del hogar",
           "Unidades de producción familiares y colectivos de artesanas en la India",
           "Control de calidad sobre muestra física y exportación a la UE",
         ]
@@ -94,7 +101,7 @@ function buildOrganizationNode(lang: SiteLanguage): Record<string, unknown> {
           "Product design and ergonomic development for European brands",
           "Private-label clothing manufacturing in natural and varied fabrics in India",
           "Leather bag and small leather goods manufacturing in India",
-          "Own-brand home decor and custom sewn accessories",
+          "Own-brand textile accessories and textile home decor",
           "Vetted family-run production units and women artisan collectives in India",
           "Physical sample review, on-site quality supervision, and EU export delivery",
         ],
@@ -144,7 +151,7 @@ export function getHomeStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -157,9 +164,9 @@ export function getHomeStructuredData(
           ? "Fabricación de marca propia en la India | KarmaRise"
           : "Own-brand manufacturing in India | KarmaRise D Global",
         description: isEs
-          ? "Fabrica en la India tus bolsos de piel, ropa, complementos y decoración del hogar con Alma y Shirish sobre el terreno. Muestra física primero. Empieza hoy."
-          : "Manufacture own-brand leather bags, clothing, sewn accessories, and home decor in India with Alma and Shirish on site. Samples first. Start your brief.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+          ? "Fabrica bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en la India con Alma y Shirish. Muestra física primero."
+          : "Manufacture own-brand leather goods, clothing, textile accessories, and textile home decor in India with Alma and Shirish on site. Samples first.",
+        inLanguage: isEs ? "es" : "en",
         isPartOf: {
           "@id": websiteId,
         },
@@ -171,14 +178,14 @@ export function getHomeStructuredData(
         "@type": "Service",
         "@id": serviceId,
         name: isEs
-          ? "Programa de producción de bolsos de piel, ropa, complementos y decoración del hogar en la India"
-          : "Own-brand leather goods, clothing, sewn accessories, and home decor Manufacturing Programme in India",
+          ? "Programa de producción de bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en la India"
+          : "Own-brand leather goods, clothing, textile accessories, and textile home decor Manufacturing Programme in India",
         serviceType: isEs
           ? "Fabricación gestionada de marca propia en la India"
           : "Managed own-brand product development and manufacturing in India",
         description: isEs
-          ? "Servicio integral de desarrollo y fabricación de bolsos de piel, prendas en diversos tejidos, complementos confeccionados y decoración del hogar en unidades de producción auditadas de la India para marcas y comercios de España y el resto de Europa. Cada proyecto se valora a medida según el briefing de producto."
-          : "End-to-end own-brand development and manufacturing of leather goods, clothing in natural and varied fabrics, custom sewn accessories, and home decor across audited Indian production units for brands and shops in Spain and the rest of Europe. Each programme is scoped individually per Product Brief.",
+          ? "Servicio integral de desarrollo y fabricación de bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en unidades de producción auditadas de la India para marcas y comercios de España y el resto de Europa. Cada proyecto se valora a medida según el briefing de producto."
+          : "End-to-end own-brand development and manufacturing of leather goods, clothing, textile accessories, and textile home decor across audited Indian production units for brands and shops in Spain and the rest of Europe. Each programme is scoped individually per Product Brief.",
         provider: {
           "@id": organizationId,
         },
@@ -216,7 +223,7 @@ export function getHomeStructuredData(
         "@type": "FAQPage",
         "@id": `${pageIdBase}#faq`,
         url: pageUrl,
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         mainEntity: HOME_FAQS.map((item) => ({
           "@type": "Question",
           name: item.question[lang],
@@ -254,7 +261,7 @@ export function getManufacturingProgrammeStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -267,9 +274,9 @@ export function getManufacturingProgrammeStructuredData(
           ? "Estudio de producto, diseño y fabricación gestionada en la India para marcas europeas"
           : "Product study, design, and managed manufacturing across India for European brands",
         description: isEs
-          ? "Diseña y fabrica bolsos de piel, ropa, complementos y decoración del hogar en la India. Unidades auditadas, muestra física y entrega en tu negocio."
-          : "Develop own-brand leather goods, clothing, sewn accessories, and home decor in India. Product study, vetted production units, samples, and EU delivery.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+          ? "Diseña y fabrica bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en la India. Unidades auditadas y muestra física."
+          : "Develop own-brand leather goods, clothing, textile accessories, and textile home decor in India. Product study, audited units, samples, and EU delivery.",
+        inLanguage: isEs ? "es" : "en",
         dateModified: MANUFACTURING_LAST_REVIEWED.iso,
         isPartOf: {
           "@id": websiteId,
@@ -343,7 +350,7 @@ export function getManufacturingProgrammeStructuredData(
                   ? "Estudio de producto, viabilidad y diseño ergonómico"
                   : "Product study, regional feasibility, and ergonomic design",
                 description: isEs
-                  ? "Evaluación comercial y ergonómica, selección de materiales y regiones especialistas, briefing de producto por escrito con retal físico de color y planificación de etiquetado europeo."
+                  ? "Evaluación comercial y ergonómica, selección de materiales y regiones especialistas, briefing de producto por escrito con muestra física de color y planificación de etiquetado europeo."
                   : "Commercial and ergonomic review, regional craft feasibility check, written Product Brief with physical colour swatch, and EU labelling and customs planning.",
               },
             },
@@ -367,7 +374,7 @@ export function getManufacturingProgrammeStructuredData(
         description: isEs
           ? "Proceso paso a paso desde el briefing de producto y el estudio de viabilidad hasta la aprobación de muestras físicas, la supervisión en planta y la entrega en Europa."
           : "Step-by-step process from Product Brief and feasibility study through physical sample sign-off, on-site production supervision, and European export delivery.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         step: MANUFACTURING_STAGES.map((stage, index) => ({
           "@type": "HowToStep",
           position: index + 1,
@@ -380,7 +387,7 @@ export function getManufacturingProgrammeStructuredData(
         "@type": "FAQPage",
         "@id": faqId,
         url: pageUrl,
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         mainEntity: MANUFACTURING_FAQS.map((item) => ({
           "@type": "Question",
           name: item.question[lang],
@@ -417,7 +424,7 @@ export function getHowWeWorkStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -432,7 +439,7 @@ export function getHowWeWorkStructuredData(
         description: isEs
           ? "Descubre cómo Alma y Shirish dirigen tu producción en la India: conclusiones de reunión, muestras de color, revisión previa, control en planta y envío."
           : "See how Alma and Shirish manage India manufacturing for Europe: call conclusions, physical colour swatches, reviewed samples, on-site checks, and EU delivery.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         dateModified: HOW_WE_WORK_LAST_REVIEWED.iso,
         isPartOf: {
           "@id": websiteId,
@@ -471,7 +478,7 @@ export function getHowWeWorkStructuredData(
         description: isEs
           ? "Flujo de trabajo en cinco pasos entre tu comercio o marca en Europa, Alma y Shirish, y las unidades de producción en la India."
           : "Five-step operating workflow connecting European brands and shops with Alma, Shirish, and vetted production units across India.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         step: HOW_WE_WORK_STEPS.map((step, index) => ({
           "@type": "HowToStep",
           position: index + 1,
@@ -484,7 +491,7 @@ export function getHowWeWorkStructuredData(
         "@type": "FAQPage",
         "@id": faqId,
         url: pageUrl,
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         mainEntity: HOW_WE_WORK_FAQS.map((item) => ({
           "@type": "Question",
           name: item.question[lang],
@@ -525,7 +532,7 @@ export function getAboutStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -535,7 +542,8 @@ export function getAboutStructuredData(
         "@id": almaId,
         name: "Alma",
         url: `${pageUrl}#alma`,
-        image: `${siteUrl}/images/founders/alma-spain-hillside-portrait.jpeg`,
+        sameAs: [OFFICIAL_SOCIALS.almaLinkedIn],
+        image: `${siteUrl}/images/founders/alma-portrait.jpeg`,
         jobTitle: isEs
           ? "Cofundadora, desarrollo de producto y relación con clientes en España y el resto de Europa"
           : "Co-founder, client alignment and product development across Spain and the rest of Europe",
@@ -547,7 +555,7 @@ export function getAboutStructuredData(
           ? [
               "Desarrollo y ergonomía de producto para comercios y marcas europeas",
               "Auditoría de unidades de producción, fábricas de corte familiar y colectivos de artesanas en la India",
-              "AlmaRise D Reborn, AlmaRise D Organic y decoración del hogar",
+              "AlmaRise D Reborn, AlmaRise D Organic y AlmaRise D Home Decor",
             ]
           : [
               "Retail product development and ergonomics for European shops and brands",
@@ -563,7 +571,8 @@ export function getAboutStructuredData(
         "@id": shirishId,
         name: "Shirish",
         url: `${pageUrl}#shirish`,
-        image: `${siteUrl}/images/founders/shirish-co-founder-office-india.jpeg`,
+        sameAs: [OFFICIAL_SOCIALS.shirishLinkedIn],
+        image: `${siteUrl}/images/workshops/shirish-at-leather-warehouse-desk.jpeg`,
         jobTitle: isEs
           ? "Cofundador, abogado colegiado en el Bar Council de la India y dirección de operaciones sobre el terreno"
           : "Co-founder, registered Bar Council advocate in India and operations lead",
@@ -596,7 +605,7 @@ export function getAboutStructuredData(
         description: isEs
           ? "Conoce a Alma en España y a Shirish, abogado del Bar Council en la India, fundadores de KarmaRise D Global (Karmarise Global LLP). Pide llamada o briefing."
           : "Meet Alma in Spain and Bar Council advocate Shirish in India, founders of KarmaRise D Global (Karmarise Global LLP). Book a free call or send your brief.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         dateModified: ABOUT_LAST_REVIEWED.iso,
         isPartOf: {
           "@id": websiteId,
@@ -633,7 +642,7 @@ export function getAboutStructuredData(
         "@type": "FAQPage",
         "@id": faqId,
         url: pageUrl,
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         mainEntity: ABOUT_FAQS.map((item) => ({
           "@type": "Question",
           name: item.question[lang],
@@ -669,7 +678,7 @@ export function getAlmariseStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -679,14 +688,15 @@ export function getAlmariseStructuredData(
         "@id": brandId,
         name: "AlmaRise D Brand",
         url: pageUrl,
+        sameAs: [OFFICIAL_SOCIALS.almariseInstagram],
         logo: {
           "@type": "ImageObject",
-          url: `${siteUrl}/brand/main-logo-transparent.png`,
-          width: 701,
-          height: 815,
+          url: `${siteUrl}/brand/almarise-d-brand-logo.png`,
+          width: 723,
+          height: 607,
         },
         description: isEs
-          ? "AlmaRise D Brand es la marca propia de moda sostenible y decoración del hogar de KarmaRise D Global, con AlmaRise D Reborn (prendas únicas a partir de saris que mujeres indias han guardado con una historia que contar), AlmaRise D Organic (tintes orgánicos y tejidos de residuos de caña de azúcar, naranja, plátano y piña, entre otros) y decoración del hogar."
+          ? "AlmaRise D Brand es la marca propia de moda sostenible y decoración del hogar de KarmaRise D Global, con AlmaRise D Reborn (prendas únicas a partir de saris que mujeres indias han guardado con una historia que contar), AlmaRise D Organic (tintes orgánicos y tejidos de residuos de caña de azúcar, naranja, plátano y piña, entre otros) y AlmaRise D Home Decor."
           : "AlmaRise D Brand is the owned sustainable fashion and home decor brand of KarmaRise D Global, spanning AlmaRise D Reborn (one-of-a-kind everyday garments tailored from kept Indian sarees with a story), AlmaRise D Organic (organic dyes and plant-waste fabrics from sugarcane, orange, banana, and pineapple, among others), and AlmaRise D Home Decor.",
         slogan: isEs
           ? "Saris con historia, tejidos vegetales y piezas para el hogar desde la India."
@@ -697,13 +707,13 @@ export function getAlmariseStructuredData(
         "@id": `${pageUrl}#webpage`,
         url: pageUrl,
         name: isEs
-          ? "AlmaRise D Brand: D Reborn, D Organic y hogar | KarmaRise"
-          : "AlmaRise D Brand: D Reborn, D Organic & Decor | KarmaRise",
+          ? "AlmaRise D Brand: Moda sostenible y hogar | KarmaRise"
+          : "AlmaRise D Brand: Our Own Indian Craft Brand | KarmaRise",
         description: isEs
-          ? "AlmaRise D Brand de KarmaRise D Global: prendas AlmaRise D Reborn de saris, tejidos AlmaRise D Organic y decoración del hogar para España y el resto de Europa."
-          : "AlmaRise D Brand by KarmaRise D Global: AlmaRise D Reborn sarees, AlmaRise D Organic fabrics, and D Home Decor, made in India for Spain and the rest of Europe.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
-        dateModified: "2026-11-24",
+          ? "AlmaRise D Brand de KarmaRise D Global: AlmaRise D Reborn, AlmaRise D Organic y AlmaRise D Home Decor, hechos en la India para España y el resto de Europa."
+          : "AlmaRise D Brand by KarmaRise D Global: AlmaRise D Reborn, AlmaRise D Organic, and AlmaRise D Home Decor, made in India for Spain and the rest of Europe.",
+        inLanguage: isEs ? "es" : "en",
+        dateModified: "2026-11-27",
         isPartOf: {
           "@id": websiteId,
         },
@@ -761,7 +771,7 @@ export function getProductBriefStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -774,9 +784,9 @@ export function getProductBriefStructuredData(
           ? "Empieza tu briefing de producto para la India"
           : "Start your Product Brief for India",
         description: isEs
-          ? "Comparte tu briefing de producto en 3 pasos para valorar bolsos de piel, ropa o complementos en la India. Alma responde en 1 o 2 días laborables."
-          : "Share your Product Brief in 3 quick steps to scope own-brand leather bags, clothing, or custom sewn goods in India. Alma replies within 1–2 business days.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+          ? "Envía tu briefing de producto en 3 pasos para valorar bolsos y artículos de piel, ropa, complementos textiles o decoración textil del hogar en la India. Alma responde en 1 o 2 días laborables."
+          : "Share your Product Brief in 3 quick steps to scope own-brand leather goods, clothing, textile accessories, or textile home decor in India. Alma replies within 1–2 business days.",
+        inLanguage: isEs ? "es" : "en",
         isPartOf: {
           "@id": websiteId,
         },
@@ -800,7 +810,7 @@ export function getProductBriefStructuredData(
           {
             "@type": "ListItem",
             position: 2,
-            name: isEs ? "Briefing de producto" : "Start a Product Brief",
+            name: isEs ? "Briefing de producto" : "Product Brief",
             item: pageUrl,
           },
         ],
@@ -814,7 +824,7 @@ export function getProductBriefStructuredData(
         description: isEs
           ? "Cuatro pasos desde la lectura personal por Alma en 1 o 2 días laborables hasta la propuesta y el muestreo físico en la India."
           : "Four steps from Alma's personal review within 1–2 business days through proposal and physical sampling in India.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         step: PRODUCT_BRIEF_POST_STEPS.map((step, index) => ({
           "@type": "HowToStep",
           position: index + 1,
@@ -849,7 +859,7 @@ export function getBookACallStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -864,7 +874,7 @@ export function getBookACallStructuredData(
         description: isEs
           ? "Reserva una videollamada gratuita de 15 o 30 min por Google Meet con Alma en español, inglés o portugués para hablar de tu briefing de producto en la India."
           : "Book a free 15-min or 30-min Google Meet call with Alma in English, Spanish, or Portuguese to discuss your Product Brief and manufacturing in India.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         isPartOf: {
           "@id": websiteId,
         },
@@ -912,7 +922,7 @@ export function getBookACallStructuredData(
         "@type": "FAQPage",
         "@id": faqId,
         url: pageUrl,
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         mainEntity: BOOK_CALL_FAQS.map((item) => ({
           "@type": "Question",
           name: item.question[lang],
@@ -988,7 +998,7 @@ export function getContactStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -1003,7 +1013,7 @@ export function getContactStructuredData(
         description: isEs
           ? "Contacta con KarmaRise D Global en español o inglés para Programas de producción, unidades en la India, AlmaRise D Brand o consultas generales."
           : "Contact KarmaRise D Global (Karmarise Global LLP) in Spain and India in English or Spanish for Manufacturing Programmes, partners, or AlmaRise D Brand.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         isPartOf: {
           "@id": websiteId,
         },
@@ -1064,7 +1074,8 @@ function buildFounderNode(
       "@id": `${siteUrl}/#alma`,
       name: "Alma",
       url: `${aboutUrl}#alma`,
-      image: `${siteUrl}/images/founders/alma-spain-hillside-portrait.jpeg`,
+      sameAs: [OFFICIAL_SOCIALS.almaLinkedIn],
+      image: `${siteUrl}/images/founders/alma-portrait.jpeg`,
       jobTitle: isEs
         ? "Cofundadora, desarrollo de producto y relación con clientes en España y el resto de Europa"
         : "Co-founder, client alignment and product development across Spain and the rest of Europe",
@@ -1081,7 +1092,8 @@ function buildFounderNode(
     "@id": `${siteUrl}/#shirish`,
     name: "Shirish",
     url: `${aboutUrl}#shirish`,
-    image: `${siteUrl}/images/founders/shirish-co-founder-office-india.jpeg`,
+    sameAs: [OFFICIAL_SOCIALS.shirishLinkedIn],
+    image: `${siteUrl}/images/workshops/shirish-at-leather-warehouse-desk.jpeg`,
     jobTitle: isEs
       ? "Cofundador, abogado colegiado en el Bar Council de la India y dirección de operaciones sobre el terreno"
       : "Co-founder, registered Bar Council advocate in India and operations lead",
@@ -1163,7 +1175,7 @@ export function getStoriesIndexStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -1172,13 +1184,11 @@ export function getStoriesIndexStructuredData(
         "@type": "CollectionPage",
         "@id": `${pageUrl}#webpage`,
         url: pageUrl,
-        name: isEs
-          ? "Historias desde nuestros puntos de producción en la India y nuestra vida en España."
-          : "Stories from our production sites in India and our life in Spain.",
+        name: isEs ? "Historias de KarmaRise" : "KarmaRise Stories",
         description: isEs
-          ? "Historias de Alma y Shirish desde puntos de producción y marroquineros en la India, las líneas de AlmaRise D Brand y el día a día entre España y la India."
-          : "First-person Stories by Alma and Shirish from Indian production sites, leather ateliers, AlmaRise D Reborn & D Organic, and shared tables in India and Spain.",
-        inLanguage: isEs ? "es-ES" : "en-GB",
+          ? "Historias de Alma y Shirish desde nuestro trabajo y marroquineros en la India, AlmaRise D Brand y el día a día entre España y la India."
+          : "First-person Stories by Alma and Shirish from our work in India, leather ateliers, AlmaRise D Brand lines, and shared tables in India and Spain.",
+        inLanguage: isEs ? "es" : "en",
         dateModified: latestIso,
         isPartOf: {
           "@id": websiteId,
@@ -1280,7 +1290,7 @@ export function getStoryDetailStructuredData(
         name: "KarmaRise D Global",
         alternateName: "KarmaRise",
         url: siteUrl,
-        inLanguage: ["en-GB", "es-ES"],
+        inLanguage: ["en", "es"],
         publisher: {
           "@id": organizationId,
         },
@@ -1294,7 +1304,7 @@ export function getStoryDetailStructuredData(
         image: [toAbsoluteAssetUrl(localized.leadImage?.url)],
         datePublished: story.publishedAt,
         dateModified: story.updatedAt || story.publishedAt,
-        inLanguage: isEs ? "es-ES" : "en-GB",
+        inLanguage: isEs ? "es" : "en",
         articleSection: localized.categoryLabel,
         keywords: localized.tags,
         wordCount,
@@ -1330,6 +1340,220 @@ export function getStoryDetailStructuredData(
             "@type": "ListItem",
             position: 3,
             name: localized.title,
+            item: pageUrl,
+          },
+        ],
+      },
+    ],
+  };
+}
+
+export function getWomensTrainingInitiativeStructuredData(
+  language: SiteLanguage,
+): Record<string, unknown> {
+  const isEs = language === "es";
+  const homeUrl =
+    language === "es" ? `${siteUrl}${localizePath("/", "es")}` : siteUrl;
+  const pageUrl = `${siteUrl}${localizePath("/womens-training-initiative", language)}`;
+  const organizationId = `${siteUrl}/#organization`;
+  const websiteId = `${siteUrl}/#website`;
+  const breadcrumbId = `${pageUrl}#breadcrumb`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      buildOrganizationNode(language),
+      {
+        "@type": "WebSite",
+        "@id": websiteId,
+        name: "KarmaRise D Global",
+        alternateName: "KarmaRise",
+        url: siteUrl,
+        inLanguage: ["en", "es"],
+        publisher: {
+          "@id": organizationId,
+        },
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: isEs
+          ? "Iniciativa de formación para mujeres | KarmaRise D Global"
+          : "Women's Training Initiative | KarmaRise D Global",
+        description: isEs
+          ? "Programa en preparación de KarmaRise D Global en la India para formar a mujeres en diseño de prendas y confección, con el empleo remunerado como meta."
+          : "A planned programme by KarmaRise D Global in India to train women in garment design and stitching, with paid employment opportunities as a long-term aim.",
+        inLanguage: isEs ? "es" : "en",
+        dateModified: "2026-11-27",
+        isPartOf: {
+          "@id": websiteId,
+        },
+        about: {
+          "@id": organizationId,
+        },
+        breadcrumb: {
+          "@id": breadcrumbId,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": breadcrumbId,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: isEs ? "Inicio" : "Home",
+            item: homeUrl,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: isEs
+              ? "Iniciativa de formación para mujeres"
+              : "Women's Training Initiative",
+            item: pageUrl,
+          },
+        ],
+      },
+    ],
+  };
+}
+
+export type LegalPageRouteKey =
+  "legalNotice" | "privacyPolicy" | "terms" | "cookiePolicy";
+
+const LEGAL_PAGE_SCHEMA_CONFIG: Record<
+  LegalPageRouteKey,
+  {
+    readonly path: string;
+    readonly name: Record<SiteLanguage, string>;
+    readonly description: Record<SiteLanguage, string>;
+    readonly breadcrumb: Record<SiteLanguage, string>;
+  }
+> = {
+  legalNotice: {
+    path: "/legal-notice",
+    name: {
+      en: "Legal notice | KarmaRise D Global",
+      es: "Aviso legal | KarmaRise D Global",
+    },
+    description: {
+      en: "Corporate registration disclosures (India LLP Act 2008 and Spain LSSI-CE) and official channels for Karmarise Global LLP (KarmaRise D Global).",
+      es: "Datos registrales e identificación legal de Karmarise Global LLP (titular de KarmaRise D Global) conforme a la LLP Act de la India y la LSSI-CE española.",
+    },
+    breadcrumb: {
+      en: "Legal notice",
+      es: "Aviso legal",
+    },
+  },
+  privacyPolicy: {
+    path: "/privacy-policy",
+    name: {
+      en: "Privacy policy | KarmaRise D Global",
+      es: "Política de privacidad | KarmaRise D Global",
+    },
+    description: {
+      en: "How Karmarise Global LLP (KarmaRise D Global) handles contact details, Product Brief enquiries, and personal data under EU GDPR and Indian law.",
+      es: "Cómo trata Karmarise Global LLP (KarmaRise D Global) los datos de contacto y briefings de producto conforme al RGPD europeo, LOPDGDD y la ley india.",
+    },
+    breadcrumb: {
+      en: "Privacy policy",
+      es: "Política de privacidad",
+    },
+  },
+  terms: {
+    path: "/terms",
+    name: {
+      en: "Website terms | KarmaRise D Global",
+      es: "Condiciones de uso | KarmaRise D Global",
+    },
+    description: {
+      en: "Terms of use, Product Brief IP and confidentiality protections, and governing law for the KarmaRise D Global website (Karmarise Global LLP).",
+      es: "Condiciones de uso del sitio web de KarmaRise D Global (Karmarise Global LLP), propiedad intelectual del briefing de producto y legislación aplicable.",
+    },
+    breadcrumb: {
+      en: "Website terms",
+      es: "Condiciones de uso",
+    },
+  },
+  cookiePolicy: {
+    path: "/cookie-policy",
+    name: {
+      en: "Cookie policy | KarmaRise D Global",
+      es: "Política de cookies | KarmaRise D Global",
+    },
+    description: {
+      en: "Information about cookies, how they are used on the KarmaRise D Global website, and how to manage or disable them in your browser.",
+      es: "Información sobre las cookies y el almacenamiento utilizados en el sitio web de KarmaRise D Global, sus finalidades y cómo gestionarlos o desactivarlos.",
+    },
+    breadcrumb: {
+      en: "Cookie policy",
+      es: "Política de cookies",
+    },
+  },
+};
+
+export function getLegalPageStructuredData(
+  language: SiteLanguage,
+  routeKey: LegalPageRouteKey,
+): Record<string, unknown> {
+  const isEs = language === "es";
+  const config = LEGAL_PAGE_SCHEMA_CONFIG[routeKey];
+  const homeUrl =
+    language === "es" ? `${siteUrl}${localizePath("/", "es")}` : siteUrl;
+  const pageUrl = `${siteUrl}${localizePath(config.path, language)}`;
+  const organizationId = `${siteUrl}/#organization`;
+  const websiteId = `${siteUrl}/#website`;
+  const breadcrumbId = `${pageUrl}#breadcrumb`;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      buildOrganizationNode(language),
+      {
+        "@type": "WebSite",
+        "@id": websiteId,
+        name: "KarmaRise D Global",
+        alternateName: "KarmaRise",
+        url: siteUrl,
+        inLanguage: ["en", "es"],
+        publisher: {
+          "@id": organizationId,
+        },
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: config.name[language],
+        description: config.description[language],
+        inLanguage: isEs ? "es" : "en",
+        dateModified: "2026-11-27",
+        isPartOf: {
+          "@id": websiteId,
+        },
+        about: {
+          "@id": organizationId,
+        },
+        breadcrumb: {
+          "@id": breadcrumbId,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": breadcrumbId,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: isEs ? "Inicio" : "Home",
+            item: homeUrl,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: config.breadcrumb[language],
             item: pageUrl,
           },
         ],

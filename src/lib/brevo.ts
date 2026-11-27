@@ -1,6 +1,12 @@
 import "server-only";
 
 import {
+  attributionToEventProperties,
+  EMAIL_ANALYTICS_EVENTS,
+  type EmailAnalyticsEventName,
+  type SessionAttribution,
+} from "@/lib/email-analytics";
+import {
   formatNewsletterInterest,
   getWelcomeTrackCopy,
   normalizeNewsletterTracks,
@@ -9,6 +15,7 @@ import {
 
 const BREVO_CONTACTS_API_URL = "https://api.brevo.com/v3/contacts";
 const BREVO_SMTP_EMAIL_API_URL = "https://api.brevo.com/v3/smtp/email";
+const BREVO_EVENTS_API_URL = "https://api.brevo.com/v3/events";
 
 export interface BrevoSubscriberInput {
   email: string;
@@ -18,6 +25,10 @@ export interface BrevoSubscriberInput {
   interest?: string;
   source?: string;
   tracks?: readonly NewsletterTrack[];
+  attribution?: SessionAttribution;
+  referralSource?: string;
+  referralCode?: string;
+  attributionConsent?: boolean;
 }
 
 type BrevoSubscribeResult =
@@ -114,14 +125,65 @@ export function resolveCountryName(
 }
 
 /**
- * Checks whether the contact is already subscribed to the master list in Brevo
- * so repeat form submissions do not trigger duplicate welcome emails.
+ * Sends a non-blocking custom event to Brevo Events API (`/v3/events`) to drive
+ * automation triggers, exit conditions, and zero-PII conversion attribution.
  */
-async function isAlreadyInMasterList(
+export async function trackBrevoEvent(options: {
+  email: string;
+  eventName: EmailAnalyticsEventName;
+  eventProperties?: Record<string, string | number | boolean>;
+  contactProperties?: Record<string, string | number | boolean>;
+}): Promise<boolean> {
+  const apiKey = process.env.BREVO_API_KEY?.trim();
+  if (!apiKey || !options.email.trim()) {
+    return false;
+  }
+
+  try {
+    const response = await fetch(BREVO_EVENTS_API_URL, {
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        event_name: options.eventName,
+        identifiers: {
+          email_id: options.email.trim().toLowerCase(),
+        },
+        ...(options.contactProperties &&
+        Object.keys(options.contactProperties).length > 0
+          ? { contact_properties: options.contactProperties }
+          : {}),
+        ...(options.eventProperties &&
+        Object.keys(options.eventProperties).length > 0
+          ? { event_properties: options.eventProperties }
+          : {}),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      console.error(
+        `Brevo event "${options.eventName}" failed:`,
+        response.status,
+        errorBody,
+      );
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Brevo event "${options.eventName}" request error:`, error);
+    return false;
+  }
+}
+
+async function fetchContactListIds(
   apiKey: string,
   email: string,
-  masterListId: number,
-): Promise<boolean> {
+): Promise<{ listIds: number[]; emailBlacklisted: boolean } | null> {
   try {
     const response = await fetch(
       `${BREVO_CONTACTS_API_URL}/${encodeURIComponent(email)}`,
@@ -135,7 +197,7 @@ async function isAlreadyInMasterList(
     );
 
     if (!response.ok) {
-      return false;
+      return null;
     }
 
     const data = (await response.json()) as {
@@ -143,18 +205,33 @@ async function isAlreadyInMasterList(
       emailBlacklisted?: boolean;
     };
 
-    if (data.emailBlacklisted) {
-      return false;
-    }
-
-    return Array.isArray(data.listIds) && data.listIds.includes(masterListId);
+    return {
+      listIds: Array.isArray(data.listIds) ? data.listIds : [],
+      emailBlacklisted: Boolean(data.emailBlacklisted),
+    };
   } catch {
-    return false;
+    return null;
   }
 }
 
 /**
- * Triggers the language-matched Welcome Email template in Brevo (Template #3 for EN, Template #4 for ES).
+ * Checks whether the contact is already subscribed to the master list in Brevo
+ * so repeat form submissions do not trigger duplicate welcome emails.
+ */
+async function isAlreadyInMasterList(
+  apiKey: string,
+  email: string,
+  masterListId: number,
+): Promise<boolean> {
+  const existing = await fetchContactListIds(apiKey, email);
+  if (!existing || existing.emailBlacklisted) {
+    return false;
+  }
+  return existing.listIds.includes(masterListId);
+}
+
+/**
+ * Triggers the language-matched Welcome Email 1 template in Brevo (Template #3 for EN, Template #4 for ES).
  */
 async function sendBrevoWelcomeEmail(options: {
   apiKey: string;
@@ -175,7 +252,10 @@ async function sendBrevoWelcomeEmail(options: {
   const templateId = options.language === "ES" ? templateIdEs : templateIdEn;
 
   const senderName =
-    process.env.BREVO_SENDER_NAME?.trim() || "Alma & Shirish · KarmaRise";
+    process.env.BREVO_SENDER_NAME?.trim() ||
+    (options.language === "ES"
+      ? "Alma y Shirish · KarmaRise D Global"
+      : "Alma & Shirish · KarmaRise D Global");
   const senderEmail =
     process.env.BREVO_SENDER_EMAIL?.trim() || "stories@karmarisedglobal.com";
   const replyToEmail = process.env.BREVO_REPLY_TO_EMAIL?.trim() || senderEmail;
@@ -206,15 +286,16 @@ async function sendBrevoWelcomeEmail(options: {
           },
         ],
         params: {
-          FIRSTNAME:
-            options.firstName || (options.language === "ES" ? "" : "there"),
+          FIRSTNAME: options.firstName || "",
           LANGUAGE: options.language,
           EMAIL: options.email,
           TRACK_LABEL: trackCopy.trackLabel,
           TRACK_NOTE: trackCopy.trackNote,
+          PRIMARY_TRACK: trackCopy.primaryTrack,
         },
         tags: [
           "welcome-automation",
+          "welcome-01",
           options.language === "ES" ? "welcome-es" : "welcome-en",
         ],
       }),
@@ -238,14 +319,17 @@ async function sendBrevoWelcomeEmail(options: {
 }
 
 /**
- * Adds or updates a newsletter subscriber in Brevo with language and consent attributes,
- * and triggers the automated welcome email in English or Spanish for new subscribers.
+ * Adds or updates a newsletter subscriber in Brevo with language, track, and consent attributes,
+ * triggers the immediate welcome email (W1), and logs `newsletter_subscribed` for W2-W5 automation.
  */
 export async function subscribeToBrevoNewsletter(
   input: string | BrevoSubscriberInput,
 ): Promise<BrevoSubscribeResult> {
   const subscriber: BrevoSubscriberInput =
     typeof input === "string" ? { email: input } : input;
+
+  const language = subscriber.language === "ES" ? "ES" : "EN";
+  const isEs = language === "ES";
 
   const apiKey = process.env.BREVO_API_KEY?.trim();
   const masterListId = parsePositiveInt(process.env.BREVO_LIST_ID);
@@ -267,13 +351,16 @@ export async function subscribeToBrevoNewsletter(
   if (!apiKey || !masterListId) {
     return {
       ok: false,
-      error: "Newsletter subscription is not configured yet.",
+      error: isEs
+        ? "La suscripción al boletín todavía no está configurada."
+        : "Newsletter subscription is not configured yet.",
       status: 500,
     };
   }
 
-  const language = subscriber.language === "ES" ? "ES" : "EN";
   const resolvedTracks = normalizeNewsletterTracks(subscriber.tracks);
+  const trackCopy = getWelcomeTrackCopy(resolvedTracks, language);
+
   const listIds = new Set<number>([masterListId]);
   if (language === "EN" && enListId) {
     listIds.add(enListId);
@@ -311,17 +398,26 @@ export async function subscribeToBrevoNewsletter(
     (id) => !listIds.has(id),
   );
 
+  const resolvedInterest =
+    subscriber.interest ||
+    (resolvedTracks.length > 0
+      ? formatNewsletterInterest(resolvedTracks)
+      : "KarmaRise Stories");
+
+  const allowMarketingAttribution = subscriber.attributionConsent !== false;
+  const referralSource =
+    subscriber.referralSource || subscriber.attribution?.referralSource;
+  const referralCode =
+    subscriber.referralCode || subscriber.attribution?.referralCode;
+
   const attributes: Record<string, string> = {
     LANGUAGE: language,
     CUSTOMER_TYPE: "Subscriber",
     CONSENT_STATUS: "Yes",
     CONSENT_DATE: new Date().toISOString(),
     SOURCE: subscriber.source || "Website",
-    INTEREST:
-      subscriber.interest ||
-      (resolvedTracks.length > 0
-        ? formatNewsletterInterest(resolvedTracks)
-        : "KarmaRise Stories"),
+    PRIMARY_TRACK: trackCopy.primaryTrack,
+    INTEREST: resolvedInterest,
   };
 
   if (subscriber.firstName) {
@@ -329,6 +425,26 @@ export async function subscribeToBrevoNewsletter(
   }
   if (subscriber.country) {
     attributes.COUNTRY = subscriber.country;
+  }
+  if (referralSource) {
+    attributes.REFERRAL_SOURCE = referralSource;
+  }
+  if (referralCode) {
+    attributes.REFERRAL_CODE = referralCode;
+  }
+  if (allowMarketingAttribution && subscriber.attribution) {
+    if (subscriber.attribution.utmSource) {
+      attributes.UTM_SOURCE = subscriber.attribution.utmSource;
+    }
+    if (subscriber.attribution.utmMedium) {
+      attributes.UTM_MEDIUM = subscriber.attribution.utmMedium;
+    }
+    if (subscriber.attribution.utmCampaign) {
+      attributes.UTM_CAMPAIGN = subscriber.attribution.utmCampaign;
+    }
+    if (subscriber.attribution.utmContent) {
+      attributes.UTM_CONTENT = subscriber.attribution.utmContent;
+    }
   }
 
   try {
@@ -358,7 +474,11 @@ export async function subscribeToBrevoNewsletter(
     let contactSaved = response.ok;
 
     if (!contactSaved && response.status === 400) {
-      const fallbackAttributes: Record<string, string> = {};
+      const fallbackAttributes: Record<string, string> = {
+        LANGUAGE: language,
+        SOURCE: subscriber.source || "Website",
+        INTEREST: resolvedInterest,
+      };
       if (subscriber.firstName) {
         fallbackAttributes.FIRSTNAME = subscriber.firstName;
       }
@@ -372,9 +492,7 @@ export async function subscribeToBrevoNewsletter(
         },
         body: JSON.stringify({
           email: subscriber.email,
-          ...(Object.keys(fallbackAttributes).length > 0
-            ? { attributes: fallbackAttributes }
-            : {}),
+          attributes: fallbackAttributes,
           listIds: Array.from(listIds),
           updateEnabled: true,
         }),
@@ -389,8 +507,9 @@ export async function subscribeToBrevoNewsletter(
 
       return {
         ok: false,
-        error:
-          "Unable to subscribe right now. Please try again or write to hola@karmarisedglobal.com.",
+        error: isEs
+          ? "No pudimos completar tu suscripción ahora mismo. Inténtalo de nuevo o escríbenos a hola@karmarisedglobal.com."
+          : "Unable to subscribe right now. Please try again or write to hola@karmarisedglobal.com.",
         status: 502,
       };
     }
@@ -404,6 +523,25 @@ export async function subscribeToBrevoNewsletter(
         language,
         tracks: resolvedTracks,
       });
+
+      const eventAttribution = allowMarketingAttribution
+        ? attributionToEventProperties(subscriber.attribution)
+        : {
+            ...(referralSource ? { referral_source: referralSource } : {}),
+            ...(referralCode ? { referral_code: referralCode } : {}),
+          };
+
+      await trackBrevoEvent({
+        email: subscriber.email,
+        eventName: EMAIL_ANALYTICS_EVENTS.newsletterSubscribed,
+        eventProperties: {
+          language: language.toLowerCase(),
+          signup_source: subscriber.source || "Website",
+          primary_track: trackCopy.primaryTrack,
+          tracks: resolvedTracks.join(",") || "all",
+          ...eventAttribution,
+        },
+      });
     }
 
     return { ok: true, welcomeSent, language };
@@ -411,7 +549,9 @@ export async function subscribeToBrevoNewsletter(
     console.error("Brevo request failed:", error);
     return {
       ok: false,
-      error: "Network error while subscribing. Please try again shortly.",
+      error: isEs
+        ? "Error de conexión al completar tu suscripción. Inténtalo de nuevo en unos minutos."
+        : "Network error while subscribing. Please try again shortly.",
       status: 502,
     };
   }
@@ -419,31 +559,86 @@ export async function subscribeToBrevoNewsletter(
 
 /**
  * Updates an existing subscriber's preferred language ("EN" | "ES") in Brevo
- * when they click the one-click language switch link inside a welcome or newsletter email.
+ * when they use the language switch link inside a welcome, newsletter, or re-engagement email.
+ * Migrates any configured topic-track lists cleanly to the chosen language and emits
+ * `newsletter_language_switched` (or `newsletter_reengaged` for legacy stay links).
  */
 export async function updateBrevoSubscriberLanguage(
   email: string,
   language: "EN" | "ES",
+  options?: { markReengaged?: boolean; campaign?: string },
 ): Promise<boolean> {
   const apiKey = process.env.BREVO_API_KEY?.trim();
   const masterListId = parsePositiveInt(process.env.BREVO_LIST_ID);
   const enListId = parsePositiveInt(process.env.BREVO_LIST_ID_EN);
   const esListId = parsePositiveInt(process.env.BREVO_LIST_ID_ES);
+  const mfgEnListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_MANUFACTURING_EN,
+  );
+  const mfgEsListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_MANUFACTURING_ES,
+  );
+  const almariseEnListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_ALMARISE_EN,
+  );
+  const almariseEsListId = parsePositiveInt(
+    process.env.BREVO_LIST_ID_ALMARISE_ES,
+  );
 
   if (!apiKey || !masterListId) {
     return false;
   }
 
   const listIds = new Set<number>([masterListId]);
-  const unlinkListIds: number[] = [];
+  const unlinkListIds = new Set<number>();
 
   if (language === "ES") {
     if (esListId) listIds.add(esListId);
-    if (enListId) unlinkListIds.push(enListId);
+    if (enListId) unlinkListIds.add(enListId);
   } else {
     if (enListId) listIds.add(enListId);
-    if (esListId) unlinkListIds.push(esListId);
+    if (esListId) unlinkListIds.add(esListId);
   }
+
+  const hasTrackLists = Boolean(
+    mfgEnListId || mfgEsListId || almariseEnListId || almariseEsListId,
+  );
+  if (hasTrackLists) {
+    const existing = await fetchContactListIds(apiKey, email);
+    const currentIds = new Set(existing?.listIds ?? []);
+
+    const hadManufacturing = Boolean(
+      (mfgEnListId && currentIds.has(mfgEnListId)) ||
+      (mfgEsListId && currentIds.has(mfgEsListId)),
+    );
+    const hadAlmarise = Boolean(
+      (almariseEnListId && currentIds.has(almariseEnListId)) ||
+      (almariseEsListId && currentIds.has(almariseEsListId)),
+    );
+
+    if (language === "ES") {
+      if (hadManufacturing && mfgEsListId) listIds.add(mfgEsListId);
+      if (hadAlmarise && almariseEsListId) listIds.add(almariseEsListId);
+      if (mfgEnListId) unlinkListIds.add(mfgEnListId);
+      if (almariseEnListId) unlinkListIds.add(almariseEnListId);
+    } else {
+      if (hadManufacturing && mfgEnListId) listIds.add(mfgEnListId);
+      if (hadAlmarise && almariseEnListId) listIds.add(almariseEnListId);
+      if (mfgEsListId) unlinkListIds.add(mfgEsListId);
+      if (almariseEsListId) unlinkListIds.add(almariseEsListId);
+    }
+  }
+
+  const finalUnlink = Array.from(unlinkListIds).filter(
+    (id) => !listIds.has(id),
+  );
+
+  const attributes: Record<string, string> = {
+    LANGUAGE: language,
+    ...(options?.markReengaged
+      ? { REENGAGED_AT: new Date().toISOString() }
+      : {}),
+  };
 
   try {
     const response = await fetch(BREVO_CONTACTS_API_URL, {
@@ -455,14 +650,26 @@ export async function updateBrevoSubscriberLanguage(
       },
       body: JSON.stringify({
         email,
-        attributes: {
-          LANGUAGE: language,
-        },
+        attributes,
         listIds: Array.from(listIds),
-        ...(unlinkListIds.length > 0 ? { unlinkListIds } : {}),
+        ...(finalUnlink.length > 0 ? { unlinkListIds: finalUnlink } : {}),
         updateEnabled: true,
+        ...(options?.markReengaged ? { emailBlacklisted: false } : {}),
       }),
     });
+
+    if (response.ok) {
+      await trackBrevoEvent({
+        email,
+        eventName: options?.markReengaged
+          ? EMAIL_ANALYTICS_EVENTS.newsletterReengaged
+          : EMAIL_ANALYTICS_EVENTS.newsletterLanguageSwitched,
+        eventProperties: {
+          language: language.toLowerCase(),
+          ...(options?.campaign ? { utm_campaign: options.campaign } : {}),
+        },
+      });
+    }
 
     return response.ok;
   } catch (error) {

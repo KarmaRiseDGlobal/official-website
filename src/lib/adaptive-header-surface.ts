@@ -191,7 +191,7 @@ function sampleVerticalGradient(
 function isIgnoredOverlay(element: Element): boolean {
   return (
     element.closest(
-      ".site-header, .menu-panel, .page-transition, .chat-widget-anchor",
+      ".site-header, .menu-panel, .page-transition, .chat-widget-anchor, .site-loader, .cookie-consent-banner",
     ) !== null
   );
 }

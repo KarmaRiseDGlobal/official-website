@@ -57,6 +57,37 @@ export function requestSmoothScrollBy(detail: SmoothScrollByDetail): void {
   );
 }
 
+function resolveHashTarget(rawHash: string): HTMLElement | null {
+  const trimmed = rawHash.replace(/^#/, "");
+  if (!trimmed) {
+    return null;
+  }
+
+  let decoded = trimmed;
+  try {
+    decoded = decodeURIComponent(trimmed);
+  } catch {
+    // Keep the raw fragment when percent-encoding is malformed.
+  }
+
+  return document.getElementById(decoded);
+}
+
+function getScrollPaddingBlockStart(): number {
+  const value = window.getComputedStyle(
+    document.documentElement,
+  ).scrollPaddingTop;
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isScrollLockedByOverlay(): boolean {
+  return (
+    document.body.dataset.menuOpen === "true" ||
+    document.body.dataset.loaderActive === "true"
+  );
+}
+
 export function SmoothScroll() {
   const pathname = usePathname();
   const lenisRef = useRef<Lenis | null>(null);
@@ -79,16 +110,17 @@ export function SmoothScroll() {
         return;
       }
 
+      // Preserve Apple native inertia on iOS/iPadOS touch (syncTouch: false) while delivering crisp smoothed wheel/trackpad motion on macOS and iPad Magic Keyboard.
       lenis = new Lenis({
-        duration: 1.2,
+        duration: 1.05,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
         syncTouch: false,
-        touchMultiplier: 2,
+        touchMultiplier: 1.6,
         prevent: (node) =>
           node instanceof Element &&
           node.closest(
-            "[data-lenis-prevent], .menu-surface, .karmarise-chat-scroll",
+            "[data-lenis-prevent], .menu-surface, .karmarise-chat-scroll, .cookie-consent-banner",
           ) !== null,
       });
 
@@ -101,7 +133,7 @@ export function SmoothScroll() {
       gsap.ticker.add(onTick);
       gsap.ticker.lagSmoothing(0);
 
-      if (document.body.dataset.menuOpen === "true") {
+      if (isScrollLockedByOverlay()) {
         lenis.stop();
       }
     };
@@ -133,7 +165,7 @@ export function SmoothScroll() {
 
     const bodyObserver = new MutationObserver(() => {
       if (!lenis) return;
-      if (document.body.dataset.menuOpen === "true") {
+      if (isScrollLockedByOverlay()) {
         lenis.stop();
       } else {
         lenis.start();
@@ -142,7 +174,7 @@ export function SmoothScroll() {
 
     bodyObserver.observe(document.body, {
       attributes: true,
-      attributeFilter: ["data-menu-open"],
+      attributeFilter: ["data-menu-open", "data-loader-active"],
     });
 
     const handleScrollTopEvent = () => {
@@ -246,10 +278,38 @@ export function SmoothScroll() {
   }, []);
 
   useEffect(() => {
-    lenisRef.current?.scrollTo(0, { immediate: true, force: true });
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    const scrollToTargetTop = (top: number) => {
+      const clampedTop = Math.max(0, Math.round(top));
+      lenisRef.current?.scrollTo(clampedTop, { immediate: true, force: true });
+      window.scrollTo({ top: clampedTop, left: 0, behavior: "instant" });
+    };
+
+    const rawHash = window.location.hash;
+    const hashTarget = rawHash ? resolveHashTarget(rawHash) : null;
+
+    if (hashTarget) {
+      const targetTop =
+        hashTarget.getBoundingClientRect().top +
+        window.scrollY -
+        getScrollPaddingBlockStart();
+      scrollToTargetTop(targetTop);
+    } else {
+      scrollToTargetTop(0);
+    }
+
     const id = window.requestAnimationFrame(() => {
       ScrollTrigger.refresh();
+      if (rawHash) {
+        const refreshedTarget = resolveHashTarget(rawHash);
+        if (refreshedTarget) {
+          const refreshedTop =
+            refreshedTarget.getBoundingClientRect().top +
+            window.scrollY -
+            getScrollPaddingBlockStart();
+          scrollToTargetTop(refreshedTop);
+          ScrollTrigger.update();
+        }
+      }
     });
     return () => window.cancelAnimationFrame(id);
   }, [pathname]);

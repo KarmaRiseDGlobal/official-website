@@ -65,13 +65,13 @@ function getLocalizedError(
 
   switch (code) {
     case "empty_message":
-      return "Please write a message before sending.";
+      return "Write a message before sending.";
     case "rate_limited":
       return "You have sent several messages in a row. Wait a minute, or reach us directly on WhatsApp or email.";
     case "turnstile_required":
-      return "Please complete the security check before starting the chat.";
+      return "Complete the security check before starting the chat.";
     case "turnstile_failed":
-      return "Security verification failed. Please try again.";
+      return "Security verification failed. Try again.";
     case "session_limit":
       return "You have reached the message limit for this session. Continue directly with our team via Product Brief, Contact, or WhatsApp.";
     case "quota_exceeded":

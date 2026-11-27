@@ -234,13 +234,10 @@ export const STORY_PROJECTION = `{
     "url": leadImage.asset->url,
     "alt": leadImage.alt,
     "spanishAlt": leadImage.spanishAlt,
-    "caption": leadImage.caption,
-    "spanishCaption": leadImage.spanishCaption,
     "objectPosition": leadImage.objectPosition,
     "hotspot": leadImage.hotspot
   },
   spanishLeadAlt,
-  spanishLeadCaption,
   leadSlot,
   pullQuote,
   spanishPullQuote,
@@ -248,13 +245,10 @@ export const STORY_PROJECTION = `{
     "url": asset->url,
     "alt": alt,
     "spanishAlt": spanishAlt,
-    "caption": caption,
-    "spanishCaption": spanishCaption,
     "objectPosition": objectPosition,
     "hotspot": hotspot
   },
   spanishPairAlts,
-  spanishPairCaptions,
   pairSlots,
   "body": body[]{
     _key,
@@ -265,7 +259,6 @@ export const STORY_PROJECTION = `{
     markDefs,
     "url": select(_type == "image" => asset->url),
     alt,
-    caption,
     aspectRatio,
     objectPosition,
     hotspot,
@@ -281,7 +274,6 @@ export const STORY_PROJECTION = `{
     markDefs,
     "url": select(_type == "image" => asset->url),
     alt,
-    caption,
     aspectRatio,
     objectPosition,
     hotspot,
@@ -295,7 +287,6 @@ export const STORY_PROJECTION = `{
     "images": images[]{
       "url": asset->url,
       alt,
-      caption,
       aspectRatio,
       objectPosition,
       hotspot
@@ -308,7 +299,6 @@ export const STORY_PROJECTION = `{
     "images": images[]{
       "url": asset->url,
       alt,
-      caption,
       aspectRatio,
       objectPosition,
       hotspot
@@ -354,13 +344,10 @@ export const STORY_SUMMARY_PROJECTION = `{
     "url": leadImage.asset->url,
     "alt": leadImage.alt,
     "spanishAlt": leadImage.spanishAlt,
-    "caption": leadImage.caption,
-    "spanishCaption": leadImage.spanishCaption,
     "objectPosition": leadImage.objectPosition,
     "hotspot": leadImage.hotspot
   },
   spanishLeadAlt,
-  spanishLeadCaption,
   leadSlot
 }`;
 
@@ -403,8 +390,6 @@ const NEWSLETTER_ISSUE_BY_ID_QUERY = `*[_type == "newsletterIssue" && _id == $id
   "heroImageUrl": heroImage.asset->url,
   "heroImageAltEn": heroImage.alt,
   "heroImageAltEs": heroImage.spanishAlt,
-  heroImageCaptionEn,
-  heroImageCaptionEs,
   brevoCampaignIdEn,
   brevoCampaignIdEs,
   "selectedStories": selectedStories[]->{
@@ -684,7 +669,7 @@ export function normalizeStory(
   const summary =
     raw.summary ||
     fallbackMatch?.summary ||
-    "Stories from our work across India, Spain, and Europe.";
+    "Stories from our work across India, Spain, and the rest of Europe.";
   const location = raw.location || fallbackMatch?.location || "India & Spain";
 
   const leadImageUrl = raw.leadImage?.url || fallbackMatch?.leadImage?.url;
@@ -1137,88 +1122,144 @@ export function normalizeStorySummary(
     return null;
   }
 
-  const category = resolveCategory(raw.category ?? undefined);
-  const language: StoryLanguage = raw.language === "es" ? "es" : "en";
-  const summary =
-    raw.summary || "Stories from our work across India, Spain, and Europe.";
-  const location = raw.location || "India & Spain";
+  const fallbackMatch = fallbackStories.find(
+    (entry) => entry.slug === raw.slug,
+  );
 
-  const leadImageUrl = raw.leadImage?.url;
+  const category = resolveCategory(
+    raw.category ?? undefined,
+    fallbackMatch?.category,
+  );
+  const language: StoryLanguage =
+    raw.language === "es"
+      ? "es"
+      : raw.language === "en"
+        ? "en"
+        : (fallbackMatch?.language ?? "en");
+  const summary =
+    raw.summary ||
+    fallbackMatch?.summary ||
+    "Stories from our work across India, Spain, and the rest of Europe.";
+  const location = raw.location || fallbackMatch?.location || "India & Spain";
+
+  const leadImageUrl = raw.leadImage?.url || fallbackMatch?.leadImage?.url;
   const leadImage: StoryImage | undefined = leadImageUrl
     ? {
         url: leadImageUrl,
-        alt: raw.leadImage?.alt || raw.title,
-        caption: raw.leadImage?.caption ?? undefined,
+        alt: raw.leadImage?.alt || fallbackMatch?.leadImage?.alt || raw.title,
         objectPosition:
           raw.leadImage?.objectPosition ??
           hotspotToObjectPosition(raw.leadImage?.hotspot) ??
+          fallbackMatch?.leadImage?.objectPosition ??
           undefined,
       }
     : undefined;
 
   const spanishLeadAlt =
-    raw.leadImage?.spanishAlt || raw.spanishLeadAlt || undefined;
-  const spanishLeadCaption =
-    raw.leadImage?.spanishCaption ?? raw.spanishLeadCaption ?? undefined;
+    raw.leadImage?.spanishAlt ||
+    raw.spanishLeadAlt ||
+    fallbackMatch?.spanishLeadAlt ||
+    undefined;
 
   const rawTags = (raw.tags ?? []).filter(
     (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
   );
-  const tags = rawTags.length > 0 ? rawTags : [category];
+  const tags =
+    rawTags.length > 0
+      ? rawTags
+      : fallbackMatch?.tags?.length
+        ? fallbackMatch.tags
+        : [category];
 
   const rawSpanishTags = (raw.spanishTags ?? []).filter(
     (tag): tag is string => typeof tag === "string" && tag.trim().length > 0,
   );
-  const spanishTags = rawSpanishTags.length > 0 ? rawSpanishTags : undefined;
+  const spanishTags =
+    rawSpanishTags.length > 0 ? rawSpanishTags : fallbackMatch?.spanishTags;
 
   const firstSlot = raw.pairSlots?.[0];
   const secondSlot = raw.pairSlots?.[1];
 
   return {
     slug: raw.slug,
-    featured: raw.featured ?? false,
-    newsletterEligible: raw.newsletterEligible ?? true,
+    featured: raw.featured ?? fallbackMatch?.featured ?? false,
+    newsletterEligible:
+      raw.newsletterEligible ?? fallbackMatch?.newsletterEligible ?? true,
     language,
-    issueNumber: raw.issueNumber || "01",
-    publishedAt: raw.publishedAt || new Date().toISOString().slice(0, 10),
-    updatedAt: raw.updatedAt || undefined,
-    readingTimeMinutes: raw.readingTimeMinutes ?? 5,
+    issueNumber: raw.issueNumber || fallbackMatch?.issueNumber || "01",
+    publishedAt:
+      raw.publishedAt ||
+      fallbackMatch?.publishedAt ||
+      new Date().toISOString().slice(0, 10),
+    updatedAt: raw.updatedAt || fallbackMatch?.updatedAt || undefined,
+    readingTimeMinutes:
+      raw.readingTimeMinutes ?? fallbackMatch?.readingTimeMinutes ?? 5,
     category,
     location,
-    spanishLocation: raw.spanishLocation ?? undefined,
+    spanishLocation:
+      raw.spanishLocation ?? fallbackMatch?.spanishLocation ?? undefined,
     title: raw.title,
-    spanishTitle: raw.spanishTitle ?? undefined,
+    spanishTitle: raw.spanishTitle ?? fallbackMatch?.spanishTitle ?? undefined,
     summary,
-    spanishSummary: raw.spanishSummary ?? undefined,
+    spanishSummary:
+      raw.spanishSummary ?? fallbackMatch?.spanishSummary ?? undefined,
     author: {
-      name: raw.author?.name || "Alma & Shirish",
-      role: raw.author?.role || "Co-founders, KarmaRise D Global",
-      spanishRole: raw.author?.spanishRole ?? undefined,
-      location: raw.author?.location || location,
-      spanishLocation: raw.author?.spanishLocation ?? undefined,
+      name: raw.author?.name || fallbackMatch?.author.name || "Alma & Shirish",
+      role:
+        raw.author?.role ||
+        fallbackMatch?.author.role ||
+        "Co-founders, KarmaRise D Global",
+      spanishRole:
+        raw.author?.spanishRole ??
+        fallbackMatch?.author.spanishRole ??
+        undefined,
+      location:
+        raw.author?.location || fallbackMatch?.author.location || location,
+      spanishLocation:
+        raw.author?.spanishLocation ??
+        fallbackMatch?.author.spanishLocation ??
+        undefined,
       portraitUrl:
         raw.author?.portraitUrl ||
+        fallbackMatch?.author.portraitUrl ||
         "/images/founders/alma-and-shirish-avatar.jpg",
     },
     tags,
     spanishTags,
     leadImage,
     spanishLeadAlt,
-    spanishLeadCaption,
     leadSlot: {
-      kind: raw.leadSlot?.kind ?? "Photo",
-      ratio: raw.leadSlot?.ratio ?? "16:10 horizontal",
-      title: raw.leadSlot?.title || raw.title,
-      description: raw.leadSlot?.description || summary,
+      kind: raw.leadSlot?.kind ?? fallbackMatch?.leadSlot.kind ?? "Photo",
+      ratio:
+        raw.leadSlot?.ratio ??
+        fallbackMatch?.leadSlot.ratio ??
+        "16:10 horizontal",
+      title: raw.leadSlot?.title || fallbackMatch?.leadSlot.title || raw.title,
+      description:
+        raw.leadSlot?.description ||
+        fallbackMatch?.leadSlot.description ||
+        summary,
     },
     pairSlots: [
       {
-        title: firstSlot?.title || `${raw.title} detail one`,
-        description: firstSlot?.description || summary,
+        title:
+          firstSlot?.title ||
+          fallbackMatch?.pairSlots[0].title ||
+          `${raw.title} detail one`,
+        description:
+          firstSlot?.description ||
+          fallbackMatch?.pairSlots[0].description ||
+          summary,
       },
       {
-        title: secondSlot?.title || `${raw.title} detail two`,
-        description: secondSlot?.description || summary,
+        title:
+          secondSlot?.title ||
+          fallbackMatch?.pairSlots[1].title ||
+          `${raw.title} detail two`,
+        description:
+          secondSlot?.description ||
+          fallbackMatch?.pairSlots[1].description ||
+          summary,
       },
     ],
   };
@@ -1246,15 +1287,17 @@ function toStorySummary(story: StorySummary): StorySummary {
     spanishTags: story.spanishTags,
     leadImage: story.leadImage,
     spanishLeadAlt: story.spanishLeadAlt,
-    spanishLeadCaption: story.spanishLeadCaption,
     leadSlot: story.leadSlot,
     pairSlots: story.pairSlots,
   };
 }
 
-function mergeWithFallbackStories(normalized: StoryEntry[]): StoryEntry[] {
+function mergeWithFallbackStories<T extends StorySummary>(
+  normalized: T[],
+  fallbacks: readonly T[],
+): T[] {
   const seenSlugs = new Set(normalized.map((entry) => entry.slug));
-  const missingLocalStories = fallbackStories.filter(
+  const missingLocalStories = fallbacks.filter(
     (entry) => !seenSlugs.has(entry.slug),
   );
 
@@ -1285,7 +1328,7 @@ export const getStories = cache(async (): Promise<StoryEntry[]> => {
     return fallbackStories;
   }
 
-  return mergeWithFallbackStories(normalized);
+  return mergeWithFallbackStories(normalized, fallbackStories);
 });
 
 /** Fetches lightweight Story summaries (without body/sections) for index grids, related strips, and sitemaps. */
@@ -1305,7 +1348,10 @@ export const getStorySummaries = cache(async (): Promise<StorySummary[]> => {
     return fallbackStories.map(toStorySummary);
   }
 
-  return normalized;
+  return mergeWithFallbackStories(
+    normalized,
+    fallbackStories.map(toStorySummary),
+  );
 });
 
 /** Fetches one Story by slug from Sanity, falling back to static Stories if unavailable. */

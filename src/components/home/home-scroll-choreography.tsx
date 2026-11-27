@@ -6,6 +6,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { useEffect } from "react";
 
+import { scheduleHeroAfterLoader } from "@/lib/loader";
+
 function isBelowFold(element: Element): boolean {
   const rect = element.getBoundingClientRect();
   return rect.top > window.innerHeight * 0.92;
@@ -37,6 +39,7 @@ export function HomeScrollChoreography() {
     media.add("(prefers-reduced-motion: no-preference)", () => {
       let cancelled = false;
       const splits: SplitText[] = [];
+      let cancelHeroSchedule: (() => void) | null = null;
 
       const ctx = gsap.context(() => {
         // 0. Hero arrival (cover scale, SplitText line-masked wave, support blur-in) + scroll parallax & line drift
@@ -54,7 +57,7 @@ export function HomeScrollChoreography() {
           heroWrapper?.querySelector<HTMLElement>("[data-hero-sub]");
 
         if (heroWrapper) {
-          const runHeroEntrance = () => {
+          const runHeroEntrance = ({ introDelay }: { introDelay: number }) => {
             if (cancelled) return;
 
             ctx.add(() => {
@@ -70,7 +73,27 @@ export function HomeScrollChoreography() {
                 allChars.push(...split.chars);
               }
 
+              const isCompactPhone = window.innerWidth < 736;
+
+              if (heroVideoEl) {
+                gsap.set(heroVideoEl, { scale: isCompactPhone ? 1.05 : 1.08 });
+              }
+              if (allChars.length > 0) {
+                gsap.set(allChars, {
+                  yPercent: isCompactPhone ? 96 : 112,
+                  filter: isCompactPhone ? "blur(3px)" : "blur(5px)",
+                });
+              }
+              if (heroSub) {
+                gsap.set(heroSub, {
+                  opacity: 0,
+                  filter: isCompactPhone ? "blur(3px)" : "blur(5px)",
+                  y: isCompactPhone ? 10 : 14,
+                });
+              }
+
               const introTl = gsap.timeline({
+                delay: introDelay,
                 onComplete: () => {
                   for (const split of splits) {
                     split.revert();
@@ -85,12 +108,11 @@ export function HomeScrollChoreography() {
               });
 
               if (heroVideoEl) {
-                introTl.fromTo(
+                introTl.to(
                   heroVideoEl,
-                  { scale: 1.09 },
                   {
                     scale: 1,
-                    duration: 1.75,
+                    duration: isCompactPhone ? 1.35 : 1.75,
                     ease: "expo.out",
                     clearProps: "transform",
                   },
@@ -99,16 +121,15 @@ export function HomeScrollChoreography() {
               }
 
               if (allChars.length > 0) {
-                introTl.fromTo(
+                introTl.to(
                   allChars,
-                  { yPercent: 112, filter: "blur(5px)" },
                   {
                     yPercent: 0,
                     filter: "blur(0px)",
-                    duration: 1.15,
+                    duration: isCompactPhone ? 0.92 : 1.15,
                     ease: "expo.out",
                     stagger: {
-                      each: 0.026,
+                      each: isCompactPhone ? 0.018 : 0.026,
                       ease: "power2.out",
                     },
                     onComplete: () => {
@@ -120,14 +141,13 @@ export function HomeScrollChoreography() {
               }
 
               if (heroSub) {
-                introTl.fromTo(
+                introTl.to(
                   heroSub,
-                  { opacity: 0, filter: "blur(5px)", y: 10 },
                   {
                     opacity: 1,
                     filter: "blur(0px)",
                     y: 0,
-                    duration: 0.85,
+                    duration: isCompactPhone ? 0.72 : 0.85,
                     ease: "power3.out",
                     onComplete: () => {
                       gsap.set(heroSub, {
@@ -143,11 +163,7 @@ export function HomeScrollChoreography() {
             });
           };
 
-          if (document.fonts?.ready) {
-            void document.fonts.ready.then(runHeroEntrance);
-          } else {
-            runHeroEntrance();
-          }
+          cancelHeroSchedule = scheduleHeroAfterLoader(runHeroEntrance);
 
           ScrollTrigger.create({
             trigger: heroWrapper,
@@ -158,25 +174,29 @@ export function HomeScrollChoreography() {
             onUpdate: (self) => {
               const progress = self.progress;
               const wrapperHeight = heroWrapper.offsetHeight;
-              const isShortViewport = window.innerHeight < 560;
-              const isFineDesktop =
-                window.innerWidth >= 1024 &&
-                window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+              const isShortViewport = window.innerHeight < 500;
+              const isWideViewport = window.innerWidth >= 1024;
+              const isTabletViewport = window.innerWidth >= 768;
+              const isFinePointer = window.matchMedia(
+                "(hover: hover) and (pointer: fine)",
+              ).matches;
 
               if (heroContent) {
                 const parallaxFactor = isShortViewport
                   ? 0
-                  : isFineDesktop
+                  : isWideViewport && isFinePointer
                     ? 0.5
-                    : 0.14;
+                    : isTabletViewport
+                      ? 0.24
+                      : 0.12;
                 gsap.set(heroContent, {
                   y: wrapperHeight * parallaxFactor * progress,
                 });
               }
 
               if (heroLines.length >= 2) {
-                if (isFineDesktop) {
-                  const drift = progress * 4.5;
+                if (isWideViewport && !isShortViewport) {
+                  const drift = progress * (isFinePointer ? 4.5 : 3.2);
                   gsap.set(heroLines[0]!, { xPercent: drift });
                   gsap.set(heroLines[1]!, { xPercent: -drift });
                 } else {
@@ -187,7 +207,7 @@ export function HomeScrollChoreography() {
           });
         }
 
-        // 1. Ownership chapter (#work): Calm editorial arrival (headline leads, prose and studio frame settle smoothly)
+        // 1. Ownership chapter (#work): Editorial arrival (headline leads, prose and studio frame settle smoothly)
         const workSection = main.querySelector<HTMLElement>("#work");
         const workHeader = workSection?.querySelector<HTMLElement>(
           "[data-choreo='work-header']",
@@ -205,18 +225,18 @@ export function HomeScrollChoreography() {
             (el): el is HTMLElement => el !== null,
           );
           if (workHeader) {
-            gsap.set(workHeader, { opacity: 0, y: 10 });
+            gsap.set(workHeader, { opacity: 0, y: 24 });
           }
-          gsap.set(workCopy, { opacity: 0, y: 10 });
-          gsap.set(workMedia, { opacity: 0, y: 12 });
+          gsap.set(workCopy, { opacity: 0, y: 24 });
+          gsap.set(workMedia, { opacity: 0, y: 28 });
           if (workMediaImg) {
-            gsap.set(workMediaImg, { scale: 1.02 });
+            gsap.set(workMediaImg, { scale: 1.05 });
           }
 
           const workTl = gsap.timeline({
             scrollTrigger: {
               trigger: workSection,
-              start: "top 82%",
+              start: "top 84%",
               once: true,
             },
             onComplete: () => {
@@ -235,8 +255,8 @@ export function HomeScrollChoreography() {
               {
                 opacity: 1,
                 y: 0,
-                duration: 0.48,
-                ease: "power4.out",
+                duration: 0.68,
+                ease: "power3.out",
               },
               0,
             );
@@ -246,30 +266,30 @@ export function HomeScrollChoreography() {
             {
               opacity: 1,
               y: 0,
-              duration: 0.48,
-              ease: "power4.out",
+              duration: 0.68,
+              ease: "power3.out",
             },
-            0.06,
+            0.09,
           );
           workTl.to(
             workMedia,
             {
               opacity: 1,
               y: 0,
-              duration: 0.56,
-              ease: "power4.out",
+              duration: 0.78,
+              ease: "power3.out",
             },
-            0.09,
+            0.12,
           );
           if (workMediaImg) {
             workTl.to(
               workMediaImg,
               {
                 scale: 1,
-                duration: 0.64,
-                ease: "power4.out",
+                duration: 0.9,
+                ease: "power3.out",
               },
-              0.09,
+              0.12,
             );
           }
         }
@@ -281,11 +301,11 @@ export function HomeScrollChoreography() {
         );
 
         if (capHeader && isBelowFold(capHeader)) {
-          gsap.set(capHeader, { opacity: 0, y: 12 });
+          gsap.set(capHeader, { opacity: 0, y: 22 });
           gsap.to(capHeader, {
             opacity: 1,
             y: 0,
-            duration: 0.46,
+            duration: 0.64,
             ease: "power3.out",
             clearProps: "transform,opacity",
             scrollTrigger: {
@@ -301,11 +321,11 @@ export function HomeScrollChoreography() {
           "[data-choreo='faq-group']",
         );
         if (faqGroup && isBelowFold(faqGroup)) {
-          gsap.set(faqGroup, { opacity: 0, y: 14 });
+          gsap.set(faqGroup, { opacity: 0, y: 24 });
           gsap.to(faqGroup, {
             opacity: 1,
             y: 0,
-            duration: 0.5,
+            duration: 0.68,
             ease: "power3.out",
             clearProps: "transform,opacity",
             scrollTrigger: {
@@ -321,6 +341,7 @@ export function HomeScrollChoreography() {
 
       return () => {
         cancelled = true;
+        cancelHeroSchedule?.();
         for (const split of splits) {
           split.revert();
         }
@@ -690,32 +711,62 @@ export function HomeScrollChoreography() {
       },
     );
 
-    // Calm below-fold arrival for the stacked enquiry card on non-enhanced (touch/compact) viewports
+    // Deduplicate wide-desktop hover overlay link so keyboard & AT users get 1 canonical link per capability card
+    media.add(
+      "(min-width: 75rem) and (hover: hover) and (pointer: fine)",
+      () => {
+        const overlayLinks = Array.from(
+          main.querySelectorAll<HTMLElement>("[data-cap-overlay-link]"),
+        );
+        for (const link of overlayLinks) {
+          link.setAttribute("tabindex", "-1");
+          link.setAttribute("aria-hidden", "true");
+        }
+        return () => {
+          for (const link of overlayLinks) {
+            link.removeAttribute("tabindex");
+            link.removeAttribute("aria-hidden");
+          }
+        };
+      },
+    );
+
+    // Calm below-fold arrival for the stacked enquiry card on non-enhanced (iPad portrait, iPhone, short landscape) viewports
     media.add(
       {
-        enhancedViewport:
-          "(min-width: 64rem) and (hover: hover) and (pointer: fine)",
+        enhancedViewport: "(min-width: 64rem) and (min-height: 35rem)",
         reducedMotion: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
         const { enhancedViewport, reducedMotion } = context.conditions ?? {};
-        if (enhancedViewport || reducedMotion) {
+        if (reducedMotion) {
           return;
         }
 
         const enquiryCard = main.querySelector<HTMLElement>(
           "[data-choreo='enquiry-fallback-card']",
         );
-        if (!enquiryCard || !isBelowFold(enquiryCard)) {
+        if (!enquiryCard) {
+          return;
+        }
+
+        const showcaseRoot = enquiryCard.closest<HTMLElement>(
+          ".horizontal-showcase",
+        );
+        if (enhancedViewport && showcaseRoot?.dataset.enhanced === "true") {
+          return;
+        }
+        if (!isBelowFold(enquiryCard)) {
           return;
         }
 
         const fallbackCtx = gsap.context(() => {
-          gsap.set(enquiryCard, { opacity: 0, y: 14 });
+          const isCompactPhone = window.innerWidth < 736;
+          gsap.set(enquiryCard, { opacity: 0, y: isCompactPhone ? 12 : 16 });
           gsap.to(enquiryCard, {
             opacity: 1,
             y: 0,
-            duration: 0.52,
+            duration: isCompactPhone ? 0.44 : 0.52,
             ease: "power3.out",
             clearProps: "transform,opacity",
             scrollTrigger: {

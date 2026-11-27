@@ -1,9 +1,26 @@
+import type { ClosingConversationCopy } from "@/components/home/closing-conversation-section";
 import type { SiteLanguage } from "@/lib/urls";
 
-export interface AboutHeroFact {
-  readonly number: string;
-  readonly label: Record<SiteLanguage, string>;
-  readonly detail: Record<SiteLanguage, string>;
+export interface AboutFounderModule {
+  readonly id: "alma" | "shirish";
+  readonly name: string;
+  readonly place: Record<SiteLanguage, string>;
+  readonly lead: Record<SiteLanguage, string>;
+  readonly body: Record<SiteLanguage, string>;
+  readonly image: string;
+  readonly imageAlt: Record<SiteLanguage, string>;
+}
+
+export interface AboutSpainIndiaEndpoint {
+  readonly preposition: Record<SiteLanguage, string>;
+  readonly country: Record<SiteLanguage, string>;
+}
+
+export interface AboutSpainIndiaBridge {
+  readonly heading: Record<SiteLanguage, string>;
+  readonly summary: Record<SiteLanguage, string>;
+  readonly origin: AboutSpainIndiaEndpoint;
+  readonly destination: AboutSpainIndiaEndpoint;
 }
 
 export interface AboutPrinciple {
@@ -16,12 +33,7 @@ export interface AboutCompanyFactRow {
   readonly id: string;
   readonly label: Record<SiteLanguage, string>;
   readonly value: Record<SiteLanguage, string>;
-}
-
-export interface AboutFounderQuote {
-  readonly id: string;
-  readonly quote: Record<SiteLanguage, string>;
-  readonly attribution: Record<SiteLanguage, string>;
+  readonly numeric?: boolean;
 }
 
 export interface AboutFaqItem {
@@ -31,115 +43,131 @@ export interface AboutFaqItem {
 }
 
 export const ABOUT_LAST_REVIEWED = {
-  iso: "2026-11-24",
-  en: "24 November 2026",
-  es: "24 de noviembre de 2026",
+  iso: "2026-11-27",
+  en: "27 November 2026",
+  es: "27 de noviembre de 2026",
 } as const;
 
-export const ABOUT_HERO_FACTS: readonly AboutHeroFact[] = [
-  {
-    number: "01",
-    label: {
-      en: "One team across both countries",
-      es: "Un solo equipo entre ambos países",
+export const ABOUT_SPAIN_INDIA_BRIDGE: AboutSpainIndiaBridge = {
+  heading: {
+    en: "One team, from Spain to India",
+    es: "Un solo equipo, de España a la India",
+  },
+  summary: {
+    en: "You talk things through with Alma in Spain, and both of us visit every factory and atelier in India so nothing gets lost between your shop and the stitching room.",
+    es: "Lo hablas de tú a tú con Alma en España, y visitamos juntos cada fábrica y estudio artesano en la India para que nada se pierda entre tu tienda y la confección.",
+  },
+  origin: {
+    preposition: {
+      en: "From",
+      es: "Desde",
     },
-    detail: {
-      en: "Alma leads your calls and product feedback from Spain and the rest of Europe, then works beside Shirish at production sites across India so every detail survives the trip from your shop to delivery.",
-      es: "Alma atiende tus llamadas y aporta criterio comercial desde España y el resto de Europa. Después trabaja codo con codo junto a Shirish a pie de obra en la India para que ningún detalle se pierda por el camino.",
+    country: {
+      en: "Spain",
+      es: "España",
     },
   },
-  {
-    number: "02",
-    label: {
-      en: "Registered Indian LLP",
-      es: "LLP registrada en la India",
+  destination: {
+    preposition: {
+      en: "To",
+      es: "Hasta",
     },
-    detail: {
-      en: "Karmarise Global LLP legally operates KarmaRise D Global, incorporated on 15 May 2025 (LLPIN ACO-3878, GSTIN 27ABDFK8128R1ZL). Shirish puts written Indian supplier contracts in place before any Manufacturing Partner buys hides or cloth.",
-      es: "Karmarise Global LLP opera legalmente KarmaRise D Global, constituida el 15 de mayo de 2025 (LLPIN ACO-3878, GSTIN 27ABDFK8128R1ZL). Antes de comprar piel o tejido, dejamos firmados contratos escritos bajo legislación india.",
-    },
-  },
-  {
-    number: "03",
-    label: {
-      en: "Open-door partner audits",
-      es: "Auditorías externas",
-    },
-    detail: {
-      en: "We audit family-run factories, specialist production units, and women artisan collectives across India in person. If a facility keeps its doors closed or falls short of our zero-exploitation standard, we walk away.",
-      es: "Auditamos en persona fábricas de corte familiar, unidades de producción especializadas y colectivos de artesanas por toda la India. Puertas abiertas, o nos marchamos. Si una instalación incumple nuestra tolerancia cero ante la explotación, no trabajamos con ella.",
+    country: {
+      en: "India",
+      es: "la India",
     },
   },
-];
+};
+
+export const ABOUT_FOUNDERS: readonly [AboutFounderModule, AboutFounderModule] =
+  [
+    {
+      id: "alma",
+      name: "Alma",
+      place: {
+        en: "Spain",
+        es: "España",
+      },
+      lead: {
+        en: "Alma knows what it takes to open a shop every morning and stand behind every piece in the window.",
+        es: "Alma sabe lo que cuesta subir el cierre de una tienda cada mañana y responder por cada pieza del escaparate.",
+      },
+      body: {
+        en: "Having run her own companies in Spain and guided imports from Asia, she leads every client conversation with a shop owner's eye. Beside Shirish in India, she checks drape, comfort, and finishing by hand on every sample, and directs our own label AlmaRise D Brand.",
+        es: "Tras dirigir sus propias empresas en España y acompañar importaciones desde Asia, lleva cada conversación con la mirada de quien atiende una tienda. Junto a Shirish en la India, revisa a mano la caída, la comodidad y los acabados de cada muestra, y dirige nuestra marca AlmaRise D Brand.",
+      },
+      image: "/images/founders/alma-portrait.jpeg",
+      imageAlt: {
+        en: "Alma standing beside a sunlit stone overlook, co-founder of KarmaRise D Global",
+        es: "Alma junto a un mirador de piedra al sol, cofundadora de KarmaRise D Global",
+      },
+    },
+    {
+      id: "shirish",
+      name: "Shirish",
+      place: {
+        en: "India",
+        es: "La India",
+      },
+      lead: {
+        en: "A registered Bar Council advocate in India, Shirish brings legal clarity and steady presence to every maker relationship.",
+        es: "Abogado colegiado en el Bar Council de la India, Shirish aporta claridad legal y presencia cercana en cada relación con fabricantes.",
+      },
+      body: {
+        en: "He visits family-run factories, leather ateliers, garment makers, and women artisan collectives across India in person, putting clear terms into Indian supplier contracts and guiding shipments through export. He is also laying the legal groundwork for our planned Section 8 foundation.",
+        es: "Visita en persona fábricas familiares, marroquineros, confeccionistas y colectivos de artesanas por toda la India, dejando cada compromiso claro en contratos bajo ley india y guiando cada envío hasta su salida. También prepara la base legal de nuestra futura fundación Section 8.",
+      },
+      image: "/images/workshops/shirish-at-leather-warehouse-desk.jpeg",
+      imageAlt: {
+        en: "Shirish, co-founder and registered Bar Council advocate, seated at a review desk surrounded by leather hides and sample bags in India",
+        es: "Shirish, cofundador y abogado colegiado en el Bar Council, sentado en una mesa de revisión rodeado de pieles y muestras de bolsos en la India",
+      },
+    },
+  ];
 
 export const ABOUT_PRINCIPLES: readonly AboutPrinciple[] = [
   {
     id: "feasible-early",
     title: {
-      en: "Tell you what is feasible early",
-      es: "Decirte qué es viable desde el principio",
+      en: "Say what works early",
+      es: "Decir qué es viable desde el principio",
     },
     body: {
-      en: "If a leather finish, fabric blend, hardware piece, quantity, or launch date needs rethinking, we say so plainly before you spend money on samples.",
-      es: "Si un acabado en piel, un tejido, un herraje, un volumen o una fecha de campaña piden cambios, te lo decimos sin rodeos antes de que inviertas en prototipos.",
+      en: "If a material, hardware detail, quantity, or launch date needs rethinking, we say so plainly before you spend money on samples.",
+      es: "Si un material, un detalle, un volumen o una fecha piden cambios, te lo decimos sin rodeos antes de que inviertas en prototipos.",
     },
   },
   {
     id: "clear-terms",
     title: {
-      en: "Write clear terms for both sides",
-      es: "Pactar condiciones claras para ambas partes",
+      en: "Fair terms for both sides",
+      es: "Trato justo para ambas partes",
     },
     body: {
-      en: "A Manufacturing Partner produces their cleanest work with fair pay, a binding contract under Indian law, and a written Product Brief. We lock material tolerances, NDA confidentiality, and delivery expectations before cutting starts.",
-      es: "Una unidad de producción rinde al máximo con una retribución justa, un contrato sólido bajo ley india y un briefing de producto preciso. Cerramos cada tolerancia, los acuerdos mutuos NDA y los plazos antes de comenzar con el corte de las piezas.",
+      en: "Makers do their cleanest work with fair pay, clear written specs, and solid contracts under Indian law. Nobody wins when margins squeeze craft.",
+      es: "Un buen fabricante da lo mejor de sí con un pago justo, especificaciones claras y contratos sólidos bajo ley india. Nadie gana cuando se aprieta el oficio.",
     },
   },
   {
     id: "stay-involved",
     title: {
-      en: "Approve physical colour swatches and reviewed samples",
-      es: "Aprobar muestras físicas de color y muestras para valoración",
+      en: "Touch everything before it ships",
+      es: "Tocar cada pieza antes de que viaje",
     },
     body: {
-      en: "Phone photos distort tan leather and natural dyes. We tell you what each dye batch requires and create a physical colour swatch for your approval. In India, we review every prototype first, flag tiny refinements openly, and check stitching, EU labels, and export cartons on site before dispatch.",
-      es: "Las fotos del móvil engañan con la piel tostada y los tintes naturales. Te indicamos qué hace falta para cada tintada y creamos una muestra física de color para tu aprobación. Revisamos cada prototipo allí, avisamos de frente sobre cualquier ajuste mínimo y comprobamos en planta las costuras, el etiquetado europeo y el embalaje antes de embarcar.",
+      en: "We never trust colour or finishing from phone photos alone. We check swatches, prototypes, and finished batches by hand before anything leaves India.",
+      es: "Nunca nos fiamos del color ni de los acabados solo por fotos. Comprobamos muestras de color, prototipos y lotes terminados a mano antes de que salgan de la India.",
     },
   },
   {
     id: "repeat-work",
     title: {
-      en: "Build for your second and third Bulk Order",
-      es: "Construir para tu segundo y tercer pedido de producción",
+      en: "Build for your second and third season",
+      es: "Construir para tu segunda y tercera temporada",
     },
     body: {
-      en: "We spend full days at open-door production sites talking directly with the artisans beside the stitching lines. That steady relationship is why your second and third Bulk Order run smoother every season.",
-      es: "Pasamos jornadas enteras en puntos de producción de puertas abiertas charlando de tú a tú con los artesanos y artesanas. Esa cercanía es lo que hace que tu segundo y tercer pedido de producción salgan todavía más rodados.",
-    },
-  },
-];
-
-export const ABOUT_FOUNDER_QUOTES: readonly AboutFounderQuote[] = [
-  {
-    id: "alma-checks",
-    quote: {
-      en: "I cannot assure you that nothing will go off plan, because that is not in my hand. I can assure you everything will be checked two, three, five times.",
-      es: "No puedo asegurarte que nunca surgirá un imprevisto, porque eso no está en mi mano. Puedo asegurarte que todo se revisará dos, tres y cinco veces.",
-    },
-    attribution: {
-      en: "Alma, Co-founder of KarmaRise D Global",
-      es: "Alma, cofundadora de KarmaRise D Global",
-    },
-  },
-  {
-    id: "shirish-straight-dealing",
-    quote: {
-      en: "Whether we are producing leather bags for a Client in Spain or giving a family saree a second life, we carry our history, our straight dealing, and our people into everything that leaves our hands.",
-      es: "Tanto si fabricamos bolsos de piel para un cliente en España como si damos una segunda vida a un sari familiar, ponemos nuestra historia, nuestro trato limpio y a nuestra gente en cada pieza que sale de nuestras manos.",
-    },
-    attribution: {
-      en: "Shirish, Co-founder and registered Bar Council advocate in India",
-      es: "Shirish, cofundador y abogado colegiado en el Bar Council de la India",
+      en: "We spend full days beside the people stitching your pieces in open-door ateliers. That relationship is why repeat runs run smoother every season.",
+      es: "Pasamos jornadas enteras junto a quienes cosen tus piezas en fábricas de puertas abiertas. Esa confianza hace que cada temporada salga más rodada.",
     },
   },
 ];
@@ -159,23 +187,24 @@ export const ABOUT_COMPANY_FACTS: readonly AboutCompanyFactRow[] = [
   {
     id: "registration",
     label: {
-      en: "Indian registration numbers",
+      en: "Indian registration",
       es: "Registro mercantil y fiscal",
     },
     value: {
-      en: "LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL (full statutory disclosures on Legal notice)",
-      es: "LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL (datos registrales completos en Aviso legal)",
+      en: "LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL",
+      es: "LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL",
     },
+    numeric: true,
   },
   {
     id: "founders",
     label: {
-      en: "Co-founders and roles",
-      es: "Cofundadores y reparto",
+      en: "Co-founders",
+      es: "Cofundadores",
     },
     value: {
-      en: "Alma (Spanish entrepreneur leading Client alignment, product ergonomics, and AlmaRise D Brand) and Shirish (registered Bar Council advocate in India leading Indian supplier contracts, NDA/NNN terms, partner audits, and on-site supervision)",
-      es: "Alma (empresaria española al frente de clientes, ergonomía y AlmaRise D Brand) y Shirish (abogado colegiado en el Bar Council de la India al frente de contratos, acuerdos NDA y NNN, auditorías externas y controles en planta)",
+      en: "Alma (client direction, product wearability, AlmaRise D Brand) and Shirish (Bar Council advocate, Indian contracts, maker visits, export)",
+      es: "Alma (relación con clientes, producto, AlmaRise D Brand) y Shirish (abogado del Bar Council, contratos indios, visitas y exportación)",
     },
   },
   {
@@ -185,19 +214,19 @@ export const ABOUT_COMPANY_FACTS: readonly AboutCompanyFactRow[] = [
       es: "Idiomas de trabajo",
     },
     value: {
-      en: "Spanish, English, and Portuguese for Client calls and briefings in Spain and the rest of Europe; English, Marathi, and Hindi on the ground in India",
-      es: "Español, inglés y portugués en llamadas y briefings con España y el resto de Europa; inglés, maratí e hindi sobre el terreno en la India",
+      en: "Spanish, English, and Portuguese with European clients; English, Marathi, and Hindi in India",
+      es: "Español, inglés y portugués con clientes europeos; inglés, maratí e hindi en la India",
     },
   },
   {
     id: "core-service",
     label: {
-      en: "Core B2B categories",
-      es: "Categorías B2B principales",
+      en: "What we manufacture",
+      es: "Qué fabricamos",
     },
     value: {
-      en: "End-to-end Manufacturing Programmes across India in four categories: leather bags and other leather goods, clothing in natural and varied fabrics and capsule collections, custom sewn accessories and brand presentation, and home decor",
-      es: "Programas de producción integrales en cuatro áreas: bolsos de piel y otros artículos de piel, prendas de diversos tejidos en colecciones cápsula, complementos confeccionados a medida con presentación de marca y decoración del hogar",
+      en: "Own-brand leather goods, clothing, textile accessories, and textile home decor, scoped individually per brief",
+      es: "Bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar con tu marca, valorados a medida",
     },
   },
   {
@@ -207,19 +236,8 @@ export const ABOUT_COMPANY_FACTS: readonly AboutCompanyFactRow[] = [
       es: "Ámbito geográfico",
     },
     value: {
-      en: "Studio in Maharashtra (near Mumbai) with in-person audits across Indian craft hubs including Kolkata, Kanpur, Agra, and Chennai; serving boutiques, brands, and retail chains in Spain and the rest of Europe",
-      es: "Estudio en Maharashtra (cerca de Mumbai) con auditorías presenciales en Calcuta, Kanpur, Agra y Chennai; clientes en España y el resto de Europa",
-    },
-  },
-  {
-    id: "scoping",
-    label: {
-      en: "Scoping and minimums",
-      es: "Valoración y cantidades",
-    },
-    value: {
-      en: "Every Manufacturing Programme is scoped individually from your Product Brief after an initial call, with no fixed public price lists or rigid minimums",
-      es: "Cada Programa de producción se estudia de forma individual a partir de tu briefing de producto tras una primera llamada, sin tarifas públicas cerradas ni mínimos rígidos",
+      en: "Studio in Maharashtra (near Mumbai) coordinating craft hubs across Kolkata, Kanpur, Agra, and Chennai for clients in Spain and the rest of Europe",
+      es: "Estudio en Maharashtra (cerca de Mumbai) coordinando polos artesanos en Calcuta, Kanpur, Agra y Chennai para clientes de España y el resto de Europa",
     },
   },
   {
@@ -229,8 +247,8 @@ export const ABOUT_COMPANY_FACTS: readonly AboutCompanyFactRow[] = [
       es: "Marca propia",
     },
     value: {
-      en: "AlmaRise D Brand, spanning AlmaRise D Reborn (one-of-a-kind everyday garments cut from kept Indian sarees), AlmaRise D Organic (organic dyes and plant or fruit-waste fabrics such as sugarcane, orange, banana, and pineapple, among others), and AlmaRise D Home Decor",
-      es: "AlmaRise D Brand, que abarca AlmaRise D Reborn (prendas de uso diario únicas a partir de saris indios guardados), AlmaRise D Organic (tintes orgánicos y tejidos de residuos vegetales como caña de azúcar, naranja, plátano y piña, entre otros) y decoración del hogar",
+      en: "AlmaRise D Brand (AlmaRise D Reborn, AlmaRise D Organic, and AlmaRise D Home Decor)",
+      es: "AlmaRise D Brand (AlmaRise D Reborn, AlmaRise D Organic y AlmaRise D Home Decor)",
     },
   },
   {
@@ -240,77 +258,115 @@ export const ABOUT_COMPANY_FACTS: readonly AboutCompanyFactRow[] = [
       es: "Iniciativa social en preparación",
     },
     value: {
-      en: "Women's Training Initiative in India (in preparation under a planned Section 8 foundation; applications are not yet open)",
-      es: "Iniciativa de formación para mujeres en la India (en preparación bajo una futura fundación Section 8; inscripciones aún no abiertas)",
+      en: "Women's Training Initiative in India under a planned Section 8 foundation (applications not yet open)",
+      es: "Iniciativa de formación para mujeres en la India bajo una futura fundación Section 8 (inscripciones cerradas)",
     },
   },
 ];
 
 export const ABOUT_FAQS: readonly AboutFaqItem[] = [
   {
-    id: "registered-company",
-    question: {
-      en: "Who founded KarmaRise D Global, and is it a registered company in India?",
-      es: "¿Quién fundó KarmaRise D Global y es una empresa registrada en la India?",
-    },
-    answer: {
-      en: "KarmaRise D Global was co-founded by Alma, a Spanish business owner working between Spain and India, and Shirish, a registered Bar Council advocate in India. The business is legally operated by Karmarise Global LLP, incorporated in India on 15 May 2025 under LLPIN ACO-3878 and GSTIN 27ABDFK8128R1ZL. Full statutory registration details appear on our Legal notice page.",
-      es: "KarmaRise D Global nació de la mano de Alma, empresaria española que trabaja entre España y la India, y Shirish, abogado colegiado en el Bar Council de la India. La actividad opera legalmente mediante Karmarise Global LLP, constituida el 15 de mayo de 2025 con LLPIN ACO-3878 y GSTIN 27ABDFK8128R1ZL. Todos los datos registrales constan en nuestro Aviso legal.",
-    },
-  },
-  {
     id: "brokers-or-hands-on",
     question: {
-      en: "Are Alma and Shirish remote sourcing brokers, or do they supervise production in person?",
-      es: "¿Sois intermediarios a distancia o supervisáis la producción en persona?",
+      en: "Are Alma and Shirish remote sourcing agents, or do they visit makers in person?",
+      es: "¿Sois intermediarios a distancia o visitáis a los fabricantes en persona?",
     },
     answer: {
-      en: "We work directly on the ground in India rather than acting as distant email brokers. Together we travel across specialist hubs such as Kolkata, Kanpur, Agra, and Chennai to audit family-run factories, leather ateliers, garment makers, and women artisan collectives in person. We talk directly with the people sewing your pieces, inspect hides and fabrics by hand, review prototypes before sending physical samples for your approval, and supervise production and export packing on site.",
-      es: "Trabajamos directamente sobre el terreno. Nunca actuamos como intermediarios lejanos por correo. Recorremos juntos centros especialistas como Calcuta, Kanpur, Agra y Chennai para auditar fábricas de corte familiar, marroquineros, confeccionistas y colectivos de artesanas. Hablamos cara a cara con quienes cosen cada artículo, palpamos pieles y tejidos a mano, preparamos muestras para valoración antes de que las apruebes y seguimos tu pedido en planta hasta la exportación.",
-    },
-  },
-  {
-    id: "communication-and-languages",
-    question: {
-      en: "Who do we speak with during a project, and in what languages?",
-      es: "¿Con quién hablo durante el proyecto y en qué idiomas?",
-    },
-    answer: {
-      en: "Alma is your direct point of contact from the first video call through doorstep delivery. You can speak with her in Spanish, English, or Portuguese, and she emails written meeting conclusions straight after every call so every agreement stays clear. On the ground in India, Shirish coordinates with Manufacturing Partners in English, Marathi, and Hindi and joins technical or production calls whenever helpful.",
-      es: "Alma es tu contacto directo desde la primera videollamada hasta la entrega en la puerta de tu negocio. Puedes hablar con ella en español, inglés o portugués. Nada más colgar, te manda por correo las conclusiones de la reunión para que cada decisión quede clara. En la India, Shirish coordina con las unidades de producción en inglés, maratí e hindi y entra en las llamadas técnicas siempre que convenga.",
-    },
-  },
-  {
-    id: "contracts-and-ip",
-    question: {
-      en: "How do KarmaRise D Global and Shirish protect our designs and supplier commitments?",
-      es: "¿Cómo protegéis mis diseños y los compromisos con las unidades de producción?",
-    },
-    answer: {
-      en: "Your sketches, Product Brief, patterns, and specifications stay confidential, and mutual NDA and NNN agreements are available before you share sensitive details. Shirish puts partner obligations, material tolerances, and delivery schedules into binding contracts under Indian law before any production unit buys hides or cloth. We also prepare a physical colour swatch for your approval, and cutting never starts until you hold and sign off the physical sample.",
-      es: "Tus bocetos, tu briefing de producto, los patrones y las especificaciones se tratan con estricta confidencialidad, con acuerdos mutuos NDA y NNN disponibles antes de compartir detalles sensibles. Shirish recoge los compromisos de cada instalación, las tolerancias de materiales y los plazos en contratos vinculantes bajo ley india antes de comprar piel o tejido. Antes de teñir, preparamos una muestra física de color para tu visto bueno. Nunca comenzamos con el corte de las piezas sin una muestra física previamente revisada y aprobada por ti.",
+      en: "We work directly on the ground in India rather than brokering by email. Both of us travel to visit family-run factories, leather ateliers, garment makers, and women artisan collectives in person, inspect prototypes by hand, and oversee packing before dispatch.",
+      es: "Trabajamos directamente sobre el terreno en la India, nunca como intermediarios por correo. Recorremos juntos fábricas familiares, marroquineros, confeccionistas y colectivos de artesanas en persona, revisamos prototipos a mano y supervisamos el embalaje antes de cada envío.",
     },
   },
   {
     id: "almarise-connection",
     question: {
-      en: "How does AlmaRise D Brand connect to your B2B Manufacturing Programmes?",
-      es: "¿Qué relación tiene AlmaRise D Brand con vuestros Programas de producción B2B?",
+      en: "How does AlmaRise D Brand connect to your client manufacturing work?",
+      es: "¿Qué relación tiene AlmaRise D Brand con vuestra fabricación para clientes?",
     },
     answer: {
-      en: "AlmaRise D Brand is our own fashion and lifestyle label, covering AlmaRise D Reborn (one-of-a-kind everyday garments cut from kept Indian sarees), AlmaRise D Organic (organic dyes and plant or fruit-waste fabrics such as sugarcane, orange, banana, and pineapple, among others), and AlmaRise D Home Decor. Developing, cutting, and finishing our own pieces in India gives us first-hand production knowledge that directly sharpens how we advise B2B Clients across leather goods, clothing, custom sewn accessories, and home decor.",
-      es: "AlmaRise D Brand es nuestra marca propia de moda y estilo de vida. Reúne AlmaRise D Reborn (prendas de uso diario únicas a partir de saris indios guardados), AlmaRise D Organic (tintes orgánicos y tejidos de residuos vegetales como caña de azúcar, naranja, plátano y piña, entre otros) y decoración del hogar. Diseñar, cortar y rematar nuestras propias colecciones en la India nos aporta criterio práctico de confección que afina nuestro asesoramiento con cada cliente B2B en marroquinería, ropa, complementos y decoración del hogar.",
+      en: "AlmaRise D Brand is our own fashion and lifestyle label in India. Designing, cutting, and finishing our own pieces every week keeps our eye sharp on fabrics, seams, and fit for every client collection we supervise.",
+      es: "AlmaRise D Brand es nuestra marca propia de moda y hogar en la India. Diseñar, cortar y rematar nuestras propias piezas cada semana afina nuestro ojo para tejidos, costuras y caída en cada colección de clientes.",
     },
   },
   {
     id: "womens-training-status",
     question: {
       en: "Is the Women's Training Initiative an NGO or open for applications right now?",
-      es: "¿Es la Iniciativa de formación para mujeres una ONG o tiene plazas abiertas ahora mismo?",
+      es: "¿Es la Iniciativa de formación para mujeres una ONG o tiene plazas abiertas?",
     },
     answer: {
-      en: "No. The Women's Training Initiative is a planned garment design and stitching training programme in India currently in preparation alongside a future Section 8 foundation, with dignified paid work as its long-term aim. It is neither a charity nor an NGO, and applications are not yet open. We post candid progress updates on its dedicated page.",
-      es: "No. La Iniciativa de formación para mujeres es un programa planificado en la India para formar en diseño de prendas y confección, en preparación junto a una futura fundación Section 8, con el empleo digno y remunerado como horizonte. No es una ONG ni caridad. Las inscripciones siguen cerradas y publicamos avances reales en su página dedicada.",
+      en: "No. It is a planned garment design and stitching programme in India currently in preparation under a future Section 8 foundation, focused on dignified paid work. Applications are not open yet, and we post candid progress updates on its dedicated page.",
+      es: "No. Es un programa de diseño y confección en preparación en la India bajo una futura fundación Section 8, pensado para abrir camino hacia un trabajo digno y remunerado. Las inscripciones siguen cerradas y publicamos avances reales en su página dedicada.",
     },
   },
 ];
+
+export const ABOUT_CLOSING_CONVERSATION: ClosingConversationCopy = {
+  heading: {
+    en: "Come tell us what you want to make.",
+    es: "Ven a contarnos qué quieres fabricar.",
+  },
+  confidentialityNote: {
+    en: "No tech pack needed. Mutual NDA available from day one, and only Alma and Shirish read your notes.",
+    es: "Sin ficha técnica previa. Acuerdo NDA disponible desde el primer día y solo Alma y Shirish leen tus notas.",
+  },
+  advanceCue: {
+    en: "Choose how to start",
+    es: "Elige cómo empezar",
+  },
+  optionsAriaLabel: {
+    en: "Three ways to start working with Alma and Shirish",
+    es: "Tres formas de empezar a trabajar con Alma y Shirish",
+  },
+  options: [
+    {
+      id: "whatsapp",
+      tier: "arch-1",
+      eyebrow: {
+        en: "Have a quick question",
+        es: "Una duda rápida",
+      },
+      title: {
+        en: "Message Alma on WhatsApp",
+        es: "Escribe a Alma por WhatsApp",
+      },
+      detail: {
+        en: "Ask about samples, materials, or how we work in India and hear straight back from Alma.",
+        es: "Consulta sobre muestras, materiales o cómo trabajamos en la India y te responde directamente Alma.",
+      },
+      external: true,
+    },
+    {
+      id: "book-call",
+      tier: "arch-2",
+      primary: true,
+      eyebrow: {
+        en: "Meet us face to face",
+        es: "Conócenos cara a cara",
+      },
+      title: {
+        en: "Book a free call with Alma",
+        es: "Reserva una llamada gratis con Alma",
+      },
+      detail: {
+        en: "Free 15-minute video call. Bring a favourite piece from your shop or a rough sketch, and Alma sends clear meeting notes right after.",
+        es: "Videollamada gratuita de 15 minutos. Trae una pieza que funcione en tu tienda o un boceto rápido y Alma te envía por escrito las conclusiones de la reunión al colgar.",
+      },
+    },
+    {
+      id: "product-brief",
+      tier: "arch-3",
+      eyebrow: {
+        en: "Ready to share your piece",
+        es: "Ya tienes una idea o pieza",
+      },
+      title: {
+        en: "Share your product idea",
+        es: "Cuéntanos tu idea",
+      },
+      detail: {
+        en: "Three short steps from a sketch or shop piece. Zero obligation.",
+        es: "Tres pasos breves desde un boceto o una pieza de tu tienda. Sin compromiso.",
+      },
+    },
+  ],
+};

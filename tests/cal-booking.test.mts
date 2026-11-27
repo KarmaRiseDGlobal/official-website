@@ -328,3 +328,159 @@ test("POST /api/book-call validates input, creates Cal bookings, handles honeypo
     }
   }
 });
+
+test("POST /api/book-call sends Alma pre-call prep email and logs Brevo call_booked event when configured", async () => {
+  resetRateLimitStore();
+  const prevCalKey = process.env.CAL_ALMA_API_KEY;
+  const prevResendKey = process.env.RESEND_API_KEY;
+  const prevResendFrom = process.env.RESEND_FROM_EMAIL;
+  const prevBrevoKey = process.env.BREVO_API_KEY;
+  const prevTurnstile = process.env.TURNSTILE_SECRET_KEY;
+
+  process.env.CAL_ALMA_API_KEY = "cal_live_test_key";
+  process.env.RESEND_API_KEY = "re_test_key";
+  process.env.RESEND_FROM_EMAIL =
+    "KarmaRise D Global <noreply@send.karmarisedglobal.com>";
+  process.env.BREVO_API_KEY = "brevo_test_key";
+  delete process.env.TURNSTILE_SECRET_KEY;
+
+  const futureSlot = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+
+  try {
+    await withMockedFetch(
+      (url) => {
+        if (url.includes("api.cal.com")) {
+          return Response.json(
+            {
+              status: "success",
+              data: {
+                id: 101,
+                uid: "bkg_prep_456",
+                title: "Consulta rápida (15 min)",
+                status: "ACCEPTED",
+                start: futureSlot,
+                end: futureSlot,
+                meetingUrl: "https://meet.google.com/xyz-uvwx-yz",
+              },
+            },
+            { status: 201 },
+          );
+        }
+        if (url.includes("api.resend.com")) {
+          return Response.json({ id: "re_prep_1" }, { status: 200 });
+        }
+        if (url.includes("api.brevo.com/v3/events")) {
+          return new Response(null, { status: 204 });
+        }
+        return new Response("Unexpected", { status: 500 });
+      },
+      async (calls) => {
+        const res = await bookCallPost(
+          new Request("https://karmarisedglobal.com/api/book-call", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "cf-connecting-ip": "203.0.113.118",
+            },
+            body: JSON.stringify({
+              siteLanguage: "es",
+              duration: "15",
+              start: futureSlot,
+              timeZone: "Europe/Madrid",
+              name: "Elena Sanz",
+              email: "elena@boutique.es",
+              company: "Boutique Sol",
+              callLanguage: "es",
+              attributionConsent: true,
+              attribution: {
+                utmSource: "brevo",
+                utmMedium: "email",
+                utmCampaign: "welcome-05-es",
+                utmContent: "secondary-call-link",
+              },
+            }),
+          }),
+        );
+        assert.equal(res.status, 200);
+        const body = (await res.json()) as {
+          ok: boolean;
+          prepEmailSent?: boolean;
+        };
+        assert.equal(body.ok, true);
+        assert.equal(body.prepEmailSent, true);
+        assert.equal(calls.length, 3);
+
+        const resendCall = calls.find((c) => c.url.includes("api.resend.com"));
+        const resendPayload = JSON.parse(resendCall?.bodyText || "{}") as {
+          subject?: string;
+          html?: string;
+          reply_to?: string;
+        };
+        assert.equal(resendPayload.reply_to, "alma@karmarisedglobal.com");
+        assert.match(resendPayload.subject ?? "", /Google Meet/i);
+        assert.match(resendPayload.html ?? "", /conclusiones de la reunión/i);
+
+        const brevoEventCall = calls.find((c) =>
+          c.url.includes("api.brevo.com/v3/events"),
+        );
+        const eventPayload = JSON.parse(brevoEventCall?.bodyText || "{}") as {
+          event_name?: string;
+          event_properties?: Record<string, unknown>;
+        };
+        assert.equal(eventPayload.event_name, "call_booked");
+        assert.equal(eventPayload.event_properties?.duration_minutes, 15);
+        assert.equal(
+          eventPayload.event_properties?.utm_campaign,
+          "welcome-05-es",
+        );
+
+        // Negative case: attributionConsent: false must NOT send Brevo call_booked event
+        const beforeNoConsent = calls.length;
+        const noConsentRes = await bookCallPost(
+          new Request("https://karmarisedglobal.com/api/book-call", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "cf-connecting-ip": "203.0.113.119",
+            },
+            body: JSON.stringify({
+              siteLanguage: "en",
+              duration: "15",
+              start: futureSlot,
+              timeZone: "Europe/London",
+              name: "Clara Moore",
+              email: "clara@studio.co.uk",
+              company: "Studio Moore",
+              callLanguage: "en",
+              attributionConsent: false,
+              attribution: {
+                utmSource: "brevo",
+                utmMedium: "email",
+                utmCampaign: "welcome-05-en",
+              },
+            }),
+          }),
+        );
+        assert.equal(noConsentRes.status, 200);
+        const noConsentCalls = calls.slice(beforeNoConsent);
+        assert.equal(noConsentCalls.length, 2);
+        assert.equal(
+          noConsentCalls.some((c) => c.url.includes("api.brevo.com/v3/events")),
+          false,
+          "Brevo call_booked event must be gated off when attributionConsent is false",
+        );
+      },
+    );
+  } finally {
+    if (prevCalKey === undefined) delete process.env.CAL_ALMA_API_KEY;
+    else process.env.CAL_ALMA_API_KEY = prevCalKey;
+    if (prevResendKey === undefined) delete process.env.RESEND_API_KEY;
+    else process.env.RESEND_API_KEY = prevResendKey;
+    if (prevResendFrom === undefined) delete process.env.RESEND_FROM_EMAIL;
+    else process.env.RESEND_FROM_EMAIL = prevResendFrom;
+    if (prevBrevoKey === undefined) delete process.env.BREVO_API_KEY;
+    else process.env.BREVO_API_KEY = prevBrevoKey;
+    if (prevTurnstile === undefined) delete process.env.TURNSTILE_SECRET_KEY;
+    else process.env.TURNSTILE_SECRET_KEY = prevTurnstile;
+  }
+});

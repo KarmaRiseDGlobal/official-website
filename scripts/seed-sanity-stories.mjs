@@ -346,7 +346,6 @@ export async function buildPortableBodyFromStory(
           _key: `${keyPrefix}sec-img-${sectionIdx}-${imgIdx}`,
           _type: "image",
           alt: img.alt,
-          ...(img.caption ? { caption: img.caption } : {}),
           ...(img.aspectRatio ? { aspectRatio: img.aspectRatio } : {}),
           ...(img.objectPosition ? { objectPosition: img.objectPosition } : {}),
           asset: { _type: "reference", _ref: imgAssetId },
@@ -374,7 +373,6 @@ async function mapSectionsForSanity(
           _key: `${keyPrefix}-img-${sectionIndex}-${imgIdx}`,
           _type: "image",
           alt: img.alt,
-          ...(img.caption ? { caption: img.caption } : {}),
           ...(img.aspectRatio ? { aspectRatio: img.aspectRatio } : {}),
           ...(img.objectPosition ? { objectPosition: img.objectPosition } : {}),
           asset: { _type: "reference", _ref: imgAssetId },
@@ -414,6 +412,9 @@ export async function buildSeedMutations({
               coverImage: {
                 _type: "image",
                 alt: category.coverAlt,
+                ...(category.spanishCoverAlt
+                  ? { spanishAlt: category.spanishCoverAlt }
+                  : {}),
                 asset: { _type: "reference", _ref: assetId },
               },
             }
@@ -424,13 +425,13 @@ export async function buildSeedMutations({
 
   // Upload author portraits
   const foundersPortraitId = await uploadAsset(
-    "/images/founders/alma-and-shirish-founders.jpg",
+    "/images/founders/alma-and-shirish-avatar.jpg",
   );
   const almaPortraitId = await uploadAsset(
     "/images/founders/alma-portrait.jpeg",
   );
   const shirishPortraitId = await uploadAsset(
-    "/images/founders/shirish-portrait.jpeg",
+    "/images/workshops/shirish-at-leather-warehouse-desk.jpeg",
   );
 
   const authorMutations = [
@@ -441,7 +442,7 @@ export async function buildSeedMutations({
         name: "Alma & Shirish",
         slug: { _type: "slug", current: "alma-and-shirish" },
         role: "Co-founders, KarmaRise D Global",
-        spanishRole: "Cofundadores, KarmaRise D Global",
+        spanishRole: "Cofundadores de KarmaRise D Global",
         location: "India & Spain",
         spanishLocation: "India y España",
         bio: "Alma works with Clients in Spain and the rest of Europe while living and working on the ground in India alongside Shirish to oversee audited production units across the country.",
@@ -449,7 +450,7 @@ export async function buildSeedMutations({
           ? {
               portrait: {
                 _type: "image",
-                alt: "Alma and Shirish at their studio desk in India",
+                alt: "Alma and Shirish smiling together outdoors",
                 asset: { _type: "reference", _ref: foundersPortraitId },
               },
             }
@@ -506,7 +507,7 @@ export async function buildSeedMutations({
     createOrReplace: {
       _id: "newsletterSettings",
       _type: "newsletterSettings",
-      senderName: "Alma & Shirish · KarmaRise",
+      senderName: "Alma & Shirish · KarmaRise D Global",
       senderEmail: "stories@karmarisedglobal.com",
       replyToEmail: "stories@karmarisedglobal.com",
       brevoMasterListId: Number(process.env.BREVO_LIST_ID) || 6,
@@ -534,10 +535,6 @@ export async function buildSeedMutations({
           alt: pairImg.alt,
           ...(story.spanishPairAlts?.[idx]
             ? { spanishAlt: story.spanishPairAlts[idx] }
-            : {}),
-          caption: pairImg.caption,
-          ...(story.spanishPairCaptions?.[idx]
-            ? { spanishCaption: story.spanishPairCaptions[idx] }
             : {}),
           ...(pairImg.objectPosition
             ? { objectPosition: pairImg.objectPosition }
@@ -621,10 +618,6 @@ export async function buildSeedMutations({
                 alt: story.leadImage?.alt || story.title,
                 ...(story.spanishLeadAlt
                   ? { spanishAlt: story.spanishLeadAlt }
-                  : {}),
-                caption: story.leadImage?.caption,
-                ...(story.spanishLeadCaption
-                  ? { spanishCaption: story.spanishLeadCaption }
                   : {}),
                 ...(story.leadImage?.objectPosition
                   ? { objectPosition: story.leadImage.objectPosition }

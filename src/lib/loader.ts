@@ -18,28 +18,84 @@ export interface PageTransitionEventDetail {
   readonly isLanguageSwitch: boolean;
 }
 
-const DARK_HERO_ROUTES = new Set(["/", "/about", "/how-we-work", "/almarise"]);
+export const DARK_HERO_ROUTES: ReadonlySet<string> = new Set([
+  "/",
+  "/how-we-work",
+  "/almarise",
+  "/manufacturing",
+  "/stories",
+]);
 
 export const LOADER_PREPAINT_SCRIPT = `(() => {
   try {
-    document.documentElement.setAttribute("${LOADER_DONE_ATTR}", "true");
-    if (window.sessionStorage.getItem("${LOADER_SKIP_KEY}") === "1") {
+    const reducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const skipOnce =
+      window.sessionStorage.getItem("${LOADER_SKIP_KEY}") === "1";
+    if (skipOnce) {
       window.sessionStorage.removeItem("${LOADER_SKIP_KEY}");
-      document.documentElement.setAttribute("${LOADER_SKIP_ATTR}", "true");
     }
-    if (window.sessionStorage.getItem("${PAGE_TRANSITION_PENDING_KEY}") === "1") {
+    const pendingTransition =
+      window.sessionStorage.getItem("${PAGE_TRANSITION_PENDING_KEY}") === "1";
+    if (pendingTransition) {
       document.documentElement.setAttribute("${PAGE_TRANSITION_COVER_ATTR}", "true");
       const tone = window.sessionStorage.getItem("${PAGE_TRANSITION_TONE_KEY}");
       if (tone === "dark" || tone === "light") {
         document.documentElement.setAttribute("${PAGE_TRANSITION_TONE_ATTR}", tone);
       }
     }
-  } catch {}
+    if (reducedMotion || skipOnce || pendingTransition) {
+      document.documentElement.setAttribute("${LOADER_SKIP_ATTR}", "true");
+      document.documentElement.setAttribute("${LOADER_DONE_ATTR}", "true");
+    } else {
+      window.setTimeout(() => {
+        if (document.documentElement.getAttribute("${LOADER_DONE_ATTR}") !== "true") {
+          document.documentElement.setAttribute("${LOADER_SKIP_ATTR}", "true");
+          document.documentElement.setAttribute("${LOADER_DONE_ATTR}", "true");
+        }
+      }, 5500);
+    }
+  } catch {
+    document.documentElement.setAttribute("${LOADER_SKIP_ATTR}", "true");
+    document.documentElement.setAttribute("${LOADER_DONE_ATTR}", "true");
+  }
 })();`;
 
-export const LOADER_CRITICAL_CSS = "";
+export const LOADER_CRITICAL_CSS = `
+html:not([${LOADER_SKIP_ATTR}="true"]):not([${LOADER_DONE_ATTR}="true"]) {
+  background: #111914;
+  overflow: clip;
+}
+html[${LOADER_SKIP_ATTR}="true"] .site-loader {
+  display: none !important;
+}
+.site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+.site-loader-veil {
+  position: absolute;
+  inset: 0;
+  background: #182d20;
+}
+.site-loader-curtain {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #111914;
+}
+.site-loader-flood {
+  flood-color: #f2ecdf;
+}
+`;
 
-export const LOADER_NOSCRIPT_CSS = "";
+export const LOADER_NOSCRIPT_CSS = `
+html { background: #f2ecdf !important; overflow: auto !important; }
+.site-loader { display: none !important; }
+`;
 
 export function resolveRouteTone(href: string): TransitionTone {
   let pathname = href;
@@ -126,4 +182,77 @@ export function requestPageTransition(
     },
   );
   return !window.dispatchEvent(event);
+}
+
+/**
+ * Runs a hero entrance choreography only after web fonts are ready AND the
+ * initial SiteLoader curtain has begun lifting (preventing hero animations
+ * from finishing unseen behind the opaque curtain). Returns a cleanup callback.
+ */
+export function scheduleHeroAfterLoader(
+  run: (options: { readonly introDelay: number }) => void,
+): () => void {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return () => {};
+  }
+
+  let cancelled = false;
+  let fired = false;
+  let fontsReady = !document.fonts?.ready;
+  let loaderReleased =
+    document.documentElement.getAttribute(LOADER_DONE_ATTR) === "true" ||
+    document.documentElement.getAttribute(LOADER_SKIP_ATTR) === "true";
+  const waitedForLoader = !loaderReleased;
+
+  const tryRun = () => {
+    if (cancelled || fired || !fontsReady || !loaderReleased) {
+      return;
+    }
+    fired = true;
+    window.clearTimeout(safetyTimer);
+    window.removeEventListener(LOADER_EXITING_EVENT, onLoaderExiting);
+    // Start immediately behind the still-closed curtain at LOADER_EXITING_EVENT
+    // so SplitText masks initialize with zero flash, while the tween delay lets
+    // the motion play right as the dark curtain and botanical veil lift across
+    // the hero. Client navigations (already done) start with zero delay.
+    run({ introDelay: waitedForLoader ? 0.3 : 0 });
+  };
+
+  const onLoaderExiting = () => {
+    loaderReleased = true;
+    tryRun();
+  };
+
+  const safetyTimer = window.setTimeout(() => {
+    fontsReady = true;
+    loaderReleased = true;
+    tryRun();
+  }, 5000);
+
+  if (!loaderReleased) {
+    window.addEventListener(LOADER_EXITING_EVENT, onLoaderExiting, {
+      once: true,
+    });
+  }
+
+  if (document.fonts?.ready) {
+    void document.fonts.ready.then(
+      () => {
+        fontsReady = true;
+        tryRun();
+      },
+      () => {
+        fontsReady = true;
+        tryRun();
+      },
+    );
+  } else {
+    tryRun();
+  }
+
+  return () => {
+    cancelled = true;
+    window.clearTimeout(safetyTimer);
+    window.removeEventListener(LOADER_EXITING_EVENT, onLoaderExiting);
+  };
 }

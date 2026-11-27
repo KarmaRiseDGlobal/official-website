@@ -92,3 +92,20 @@
 - Context: Project owner directive on 2026-11-24 updating standalone brand and sub-line naming sitewide.
 - Locale: en-GB, es-ES
 - Status: approved
+
+## 2026-11-27
+
+- Decision: Replace the retired zero-social-links rule with the **Approved Official Social Channels policy**, strictly limited to the five verified LinkedIn and Instagram URLs in `src/data/socials.ts` (`KarmaRise D Global` LinkedIn and Instagram, `AlmaRise D Brand` Instagram, `Alma` LinkedIn, and `Shirish` LinkedIn) across footer links, founder sections, `/almarise`, `public/llms.txt`, and JSON-LD `sameAs`. Unowned or third-party social networks (such as X, Facebook, or TikTok) remain strictly banned.
+- Context: Project owner approval of KarmaRise D Global and AlmaRise D Brand's five official LinkedIn and Instagram profiles on 2026-11-27.
+- Locale: en-GB, es-ES
+- Status: approved
+
+- Decision: Standardize KarmaRise's four manufacturing categories across all canonical documentation, glossaries, metadata, and structured data strictly to the v7 set: **leather goods** (`bolsos y artículos de piel`), **clothing** (`ropa y prendas`), **textile accessories** (`complementos textiles`), and **textile home decor** (`decoración textil del hogar`), retiring legacy `"custom sewn accessories and brand presentation"`.
+- Context: Full codebase and canonical-docs parity alignment on 2026-11-27 resolving v6-to-v7 category drift in `PRODUCT.md` and downstream references.
+- Locale: en-GB, es-ES
+- Status: approved
+
+- Decision: Omit repetitive duration tags (`(1 min)`, `1-min`, `15-min`) inside CTA button labels (using `"Share your product idea"` / `"Cuéntanos tu idea"` and `"Book a free call with Alma"` / `"Reserva una llamada gratis con Alma"`), keeping duration reassurance strictly in supporting prose; harmonize HTML `lang`, `hreflang`, `content-language`, `sitemap.ts`, and JSON-LD `inLanguage` on pan-European `en` and `es` while keeping OpenGraph `og:locale` on `en_GB` and `es_ES`.
+- Context: Global design-taste rule #1 and sitewide bilingual SEO alignment on 2026-11-27.
+- Locale: en-GB, es-ES
+- Status: approved

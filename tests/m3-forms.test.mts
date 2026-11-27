@@ -880,10 +880,14 @@ test("POST /api/product-brief handles JSON + multipart attachments, referenceUrl
         const esConfirmHtml = String(calls[3]?.jsonBody?.html ?? "");
         assert.match(
           String(calls[3]?.jsonBody?.subject ?? ""),
-          /Hemos recibido tu Product Brief/i,
+          /Hemos recibido tu briefing de producto/i,
         );
         assert.match(esConfirmText, /\bresponderte\b/i);
         assert.match(esConfirmHtml, /te escribirá/i);
+        assert.equal(
+          /feel free to/i.test(String(calls[1]?.jsonBody?.text ?? "")),
+          false,
+        );
         assertCleanVoiceAndCopy(esConfirmText);
         assertCleanVoiceAndCopy(esConfirmHtml);
       },

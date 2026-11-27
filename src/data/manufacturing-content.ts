@@ -1,23 +1,43 @@
+import type { ClosingConversationCopy } from "@/components/home/closing-conversation-section";
 import type { SiteLanguage } from "@/lib/urls";
 
-export interface ManufacturingHeroFact {
-  readonly number: string;
-  readonly label: Record<SiteLanguage, string>;
-  readonly detail: Record<SiteLanguage, string>;
-}
+export type ProductStudyPillarId =
+  | "ergonomics-and-design"
+  | "material-and-cluster-feasibility"
+  | "written-brief-and-colour-swatch"
+  | "eu-presentation-and-compliance";
 
 export interface ProductStudyPillar {
-  readonly id: string;
+  readonly id: ProductStudyPillarId;
   readonly number: string;
   readonly title: Record<SiteLanguage, string>;
   readonly body: Record<SiteLanguage, string>;
 }
 
+export type CategoryDepthPlane =
+  "front" | "mid-left" | "mid-right" | "back-left";
+
+export interface CategoryShowcaseItem {
+  readonly id: string;
+  readonly plane: CategoryDepthPlane;
+  readonly name: Record<SiteLanguage, string>;
+  readonly shortLabel: Record<SiteLanguage, string>;
+  readonly tooltip: Record<SiteLanguage, string>;
+  readonly description: Record<SiteLanguage, string>;
+  readonly specs: readonly Record<SiteLanguage, string>[];
+  readonly image: string;
+  readonly imageAlt: Record<SiteLanguage, string>;
+}
+
 export interface ManufacturingCategory {
   readonly id: string;
-  readonly querySlug: "bags" | "garments" | "other" | "home-decor";
+  readonly querySlug:
+    "bags" | "garments" | "textile-accessories" | "home-decor";
   readonly number: string;
+  readonly jumpLabel: Record<SiteLanguage, string>;
   readonly name: Record<SiteLanguage, string>;
+  readonly showcaseSummary: Record<SiteLanguage, string>;
+  readonly showcaseProof: Record<SiteLanguage, string>;
   readonly summary: Record<SiteLanguage, string>;
   readonly details: Record<SiteLanguage, string>;
   readonly tableMaterials: Record<SiteLanguage, string>;
@@ -25,51 +45,39 @@ export interface ManufacturingCategory {
   readonly tableVerification: Record<SiteLanguage, string>;
   readonly ctaLabel: Record<SiteLanguage, string>;
   readonly ctaMicrocopy: Record<SiteLanguage, string>;
-  readonly image?: string;
-  readonly imageAlt?: Record<SiteLanguage, string>;
-  readonly placeholderTitle?: Record<SiteLanguage, string>;
-  readonly placeholderDescription?: Record<SiteLanguage, string>;
-}
-
-export interface ManufacturingProofMetric {
-  readonly id: string;
-  readonly label: Record<SiteLanguage, string>;
-  readonly value: Record<SiteLanguage, string>;
-  readonly detail: Record<SiteLanguage, string>;
+  readonly image: string;
+  readonly imageAlt: Record<SiteLanguage, string>;
+  readonly imagePosition?: string;
+  readonly items: readonly CategoryShowcaseItem[];
 }
 
 export interface WorkshopCriterion {
   readonly id: string;
-  readonly number: string;
   readonly title: Record<SiteLanguage, string>;
   readonly body: Record<SiteLanguage, string>;
 }
 
-export interface SourcingComparisonRow {
-  readonly id: string;
-  readonly criterion: Record<SiteLanguage, string>;
-  readonly karmarise: Record<SiteLanguage, string>;
-  readonly brokers: Record<SiteLanguage, string>;
-  readonly diy: Record<SiteLanguage, string>;
-}
+export type ManufacturingStageId =
+  | "product-brief"
+  | "product-study-match"
+  | "sample-approval"
+  | "materials-contracts"
+  | "production"
+  | "bulk-delivery";
 
 export interface ManufacturingStage {
-  readonly id: string;
+  readonly id: ManufacturingStageId;
   readonly stepNumber: string;
-  readonly shortLabel: Record<SiteLanguage, string>;
   readonly title: Record<SiteLanguage, string>;
   readonly body: Record<SiteLanguage, string>;
+  readonly signOff: Record<SiteLanguage, string>;
   readonly video: string;
   readonly poster: string;
-  readonly videoLabel: Record<SiteLanguage, string>;
-  readonly x: number;
-  readonly y: number;
-  readonly labelPosition: "above" | "below";
+  readonly mediaLabel: Record<SiteLanguage, string>;
 }
 
 export interface PreProductionAgreement {
   readonly id: string;
-  readonly number: string;
   readonly title: Record<SiteLanguage, string>;
   readonly body: Record<SiteLanguage, string>;
 }
@@ -81,46 +89,10 @@ export interface ManufacturingFaqItem {
 }
 
 export const MANUFACTURING_LAST_REVIEWED = {
-  iso: "2026-11-24",
-  en: "24 November 2026",
-  es: "24 de noviembre de 2026",
+  iso: "2026-11-27",
+  en: "27 November 2026",
+  es: "27 de noviembre de 2026",
 } as const;
-
-export const MANUFACTURING_HERO_FACTS: readonly ManufacturingHeroFact[] = [
-  {
-    number: "01",
-    label: {
-      en: "Product study before you spend on samples",
-      es: "Estudio de producto antes de invertir en muestras",
-    },
-    detail: {
-      en: "Bring a four-line sketch or a bag already sitting in your shop. We check ergonomics, materials, and production feasibility before anyone cuts leather or cloth.",
-      es: "Trae un boceto de cuatro líneas o un bolso que ya vendas en tu tienda. Revisamos contigo la ergonomía, los materiales y la viabilidad en planta antes de que nadie corte piel ni tela.",
-    },
-  },
-  {
-    number: "02",
-    label: {
-      en: "Vetted Indian production units and craft makers",
-      es: "Unidades de producción y artesanos auditados en la India",
-    },
-    detail: {
-      en: "We travel across India in person to audit family-run factories, tanneries, leather ateliers, garment makers, and women artisan collectives, matching each stage of your product to the specialist city suited to it.",
-      es: "Recorremos el país en persona para auditar fábricas de corte familiar, curtidurías, marroquineros, confeccionistas y colectivos de artesanas. Así cada fase de tu producto va al lugar de producción con más oficio para ello.",
-    },
-  },
-  {
-    number: "03",
-    label: {
-      en: "Physical sample in hand and Indian legal backing",
-      es: "Muestra física en mano y respaldo legal en la India",
-    },
-    detail: {
-      en: "Cutting never begins until you hold and approve a physical sample in Spain or the rest of Europe. Co-founder Shirish, a registered Bar Council advocate, puts every production commitment into a written Indian contract.",
-      es: "No comenzamos con el corte de las piezas hasta que tienes y apruebas la muestra física en España o en el resto de Europa. Shirish, abogado colegiado en el Bar Council de la India, deja cada compromiso recogido en contratos escritos con unidades de producción bajo ley india.",
-    },
-  },
-];
 
 export const MANUFACTURING_PRODUCT_STUDY_PILLARS: readonly ProductStudyPillar[] =
   [
@@ -132,8 +104,8 @@ export const MANUFACTURING_PRODUCT_STUDY_PILLARS: readonly ProductStudyPillar[] 
         es: "Estudio ergonómico y comercial del diseño",
       },
       body: {
-        en: "We review strap drop, bag weight, pocket placement, hardware, and garment drape from the point of view of a European wearer. On a flagship leather backpack for a Spanish boutique, we started from a four-line sketch and tapered a boxy rectangle into a balanced pyramid silhouette with a top grab handle. We replaced metal teeth with smooth, high-quality Japanese plastic YKK zippers to protect hands and winter coats, and lined the interior in light cotton so keys stay easy to spot.",
-        es: "Revisamos la caída del asa, el peso del bolso, la colocación de los bolsillos, los herrajes y el movimiento de la prenda pensando en quien la va a llevar cada día. En la mochila principal de una boutique española partimos de un boceto de cuatro líneas y afinamos una caja cuadrada hasta darle un perfil piramidal equilibrado con asa superior de agarre. Cambiamos los dientes metálicos por cremalleras japonesas YKK de plástico de alta calidad para cuidar manos y abrigos de invierno. Elegimos forro claro de algodón para encontrar las llaves a la primera.",
+        en: "We check strap drop, bag weight, pocket placement, hardware, and garment drape for European shoppers. From a four-line sketch, we refine silhouette, fit high-quality Japanese plastic YKK zippers that spare hands and coats, and pair light cotton linings so keys stay easy to find.",
+        es: "Revisamos la caída del asa, el peso, los bolsillos, los herrajes y la caída de cada prenda pensando en quien la lleva a diario. Desde un boceto de cuatro líneas afinamos el corte, montamos cremalleras japonesas YKK de plástico de alta calidad y elegimos forros claros de algodón.",
       },
     },
     {
@@ -141,23 +113,23 @@ export const MANUFACTURING_PRODUCT_STUDY_PILLARS: readonly ProductStudyPillar[] 
       number: "02",
       title: {
         en: "Material and regional feasibility across India",
-        es: "Materiales y viabilidad por centros especialistas de la India",
+        es: "Materiales y viabilidad por polos artesanos",
       },
       body: {
-        en: "Before you spend money on prototypes, we check in person which Indian craft hub holds the hides, textiles, and machinery your design calls for. For leather goods, clothing, custom sewn accessories, and home decor, we work across specialist Indian hubs including Kolkata, Kanpur, Agra, and Chennai, with coordination and quality supervision from Maharashtra. When a Spanish boutique asked for silky, soft leather they called goxo-goxo in Basque, we paid for exploratory samples first and tested multiple vegetable-tanning rounds. To hold that exact hand-feel, we split the work across three regions: vegetable tanning in Kolkata, bag construction in Uttar Pradesh, and quality supervision from Maharashtra.",
-        es: "Antes de invertir en prototipos, comprobamos en persona qué polo artesano de la India reúne la piel, el tejido y la maquinaria que pide tu diseño. Trabajamos en ciudades especialistas como Calcuta, Kanpur, Agra y Chennai, junto a puntos de producción textiles y de decoración del hogar repartidos por el país, con supervisión desde Maharashtra. Cuando una boutique en España nos pidió una piel sedosa y blandita que en euskera llamaban goxo-goxo, pagamos primero muestras de prueba y ensayamos varias rondas de curtido vegetal. Para mantener ese tacto exacto repartimos el trabajo entre tres regiones: curtido vegetal en Calcuta, confección marroquinera en Uttar Pradesh y seguimiento de calidad desde Maharashtra.",
+        en: "Before you spend on prototypes, we verify in person which Indian city holds the hides, fabrics, and machinery your design needs. We coordinate specialist makers across Kolkata, Kanpur, Agra, and Chennai with quality oversight led from Maharashtra.",
+        es: "Antes de invertir en prototipos, comprobamos en persona qué polo artesano de la India reúne la piel, el tejido y la maquinaria que pide tu diseño. Coordinamos especialistas en Calcuta, Kanpur, Agra y Chennai con supervisión desde Maharashtra.",
       },
     },
     {
       id: "written-brief-and-colour-swatch",
       number: "03",
       title: {
-        en: "Written Product Brief and physical colour swatch",
-        es: "Briefing de producto por escrito y muestra física de color",
+        en: "Written notes and physical colour swatch",
+        es: "Conclusiones por escrito y muestra física de color",
       },
       body: {
-        en: "Alma emails clear written meeting conclusions right after every video call so both sides confirm every point agreed. Because phone screens shift shades such as tan leather or natural linen toward mustard or dark brown under different light, we never dye from screen photos alone. We tell you what is needed for each dye batch and create a physical colour swatch for your approval before cutting starts.",
-        es: "Alma envía por correo las conclusiones de la reunión nada más colgar cada videollamada, para que ambas partes confirmemos cada punto acordado. Como la pantalla del móvil altera tonos como la piel tostada o el lino crudo hacia matices mostaza o marrón oscuro según la luz, nunca teñimos a partir de fotos. Te indicamos lo que necesitamos para cada tintada y preparamos una muestra física de color para tu aprobación antes de comenzar con el corte de las piezas.",
+        en: "Alma sends clear meeting notes straight after every call so every detail stays agreed. Because screens distort leather and linen shades, we prepare a physical colour swatch for your approval before dyeing begins.",
+        es: "Alma envía por escrito las conclusiones de la reunión tras cada llamada para que cada detalle quede acordado. Como las pantallas alteran los tonos de piel y lino, preparamos una muestra física de color para tu aprobación antes de teñir.",
       },
     },
     {
@@ -165,11 +137,11 @@ export const MANUFACTURING_PRODUCT_STUDY_PILLARS: readonly ProductStudyPillar[] 
       number: "04",
       title: {
         en: "EU labelling, packaging, and customs from day one",
-        es: "Etiquetado europeo, presentación y aduanas desde el primer día",
+        es: "Etiquetado europeo, presentación y aduanas",
       },
       body: {
-        en: "Garments, leather goods, and home items entering Spain and the rest of Europe carry clear compliance rules, from sewn-in textile fibre tags to permanent leather origin markings for EU customs clearance. Planning woven brand labels, cotton dust bags, unbleached chemical-free recycled cardboard care hangtags, and numbered export cartons from the outset keeps customs holds and unexpected air-freight quotes from ambushing you at dispatch.",
-        es: "Las prendas, los artículos de piel y las piezas de hogar que entran en España y el resto de Europa cumplen reglas claras de etiquetado, desde las etiquetas cosidas de composición textil hasta los marcajes permanentes de origen y piel para aduanas. Dejar cerradas desde el inicio las etiquetas tejidas con tu marca, las bolsas guardapolvo de algodón, las etiquetas de cartón reciclado sin blanquear, libre de químicos, y las cajas de exportación evita retrasos en frontera y sustos con el flete aéreo.",
+        en: "Items entering Spain and the rest of Europe need accurate fibre tags, leather origin markings, and export paperwork. Planning woven brand labels, cotton dust bags, unbleached chemical-free recycled cardboard hangtags, and packing early prevents customs delays.",
+        es: "Las piezas que entran en España y el resto de Europa exigen etiquetas de composición, marcajes de origen y papeles de aduanas. Dejar cerradas desde el inicio tus etiquetas tejidas, bolsas guardapolvo de algodón y etiquetas de cartón reciclado sin blanquear, libre de químicos, evita retrasos.",
       },
     },
   ];
@@ -179,390 +151,714 @@ export const MANUFACTURING_CATEGORIES: readonly ManufacturingCategory[] = [
     id: "bags",
     querySlug: "bags",
     number: "01",
+    jumpLabel: {
+      en: "Leather goods",
+      es: "Bolsos y piel",
+    },
     name: {
-      en: "Leather bags and other leather goods",
-      es: "Bolsos de piel y otros artículos de piel",
+      en: "Leather goods",
+      es: "Bolsos y artículos de piel",
+    },
+    showcaseSummary: {
+      en: "Relaxed yet refined hobo bags, everyday backpacks, small crossbodies, makeup pouches, wallets, belts, and travel bags made with Indian tanneries and leather ateliers.",
+      es: "Bolsos hobo actuales, mochilas urbanas, bandoleras pequeñas, estuches, carteras, cinturones y bolsas de viaje hechos con curtidurías y marroquinerías indias.",
+    },
+    showcaseProof: {
+      en: "Physical colour swatch and reviewed sample in hand before cutting starts.",
+      es: "Muestra física de color y muestra para valoración en mano antes de cortar.",
     },
     summary: {
-      en: "Structured handbags, soft carryalls, backpacks, leather-and-canvas styles, and small leather goods produced with specialist Indian tanneries, leather ateliers, and vetted leather production units across Kolkata, Kanpur, Agra, and Chennai.",
-      es: "Bolsos estructurados, bolsones, mochilas, modelos combinados de piel y lona y pequeña marroquinería producidos con curtidurías, marroquineros y unidades de producción especializadas en Calcuta, Kanpur, Agra y Chennai.",
+      en: "Contemporary leather goods that feel relaxed yet polished for European daily wear: hobo bags, stylish everyday backpacks, small crossbodies, wallets, makeup and lipstick pouches, belts, and travel bags crafted across Kolkata, Kanpur, Agra, and Chennai.",
+      es: "Marroquinería actual, informal y cuidada para el día a día en Europa: bolsos hobo, mochilas urbanas, bandoleras pequeñas, carteras, estuches de maquillaje y labial, cinturones y bolsas de viaje hechos en Calcuta, Kanpur, Agra y Chennai.",
     },
     details: {
-      en: "Vegetable-tanned hides, antique brass hardware, high-quality Japanese plastic YKK zippers, light cotton linings, accurate strap drop, and custom cotton dust bags built for daily wear and clean shop display.",
-      es: "Pieles de curtido vegetal, herrajes de latón envejecido, cremalleras japonesas YKK de plástico de alta calidad, forros claros de algodón, caída del asa medida al detalle y bolsas guardapolvo de algodón pensadas para el trote diario y para colocar directamente en el escaparate.",
+      en: "Supple vegetable-tanned hides, brushed antique brass hardware, high-quality Japanese plastic YKK zippers, light cotton linings, and well-balanced strap drop built for effortless everyday use.",
+      es: "Pieles suaves de curtido vegetal, herrajes de latón envejecido, cremalleras japonesas YKK de plástico de alta calidad, forros claros de algodón y caída del asa pensada para el uso diario.",
     },
     tableMaterials: {
-      en: "Vegetable-tanned leather, canvas, light cotton linings, antique brass hardware, high-quality Japanese plastic YKK zippers",
-      es: "Piel de curtido vegetal, lona, forros claros de algodón, herrajes de latón envejecido, cremalleras japonesas YKK de plástico de alta calidad",
+      en: "Supple vegetable-tanned hides, light cotton linings, brushed antique brass hardware, high-quality Japanese plastic YKK zippers",
+      es: "Piel suave de curtido vegetal, forros claros de algodón, herrajes de latón envejecido y cremalleras japonesas YKK de plástico de alta calidad",
     },
     tableRegions: {
       en: "Tanneries, leather ateliers, and production units in Kolkata, Kanpur, Agra, and Chennai; quality oversight from Maharashtra",
-      es: "Curtidurías, marroquineros y unidades de producción en Calcuta, Kanpur, Agra y Chennai; supervisión de calidad desde Maharashtra",
+      es: "Curtidurías, marroquineros y unidades de producción en Calcuta, Kanpur, Agra y Chennai; supervisión desde Maharashtra",
     },
     tableVerification: {
       en: "Physical colour swatch approved by you, strap drop and zipper ergonomics check, reviewed physical sample in hand",
       es: "Muestra física de color aprobada por ti, revisión de caída del asa y cremalleras, muestra para valoración en mano",
     },
     ctaLabel: {
-      en: "Share your leather bag idea",
-      es: "Cuéntanos tu idea de bolsos",
+      en: "Share your leather goods idea",
+      es: "Cuéntanos tu idea de piel",
     },
     ctaMicrocopy: {
-      en: "Opens your brief in the leather category. No tech pack needed.",
-      es: "Abre el briefing en la categoría de piel. Sin ficha técnica previa.",
+      en: "Opens your brief in the leather goods category. No tech pack needed.",
+      es: "Abre el briefing en artículos de piel. Sin ficha técnica previa.",
     },
     image: "/images/workshops/alma-black-leather-tote-inspection.jpeg",
+    imagePosition: "50% 22%",
     imageAlt: {
-      en: "Alma holding a finished black leather handbag inside the sample room of a vetted Indian leather production unit",
+      en: "Alma holding a finished black leather bag inside the sample room of a vetted Indian leather production unit",
       es: "Alma sosteniendo un bolso terminado de piel negra en la sala de muestras de una unidad de producción marroquinera auditada en la India",
     },
+    items: [
+      {
+        id: "leather-hobo-bag",
+        plane: "front",
+        shortLabel: { en: "Hobo bags", es: "Bolsos hobo" },
+        name: {
+          en: "Slouchy leather hobo bags",
+          es: "Bolsos hobo de piel",
+        },
+        tooltip: {
+          en: "Relaxed everyday crescent drape in supple vegetable-tanned hide.",
+          es: "Caída suave y actual en piel de curtido vegetal para el día a día.",
+        },
+        description: {
+          en: "Soft, informal shoulder bags with sculpted strap drop, light cotton lining, and understated hardware sized for European everyday wear.",
+          es: "Bolsos hobo informales y cuidados con caída del asa cómoda, forro claro de algodón y herrajes discretos para diario.",
+        },
+        specs: [
+          { en: "Supple pebbled hide", es: "Piel suave graneada" },
+          { en: "Balanced strap drop", es: "Caída del asa cómoda" },
+        ],
+        image: "/images/categories-3d/leather/hobo-bag.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a contemporary slouchy caramel leather hobo bag with wide shoulder strap",
+          es: "Ilustración 3D de un bolso hobo actual de piel caramelo suave con asa ancha al hombro",
+        },
+      },
+      {
+        id: "everyday-leather-backpack",
+        plane: "mid-left",
+        shortLabel: { en: "Everyday backpacks", es: "Mochilas urbanas" },
+        name: {
+          en: "Stylish everyday backpacks",
+          es: "Mochilas urbanas de piel",
+        },
+        tooltip: {
+          en: "Streamlined modern leather backpacks with top grab handle and YKK zips.",
+          es: "Mochilas estilizadas en piel con asa superior y cremalleras YKK suaves.",
+        },
+        description: {
+          en: "Clean curved profiles that balance daily practicality with quiet polish, fitted with smooth high-quality Japanese plastic YKK zippers.",
+          es: "Siluetas curvas y ligeras que unen comodidad diaria y acabado cuidado con cremalleras japonesas YKK de plástico de alta calidad.",
+        },
+        specs: [
+          { en: "Refined dome profile", es: "Perfil urbano limpio" },
+          { en: "Japanese plastic YKK zips", es: "Cremalleras YKK suaves" },
+        ],
+        image: "/images/categories-3d/leather/everyday-backpack.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a sleek contemporary espresso leather everyday backpack",
+          es: "Ilustración 3D de una mochila urbana actual en piel color café espresso",
+        },
+      },
+      {
+        id: "small-leather-crossbody",
+        plane: "back-left",
+        shortLabel: { en: "Small crossbodies", es: "Bandoleras pequeñas" },
+        name: {
+          en: "Small crossbody bags",
+          es: "Bandoleras pequeñas de piel",
+        },
+        tooltip: {
+          en: "Compact hands-free silhouettes that stay relaxed yet polished.",
+          es: "Formatos compactos manos libres con aire informal y elegante.",
+        },
+        description: {
+          en: "Compact half-moon and softly structured crossbody shapes sized for phone, keys, and daily essentials without excess weight.",
+          es: "Bandoleras pequeñas de líneas limpias pensadas para llevar móvil, llaves y lo esencial con ligereza.",
+        },
+        specs: [
+          { en: "Lightweight daily size", es: "Tamaño ligero de diario" },
+          { en: "Adjustable slim strap", es: "Correa fina regulable" },
+        ],
+        image: "/images/categories-3d/leather/small-crossbody.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a small contemporary warm taupe half-moon leather crossbody bag",
+          es: "Ilustración 3D de una bandolera pequeña actual de piel topo cálido en forma de media luna",
+        },
+      },
+      {
+        id: "leather-pouches-wallets",
+        plane: "mid-right",
+        shortLabel: { en: "Pouches & wallets", es: "Estuches y carteras" },
+        name: {
+          en: "Pouches, wallets & travel goods",
+          es: "Estuches, carteras y viaje",
+        },
+        tooltip: {
+          en: "Makeup and lipstick pouches, slim wallets, belts, and weekend travel bags.",
+          es: "Neceseres de maquillaje, fundas de labial, carteras, cinturones y bolsas de viaje.",
+        },
+        description: {
+          en: "Small zip pouches for makeup or lipstick inside an everyday bag, paired with slim card wallets, belts, and coordinated leather travel bags.",
+          es: "Estuches pequeños para maquillaje o labial dentro del bolso diario, junto a carteras finas, cinturones y bolsas de viaje en piel.",
+        },
+        specs: [
+          {
+            en: "Makeup & lipstick pouches",
+            es: "Estuches de maquillaje y labial",
+          },
+          {
+            en: "Wallets, belts & travel bags",
+            es: "Carteras, cinturones y viaje",
+          },
+        ],
+        image: "/images/categories-3d/leather/pouches-wallets.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a terracotta leather makeup pouch, tan lipstick pouch, and olive card wallet",
+          es: "Ilustración 3D de un estuche de maquillaje en piel terracota, una funda de labial tostada y una cartera fina oliva",
+        },
+      },
+    ],
   },
   {
     id: "garments",
     querySlug: "garments",
     number: "02",
+    jumpLabel: {
+      en: "Clothing",
+      es: "Ropa",
+    },
     name: {
-      en: "Clothing in natural and varied fabrics and capsule collections",
-      es: "Prendas de diversos tejidos y colecciones cápsula",
+      en: "Clothing",
+      es: "Ropa y prendas",
+    },
+    showcaseSummary: {
+      en: "Cotton and linen midi dresses and skirts, distinctive denim pieces, blouses, jumpsuits, and outerwear made with family-run garment makers and women artisan collectives.",
+      es: "Vestidos y faldas midi en algodón y lino, piezas singulares en denim, blusas, monos y prendas exteriores con confeccionistas familiares y colectivos de artesanas.",
+    },
+    showcaseProof: {
+      en: "Drape checked on dressmaker forms with sewn-in EU fibre labels.",
+      es: "Caída revisada en maniquí con etiquetas europeas de composición.",
     },
     summary: {
-      en: "Shirts, dresses, kimonos, shrugs, light jackets, trousers, and seasonal capsule collections cut and stitched by established family-run factories, garment makers, and women artisan collectives across India.",
-      es: "Camisas, vestidos, kimonos, shrugs, chaquetas finas, pantalones, prendas de uso diario y colecciones cápsula de temporada cortados y cosidos en fábricas de corte familiar, confeccionistas y colectivos de artesanas por toda la India.",
+      en: "Contemporary women's clothing collections in breathable cotton, linen, and distinctive denim: midi dresses and skirts, unique denim pieces, blouses, jumpsuits, and outerwear jackets stitched by audited family-run production units and women artisan collectives.",
+      es: "Colecciones actuales en algodón, lino transpirable y denim singular: vestidos y faldas midi, prendas únicas de denim, blusas, monos y chaquetas confeccionados con unidades familiares y colectivos de artesanas auditados.",
     },
     details: {
-      en: "Breathable cotton, linen, silk, blended fabrics, organic dyes, and plant-based textiles finished with comfortable cuts and sewn-in EU fibre and care labels ready for shop rails.",
-      es: "Algodón transpirable, lino, seda, tejidos con mezcla, tintes orgánicos y tejidos de fibra vegetal con cortes cómodos y etiquetas cosidas indicando la composición y el cuidado conforme a la normativa europea.",
+      en: "Physical dye swatches, dressmaker-form fit checks, clean seam finishing, and sewn-in EU composition and care labels ready for European boutiques.",
+      es: "Muestras físicas de color, pruebas de caída en maniquí, costuras cuidadas y etiquetas europeas cosidas de composición y cuidado.",
     },
     tableMaterials: {
-      en: "Cotton, linen, silk, blended fabrics, organic dyes, plant-based textiles, sewn-in EU fibre and care labels",
-      es: "Algodón, lino, seda, tejidos con mezcla, tintes orgánicos, tejidos de fibra vegetal y etiquetas cosidas UE",
+      en: "Breathable cotton, slub linen, raw and washed denim, natural horn and mother-of-pearl buttons, sewn-in EU labels",
+      es: "Algodón transpirable, lino natural, denim crudo y lavado, botones naturales y etiquetas europeas cosidas",
     },
     tableRegions: {
-      en: "Family-run garment makers, production units, and women artisan collectives across India",
-      es: "Fábricas de corte familiar, confeccionistas y colectivos de artesanas por toda la India",
+      en: "Vetted family-run garment makers, denim specialists, and women artisan collectives across India; supervision from Maharashtra",
+      es: "Confeccionistas familiares, especialistas en denim y colectivos de artesanas en la India; supervisión desde Maharashtra",
     },
     tableVerification: {
-      en: "Drape check on dressmaker forms, fabric weight and finishes review, physical sample fit sign-off",
-      es: "Prueba de caída en maniquí, control de gramaje y acabados, muestra física previamente revisada y aprobada por ti",
+      en: "Physical fabric and dye swatch approval, dressmaker-form fit review, reviewed garment sample before cutting",
+      es: "Aprobación de muestra física de tejido y color, ajuste en maniquí y muestra física revisada antes de cortar",
     },
     ctaLabel: {
       en: "Share your clothing idea",
-      es: "Cuéntanos tu idea de prendas",
+      es: "Cuéntanos tu idea de colección",
     },
     ctaMicrocopy: {
       en: "Opens your brief in the clothing category. No tech pack needed.",
-      es: "Comparte con nosotros la prenda que te ronda en la cabeza. Sin ficha técnica previa.",
+      es: "Abre el briefing en la categoría de ropa. Sin ficha técnica previa.",
     },
-    image:
-      "/images/almarise/almarise-reborn-olive-pallu-shrug-madrid-street.jpeg",
+    image: "/images/almarise/almarise-saree-design-review.jpeg",
+    imagePosition: "52% 28%",
     imageAlt: {
-      en: "Model wearing an embroidered sheer purple and olive outer garment tailored in India",
-      es: "Modelo vistiendo una chaqueta ligera bordada en tonos ciruela y oliva confeccionada en la India",
+      en: "Alma reviewing fabric drape and garment proportions on a dressmaker form in India",
+      es: "Alma revisando la caída de un tejido y el corte sobre un maniquí en nuestro estudio en la India",
     },
+    items: [
+      {
+        id: "cotton-linen-midi-dress",
+        plane: "front",
+        shortLabel: {
+          en: "Midi dresses & skirts",
+          es: "Vestidos y faldas midi",
+        },
+        name: {
+          en: "Cotton & linen midi dresses and skirts",
+          es: "Vestidos y faldas midi en algodón y lino",
+        },
+        tooltip: {
+          en: "Breathable cotton and linen midi dresses and skirts with clean fluid drape.",
+          es: "Vestidos y faldas midi en algodón y lino transpirables con caída fluida.",
+        },
+        description: {
+          en: "Effortless European summer silhouettes in washed cotton and slub linen with clean necklines, deep side pockets, and relaxed movement.",
+          es: "Siluetas actuales en algodón lavado y lino natural con escotes limpios, bolsillos laterales y movimiento ligero.",
+        },
+        specs: [
+          { en: "Cotton & slub linen", es: "Algodón y lino natural" },
+          { en: "Clean summer drape", es: "Caída fresca de verano" },
+        ],
+        image: "/images/categories-3d/clothing/midi-dress.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a contemporary terracotta-clay linen A-line midi dress",
+          es: "Ilustración 3D de un vestido midi actual en lino color terracota",
+        },
+      },
+      {
+        id: "unique-denim-outerwear",
+        plane: "back-left",
+        shortLabel: { en: "Denim & outerwear", es: "Denim y chaquetas" },
+        name: {
+          en: "Unique denim pieces & outerwear",
+          es: "Piezas singulares en denim y chaquetas",
+        },
+        tooltip: {
+          en: "Sculptural denim jackets and distinctive separates with crisp topstitching.",
+          es: "Chaquetas y piezas singulares en denim con pespunte marcado y corte actual.",
+        },
+        description: {
+          en: "Characterful raw and washed denim jackets and separates with contrast stitching, curved sleeve geometry, and refined natural buttons.",
+          es: "Prendas exteriores y piezas especiales en denim índigo o lavado con pespunte visto, mangas con forma y botones naturales.",
+        },
+        specs: [
+          { en: "Distinctive denim washes", es: "Lavados cuidados en denim" },
+          { en: "Tailored outerwear cuts", es: "Cortes actuales de chaqueta" },
+        ],
+        image: "/images/categories-3d/clothing/denim-jacket.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a sculptural indigo cropped denim outerwear jacket with cream topstitching",
+          es: "Ilustración 3D de una chaqueta actual en denim índigo con pespunte crudo",
+        },
+      },
+      {
+        id: "cotton-linen-blouse",
+        plane: "mid-left",
+        shortLabel: { en: "Blouses", es: "Blusas" },
+        name: {
+          en: "Cotton & linen blouses",
+          es: "Blusas de algodón y lino",
+        },
+        tooltip: {
+          en: "Airy cotton and linen blouses with clean collars and soft sleeve volume.",
+          es: "Blusas frescas en algodón y lino con cuellos limpios y volumen suave.",
+        },
+        description: {
+          en: "Breathable everyday blouses featuring neat band collars, delicate sleeve tucks, and natural mother-of-pearl buttons.",
+          es: "Blusas ligeras para diario con cuello limpio, mangas con pliegues suaves y botones naturales de nácar.",
+        },
+        specs: [
+          { en: "Airy voile & slub linen", es: "Algodón ligero y lino" },
+          { en: "Mother-of-pearl buttons", es: "Botones de nácar natural" },
+        ],
+        image: "/images/categories-3d/clothing/linen-blouse.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a contemporary ivory cotton-linen blouse with softly pleated sleeves",
+          es: "Ilustración 3D de una blusa actual en algodón y lino color crudo con mangas suaves",
+        },
+      },
+      {
+        id: "linen-jumpsuit",
+        plane: "mid-right",
+        shortLabel: { en: "Jumpsuits", es: "Monos" },
+        name: {
+          en: "Tailored linen jumpsuits",
+          es: "Monos de lino y algodón",
+        },
+        tooltip: {
+          en: "Fluid wide-leg belted jumpsuits cut for comfort from morning to dinner.",
+          es: "Monos fluidos de pierna recta con cinturón pensados para llevar todo el día.",
+        },
+        description: {
+          en: "Clean wide-leg jumpsuits in breathable olive, ecru, or sand linen with tonal waist ties and relaxed tailored structure.",
+          es: "Monos de corte limpio en lino transpirable con lazada al tono y caída fluida para diario o cenas.",
+        },
+        specs: [
+          { en: "Fluid wide-leg fit", es: "Corte recto y fluido" },
+          { en: "Breathable natural linen", es: "Lino natural transpirable" },
+        ],
+        image: "/images/categories-3d/clothing/linen-jumpsuit.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a contemporary muted olive-sage belted wide-leg linen jumpsuit",
+          es: "Ilustración 3D de un mono actual de lino verde salvia con cinturón y pierna recta",
+        },
+      },
+    ],
   },
   {
-    id: "other-crafted",
-    querySlug: "other",
+    id: "textile-accessories",
+    querySlug: "textile-accessories",
     number: "03",
+    jumpLabel: {
+      en: "Textile accessories",
+      es: "Complementos textiles",
+    },
     name: {
-      en: "Custom sewn accessories and brand presentation",
-      es: "Complementos confeccionados a medida y presentación de marca",
+      en: "Textile accessories",
+      es: "Complementos textiles",
+    },
+    showcaseSummary: {
+      en: "Pashminas, scarves, thick canvas and quilted totes, embroidered clutches, toiletry cases, padded headbands, sashes, and fabric sleeves crafted with Indian textile makers.",
+      es: "Pashminas, pañuelos, totes de loneta y bolsos acolchados, clutches bordados, neceseres de viaje, diademas, fajines y fundas textiles hechos con especialistas de la India.",
+    },
+    showcaseProof: {
+      en: "Natural weaves, clean quilting, and embroidery matched to your palette.",
+      es: "Tejidos naturales, acolchados limpios y bordados en tu paleta.",
     },
     summary: {
-      en: "Textile pouches, custom sewn accessories, woven brand labels, cotton dust bags, and unbleached chemical-free recycled cardboard care hangtags that carry your brand identity from the moment a shopper picks up the piece.",
-      es: "Neceseres textiles, complementos confeccionados a medida, etiquetas tejidas con tu marca, bolsas guardapolvo de algodón y etiquetas de cartón reciclado sin blanquear, libre de químicos, que cuidan tu identidad desde que el cliente abre el paquete.",
+      en: "Wearable and everyday textile accessories and add-ons made across specialist Indian weaving, quilting, and embroidery units: pashminas, scarves, shawls, thick cotton canvas and linen tote bags, quilted bags, embroidered evening clutches, toiletry bags and travel cases, padded headbands, turban headwraps, hair scrunchies, braided or embroidered fabric belts, kimono or obi sashes, and fabric sleeves for laptops, books, or eyeglasses.",
+      es: "Complementos textiles de uso diario y ocasiones especiales elaborados en unidades indias de telar, acolchado y bordado: pashminas, pañuelos, chales, totes de loneta gruesa y lino, bolsos acolchados, clutches y bolsos de noche bordados, neceseres de viaje, diademas con volumen, turbantes, coleteros, cinturones textiles trenzados o bordados, fajines estilo kimono u obi y fundas para portátil, libros o gafas.",
     },
     details: {
-      en: "Heavy cotton canvas, natural trims, custom sewn labels, and numbered stretch-wrapped export cartons prepared for smooth EU customs arrival.",
-      es: "Loneta gruesa de algodón, fornituras naturales, etiquetas personalizadas y cajas de exportación numeradas y retractiladas listas para llegar sin tropiezos a aduanas europeas.",
+      en: "Thick cotton canvas, linen, fine woven pashminas, soft cotton quilting, refined embroidery, and smooth zippers checked piece by piece before export.",
+      es: "Loneta gruesa de algodón, lino, pashminas finas, acolchados suaves, bordado cuidado y cremalleras revisadas pieza a pieza antes de exportar.",
     },
     tableMaterials: {
-      en: "Heavy cotton canvas, natural trims, woven brand labels, cotton dust bags, unbleached chemical-free recycled cardboard hangtags",
-      es: "Loneta gruesa de algodón, fornituras naturales, etiquetas tejidas con tu marca, bolsas guardapolvo de algodón y etiquetas de cartón reciclado sin blanquear, libre de químicos",
+      en: "Pashmina weaves, thick cotton canvas, linen, quilted cotton, silk-linen embroidery, braided trims",
+      es: "Pashmina tejida, loneta gruesa de algodón, lino, algodón acolchado, bordado en seda-lino y trenzados",
     },
     tableRegions: {
-      en: "Matched in person across specialist Indian textile, print, and craft production units",
-      es: "Selección presencial entre especialistas textiles, gráficos y artesanales de la India",
+      en: "Specialist Indian weaving, quilting, embroidery, and textile sewing units; quality oversight from Maharashtra",
+      es: "Unidades indias especializadas en telar, acolchado, bordado y confección textil; supervisión desde Maharashtra",
     },
     tableVerification: {
-      en: "On-site feasibility check and physical prototype approval before cutting starts",
-      es: "Comprobación presencial en el punto de producción y aprobación del prototipo físico antes de comenzar el corte",
+      en: "Fabric weight and dye swatch check, embroidery and quilting review on physical samples before production",
+      es: "Control de gramaje y muestra física de color, revisión de bordado y acolchado en muestra antes de producir",
     },
     ctaLabel: {
-      en: "Share your brand accessory idea",
+      en: "Share your textile accessories idea",
       es: "Cuéntanos tu idea de complementos",
     },
     ctaMicrocopy: {
-      en: "We verify production-unit feasibility in person before sampling begins.",
-      es: "Comprobamos en persona la viabilidad en planta antes de hacer muestras.",
+      en: "Opens your brief in textile accessories. No tech pack needed.",
+      es: "Abre el briefing en complementos textiles. Sin ficha técnica previa.",
     },
-    image:
-      "/images/workshops/shirish-woman-artisan-striped-cotton-linings.jpeg",
+    image: "/images/capabilities/textile-accessories.jpg",
+    imagePosition: "50% 50%",
     imageAlt: {
-      en: "Shirish and an Indian artisan inspecting striped cotton bag linings and zippers before assembly at a production unit",
-      es: "Shirish y una artesana revisando forros de algodón a rayas y cremalleras antes del montaje en un punto de producción de la India",
+      en: "Woven pashmina scarf, quilted cotton-linen tote bag, embroidered evening clutch, and padded linen headband on a sunlit stone table",
+      es: "Pashmina tejida, tote acolchado de algodón y lino, clutch bordado y diadema de lino sobre una mesa de piedra soleada",
     },
+    items: [
+      {
+        id: "quilted-canvas-tote",
+        plane: "front",
+        shortLabel: { en: "Canvas & quilted totes", es: "Totes y acolchados" },
+        name: {
+          en: "Canvas, linen & quilted tote bags",
+          es: "Totes de loneta, lino y bolsos acolchados",
+        },
+        tooltip: {
+          en: "Thick cotton canvas, linen totes, and soft quilted bags for daily errands.",
+          es: "Totes en loneta gruesa o lino y bolsos acolchados suaves para diario.",
+        },
+        description: {
+          en: "Generous everyday totes in heavy cotton canvas, slub linen, or lightly padded cotton quilting with sturdy flat straps.",
+          es: "Bolsos tote amplios en loneta gruesa de algodón, lino natural o algodón acolchado con asas cómodas.",
+        },
+        specs: [
+          { en: "Thick canvas & linen", es: "Loneta gruesa y lino" },
+          { en: "Soft quilted construction", es: "Acolchado suave" },
+        ],
+        image: "/images/categories-3d/textile-accessories/quilted-tote.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a contemporary cream quilted cotton-linen everyday tote bag",
+          es: "Ilustración 3D de un tote actual acolchado de algodón y lino en tono crema",
+        },
+      },
+      {
+        id: "pashminas-scarves-shawls",
+        plane: "back-left",
+        shortLabel: { en: "Pashminas & scarves", es: "Pashminas y pañuelos" },
+        name: {
+          en: "Pashminas, scarves, shawls & sashes",
+          es: "Pashminas, pañuelos, chales y fajines",
+        },
+        tooltip: {
+          en: "Fine woven pashminas, light scarves, shawls, and kimono or obi sashes.",
+          es: "Pashminas tejidas, pañuelos ligeros, chales y fajines estilo kimono u obi.",
+        },
+        description: {
+          en: "Airy pashminas, draped scarves, generous shawls, braided fabric belts, and kimono-style obi sashes dyed to physical swatches.",
+          es: "Pashminas ligeras, pañuelos, chales amplios, cinturones textiles trenzados y fajines estilo obi teñidos según muestra física.",
+        },
+        specs: [
+          { en: "Fine natural weaves", es: "Tejidos finos naturales" },
+          { en: "Obi sashes & fabric belts", es: "Fajines obi y cinturones" },
+        ],
+        image: "/images/categories-3d/textile-accessories/pashmina-scarf.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a softly draped camel and terracotta woven pashmina shawl with fine fringe",
+          es: "Ilustración 3D de una pashmina tejida en tonos camel y terracota con flecos finos",
+        },
+      },
+      {
+        id: "toiletry-hair-accessories",
+        plane: "mid-left",
+        shortLabel: { en: "Toiletry & hair", es: "Neceseres y pelo" },
+        name: {
+          en: "Toiletry cases & hair accessories",
+          es: "Neceseres de viaje y accesorios de pelo",
+        },
+        tooltip: {
+          en: "Toiletry travel cases, padded headbands, turban headwraps, and scrunchies.",
+          es: "Neceseres de viaje, diademas con volumen, turbantes y coleteros textiles.",
+        },
+        description: {
+          en: "Quilted travel toiletry bags paired with padded headbands, turban-style headwraps, elastic hair bands, and fabric scrunchies.",
+          es: "Neceseres acolchados para viaje junto a diademas con volumen, turbantes, cintas elásticas y coleteros en tejidos naturales.",
+        },
+        specs: [
+          { en: "Quilted travel cases", es: "Neceseres acolchados" },
+          { en: "Headbands & scrunchies", es: "Diademas y coleteros" },
+        ],
+        image:
+          "/images/categories-3d/textile-accessories/toiletry-headband.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a quilted cream striped cotton toiletry bag beside a sage padded headband and scrunchie",
+          es: "Ilustración 3D de un neceser acolchado de rayas junto a una diadema verde salvia y un coletero",
+        },
+      },
+      {
+        id: "embroidered-clutches-sleeves",
+        plane: "mid-right",
+        shortLabel: { en: "Clutches & sleeves", es: "Clutches y fundas" },
+        name: {
+          en: "Embroidered clutches & fabric sleeves",
+          es: "Clutches bordados y fundas textiles",
+        },
+        tooltip: {
+          en: "Evening clutches plus padded fabric sleeves for laptops, books, or glasses.",
+          es: "Clutches bordados de noche y fundas textiles para portátil, libros o gafas.",
+        },
+        description: {
+          en: "Sleek embroidered evening clutches alongside protective padded textile sleeves tailored for laptops, notebooks, and eyeglasses.",
+          es: "Clutches y bolsos de noche bordados junto a fundas acolchadas a medida para portátil, libros o gafas.",
+        },
+        specs: [
+          { en: "Modern thread embroidery", es: "Bordado actual en hilo" },
+          {
+            en: "Laptop, book & glass sleeves",
+            es: "Fundas de portátil, libro y gafas",
+          },
+        ],
+        image:
+          "/images/categories-3d/textile-accessories/embroidered-clutch.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a sleek deep forest-green silk-linen embroidered evening clutch",
+          es: "Ilustración 3D de un clutch de noche en seda-lino verde bosque con bordado botánico",
+        },
+      },
+    ],
   },
   {
     id: "home-decor",
     querySlug: "home-decor",
     number: "04",
+    jumpLabel: {
+      en: "Textile home decor",
+      es: "Decoración textil",
+    },
     name: {
-      en: "Home decor",
-      es: "Decoración del hogar",
+      en: "Textile home decor",
+      es: "Decoración textil del hogar",
+    },
+    showcaseSummary: {
+      en: "Cushion covers, wall hangings, Kantha-style bedspreads, recycled-cotton flat-weave dhurries, table runners, tablecloths, and placemats loomed by Indian textile weavers.",
+      es: "Fundas de cojín, tapices de pared, colchas estilo Kantha, alfombras dhurrie de algodón reciclado, caminos de mesa, manteles e individuales de tejedores indios.",
+    },
+    showcaseProof: {
+      en: "Physical weave and dye swatches approved in daylight before production.",
+      es: "Muestras físicas de tejido y color aprobadas a luz natural.",
     },
     summary: {
-      en: "Own-brand home decor developed and crafted with vetted Indian production units, family-run factories, and artisan collectives across India. Bring the role, look, and textures you want in your store or brand collection, and we verify materials and specialist maker fit on the ground before moving into prototypes.",
-      es: "Artículos de decoración del hogar con tu propia marca, desarrollados y producidos con lugares de producción, fábricas de corte familiar y colectivos de artesanas auditados en la India. Cuéntanos el estilo, las texturas y el papel que buscan estas piezas en tu comercio o colección, y verificamos materiales y capacidad sobre el terreno antes de pasar a prototipos.",
+      en: "Own-brand textile home decor produced with audited Indian weaving units and women artisan collectives: cushion covers, wall hangings, Kantha-style bedspreads, flat-weave rugs (dhurries) made from recycled cotton, table runners, tablecloths, and placemats.",
+      es: "Decoración textil del hogar con tu marca producida con unidades textiles y colectivos de artesanas auditados en la India: fundas de cojín, tapices de pared, colchas estilo Kantha, alfombras dhurrie de algodón reciclado, caminos de mesa, manteles e individuales.",
     },
     details: {
-      en: "Material selection, physical colour swatches, finish checks, custom packaging, and export carton protection scoped around your Product Brief and European retail requirements.",
-      es: "Selección de materiales, muestra física de color, revisión de acabados, presentación con tu marca y embalaje de exportación adaptados a tu briefing de producto y a tus requisitos en Europa.",
+      en: "Recycled cotton yarn, hand-stitched Kantha quilting, breathable slub linen, natural dyes, and sewn-in EU fibre and care labels ready for retail display.",
+      es: "Algodón reciclado, pespunte Kantha a mano, lino natural, tintes cuidados y etiquetas europeas de composición y cuidado listas para tienda.",
     },
     tableMaterials: {
-      en: "Natural and crafted home-decor materials, finishes, custom brand tags, and protective export packing per brief",
-      es: "Materiales y acabados de decoración del hogar, etiquetas con tu marca y embalaje protector de exportación según briefing",
+      en: "Recycled cotton yarn, slub linen, hand-stitched Kantha cotton layers, hidden zippers, sewn-in EU care labels",
+      es: "Hilo de algodón reciclado, lino natural, algodón estilo Kantha pespunteado a mano y etiquetas europeas cosidas",
     },
     tableRegions: {
-      en: "Vetted Indian production units, family-run factories, and artisan collectives across India, overseen from Maharashtra",
-      es: "Unidades de producción, fábricas de corte familiar y colectivos de artesanas en la India, con supervisión desde Maharashtra",
+      en: "Specialist Indian handloom, dhurrie-weaving, and home-textile production units and artisan collectives; supervision from Maharashtra",
+      es: "Unidades textiles, tejedores de dhurries y colectivos de artesanas en la India; supervisión desde Maharashtra",
     },
     tableVerification: {
-      en: "On-site feasibility check, physical swatch sign-off, and reviewed physical sample in hand",
-      es: "Estudio presencial de viabilidad, aprobación de muestra física de color y muestra para valoración en mano",
+      en: "Daylight weave and colour swatch approval, wash shrinkage and stitch check on physical samples before dispatch",
+      es: "Aprobación de tejido y color a luz natural, prueba de lavado y control de remates en muestra antes del envío",
     },
     ctaLabel: {
-      en: "Share your home decor idea",
-      es: "Tu idea de decoración del hogar",
+      en: "Share your textile decor idea",
+      es: "Cuéntanos tu idea de decoración textil",
     },
     ctaMicrocopy: {
-      en: "Opens your brief in the home decor category. No tech pack needed.",
-      es: "Abre el briefing en decoración del hogar. Sin ficha técnica previa.",
+      en: "Opens your brief in textile home decor. No tech pack needed.",
+      es: "Abre el briefing en decoración textil del hogar. Sin ficha técnica previa.",
     },
-    placeholderTitle: {
-      en: "Home decor photography coming soon",
-      es: "Fotografía de decoración del hogar en preparación",
+    image: "/images/culture/maharashtra-handloom-zari-border.jpg",
+    imagePosition: "50% 50%",
+    imageAlt: {
+      en: "Artisan hands weaving a gold and crimson patterned cloth border on a wooden handloom with wooden shuttles beside skeins of natural yarn",
+      es: "Manos artesanas tejiendo una cenefa dorada y carmesí en un telar de madera con lanzaderas junto a madejas de hilo natural",
     },
-    placeholderDescription: {
-      en: "Reserved for verified on-ground photographs of own-brand home decor samples and Indian production units from Alma and Shirish.",
-      es: "Espacio reservado para fotografías reales de muestras de decoración del hogar y unidades de producción en la India tomadas por Alma y Shirish.",
-    },
+    items: [
+      {
+        id: "kantha-bedspreads",
+        plane: "front",
+        shortLabel: { en: "Kantha bedspreads", es: "Colchas Kantha" },
+        name: {
+          en: "Kantha-style bedspreads",
+          es: "Colchas estilo Kantha",
+        },
+        tooltip: {
+          en: "Layered cotton bedspreads and throws finished with fine Kantha running stitch.",
+          es: "Colchas y plaids de algodón en capas con fino pespunte estilo Kantha.",
+        },
+        description: {
+          en: "Reversible cotton bedspreads and throws quilted with tonal hand-stitched Kantha lines for soft, breathable weight across seasons.",
+          es: "Colchas y plaids reversibles de algodón con finas líneas de pespunte Kantha al tono, suaves y transpirables todo el año.",
+        },
+        specs: [
+          { en: "Hand-stitched Kantha lines", es: "Pespunte Kantha a mano" },
+          {
+            en: "Reversible layered cotton",
+            es: "Algodón reversible en capas",
+          },
+        ],
+        image: "/images/categories-3d/home-decor/kantha-bedspread.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a folded ecru and muted terracotta Kantha-style stitched cotton bedspread",
+          es: "Ilustración 3D de una colcha de algodón estilo Kantha doblada en tonos crudo y terracota",
+        },
+      },
+      {
+        id: "cushion-covers-wall-hangings",
+        plane: "back-left",
+        shortLabel: { en: "Cushions & wall hangings", es: "Cojines y tapices" },
+        name: {
+          en: "Cushion covers & wall hangings",
+          es: "Fundas de cojín y tapices",
+        },
+        tooltip: {
+          en: "Textured linen and cotton cushion covers plus woven textile wall hangings.",
+          es: "Fundas de cojín en lino y algodón con textura y tapices textiles de pared.",
+        },
+        description: {
+          en: "Tactile square and lumbar cushion covers with clean flange seams and hidden zips, alongside woven textile wall hangings.",
+          es: "Fundas de cojín cuadradas y lumbares con cremallera oculta y pespunte limpio, junto a tapices textiles de pared.",
+        },
+        specs: [
+          { en: "Slub linen & woven cotton", es: "Lino natural y algodón" },
+          {
+            en: "Hidden zips & wall hangings",
+            es: "Cremallera oculta y tapices",
+          },
+        ],
+        image: "/images/categories-3d/home-decor/cushion-covers.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of two textured oatmeal linen and muted sage-clay striped cushion covers",
+          es: "Ilustración 3D de dos fundas de cojín en lino avena y algodón de rayas salvia y arcilla",
+        },
+      },
+      {
+        id: "recycled-cotton-dhurries",
+        plane: "mid-left",
+        shortLabel: { en: "Recycled dhurries", es: "Alfombras dhurrie" },
+        name: {
+          en: "Flat-weave dhurries (recycled cotton)",
+          es: "Alfombras dhurrie de algodón reciclado",
+        },
+        tooltip: {
+          en: "Lightweight flat-weave dhurrie rugs loomed from recycled cotton yarn.",
+          es: "Alfombras ligeras dhurrie tejidas con hilo de algodón reciclado.",
+        },
+        description: {
+          en: "Reversible flat-weave Indian dhurries woven in recycled cotton with understated geometric stripes and tidy braided cotton fringes.",
+          es: "Alfombras dhurrie reversibles en algodón reciclado con rayas geométricas limpias y flecos trenzados.",
+        },
+        specs: [
+          { en: "Recycled cotton yarn", es: "Algodón reciclado" },
+          { en: "Reversible flat weave", es: "Ligera y reversible" },
+        ],
+        image: "/images/categories-3d/home-decor/dhurrie-rug.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a half-rolled recycled cotton flat-weave dhurrie rug in ivory, sage, and warm ochre stripes",
+          es: "Ilustración 3D de una alfombra dhurrie semienrollada de algodón reciclado en rayas marfil, salvia y ocre",
+        },
+      },
+      {
+        id: "table-linens",
+        plane: "mid-right",
+        shortLabel: { en: "Table linens", es: "Ropa de mesa" },
+        name: {
+          en: "Table runners, tablecloths & placemats",
+          es: "Caminos de mesa, manteles e individuales",
+        },
+        tooltip: {
+          en: "Woven cotton and linen tablecloths, table runners, and matching placemats.",
+          es: "Manteles, caminos de mesa e individuales a juego en lino y algodón.",
+        },
+        description: {
+          en: "Coordinated natural-fibre dining textiles: slub-linen tablecloths, woven table runners, and textured placemats cut for European tables.",
+          es: "Ropa de mesa coordinada en fibras naturales: manteles de lino, caminos de mesa tejidos e individuales para mesas europeas.",
+        },
+        specs: [
+          {
+            en: "Runners, cloths & placemats",
+            es: "Caminos, manteles e individuales",
+          },
+          { en: "Pre-washed natural drape", es: "Caída natural prelavada" },
+        ],
+        image: "/images/categories-3d/home-decor/table-linens.webp",
+        imageAlt: {
+          en: "Illustrative 3D render of a folded sand linen tablecloth, clay-striped table runner, and stacked braided placemats",
+          es: "Ilustración 3D de un mantel de lino arena doblado, camino de mesa con rayas arcilla e individuales trenzados",
+        },
+      },
+    ],
   },
 ];
-
-export const MANUFACTURING_PROOF_METRICS: readonly ManufacturingProofMetric[] =
-  [
-    {
-      id: "three-states",
-      label: {
-        en: "Multi-region craft matching",
-        es: "Coordinación entre regiones artesanas",
-      },
-      value: {
-        en: "3 Indian states coordinated for one Spanish handbag line",
-        es: "3 estados de la India coordinados para una colección española de bolsos",
-      },
-      detail: {
-        en: "We vegetable-tanned soft hides in Kolkata, stitched four bag styles in black and tan in Uttar Pradesh, and supervised quality from Maharashtra. Each stage went to the hub known for that craft.",
-        es: "Curtimos al vegetal pieles suaves en Calcuta, confeccionamos cuatro modelos de bolso en negro y tostado en Uttar Pradesh y supervisamos la producción desde Maharashtra. Cada fase fue al lugar con más oficio para ella.",
-      },
-    },
-    {
-      id: "sample-refinement",
-      label: {
-        en: "Detail-level product study",
-        es: "Estudio de producto al detalle",
-      },
-      value: {
-        en: "2 leather sample rounds and 10 to 15 days sourcing natural hangtags",
-        es: "2 rondas de muestras en piel y de 10 a 15 días buscando etiquetas naturales",
-      },
-      detail: {
-        en: "After paper drafts, two physical leather iterations locked the tapered backpack silhouette, antique brass hardware, high-quality Japanese plastic YKK zippers, and distinct casual and dressy bag sizes. Our Manufacturing Partner also spent 10 to 15 days hunting down unbleached chemical-free recycled cardboard for the Spanish care hangtags.",
-        es: "Tras los bocetos en papel, dos iteraciones físicas en piel cerraron el perfil piramidal de la mochila, los herrajes de latón envejecido, las cremalleras japonesas YKK de plástico de alta calidad y dos tamaños distintos para uso diario y más de vestir. Nuestra fábrica colaboradora dedicó también entre 10 y 15 días a localizar cartón reciclado sin blanquear, libre de químicos, para las etiquetas de cuidado en español.",
-      },
-    },
-    {
-      id: "export-delivery",
-      label: {
-        en: "Doorstep European arrival",
-        es: "Llegada a la puerta del negocio",
-      },
-      value: {
-        en: "11 numbered export cartons straight into a downtown shop window",
-        es: "11 cajas de exportación numeradas directas al escaparate",
-      },
-      detail: {
-        en: 'The minute the stretch-wrapped cartons landed outside the Spanish boutique, the Client sent a doorstep photo saying "We got it! They are here!" All eight bags in black and tan went straight into his main shop window that same day.',
-        es: "En cuanto las cajas retractiladas llegaron a la puerta de la boutique en España, el cliente nos mandó una foto desde la calle: «¡Nos han llegado! ¡Ya están aquí!». Pudo colocar directamente en el escaparate principal los ocho bolsos en negro y tostado ese mismo día.",
-      },
-    },
-  ];
 
 export const MANUFACTURING_SELECTION_CRITERIA: readonly WorkshopCriterion[] = [
   {
     id: "materials",
-    number: "01",
     title: {
       en: "Craft skill and the right machines",
       es: "Oficio y maquinaria adecuada",
     },
     body: {
-      en: "Does the production unit already make this material and construction every day, with clean skiving and stitching machines running on site?",
-      es: "¿Trabaja ya esta unidad de producción con ese material y esa construcción cada día, con máquinas bien cuidadas de rebajado y costura en planta?",
+      en: "Every partner already works your material daily with well-kept skiving, cutting, and stitching machines.",
+      es: "Cada fabricante trabaja ya ese material a diario con máquinas bien cuidadas de rebajado, corte y costura.",
     },
   },
   {
     id: "capacity",
-    number: "02",
     title: {
       en: "A scale that respects your order",
       es: "Una escala que respete tu pedido",
     },
     body: {
-      en: "An independent boutique commissioning its first own-brand capsule needs a different manufacturing unit from a retail chain placing larger repeat Bulk Orders. We match you to a facility where your order fits cleanly into the schedule.",
-      es: "Un comercio independiente que lanza su primera cápsula propia necesita una planta distinta a la de una cadena que repite pedidos de producción mayores. Buscamos el punto de producción donde tu encargo encaje sin quedar relegado.",
+      en: "We pair first-time boutique capsules and repeat retail runs with ateliers and factories where your order never gets pushed aside.",
+      es: "Emparejamos tanto primeras cápsulas de comercio como pedidos mayores con fábricas donde tu encargo nunca queda relegado.",
     },
   },
   {
     id: "sampling",
-    number: "03",
     title: {
-      en: "Accurate sample revisions and written tolerances",
-      es: "Ajustes fieles de muestras y tolerancias por escrito",
+      en: "Accurate sample revisions",
+      es: "Ajustes fieles de muestras",
     },
     body: {
-      en: "Can the pattern maker refine prototypes accurately and hold those exact linings, finishes, and stitch counts once production begins?",
-      es: "¿Sabe el patronista corregir los prototipos con precisión y mantener exactamente esos forros, puntadas y acabados una vez que empieza la producción?",
+      en: "Pattern makers refine prototypes cleanly and hold those exact linings, finishes, and stitch counts through production.",
+      es: "Los patronistas afinan los prototipos con precisión y mantienen esos mismos forros, puntadas y acabados durante toda la producción.",
     },
   },
   {
     id: "open-floors",
-    number: "04",
     title: {
-      en: "Open doors and human dignity",
-      es: "Puertas abiertas y trato digno",
+      en: "Open doors and direct talks with makers",
+      es: "Puertas abiertas y trato directo",
     },
     body: {
-      en: "We walk active production sites in person, spend days working elbow to elbow beside the makers, and speak directly with artisans rather than only facility owners. Zero exploitation is non-negotiable across every Manufacturing Partner we work with.",
-      es: "Recorremos líneas activas en persona, pasamos días a pie de obra junto a quienes cosen las piezas y hablamos directamente con artesanos y artesanas, no solo con la dirección. La tolerancia cero ante la explotación es innegociable en cada fábrica colaboradora con la que trabajamos.",
-    },
-  },
-];
-
-export const MANUFACTURING_COMPARISON_ROWS: readonly SourcingComparisonRow[] = [
-  {
-    id: "product-study",
-    criterion: {
-      en: "Product study and design",
-      es: "Estudio y diseño de producto",
-    },
-    karmarise: {
-      en: "Proactive ergonomic advice, material search, and written Product Brief from a sketch or shop piece",
-      es: "Consejo ergonómico proactivo, búsqueda de materiales y briefing de producto por escrito desde un boceto o una pieza de tu tienda",
-    },
-    brokers: {
-      en: "Passive email handoff with little European retail or usability feedback",
-      es: "Reenvío pasivo por correo con poco criterio de uso o venta en España y el resto de Europa",
-    },
-    diy: {
-      en: "Factories expect finished technical drawings and build flaws blindly",
-      es: "Las fábricas piden fichas técnicas cerradas y fabrican los fallos sin avisar",
-    },
-  },
-  {
-    id: "artisans-vetting",
-    criterion: {
-      en: "Artisan and facility vetting",
-      es: "Auditoría de artesanos y unidades",
-    },
-    karmarise: {
-      en: "In-person audits of production units, family-run factories, leather ateliers, and women artisan collectives across Kolkata, Kanpur, Agra, Chennai, and wider India",
-      es: "Auditorías presenciales de unidades de producción, fábricas de corte familiar, marroquineros y colectivos de artesanas en Calcuta, Kanpur, Agra, Chennai y el resto del país",
-    },
-    brokers: {
-      en: "Often tied to a fixed pool of commission factories with limited on-site visits",
-      es: "A menudo ligados a una lista cerrada de fábricas a comisión y pocas visitas a planta",
-    },
-    diy: {
-      en: 'Hard to verify listings remotely; polite "yes" answers can hide missing machines',
-      es: "Difícil de comprobar a distancia; un «sí» amable puede ocultar falta de maquinaria",
-    },
-  },
-  {
-    id: "colour-samples",
-    criterion: {
-      en: "Colour and sample control",
-      es: "Control de color y muestras",
-    },
-    karmarise: {
-      en: "Physical colour swatches created for your approval, every prototype reviewed in India first, and final physical sample approved in your hands",
-      es: "Muestra física de color creada para tu aprobación, cada prototipo revisado primero en la India y muestra física previamente revisada y aprobada por ti en mano",
-    },
-    brokers: {
-      en: "Relies on phone photos and forwards unreviewed samples at your cost",
-      es: "Depende de fotos de móvil y reenvía muestras sin revisar a tu costa",
-    },
-    diy: {
-      en: "High risk of tan or dye drift, silent lining swaps, and wasted courier rounds",
-      es: "Alto riesgo de desviación en tonos tostados o tintadas, cambios de forro sin aviso y mensajería desperdiciada",
-    },
-  },
-  {
-    id: "legal-protection",
-    criterion: {
-      en: "Legal and payment safety",
-      es: "Seguridad legal y de pagos",
-    },
-    karmarise: {
-      en: "Written Indian supplier contracts structured by Bar Council advocate Shirish, plus mutual NDA and NNN confidentiality available",
-      es: "Contratos escritos con unidades de producción bajo ley india estructurados por Shirish (Bar Council), con acuerdos mutuos NDA y NNN disponibles",
-    },
-    brokers: {
-      en: "Informal broker assurances with thin accountability after transfer",
-      es: "Garantías informales del intermediario con poca responsabilidad tras la transferencia",
-    },
-    diy: {
-      en: "Slow, costly cross-border disputes without local Indian legal supervision",
-      es: "Disputas internacionales lentas y caras sin respaldo legal sobre el terreno en la India",
-    },
-  },
-  {
-    id: "communication",
-    criterion: {
-      en: "Continuity and visibility",
-      es: "Continuidad y visibilidad",
-    },
-    karmarise: {
-      en: "Direct calls with Alma, written meeting conclusions straight after, and live video updates from the production site",
-      es: "Llamadas directas con Alma, conclusiones de la reunión por escrito justo después y videollamadas en directo desde el punto de producción",
-    },
-    brokers: {
-      en: "Multiple handoffs between your European team and the production line",
-      es: "Varios intermediarios entre tu equipo en Europa y la línea de costura",
-    },
-    diy: {
-      en: "Time-zone friction, misunderstandings, and silent production periods",
-      es: "Fricción horaria, malentendidos y periodos de silencio durante la producción",
-    },
-  },
-  {
-    id: "eu-export",
-    criterion: {
-      en: "EU labelling and export",
-      es: "Etiquetado europeo y exportación",
-    },
-    karmarise: {
-      en: "Sewn-in EU leather and fibre labels, care tags, export cartons, and customs planned in your proposal through doorstep delivery",
-      es: "Etiquetas cosidas europeas de piel y composición, etiquetas de cuidado, cajas de exportación y aduanas previstos en tu propuesta hasta la puerta de tu negocio",
-    },
-    brokers: {
-      en: "Compliance tags and air-freight shocks often surface right before dispatch",
-      es: "Las etiquetas obligatorias y los sustos de flete aéreo suelen aparecer justo antes de enviar",
-    },
-    diy: {
-      en: "You coordinate freight forwarders, EU labelling rules, and customs clearance alone",
-      es: "Tienes que coordinar por tu cuenta transitarios, normativa europea de etiquetado y aduanas",
+      en: "We sit beside active stitching lines, check working conditions face to face with the artisans, and walk away from any closed door.",
+      es: "Nos sentamos junto a las líneas activas, comprobamos las condiciones cara a cara con los artesanos y descartamos cualquier puerta cerrada.",
     },
   },
 ];
@@ -571,153 +867,134 @@ export const MANUFACTURING_STAGES: readonly ManufacturingStage[] = [
   {
     id: "product-brief",
     stepNumber: "01",
-    shortLabel: {
-      en: "Product Brief",
-      es: "Briefing",
-    },
     title: {
-      en: "Product Brief and discovery call",
-      es: "Briefing de producto y primera llamada",
+      en: "First call and brief",
+      es: "Primera llamada y briefing",
     },
     body: {
-      en: "Bring a rough sketch, a favourite piece from your shop, or book a free 15-minute video call with Alma. Your designs stay confidential, with mutual NDA available, and clear written meeting conclusions land in your inbox straight after we talk.",
-      es: "Trae un boceto rápido, una pieza que ya vendes en tu tienda o reserva una videollamada gratuita de 15 minutos con Alma. Tus diseños son confidenciales, con acuerdos mutuos NDA disponibles, y nada más colgar recibes en tu correo las conclusiones de la reunión por escrito.",
+      en: "Bring a rough sketch or a piece from your shop to a call with Alma. Mutual NDA is ready from day one, and clear meeting notes follow right after.",
+      es: "Trae un boceto o una pieza de tu tienda a una llamada con Alma. El acuerdo NDA está listo desde el primer día y recibes por escrito las conclusiones de la reunión al terminar.",
     },
-    video: "/videos/phases/step-01-brief-review.mp4",
-    poster: "/images/almarise/alma-draping-saree-dress-form-studio.jpeg",
-    videoLabel: {
-      en: "Reviewing patterns, leather hides, and fabric swatches for a Product Brief",
-      es: "Revisión de patrones, pieles y muestras de tejido para preparar un briefing de producto",
+    signOff: {
+      en: "Written call summary and optional mutual NDA",
+      es: "Resumen de la llamada por escrito y NDA opcional",
     },
-    x: 90,
-    y: 175,
-    labelPosition: "below",
+    video: "/videos/phases/step-01-brief-review.mp4?v=2",
+    poster: "/videos/posters/step-01-brief-review.jpg?v=2",
+    mediaLabel: {
+      en: "Alma and a client writing notes over open notebooks on a sunlit studio table during a Product Brief session",
+      es: "Alma y una clienta anotando un briefing de producto sobre cuadernos abiertos en una mesa de estudio",
+    },
   },
   {
     id: "product-study-match",
     stepNumber: "02",
-    shortLabel: {
-      en: "Study & match",
-      es: "Estudio y selección",
-    },
     title: {
-      en: "Product study and partner matching across India",
-      es: "Estudio de producto y selección de unidad de producción",
+      en: "Product study and maker match",
+      es: "Estudio y fabricante adecuado",
     },
     body: {
-      en: "We study ergonomics, materials, and EU requirements, then visit tanneries, leather ateliers, family-run factories, production units, and artisan collectives across India in person to pair your Product Brief with the right Manufacturing Partner. From that groundwork, we send you a clear custom proposal.",
-      es: "Estudiamos ergonomía, materiales y requisitos europeos antes de visitar en persona curtidurías, marroquineros, fábricas de corte familiar, lugares de producción y colectivos de artesanas de la India para elegir el equipo adecuado. Con ese trabajo previo te enviamos una propuesta a medida clara.",
+      en: "We check ergonomics, materials, and EU rules, then visit specialist Indian makers in person before sending your written proposal.",
+      es: "Revisamos ergonomía, materiales y normativa europea, y visitamos fabricantes especialistas en la India antes de enviarte propuesta.",
     },
-    video: "/videos/phases/step-02-study-match.mp4",
-    poster: "/videos/posters/step-02-study-match.jpg",
-    videoLabel: {
-      en: "Alma reviewing product specifications and matching designs to a specialist production unit in India",
-      es: "Alma revisando especificaciones de producto y seleccionando la unidad de producción adecuada en la India",
+    signOff: {
+      en: "Feasibility study and tailored proposal",
+      es: "Estudio de viabilidad y propuesta a medida",
     },
-    x: 294,
-    y: 85,
-    labelPosition: "above",
+    video: "/videos/phases/step-02-study-match.mp4?v=2",
+    poster: "/videos/posters/step-02-study-match.jpg?v=2",
+    mediaLabel: {
+      en: "Alma, Shirish, and a pattern designer reviewing leather bag sketches and specs at an Indian studio table",
+      es: "Alma, Shirish y una diseñadora revisando bocetos y especificaciones de bolsos de piel en un estudio de la India",
+    },
   },
   {
     id: "sample-approval",
     stepNumber: "03",
-    shortLabel: {
-      en: "Physical sample",
-      es: "Muestra física",
-    },
     title: {
-      en: "Physical colour swatch and reviewed sampling",
-      es: "Muestra física de color y muestras para valoración",
+      en: "Colour swatch and sample",
+      es: "Color y muestra física",
     },
     body: {
-      en: "We never guess colours from phone photos. We tell you what is needed for each dye batch and create a physical colour swatch for your approval. Alma inspects every prototype in India first, sets aside weak drafts before shipping, flags even minor refinements openly, and sends a physical sample for you to test in your hands.",
-      es: "Nunca dejamos el color en manos de una foto de móvil. Te indicamos lo que necesitamos para cada tintada y creamos una muestra física de color para tu aprobación. Alma revisa primero cada prototipo en la India, descarta los borradores que no dan la talla antes de enviártelos, te señala abiertamente hasta los ajustes mínimos y te manda la muestra para valoración para que la pruebes en mano.",
+      en: "We never judge colour from phone photos. You approve a physical swatch first, then we inspect the prototype in India and ship it to your hands.",
+      es: "Nunca aprobamos el color por fotos. Primero validas una muestra física de color, revisamos el prototipo en la India y te lo enviamos.",
     },
-    video: "/videos/phases/step-03-sample-approval.mp4",
-    poster: "/videos/posters/step-03-sample-approval.jpg",
-    videoLabel: {
-      en: "Shirish inspecting sample stitching and finishes at an Indian production site",
-      es: "Shirish revisando costuras y acabados de una muestra física en un punto de producción de la India",
+    signOff: {
+      en: "Approved colour swatch and physical sample",
+      es: "Aprobación de la muestra de color y del prototipo",
     },
-    x: 498,
-    y: 185,
-    labelPosition: "below",
+    video: "/videos/phases/step-03-sample-approval.mp4?v=2",
+    poster: "/videos/posters/step-03-sample-approval.jpg?v=2",
+    mediaLabel: {
+      en: "Inspecting black leather sample bags, brass hardware, and botanical fabric swatches at the studio",
+      es: "Revisión de muestras de bolsos de piel negra, herrajes de latón y tejidos en el estudio",
+    },
   },
   {
     id: "materials-contracts",
     stepNumber: "04",
-    shortLabel: {
-      en: "Materials & terms",
-      es: "Materiales y acuerdo",
-    },
     title: {
-      en: "Materials, contracts, and pre-production sign-off",
-      es: "Materiales, contratos y cierre previo a producción",
+      en: "Materials and contracts",
+      es: "Materiales y contratos",
     },
     body: {
-      en: "No production unit begins cutting until you sign off the physical sample in hand. Once approved, Shirish locks hides, fabrics, hardware, EU labels, and written Indian supplier contracts.",
-      es: "Ninguna unidad de producción comienza con el corte de las piezas hasta que apruebas la muestra física en mano. Con tu visto bueno, Shirish deja cerrados pieles, tejidos, herrajes, etiquetas europeas y los contratos escritos bajo legislación india.",
+      en: "Once you approve the sample, Shirish locks hides, fabrics, hardware, EU labels, and written Indian supplier contracts before cutting begins.",
+      es: "Cuando apruebas la muestra, Shirish cierra pieles, tejidos, herrajes, etiquetas europeas y contratos bajo ley india antes de cortar.",
     },
-    video: "/videos/phases/step-04-materials-contracts.mp4",
-    poster:
-      "/images/workshops/shirish-woman-artisan-striped-cotton-linings.jpeg",
-    videoLabel: {
-      en: "Shirish verifying materials, linings, and written production specifications with manufacturing specialists",
-      es: "Shirish comprobando materiales, forros y especificaciones escritas junto al equipo de producción",
+    signOff: {
+      en: "Signed Indian supplier contract and locked materials",
+      es: "Contrato firmado bajo ley india y materiales cerrados",
     },
-    x: 702,
-    y: 85,
-    labelPosition: "above",
+    video: "/videos/phases/step-04-materials-contracts.mp4?v=2",
+    poster: "/videos/posters/step-04-materials-contracts.jpg?v=2",
+    mediaLabel: {
+      en: "Shirish reviewing printed contract pages and writing production-partner contract terms at his desk in India",
+      es: "Shirish revisando y redactando contratos con unidades de producción sobre papel en su escritorio en la India",
+    },
   },
   {
     id: "production",
     stepNumber: "05",
-    shortLabel: {
-      en: "On-site checks",
-      es: "Supervisión",
-    },
     title: {
-      en: "In-person production supervision",
-      es: "Supervisión presencial de la producción",
+      en: "Production supervision",
+      es: "Supervisión en producción",
     },
     body: {
-      en: "While your Bulk Order runs, Alma and Shirish check dye batches, cutting, stitching, and finishes on the ground against your approved reference sample. We follow your order closely and keep you connected through live video calls and progress photos.",
-      es: "Mientras avanza tu pedido de producción, comprobamos a pie de obra las tintadas, el corte, las costuras y los acabados frente a tu contramuestra aprobada. Seguimos tu pedido de cerca y lo ves tú también con videollamadas en directo y fotos de avance.",
+      en: "We check dye batches, stitching, and finishes directly against your approved counter-sample, with live video calls and progress photos.",
+      es: "Comprobamos tintadas, costuras y acabados frente a tu contramuestra aprobada, con videollamadas en directo y fotos de avance.",
     },
-    video: "/videos/phases/step-05-production-checks.mp4",
-    poster: "/videos/posters/step-05-production-checks.jpg",
-    videoLabel: {
-      en: "Artisan stitching a leather strap on a heavy-duty machine during production in India",
-      es: "Artesano cosiendo una correa de piel en máquina durante un pedido de producción en la India",
+    signOff: {
+      en: "Inspection log and live production video call",
+      es: "Registro de revisión y videollamada en directo",
     },
-    x: 906,
-    y: 175,
-    labelPosition: "below",
+    video: "/videos/phases/step-05-production-checks.mp4?v=2",
+    poster: "/videos/posters/step-05-production-checks.jpg?v=2",
+    mediaLabel: {
+      en: "Artisans stitching leather panels and Shirish checking seams on a cognac leather tote in India",
+      es: "Artesanas cosiendo paneles de piel y Shirish comprobando costuras de un bolso en la India",
+    },
   },
   {
     id: "bulk-delivery",
     stepNumber: "06",
-    shortLabel: {
-      en: "Export delivery",
-      es: "Exportación",
-    },
     title: {
-      en: "Final inspection, export packing, and delivery",
-      es: "Control final, embalaje de exportación y entrega",
+      en: "Final check and delivery",
+      es: "Control final y entrega",
     },
     body: {
-      en: "We inspect finished pieces, sewn-in EU labels, custom cotton dust bags, numbered stretch-wrapped export cartons, and customs documents in person before your consignment ships to your business door in Spain or the rest of Europe.",
-      es: "Revisamos en persona las piezas terminadas, las etiquetas cosidas europeas, las bolsas guardapolvo de algodón, las cajas de exportación numeradas y retractiladas y la documentación aduanera antes de que salga tu envío hasta la puerta de tu negocio en España o el resto de Europa.",
+      en: "Finished pieces, EU labels, protective packing, and customs documents are verified before shipping to your door across Spain and the rest of Europe.",
+      es: "Revisamos piezas terminadas, etiquetas europeas, embalaje protector y aduanas antes de entregar en tu puerta en España o el resto de Europa.",
     },
-    video: "/videos/phases/step-06-export-delivery.mp4",
-    poster: "/videos/posters/step-06-export-delivery.jpg",
-    videoLabel: {
-      en: "Finished pieces inspected and stacked for export packing in India",
-      es: "Piezas terminadas revisadas y preparadas para el embalaje de exportación en la India",
+    signOff: {
+      en: "Final quality sign-off, packing list, and customs pack",
+      es: "Revisión final de calidad, lista de bultos y aduanas",
     },
-    x: 1110,
-    y: 95,
-    labelPosition: "above",
+    video: "/videos/phases/step-06-export-delivery.mp4?v=2",
+    poster: "/videos/posters/step-06-export-delivery.jpg?v=2",
+    mediaLabel: {
+      en: "Finished leather bags packed in white cotton dust bags and sealed cartons delivered to a European shop",
+      es: "Bolsos de piel envueltos en bolsas de algodón y cajas cerradas entregadas en una tienda europea",
+    },
   },
 ];
 
@@ -725,50 +1002,46 @@ export const MANUFACTURING_PRE_PRODUCTION_AGREEMENTS: readonly PreProductionAgre
   [
     {
       id: "reference-sample",
-      number: "01",
       title: {
-        en: "Your approved physical sample and colour swatch",
-        es: "Tu muestra física aprobada y tu muestra de color",
+        en: "Binding counter-sample",
+        es: "Contramuestra vinculante",
       },
       body: {
-        en: "The physical sample you approve in Spain or the rest of Europe and your signed-off colour swatch stay at the Indian production site as the binding counter-sample. Before packing, we inspect finished pieces against that sample for stitching, shade, texture, hardware, and finishes.",
-        es: "La muestra física que apruebas en España o el resto de Europa y tu muestra de color firmada permanecen en el punto de producción de la India como contramuestra vinculante. Antes de embalar, comprobamos las piezas terminadas frente a esa referencia en costuras, tono, textura, herrajes y acabados.",
+        en: "Your approved sample and colour swatch stay with the maker as the physical benchmark for every check before packing.",
+        es: "Tu prototipo y tu muestra de color aprobados quedan con el fabricante como referencia física para cada revisión.",
       },
     },
     {
       id: "contracts-and-ip",
-      number: "02",
       title: {
-        en: "Written tolerances, Indian supplier contracts, and confidentiality",
-        es: "Tolerancias escritas, contratos bajo ley india y confidencialidad con NDA",
+        en: "Indian contracts and mutual NDA",
+        es: "Contratos en la India y NDA",
       },
       body: {
-        en: "Only Alma and Shirish review your sketches and references during evaluation, with mutual NDA and NNN agreements available. Shirish puts partner commitments, quality tolerances, and delivery dates into enforceable written contracts under Indian law.",
-        es: "Durante la evaluación solo Alma y Shirish ven tus bocetos y referencias, con acuerdos mutuos NDA y NNN disponibles. Shirish recoge por escrito los compromisos de la unidad de producción, las tolerancias de calidad y las fechas de entrega en contratos vinculantes bajo legislación india.",
+        en: "Mutual NDA and NNN protection are ready from day one, and Bar Council advocate Shirish puts tolerances and dates into Indian supplier contracts.",
+        es: "Tienes acuerdos mutuos NDA y NNN desde el inicio, y Shirish, abogado colegiado en el Bar Council, fija tolerancias y plazos en contratos bajo ley india.",
       },
     },
     {
       id: "documentation",
-      number: "03",
       title: {
-        en: "EU labelling, testing, and export documentation",
-        es: "Etiquetado europeo, pruebas y documentación de exportación",
+        en: "EU labels and export paperwork",
+        es: "Etiquetado europeo y aduanas",
       },
       body: {
-        en: "Your Product Brief locks destination rules from day one: sewn-in real leather and origin tags, textile fibre composition and care labels, REACH or lab checks where applicable, export carton packing, and customs paperwork. Getting labels and documents right before dispatch prevents customs holds and surprise repacking fees on arrival in Spain or the rest of Europe.",
-        es: "Tu briefing de producto fija desde el primer día lo que exige tu destino: etiquetas cosidas de piel auténtica y origen, composición textil y símbolos de cuidado, ensayos REACH o de laboratorio cuando corresponda, embalaje de exportación y documentación aduanera. Dejarlo cerrado antes del envío evita retenciones en aduanas y costes imprevistos de reembalaje al llegar a España o al resto de Europa.",
+        en: "Sewn-in EU leather and fibre labels, REACH testing where needed, and customs paperwork are cleared before dispatch.",
+        es: "Etiquetas europeas cosidas, ensayos REACH cuando proceda y documentación aduanera quedan cerrados antes del envío.",
       },
     },
     {
       id: "lead-times",
-      number: "04",
       title: {
-        en: "Tailored order quantities and realistic timelines",
-        es: "Cantidades a medida y plazos realistas",
+        en: "Tailored quantities and realistic dates",
+        es: "Cantidades a medida y plazos claros",
       },
       body: {
-        en: "Because custom antique brass hardware, vegetable tanning rounds, natural textiles, and regional production-unit capacities vary widely, we do not publish fixed price lists or rigid minimums. We assess realistic quantities and seasonal launch windows openly on your first call.",
-        es: "Como los herrajes de latón envejecido a medida, las rondas de curtido vegetal, los tejidos naturales y la capacidad de cada planta regional varían mucho, no publicamos tarifas cerradas ni mínimos rígidos. Valoramos contigo desde la primera llamada cantidades realistas y el calendario de tu temporada.",
+        en: "No rigid minimums or fixed price lists. Quantities and seasonal delivery windows are agreed openly around your calendar.",
+        es: "Sin mínimos rígidos ni tarifas cerradas. Acordamos cantidades realistas y fechas de entrega en torno a tu temporada.",
       },
     },
   ];
@@ -777,100 +1050,127 @@ export const MANUFACTURING_FAQS: readonly ManufacturingFaqItem[] = [
   {
     id: "product-study-without-tech-pack",
     question: {
-      en: "Can I start a product study or design development without a finished tech pack?",
-      es: "¿Puedo empezar un estudio de producto o un diseño sin tener una ficha técnica cerrada?",
+      en: "Can I start without a finished tech pack?",
+      es: "¿Puedo empezar sin tener una ficha técnica cerrada?",
     },
     answer: {
-      en: "Yes. Many Clients in Spain and the rest of Europe start with a four-line sketch, an item already selling in their shop, or a free 15-minute video call with Alma. She sends clear written meeting conclusions straight after, mutual NDA protection is available, and we build your written Product Brief and physical sample before discussing a production run.",
-      es: "Sí. Muchos clientes de España y el resto de Europa empiezan con un boceto de cuatro líneas, un artículo que ya funciona en su tienda o una videollamada gratuita de 15 minutos con Alma. Justo después recibes las conclusiones de la reunión por escrito, dispones de acuerdos mutuos NDA y preparamos tu briefing de producto y tu muestra física antes de hablar del pedido de producción.",
-    },
-  },
-  {
-    id: "product-categories-and-hubs",
-    question: {
-      en: "What product categories can we manufacture in India, and which Indian cities do you work in?",
-      es: "¿Qué categorías fabricáis en la India y en qué ciudades trabajáis?",
-    },
-    answer: {
-      en: "We develop and manufacture across four core categories: leather bags and other leather goods, clothing in natural and varied fabrics and capsule collections, custom sewn accessories and brand presentation, and home decor. Rather than forcing every craft into one factory, we coordinate specialist hubs across India including Kolkata, Kanpur, Agra, and Chennai, alongside garment, accessory, and home-decor production units, with supervision and quality oversight from Maharashtra.",
-      es: "Desarrollamos y fabricamos cuatro categorías principales: bolsos y otros artículos de piel, prendas de diversos tejidos y colecciones cápsula, complementos confeccionados a medida con presentación de marca y decoración del hogar. En lugar de forzar todos los oficios en una sola planta, coordinamos centros especialistas de la India como Calcuta, Kanpur, Agra y Chennai, junto a unidades textiles, de complementos y de decoración del hogar por todo el país, con supervisión desde Maharashtra.",
-    },
-  },
-  {
-    id: "vetted-artisans-and-workshops",
-    question: {
-      en: "How do you find and vet reliable artisans and production units across India?",
-      es: "¿Cómo buscáis y auditáis artesanos y unidades de producción fiables en la India?",
-    },
-    answer: {
-      en: "We never pick facilities from online B2B directories. Alma and Shirish travel across India to audit family-run factories, leather ateliers, production units, and women artisan collectives in person, check their machinery and active stitching lines, and speak directly with the artisans making the pieces. If a site keeps its doors closed or falls short of our zero-exploitation standard, we walk away immediately.",
-      es: "Nunca elegimos fábricas en directorios B2B por internet. Recorremos el país para auditar en persona fábricas de corte familiar, marroquineros, puntos de producción y colectivos de artesanas, comprobar su maquinaria y líneas activas y hablar directamente con quienes cosen las piezas. Si una instalación cierra sus puertas o incumple nuestra tolerancia cero ante la explotación, nos marchamos al momento.",
-    },
-  },
-  {
-    id: "product-design-and-ergonomics",
-    question: {
-      en: "Do you help with product design, ergonomics, and material sourcing?",
-      es: "¿Ayudáis con el diseño de producto, la ergonomía y la búsqueda de materiales?",
-    },
-    answer: {
-      en: "Yes. Rather than copying a rough sketch blindly, we advise upfront on how European buyers handle and wear each piece. On client collections that has meant reshaping boxy backpacks, checking strap drop, adding top grab handles, switching to high-quality Japanese plastic YKK zippers, using light cotton linings, and testing garment drape on dressmaker forms. We also source finishing details such as antique brass hardware and unbleached chemical-free recycled cardboard care hangtags.",
-      es: "Sí. En lugar de copiar un boceto sin criterio, te aconsejamos desde el inicio sobre cómo manejarán y llevarán la pieza tus clientes en España y el resto de Europa. En colecciones anteriores eso ha supuesto estilizar mochilas cuadradas, ajustar la caída del asa, añadir asas superiores, pasarnos a cremalleras japonesas YKK de plástico de alta calidad, usar forros claros de algodón y revisar la caída de las prendas en maniquí. También localizamos herrajes de latón envejecido y etiquetas de cartón reciclado sin blanquear, libre de químicos.",
-    },
-  },
-  {
-    id: "colour-accuracy-and-samples",
-    question: {
-      en: "How do you control colour accuracy and sample quality before production begins?",
-      es: "¿Cómo aseguráis el color y la calidad de la muestra antes de proceder a la producción?",
-    },
-    answer: {
-      en: "Screen photos and video calls distort shades like tan leather or natural linen, so we tell you what is needed for each dye batch and create a physical colour swatch for your approval before dyeing begins. Alma inspects every prototype in India first, sets aside weak drafts before shipping, notes even minor refinements openly, and we never begin cutting until you hold and sign off the physical reference sample.",
-      es: "Las fotos de móvil y las videollamadas distorsionan tonos como la piel tostada o el lino natural. Por eso te indicamos lo que necesitamos para cada tintada y creamos una muestra física de color para tu aprobación antes de teñir el lote. Alma revisa primero cada prototipo en la India, deja fuera cualquier borrador que no cumpla antes de enviártelo, te comenta con transparencia hasta los ajustes mínimos y nunca comenzamos con el corte de las piezas hasta que tienes en mano y apruebas la muestra física de referencia.",
-    },
-  },
-  {
-    id: "legal-and-payment-protection",
-    question: {
-      en: "How are my payments and designs protected when manufacturing in India?",
-      es: "¿Cómo están protegidos mis pagos y mis diseños al fabricar en la India?",
-    },
-    answer: {
-      en: "Co-founder Shirish is a registered Bar Council advocate in India who puts production-unit commitments, quality tolerances, and delivery dates into written contracts under Indian law. During evaluation, only Alma and Shirish see your designs, mutual NDA and NNN agreements are available, and production never starts without your approved physical sample in hand.",
-      es: "Shirish es abogado colegiado en el Bar Council de la India y recoge los compromisos de cada fabricante, las especificaciones y las fechas de entrega en contratos por escrito bajo legislación india. Durante la valoración solo Alma y Shirish ven tus diseños, puedes firmar acuerdos mutuos NDA y NNN y nunca procedemos a la producción sin tu muestra física previamente revisada y aprobada por ti.",
+      en: "Yes. Many shop owners and brands start with a rough sketch, reference photos, or an item already in their store. Book a free 15-minute video call with Alma, and we turn your idea into a clear specification and physical sample before talking production.",
+      es: "Sí. Muchos comercios y marcas empiezan con un boceto a mano, fotos de referencia o una pieza de su tienda. Reserva una videollamada gratuita de 15 minutos con Alma y convertimos tu idea en especificaciones claras y muestra física antes de pasar a producción.",
     },
   },
   {
     id: "moq-and-pricing",
     question: {
-      en: "What are your minimum order quantities and how is pricing structured?",
-      es: "¿Cuáles son las cantidades mínimas y cómo se plantean los presupuestos?",
+      en: "What are your minimum quantities and pricing?",
+      es: "¿Cuáles son las cantidades mínimas y cómo se presupuesta?",
     },
     answer: {
-      en: "Every Manufacturing Programme is scoped individually from your Product Brief after an initial call. Because leather constructions, natural and varied fabrics, custom hardware, home decor specifications, and regional production-unit capacities vary widely, we do not publish fixed price lists or rigid minimums. We work with independent boutiques launching a first own-brand capsule as well as established retail chains placing larger repeat Bulk Orders.",
-      es: "Cada Programa de producción se estudia a medida a partir de tu briefing de producto tras una primera llamada. Como las construcciones en piel, los tejidos naturales y variados, los herrajes a medida, las piezas de decoración del hogar y la capacidad de cada planta cambian mucho, no publicamos tarifas fijas ni mínimos rígidos. Trabajamos tanto con comercios independientes que lanzan su primera cápsula como con cadenas consolidadas que repiten pedidos de producción más amplios.",
+      en: "We do not publish fixed price lists or rigid minimums because leather ateliers, garment makers, and home-textile weavers each run at different scales. We quote your collection directly from your brief, from small first capsules to repeat retail orders.",
+      es: "No publicamos tarifas fijas ni mínimos rígidos porque una marroquinería, un confeccionista y un tejedor de hogar trabajan a escalas muy distintas. Presupuestamos tu colección a medida desde tu idea, tanto en primeras cápsulas como en pedidos repetidos.",
+    },
+  },
+  {
+    id: "legal-and-payment-protection",
+    question: {
+      en: "How are my designs and payments protected in India?",
+      es: "¿Cómo se protegen mis diseños y pagos en la India?",
+    },
+    answer: {
+      en: "During evaluation only Alma and Shirish see your files, with mutual NDA and NNN agreements ready whenever you want them. Before cutting begins, Shirish puts quality tolerances and delivery dates into a written Indian contract, and production never starts without your approved sample in hand.",
+      es: "Durante la valoración solo Alma y Shirish ven tus archivos, con acuerdos mutuos NDA y NNN disponibles cuando quieras. Antes de cortar, Shirish recoge tolerancias y fechas en un contrato bajo ley india, y nunca producimos sin tu muestra aprobada en mano.",
     },
   },
   {
     id: "eu-labelling-and-export",
     question: {
-      en: "Do you handle EU labelling, export packing, and customs delivery to Spain and the rest of Europe?",
-      es: "¿Os encargáis del etiquetado europeo, el embalaje de exportación y la entrega en España y el resto de Europa?",
+      en: "Do you handle EU labelling and door-to-door delivery?",
+      es: "¿Os encargáis del etiquetado europeo y la entrega a puerta?",
     },
     answer: {
-      en: "Yes. Sewn-in EU leather and fibre labels, care tags, custom cotton dust bags, numbered stretch-wrapped export cartons, and customs paperwork are planned in your proposal from the start so your order arrives at your business door ready for your shop window or warehouse.",
-      es: "Sí. Las etiquetas cosidas europeas de piel y composición textil, las etiquetas de cuidado, las bolsas guardapolvo de algodón a medida, las cajas de exportación numeradas y retractiladas y la documentación aduanera quedan planificadas en tu propuesta desde el principio para que el pedido llegue a la puerta de tu negocio listo para el escaparate o el almacén.",
+      en: "Yes. Sewn-in EU leather and fibre labels, care tags, protective packing, and customs paperwork are planned into your proposal from the start so cartons arrive ready for your shop or warehouse across Spain and the rest of Europe.",
+      es: "Sí. Etiquetas europeas cosidas, etiquetas de cuidado, embalaje protector y aduanas quedan planificados en tu propuesta desde el inicio para que las cajas lleguen listas a tu tienda o almacén en España o el resto de Europa.",
     },
   },
   {
     id: "languages-and-visits",
     question: {
-      en: "What languages can we work in, and can European Clients visit production in India?",
-      es: "¿En qué idiomas podemos trabajar y pueden los clientes europeos visitar la producción en la India?",
+      en: "What languages do you work in, and can we visit India?",
+      es: "¿En qué idiomas trabajamos y podemos visitar la India?",
     },
     answer: {
-      en: "Alma works directly with Clients in Spain and the rest of Europe in Spanish, English, and Portuguese. On the ground in India, we coordinate in English, Hindi, and Marathi. In-person visits to production sites in India can be arranged around active Manufacturing Programmes.",
-      es: "Alma trabaja directamente con clientes de España y el resto de Europa en español, inglés y portugués. Sobre el terreno en la India nos coordinamos en inglés, hindi y maratí. También se pueden organizar visitas presenciales a los puntos de producción cuando hay un Programa de producción en marcha.",
+      en: "Alma works directly with you in Spanish, English, or Portuguese, while we coordinate in India in English, Hindi, and Marathi. In-person visits can be arranged around active production runs.",
+      es: "Alma trabaja contigo directamente en español, inglés o portugués, mientras nos coordinamos en la India en inglés, hindi y maratí. También podemos organizar visitas presenciales cuando hay una producción en marcha.",
     },
   },
 ];
+
+export const MANUFACTURING_CLOSING_CONVERSATION: ClosingConversationCopy = {
+  heading: {
+    en: "Tell us what you want to make. We will study what it takes in India.",
+    es: "Cuéntanos qué quieres fabricar. Nosotros estudiamos qué hace falta en la India.",
+  },
+  confidentialityNote: {
+    en: "No tech pack needed. Mutual NDA available from day one, and Alma reads your note personally.",
+    es: "Sin ficha técnica previa. Acuerdo NDA disponible desde el primer día y Alma lee tu mensaje personalmente.",
+  },
+  advanceCue: {
+    en: "Choose how to start",
+    es: "Elige cómo empezar",
+  },
+  optionsAriaLabel: {
+    en: "Three ways to start manufacturing with KarmaRise D Global",
+    es: "Tres formas de empezar a fabricar con KarmaRise D Global",
+  },
+  options: [
+    {
+      id: "whatsapp",
+      tier: "arch-1",
+      eyebrow: {
+        en: "Have a quick question",
+        es: "Una duda rápida",
+      },
+      title: {
+        en: "Message Alma on WhatsApp",
+        es: "Escribe a Alma por WhatsApp",
+      },
+      detail: {
+        en: "No form needed. Ask about materials, craft hubs, or timelines and hear straight back from Alma.",
+        es: "Sin formularios. Consulta materiales, plazos o viabilidad y te responde directamente Alma.",
+      },
+      external: true,
+    },
+    {
+      id: "book-call",
+      tier: "arch-2",
+      primary: true,
+      eyebrow: {
+        en: "Want a feasibility read first",
+        es: "Prefieres valorarlo cara a cara",
+      },
+      title: {
+        en: "Book a free call with Alma",
+        es: "Reserva una llamada gratis con Alma",
+      },
+      detail: {
+        en: "Free 15-minute video call with zero obligation. Talk through your piece face to face and receive clear meeting notes right after.",
+        es: "Videollamada gratuita de 15 minutos sin compromiso. Habla sobre tu pieza cara a cara y recibe por escrito las conclusiones de la reunión al terminar.",
+      },
+    },
+    {
+      id: "product-brief",
+      tier: "arch-3",
+      eyebrow: {
+        en: "Ready with a sketch or piece",
+        es: "Ya tienes un boceto o una pieza",
+      },
+      title: {
+        en: "Share your product idea",
+        es: "Cuéntanos tu idea",
+      },
+      detail: {
+        en: "Three quick steps from a rough sketch or shop item. Saves automatically as you write.",
+        es: "Tres pasos breves desde un boceto o un artículo de tu tienda. Se guarda mientras escribes.",
+      },
+    },
+  ],
+};

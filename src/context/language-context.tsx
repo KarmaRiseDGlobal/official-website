@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -11,6 +11,12 @@ import {
   type ReactNode,
 } from "react";
 
+import { captureSessionAttributionFromUrl } from "@/lib/client-handoff";
+import {
+  COOKIE_CONSENT_CHANGE_EVENT,
+  COOKIE_CONSENT_STORAGE_KEY,
+  hasAttributionConsent,
+} from "@/lib/consent";
 import {
   markLanguageSwitchSkip,
   requestPageTransition,
@@ -100,6 +106,7 @@ export function LanguageProvider({
   initialLanguage?: SiteLanguage;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const storeLanguage = useSyncExternalStore(
     subscribeLanguage,
     getClientLanguageSnapshot,
@@ -111,6 +118,33 @@ export function LanguageProvider({
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    const syncAttribution = () => {
+      if (hasAttributionConsent()) {
+        captureSessionAttributionFromUrl();
+      }
+    };
+
+    syncAttribution();
+
+    const onConsentChange = () => {
+      syncAttribution();
+    };
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === COOKIE_CONSENT_STORAGE_KEY) {
+        syncAttribution();
+      }
+    };
+
+    window.addEventListener(COOKIE_CONSENT_CHANGE_EVENT, onConsentChange);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(COOKIE_CONSENT_CHANGE_EVENT, onConsentChange);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [pathname]);
 
   const setLanguage = useCallback(
     (next: SiteLanguage) => {

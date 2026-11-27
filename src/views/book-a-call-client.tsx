@@ -1,15 +1,33 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { BookCallScheduler } from "@/components/forms/book-call-scheduler";
+import { HomeFaqAccordion } from "@/components/home/home-faq-accordion";
 import { SectionBridge } from "@/components/shell/section-bridge";
 import { SiteFooter } from "@/components/shell/site-footer";
-import { BOOK_CALL_FAQS, BOOK_CALL_OPTIONS } from "@/data/conversion-content";
+import { BOOK_CALL_FAQS } from "@/data/conversion-content";
 import { localizePath, type SiteLanguage } from "@/lib/urls";
 
-const WHATSAPP_HREF = {
-  en: `https://wa.me/34611722276?text=${encodeURIComponent("Hello Alma, I would like to arrange a video call about KarmaRise D Global.")}`,
-  es: `https://wa.me/34611722276?text=${encodeURIComponent("Hola Alma, me gustaría concertar una videollamada con KarmaRise D Global.")}`,
-};
+const ALMA_MEETING_PORTRAIT = "/images/founders/alma-swing-laughing.jpeg";
+
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="editorial-arrow-icon shrink-0"
+    >
+      <path d="M3.5 8h9m0 0-3.5-3.5M12.5 8 9 11.5" />
+    </svg>
+  );
+}
 
 export function BookACallPageClient({
   lang = "en",
@@ -23,183 +41,139 @@ export function BookACallPageClient({
   return (
     <>
       <main id="main">
-        <section className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-xl))] pb-[var(--section-gap-s)] text-[var(--color-forest-deep)]">
-          <div className="container grid gap-[var(--space-xl)]">
-            {/* Top 1px Hairline Breadcrumb & Context Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-b border-[var(--color-rule)] py-3.5 text-[length:var(--text-xs)] font-semibold tracking-[0.08em] uppercase">
-              <nav
-                aria-label={isEs ? "Ruta de navegación" : "Breadcrumb"}
-                className="flex items-center gap-2"
-              >
-                <ol className="m-0 flex list-none flex-wrap items-center gap-2 p-0">
-                  <li>
-                    <Link
-                      className="text-[var(--color-muted)] no-underline transition-colors hover:text-[var(--color-forest-deep)]"
-                      href={localizeHref("/")}
-                    >
-                      {isEs ? "Inicio" : "Home"}
-                    </Link>
-                  </li>
-                  <li aria-hidden="true" className="text-[var(--color-muted)]">
-                    /
-                  </li>
-                  <li
-                    aria-current="page"
-                    className="text-[var(--color-clay-ink)]"
+        {/* Band 1: Warm Parchment Editorial Invitation Header */}
+        <section className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-sm))] pb-[var(--space-lg)] text-[var(--color-forest-deep)]">
+          <div className="container grid gap-[var(--space-md)]">
+            <nav
+              aria-label={isEs ? "Ruta de navegación" : "Breadcrumb"}
+              className="flex items-center text-[length:var(--text-xs)] font-medium"
+            >
+              <ol className="m-0 flex list-none flex-wrap items-center gap-2 p-0">
+                <li>
+                  <Link
+                    className="inline-flex min-h-[var(--tap-min)] min-w-[var(--tap-min)] items-center text-[var(--color-muted)] no-underline transition-colors hover:text-[var(--color-forest-deep)]"
+                    href={localizeHref("/")}
                   >
-                    {isEs ? "Reservar videollamada" : "Book a video call"}
-                  </li>
-                </ol>
-              </nav>
-              <span className="text-[var(--color-muted)]">
-                {isEs
-                  ? "Google Meet gratis con Alma · ES, EN o PT · Notas por escrito al terminar"
-                  : "Free Google Meet with Alma · EN, ES, or PT · Written notes afterwards"}
-              </span>
-            </div>
+                    {isEs ? "Inicio" : "Home"}
+                  </Link>
+                </li>
+                <li aria-hidden="true" className="text-[var(--color-muted)]">
+                  /
+                </li>
+                <li
+                  aria-current="page"
+                  className="inline-flex min-h-[var(--tap-min)] items-center font-semibold text-[var(--color-clay-ink)]"
+                >
+                  {isEs ? "Reservar videollamada" : "Book a video call"}
+                </li>
+              </ol>
+            </nav>
 
-            <div className="grid gap-[var(--space-md)]">
-              <h1 className="max-w-[16ch] text-[clamp(2.25rem,4.8vw,4.5rem)] leading-[0.98] font-medium">
-                {isEs
-                  ? "Hablemos sobre tu idea de producto."
-                  : "Let's talk through your product idea."}
-              </h1>
-              <p className="lead max-w-[56ch] text-[var(--color-ink-2)]">
-                {isEs
-                  ? "Elige un hueco gratuito de 15 o 30 minutos por Google Meet con Alma. Comenta sin compromiso materiales, ergonomía, muestras físicas o plazos en la India y recibe notas por escrito justo después."
-                  : "Pick a free 15-minute or 30-minute Google Meet slot with Alma. Talk openly about materials, ergonomics, physical sampling, or timelines across India, and receive written call notes straight after."}
-              </p>
-            </div>
+            <div className="grid items-center gap-[var(--space-lg)] lg:grid-cols-12 lg:gap-[var(--gap-columns)]">
+              <div className="grid gap-3 lg:col-span-7">
+                <h1 className="m-0 max-w-[15ch] text-[length:var(--text-display-s)] leading-[1.06] font-normal">
+                  {isEs
+                    ? "Siéntate a charlar con Alma."
+                    : "Pull up a chair with Alma."}
+                </h1>
+                <p className="lead m-0 max-w-[46ch] text-[var(--color-ink-2)]">
+                  {isEs
+                    ? "Elige un hueco gratuito por Google Meet para hablar de materiales, muestras físicas o plazos en la India, con las conclusiones de la reunión por escrito al terminar."
+                    : "Pick a free Google Meet time to talk through materials, physical samples, or timelines in India, with clear meeting notes emailed straight after."}
+                </p>
+                <p className="m-0 text-[length:var(--text-sm)] font-medium text-[var(--color-muted)]">
+                  {isEs
+                    ? "Google Meet gratuito · Español, inglés o portugués · Acuerdo NDA disponible"
+                    : "Free Google Meet · English, Spanish, or Portuguese · Mutual NDA available"}
+                </p>
+              </div>
 
-            <BookCallScheduler />
+              <figure className="editorial-photo-frame m-0 aspect-[16/10] w-full max-w-[360px] lg:col-span-5 lg:ms-auto">
+                <Image
+                  src={ALMA_MEETING_PORTRAIT}
+                  alt={
+                    isEs
+                      ? "Alma riendo con cercanía en un columpio de madera en la India"
+                      : "Alma laughing warmly on a wooden porch swing in India"
+                  }
+                  fill
+                  priority
+                  sizes="(max-width: 64rem) 100vw, 360px"
+                  className="object-cover object-[50%_45%]"
+                />
+              </figure>
+            </div>
           </div>
         </section>
 
         <SectionBridge from="paper" to="dune" />
 
-        {/* Static SSR Call Format Comparison (CRO + SEO + Agent Readiness AR-READ-01) */}
-        <section
-          id="call-formats"
-          className="bg-[var(--color-dune)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]"
-        >
-          <div className="container grid gap-[var(--space-xl)]">
-            <div className="grid gap-3 lg:grid-cols-12 lg:items-end">
-              <div className="grid gap-2 lg:col-span-7">
-                <p className="m-0 text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
-                  {isEs
-                    ? "Elige el ritmo que mejor te encaje"
-                    : "Pick the pace that suits you"}
-                </p>
-                <h2 className="m-0 text-[length:var(--text-display-s)] leading-[1.05] font-medium">
-                  {isEs
-                    ? "Dos opciones gratuitas según el punto de tu proyecto."
-                    : "Two free call options depending on where your idea stands."}
-                </h2>
-              </div>
-              <p className="m-0 max-w-[46ch] text-[length:var(--text-sm)] text-[var(--color-ink-2)] lg:col-span-5">
-                {isEs
-                  ? "Todas las sesiones son en directo por Google Meet en español, inglés o portugués, reservando con al menos 12 horas de antelación para que Alma pueda preparar bien la reunión."
-                  : "Every call happens live on Google Meet in English, Spanish, or Portuguese, with 12-hour advance booking notice so Alma can prepare properly."}
-              </p>
-            </div>
-
-            <div className="grid gap-[var(--gap-columns)] md:grid-cols-2">
-              {BOOK_CALL_OPTIONS.map((option) => (
-                <article
-                  key={option.id}
-                  className="grid content-start gap-3 rounded-[var(--radius-card)] border border-[var(--color-rule-2)]/50 bg-[var(--color-paper)] p-6 sm:p-7"
-                >
-                  <p className="m-0 text-[length:var(--text-xs)] font-semibold tracking-[0.06em] text-[var(--color-clay-ink)] uppercase">
-                    {option.durationLabel[language]}
-                  </p>
-                  <h3 className="m-0 text-[length:var(--text-2xl)] font-medium text-[var(--color-forest-deep)]">
-                    {option.title[language]}
-                  </h3>
-                  <p className="m-0 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-ink-2)]">
-                    {option.summary[language]}
-                  </p>
-                  <p className="m-0 border-t border-[var(--color-rule)] pt-3 text-[length:var(--text-xs)] text-[var(--color-muted)]">
-                    <strong className="font-semibold text-[var(--color-forest-deep)]">
-                      {isEs ? "Recomendada para: " : "Best for: "}
-                    </strong>
-                    {option.bestFor[language]}
-                  </p>
-                </article>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-card)] border border-[var(--color-rule-2)]/45 bg-[var(--color-paper)]/75 px-6 py-4 text-[length:var(--text-sm)] text-[var(--color-ink-2)]">
-              <p className="m-0">
-                {isEs
-                  ? "¿No ves ningún hueco que encaje con tu semana? Escribe a "
-                  : "Cannot find a time that suits your week? Email "}
-                <a
-                  href="mailto:alma@karmarisedglobal.com"
-                  className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                >
-                  alma@karmarisedglobal.com
-                </a>
-                {isEs ? " o mándanos un " : " directly or message us on "}
-                <a
-                  href={WHATSAPP_HREF[language]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-                >
-                  WhatsApp (+34 611 722 276)
-                </a>
-                .
-              </p>
-              <Link
-                href={localizeHref("/product-brief")}
-                className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-              >
-                {isEs
-                  ? "¿Prefieres escribir primero? Enviar briefing en 1 min →"
-                  : "Prefer to write first? Send a 1-min Product Brief →"}
-              </Link>
-            </div>
+        {/* Band 2: Centered Single-Screen Sunlit Scheduler + Companion Below on Warm Dune */}
+        <section className="bg-[var(--color-dune)] pt-[var(--space-lg)] pb-[var(--space-2xl)] text-[var(--color-forest-deep)]">
+          <div className="container">
+            <BookCallScheduler />
           </div>
         </section>
 
-        <SectionBridge from="dune" to="paper" />
+        <SectionBridge from="dune" to="pale-sage" />
 
-        {/* Call FAQs */}
+        {/* Band 3: Warm Editorial Call FAQs using shared dark-toggle accordion */}
         <section
           id="faq"
-          className="bg-[var(--color-paper)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]"
+          className="bg-[var(--color-pale-sage)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]"
         >
-          <div className="container grid gap-[var(--space-xl)] lg:grid-cols-12">
-            <div className="grid content-start gap-3 lg:col-span-4">
-              <p className="m-0 text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
-                {isEs ? "Antes de vernos" : "Before we meet"}
-              </p>
-              <h2 className="m-0 text-[length:var(--text-2xl)] font-medium">
-                {isEs
-                  ? "Preguntas habituales antes de reservar."
-                  : "Questions founders usually ask before booking."}
-              </h2>
+          <div className="container grid items-start gap-[var(--space-xl)] lg:grid-cols-12 lg:gap-[var(--gap-columns)]">
+            <div className="grid content-start gap-6 lg:sticky lg:top-[calc(var(--nav-height)+1.5rem)] lg:col-span-5">
+              <div className="grid gap-3">
+                <h2 className="m-0 max-w-[16ch] text-[length:var(--text-section)] leading-[1.06] font-normal">
+                  {isEs
+                    ? "Dudas habituales antes de vernos."
+                    : "Questions founders usually ask before we talk."}
+                </h2>
+                <p className="m-0 max-w-[38ch] text-[length:var(--text-sm)] leading-[1.64] text-[var(--color-ink-2)]">
+                  {isEs
+                    ? "Qué traer a la llamada, cómo valoramos tiradas cortas y cómo protegemos tus diseños."
+                    : "What to bring, how we look at first runs, and how your sketches stay yours."}
+                </p>
+                <Link
+                  href={localizeHref("/how-we-work")}
+                  className="editorial-arrow-link inline-flex min-h-[var(--tap-min)] w-fit items-center gap-2 text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 transition-colors hover:text-[var(--color-clay-ink)]"
+                >
+                  <span>
+                    {isEs
+                      ? "Ver cómo trabajamos entre España y la India"
+                      : "See how we work between Spain and India"}
+                  </span>
+                  <ArrowIcon />
+                </Link>
+              </div>
+
+              <figure className="editorial-photo-frame m-0 aspect-[4/3] w-full">
+                <Image
+                  src="/images/almarise/alma-kalyan-fashion-studio-briefing.jpeg"
+                  alt={
+                    isEs
+                      ? "Alma sentada a una mesa de estudio revisando carpetas de proyecto y notas en la India"
+                      : "Alma seated at a studio table reviewing project folders and briefing notes in India"
+                  }
+                  fill
+                  sizes="(max-width: 64rem) 100vw, 38vw"
+                  className="object-cover object-[50%_25%]"
+                />
+              </figure>
             </div>
 
-            <div className="grid gap-4 lg:col-span-8">
-              {BOOK_CALL_FAQS.map((item) => (
-                <article
-                  key={item.id}
-                  className="grid gap-2 rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-white)] p-5 sm:p-6"
-                >
-                  <h3 className="m-0 text-[length:var(--text-lg)] font-medium text-[var(--color-forest-deep)]">
-                    {item.question[language]}
-                  </h3>
-                  <p className="m-0 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-ink-2)]">
-                    {item.answer[language]}
-                  </p>
-                </article>
-              ))}
+            <div className="lg:col-span-7">
+              <HomeFaqAccordion
+                idPrefix="book-call-faq"
+                items={BOOK_CALL_FAQS}
+                language={language}
+              />
             </div>
           </div>
         </section>
 
-        <SectionBridge from="paper" to="night" />
+        <SectionBridge from="pale-sage" to="night" size="gentle" />
       </main>
 
       <SiteFooter hideNewsletter />

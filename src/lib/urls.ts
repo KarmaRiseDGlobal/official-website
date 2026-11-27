@@ -43,6 +43,12 @@ export function stripLocalePrefix(pathname: string): string {
     stripped = normalized.slice(3) || "/";
   }
 
+  if (stripped === "/para") {
+    stripped = "/for";
+  } else if (stripped.startsWith("/para/")) {
+    stripped = `/for${stripped.slice(5)}`;
+  }
+
   return `${stripped}${search}${hash}`;
 }
 
@@ -61,8 +67,20 @@ export function localizePath(href: string, lang: SiteLanguage): string {
   const { path, search, hash } = splitPathParts(trimmed);
   const basePath = stripLocalePrefix(path);
 
-  const localizedBase =
-    lang === "es" ? (basePath === "/" ? "/es" : `/es${basePath}`) : basePath;
+  let localizedBase: string;
+  if (lang === "es") {
+    if (basePath === "/") {
+      localizedBase = "/es";
+    } else if (basePath === "/for") {
+      localizedBase = "/es/para";
+    } else if (basePath.startsWith("/for/")) {
+      localizedBase = `/es/para${basePath.slice(4)}`;
+    } else {
+      localizedBase = `/es${basePath}`;
+    }
+  } else {
+    localizedBase = basePath;
+  }
 
   return `${localizedBase}${search}${hash}`;
 }

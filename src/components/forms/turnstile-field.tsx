@@ -70,11 +70,13 @@ function loadTurnstileScript(): Promise<void> {
 
   turnstileScriptPromise = new Promise<void>((resolve, reject) => {
     let settled = false;
+    const noopOnLoad = () => {};
+
     const cleanupTimeout = window.setTimeout(() => {
       if (settled) return;
       settled = true;
       turnstileScriptPromise = null;
-      delete window.__karmaTurnstileOnLoad;
+      window.__karmaTurnstileOnLoad = noopOnLoad;
       reject(new Error("Timed out loading Cloudflare Turnstile script."));
     }, TURNSTILE_SCRIPT_TIMEOUT_MS);
 
@@ -82,7 +84,7 @@ function loadTurnstileScript(): Promise<void> {
       if (settled) return;
       settled = true;
       window.clearTimeout(cleanupTimeout);
-      delete window.__karmaTurnstileOnLoad;
+      window.__karmaTurnstileOnLoad = noopOnLoad;
       resolve();
     };
 
@@ -91,7 +93,7 @@ function loadTurnstileScript(): Promise<void> {
       settled = true;
       window.clearTimeout(cleanupTimeout);
       turnstileScriptPromise = null;
-      delete window.__karmaTurnstileOnLoad;
+      window.__karmaTurnstileOnLoad = noopOnLoad;
       scriptElement?.remove();
       reject(new Error("Failed to load Cloudflare Turnstile script."));
     };
@@ -142,6 +144,7 @@ function loadTurnstileScript(): Promise<void> {
 
 export interface TurnstileFieldProps {
   onTokenChange: (token: string) => void;
+  onError?: (hasError: boolean) => void;
   siteKey?: string;
   language?: SiteLanguage;
   resetSignal?: number;
@@ -153,6 +156,7 @@ export interface TurnstileFieldProps {
 
 export function TurnstileField({
   onTokenChange,
+  onError,
   siteKey,
   language = "en",
   resetSignal,
@@ -165,6 +169,7 @@ export function TurnstileField({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
   const onTokenChangeRef = useRef(onTokenChange);
+  const onErrorRef = useRef(onError);
   const prevResetSignalRef = useRef(resetSignal);
 
   const [retryNonce, setRetryNonce] = useState(0);
@@ -179,6 +184,10 @@ export function TurnstileField({
   useEffect(() => {
     onTokenChangeRef.current = onTokenChange;
   }, [onTokenChange]);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   useEffect(() => {
     activeKeyRef.current = activeKey;
@@ -209,6 +218,7 @@ export function TurnstileField({
         );
 
         setErrorConfigKey(null);
+        onErrorRef.current?.(false);
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: resolvedSiteKey,
           language: language === "es" ? "es" : "en",
@@ -217,6 +227,7 @@ export function TurnstileField({
           size: effectiveSize,
           callback: (token) => {
             setErrorConfigKey(null);
+            onErrorRef.current?.(false);
             setVerifiedKey(activeKeyRef.current);
             onTokenChangeRef.current(token);
           },
@@ -238,6 +249,7 @@ export function TurnstileField({
             setVerifiedKey(null);
             onTokenChangeRef.current("");
             setErrorConfigKey(configKey);
+            onErrorRef.current?.(true);
           },
         });
       })
@@ -246,6 +258,7 @@ export function TurnstileField({
           setVerifiedKey(null);
           onTokenChangeRef.current("");
           setErrorConfigKey(configKey);
+          onErrorRef.current?.(true);
         }
       });
 
@@ -295,7 +308,7 @@ export function TurnstileField({
       {!hasError && appearance === "interaction-only" ? (
         <p
           aria-live="polite"
-          className={`inline-flex items-center gap-1.5 text-xs leading-tight ${
+          className={`inline-flex items-center gap-1.5 text-[length:var(--text-xs)] leading-tight ${
             theme === "dark"
               ? "text-[var(--color-paper-2)]/70"
               : "text-[var(--color-muted)]"
@@ -314,11 +327,11 @@ export function TurnstileField({
           <span>
             {isVerified
               ? language === "es"
-                ? "Verificado · Cloudflare"
-                : "Verified · Cloudflare"
+                ? "Verificación completada"
+                : "Security check verified"
               : language === "es"
-                ? "Protegido por Cloudflare"
-                : "Protected by Cloudflare"}
+                ? "Protección contra spam activa"
+                : "Spam protection active"}
           </span>
         </p>
       ) : null}
@@ -327,7 +340,7 @@ export function TurnstileField({
           role="status"
           className={`flex flex-wrap items-center gap-2 text-[length:var(--text-xs)] ${
             theme === "dark"
-              ? "text-[var(--color-gold)]"
+              ? "text-[var(--color-clay-light)]"
               : "text-[var(--color-clay-ink)]"
           }`}
         >
@@ -340,10 +353,11 @@ export function TurnstileField({
             type="button"
             onClick={() => {
               setErrorConfigKey(null);
+              onErrorRef.current?.(false);
               setVerifiedKey(null);
               setRetryNonce((value) => value + 1);
             }}
-            className="cursor-pointer font-semibold underline underline-offset-4 hover:opacity-80"
+            className="inline-flex min-h-[var(--tap-min)] cursor-pointer items-center font-semibold underline underline-offset-4 hover:opacity-80"
           >
             {language === "es" ? "Reintentar" : "Retry check"}
           </button>

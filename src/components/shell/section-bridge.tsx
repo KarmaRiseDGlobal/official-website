@@ -20,7 +20,7 @@ const SURFACE_COLOR: Record<BridgeSurface, string> = {
 const LIGHT_SURFACES = new Set<BridgeSurface>(["paper", "dune", "pale-sage"]);
 
 // Calibrated 9-stop oklab S-curve blends over canonical surface tokens so
-// high-contrast transitions melt smoothly without Mach-band creases or grey bands.
+// high-contrast and same-polarity transitions melt smoothly without Mach-band creases.
 const BRIDGE_GRADIENTS: Partial<
   Record<`${BridgeSurface}->${BridgeSurface}`, string>
 > = {
@@ -60,12 +60,30 @@ const BRIDGE_GRADIENTS: Partial<
     "linear-gradient(180deg, var(--color-pale-sage) 0%, color-mix(in oklab, var(--color-pale-sage) 95%, var(--color-wood)) 14%, color-mix(in oklab, var(--color-pale-sage) 82%, var(--color-wood)) 28%, color-mix(in oklab, var(--color-pale-sage) 62%, var(--color-wood)) 42%, color-mix(in oklab, var(--color-pale-sage) 40%, var(--color-wood)) 56%, color-mix(in oklab, var(--color-wood) 80%, var(--color-pale-sage)) 70%, color-mix(in oklab, var(--color-wood) 94%, var(--color-pale-sage)) 84%, color-mix(in oklab, var(--color-wood) 98%, var(--color-pale-sage)) 94%, var(--color-wood) 100%)",
   "wood->pale-sage":
     "linear-gradient(180deg, var(--color-wood) 0%, color-mix(in oklab, var(--color-wood) 95%, var(--color-pale-sage)) 14%, color-mix(in oklab, var(--color-wood) 82%, var(--color-pale-sage)) 28%, color-mix(in oklab, var(--color-wood) 62%, var(--color-pale-sage)) 42%, color-mix(in oklab, var(--color-wood) 40%, var(--color-pale-sage)) 56%, color-mix(in oklab, var(--color-pale-sage) 80%, var(--color-wood)) 70%, color-mix(in oklab, var(--color-pale-sage) 94%, var(--color-wood)) 84%, color-mix(in oklab, var(--color-pale-sage) 98%, var(--color-wood)) 94%, var(--color-pale-sage) 100%)",
+  "paper->dune":
+    "linear-gradient(180deg, var(--color-paper) 0%, color-mix(in oklab, var(--color-paper) 82%, var(--color-dune)) 26%, color-mix(in oklab, var(--color-paper) 50%, var(--color-dune)) 52%, color-mix(in oklab, var(--color-dune) 84%, var(--color-paper)) 78%, var(--color-dune) 100%)",
+  "dune->paper":
+    "linear-gradient(180deg, var(--color-dune) 0%, color-mix(in oklab, var(--color-dune) 82%, var(--color-paper)) 26%, color-mix(in oklab, var(--color-dune) 50%, var(--color-paper)) 52%, color-mix(in oklab, var(--color-paper) 84%, var(--color-dune)) 78%, var(--color-paper) 100%)",
+  "paper->pale-sage":
+    "linear-gradient(180deg, var(--color-paper) 0%, color-mix(in oklab, var(--color-paper) 82%, var(--color-pale-sage)) 26%, color-mix(in oklab, var(--color-paper) 50%, var(--color-pale-sage)) 52%, color-mix(in oklab, var(--color-pale-sage) 84%, var(--color-paper)) 78%, var(--color-pale-sage) 100%)",
+  "pale-sage->paper":
+    "linear-gradient(180deg, var(--color-pale-sage) 0%, color-mix(in oklab, var(--color-pale-sage) 82%, var(--color-paper)) 26%, color-mix(in oklab, var(--color-pale-sage) 50%, var(--color-paper)) 52%, color-mix(in oklab, var(--color-paper) 84%, var(--color-pale-sage)) 78%, var(--color-paper) 100%)",
+  "dune->pale-sage":
+    "linear-gradient(180deg, var(--color-dune) 0%, color-mix(in oklab, var(--color-dune) 82%, var(--color-pale-sage)) 26%, color-mix(in oklab, var(--color-dune) 50%, var(--color-pale-sage)) 52%, color-mix(in oklab, var(--color-pale-sage) 84%, var(--color-dune)) 78%, var(--color-pale-sage) 100%)",
+  "pale-sage->dune":
+    "linear-gradient(180deg, var(--color-pale-sage) 0%, color-mix(in oklab, var(--color-pale-sage) 82%, var(--color-dune)) 26%, color-mix(in oklab, var(--color-pale-sage) 50%, var(--color-dune)) 52%, color-mix(in oklab, var(--color-dune) 84%, var(--color-pale-sage)) 78%, var(--color-dune) 100%)",
   "forest-deep->wood":
     "linear-gradient(180deg, var(--color-forest-deep) 0%, color-mix(in oklab, var(--color-forest-deep) 95%, var(--color-wood)) 14%, color-mix(in oklab, var(--color-forest-deep) 82%, var(--color-wood)) 28%, color-mix(in oklab, var(--color-forest-deep) 62%, var(--color-wood)) 42%, color-mix(in oklab, var(--color-forest-deep) 40%, var(--color-wood)) 56%, color-mix(in oklab, var(--color-wood) 80%, var(--color-forest-deep)) 70%, color-mix(in oklab, var(--color-wood) 94%, var(--color-forest-deep)) 84%, color-mix(in oklab, var(--color-wood) 98%, var(--color-forest-deep)) 94%, var(--color-wood) 100%)",
+  "wood->forest-deep":
+    "linear-gradient(180deg, var(--color-wood) 0%, color-mix(in oklab, var(--color-wood) 82%, var(--color-forest-deep)) 28%, color-mix(in oklab, var(--color-wood) 48%, var(--color-forest-deep)) 54%, color-mix(in oklab, var(--color-forest-deep) 84%, var(--color-wood)) 80%, var(--color-forest-deep) 100%)",
   "wood->night":
-    "linear-gradient(180deg, var(--color-wood) 0%, color-mix(in oklab, var(--color-wood) 48%, var(--color-night)) 55%, var(--color-night) 100%)",
+    "linear-gradient(180deg, var(--color-wood) 0%, color-mix(in oklab, var(--color-wood) 78%, var(--color-night)) 28%, color-mix(in oklab, var(--color-wood) 48%, var(--color-night)) 55%, color-mix(in oklab, var(--color-night) 84%, var(--color-wood)) 82%, var(--color-night) 100%)",
+  "night->wood":
+    "linear-gradient(180deg, var(--color-night) 0%, color-mix(in oklab, var(--color-night) 78%, var(--color-wood)) 28%, color-mix(in oklab, var(--color-night) 48%, var(--color-wood)) 55%, color-mix(in oklab, var(--color-wood) 84%, var(--color-night)) 82%, var(--color-wood) 100%)",
   "forest-deep->night":
-    "linear-gradient(180deg, var(--color-forest-deep) 0%, var(--color-night) 100%)",
+    "linear-gradient(180deg, var(--color-forest-deep) 0%, color-mix(in oklab, var(--color-forest-deep) 78%, var(--color-night)) 30%, color-mix(in oklab, var(--color-forest-deep) 44%, var(--color-night)) 60%, color-mix(in oklab, var(--color-night) 86%, var(--color-forest-deep)) 84%, var(--color-night) 100%)",
+  "night->forest-deep":
+    "linear-gradient(180deg, var(--color-night) 0%, color-mix(in oklab, var(--color-night) 78%, var(--color-forest-deep)) 30%, color-mix(in oklab, var(--color-night) 44%, var(--color-forest-deep)) 60%, color-mix(in oklab, var(--color-forest-deep) 86%, var(--color-night)) 84%, var(--color-forest-deep) 100%)",
 };
 
 /**
@@ -89,11 +107,9 @@ export function SectionBridge({
 
   const isHighContrast = LIGHT_SURFACES.has(from) !== LIGHT_SURFACES.has(to);
   const heightClass =
-    size === "gentle"
+    size === "gentle" || isHighContrast
       ? "h-[clamp(128px,22svh,240px)]"
-      : isHighContrast
-        ? "h-[clamp(72px,12svh,168px)]"
-        : "h-[clamp(56px,8svh,104px)]";
+      : "h-[clamp(56px,8svh,104px)]";
 
   return (
     <div

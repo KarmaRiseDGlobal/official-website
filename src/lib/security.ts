@@ -2,6 +2,10 @@ import "server-only";
 
 import { createHash, timingSafeEqual } from "node:crypto";
 
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
+import type { SiteLanguage } from "@/lib/urls";
+
 const RATE_LIMIT_MAX_ENTRIES = 1000;
 const RATE_LIMIT_PRUNE_THRESHOLD = 256;
 const DEFAULT_MAX_JSON_BYTES = 64 * 1024;
@@ -9,6 +13,16 @@ const DEFAULT_MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 const TURNSTILE_VERIFY_URL =
   "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TURNSTILE_TIMEOUT_MS = 5000;
+
+interface FormRateLimitBinding {
+  limit: (options: { key: string }) => Promise<{ success: boolean }>;
+}
+
+declare global {
+  interface CloudflareEnv {
+    FORM_RATE_LIMITER?: FormRateLimitBinding;
+  }
+}
 
 interface RateLimitEntry {
   count: number;
@@ -27,6 +41,17 @@ function sha256Digest(value: string): Buffer {
 
 export function timingSafeEqualStrings(a: string, b: string): boolean {
   return timingSafeEqual(sha256Digest(a), sha256Digest(b));
+}
+
+async function getFormRateLimiterBinding(): Promise<
+  FormRateLimitBinding | undefined
+> {
+  try {
+    const context = await getCloudflareContext({ async: true });
+    return context.env?.FORM_RATE_LIMITER;
+  } catch {
+    return undefined;
+  }
 }
 
 export function verifyWebhookSecret(
@@ -102,9 +127,11 @@ function combineUint8Chunks(
 export async function readBoundedBodyText(
   request: Request,
   maxBytes = DEFAULT_MAX_JSON_BYTES,
+  language: SiteLanguage = "en",
 ): Promise<
   { ok: true; text: string } | { ok: false; status: 400 | 413; error: string }
 > {
+  const isEs = language === "es";
   const contentLengthRaw = request.headers.get("content-length")?.trim();
   if (contentLengthRaw && /^\d+$/.test(contentLengthRaw)) {
     const declaredLength = Number(contentLengthRaw);
@@ -112,7 +139,9 @@ export async function readBoundedBodyText(
       return {
         ok: false,
         status: 413,
-        error: "Request body is too large.",
+        error: isEs
+          ? "El tamaño de la solicitud supera el límite permitido."
+          : "Request body is too large.",
       };
     }
   }
@@ -138,7 +167,9 @@ export async function readBoundedBodyText(
           return {
             ok: false,
             status: 413,
-            error: "Request body is too large.",
+            error: isEs
+              ? "El tamaño de la solicitud supera el límite permitido."
+              : "Request body is too large.",
           };
         }
         chunks.push(value);
@@ -147,7 +178,9 @@ export async function readBoundedBodyText(
       return {
         ok: false,
         status: 400,
-        error: "Unable to read request body.",
+        error: isEs
+          ? "No se pudo leer el cuerpo de la solicitud."
+          : "Unable to read request body.",
       };
     }
 
@@ -159,7 +192,9 @@ export async function readBoundedBodyText(
       return {
         ok: false,
         status: 400,
-        error: "Request body must be valid UTF-8.",
+        error: isEs
+          ? "El cuerpo de la solicitud debe estar en formato UTF-8 válido."
+          : "Request body must be valid UTF-8.",
       };
     }
   }
@@ -171,7 +206,9 @@ export async function readBoundedBodyText(
     return {
       ok: false,
       status: 400,
-      error: "Unable to read request body.",
+      error: isEs
+        ? "No se pudo leer el cuerpo de la solicitud."
+        : "Unable to read request body.",
     };
   }
 
@@ -179,7 +216,9 @@ export async function readBoundedBodyText(
     return {
       ok: false,
       status: 413,
-      error: "Request body is too large.",
+      error: isEs
+        ? "El tamaño de la solicitud supera el límite permitido."
+        : "Request body is too large.",
     };
   }
 
@@ -189,11 +228,13 @@ export async function readBoundedBodyText(
 export async function readJsonObject(
   request: Request,
   maxBytes = DEFAULT_MAX_JSON_BYTES,
+  language: SiteLanguage = "en",
 ): Promise<
   | { ok: true; data: Record<string, unknown> }
   | { ok: false; status: 400 | 413; error: string }
 > {
-  const bodyResult = await readBoundedBodyText(request, maxBytes);
+  const isEs = language === "es";
+  const bodyResult = await readBoundedBodyText(request, maxBytes, language);
   if (!bodyResult.ok) {
     return bodyResult;
   }
@@ -202,7 +243,7 @@ export async function readJsonObject(
     return {
       ok: false,
       status: 400,
-      error: "Invalid JSON payload.",
+      error: isEs ? "Datos de envío no válidos." : "Invalid JSON payload.",
     };
   }
 
@@ -213,7 +254,7 @@ export async function readJsonObject(
     return {
       ok: false,
       status: 400,
-      error: "Invalid JSON payload.",
+      error: isEs ? "Datos de envío no válidos." : "Invalid JSON payload.",
     };
   }
 
@@ -221,7 +262,9 @@ export async function readJsonObject(
     return {
       ok: false,
       status: 400,
-      error: "Expected a JSON object payload.",
+      error: isEs
+        ? "Formato de solicitud no válido."
+        : "Expected a JSON object payload.",
     };
   }
 
@@ -328,12 +371,16 @@ export function checkRateLimit(
 export async function verifyTurnstileToken(
   token: string,
   ip?: string,
+  language: SiteLanguage = "en",
 ): Promise<{ ok: boolean; error?: string }> {
+  const isEs = language === "es";
   const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
   if (!secret) {
     return {
       ok: false,
-      error: "Security verification is not configured.",
+      error: isEs
+        ? "La verificación de seguridad no está configurada."
+        : "Security verification is not configured.",
     };
   }
 
@@ -341,7 +388,9 @@ export async function verifyTurnstileToken(
   if (!trimmedToken) {
     return {
       ok: false,
-      error: "Please complete the security verification before submitting.",
+      error: isEs
+        ? "Completa la verificación de seguridad antes de enviar."
+        : "Complete the security verification before submitting.",
     };
   }
 
@@ -371,7 +420,9 @@ export async function verifyTurnstileToken(
     if (!response.ok) {
       return {
         ok: false,
-        error: "Security verification service returned an error.",
+        error: isEs
+          ? "El servicio de verificación de seguridad devolvió un error."
+          : "Security verification service returned an error.",
       };
     }
 
@@ -382,12 +433,16 @@ export async function verifyTurnstileToken(
 
     return {
       ok: false,
-      error: "Security verification failed.",
+      error: isEs
+        ? "No se pudo completar la verificación de seguridad."
+        : "Security verification failed.",
     };
   } catch {
     return {
       ok: false,
-      error: "Unable to complete security verification.",
+      error: isEs
+        ? "No pudimos completar la verificación de seguridad."
+        : "Unable to complete security verification.",
     };
   } finally {
     clearTimeout(timeoutId);
@@ -397,11 +452,19 @@ export async function verifyTurnstileToken(
 export async function guardFormRequest(
   request: Request,
   payload: { companyWebsite?: unknown; turnstileToken?: unknown },
-  options?: { scope?: string; limit?: number; windowMs?: number },
+  options?: {
+    scope?: string;
+    limit?: number;
+    windowMs?: number;
+    language?: SiteLanguage;
+  },
 ): Promise<
   | { ok: true; honeypotTriggered?: boolean }
   | { ok: false; status: 400 | 403 | 429; error: string }
 > {
+  const language: SiteLanguage = options?.language ?? "en";
+  const isEs = language === "es";
+
   if (
     typeof payload.companyWebsite === "string" &&
     payload.companyWebsite.trim().length > 0
@@ -414,12 +477,34 @@ export async function guardFormRequest(
   const windowMs = options?.windowMs ?? 60_000;
   const clientIp = getClientIp(request);
 
+  const edgeRateLimiter = await getFormRateLimiterBinding();
+  if (edgeRateLimiter) {
+    try {
+      const edgeRate = await edgeRateLimiter.limit({
+        key: `${scope}:${clientIp}`,
+      });
+      if (!edgeRate.success) {
+        return {
+          ok: false,
+          status: 429,
+          error: isEs
+            ? "Has enviado demasiadas solicitudes seguidas. Espera un momento e inténtalo de nuevo."
+            : "Too many requests. Wait a moment and try again.",
+        };
+      }
+    } catch (error) {
+      console.error("Cloudflare form rate limiter failed:", error);
+    }
+  }
+
   const rate = checkRateLimit(`${scope}:${clientIp}`, limit, windowMs);
   if (!rate.ok) {
     return {
       ok: false,
       status: 429,
-      error: "Too many requests. Please wait a moment and try again.",
+      error: isEs
+        ? "Has enviado demasiadas solicitudes seguidas. Espera un momento e inténtalo de nuevo."
+        : "Too many requests. Wait a moment and try again.",
     };
   }
 
@@ -432,16 +517,22 @@ export async function guardFormRequest(
       return {
         ok: false,
         status: 400,
-        error: "Please complete the security verification before submitting.",
+        error: isEs
+          ? "Completa la verificación de seguridad antes de enviar."
+          : "Complete the security verification before submitting.",
       };
     }
 
-    const verification = await verifyTurnstileToken(token, clientIp);
+    const verification = await verifyTurnstileToken(token, clientIp, language);
     if (!verification.ok) {
       return {
         ok: false,
         status: 403,
-        error: verification.error ?? "Security verification failed.",
+        error:
+          verification.error ??
+          (isEs
+            ? "No se pudo completar la verificación de seguridad."
+            : "Security verification failed."),
       };
     }
   }
@@ -570,7 +661,7 @@ function encodeBytesToBase64(bytes: Uint8Array): string {
 
 export async function validateUploadedFile(
   file: File,
-  options?: { maxBytes?: number },
+  options?: { maxBytes?: number; language?: SiteLanguage },
 ): Promise<
   | {
       ok: true;
@@ -582,6 +673,8 @@ export async function validateUploadedFile(
   | { ok: false; error: string }
 > {
   const maxBytes = options?.maxBytes ?? DEFAULT_MAX_UPLOAD_BYTES;
+  const isEs = options?.language === "es";
+
   if (
     !file ||
     typeof file.name !== "string" ||
@@ -589,17 +682,28 @@ export async function validateUploadedFile(
     typeof file.size !== "number" ||
     typeof file.arrayBuffer !== "function"
   ) {
-    return { ok: false, error: "Invalid uploaded file." };
+    return {
+      ok: false,
+      error: isEs ? "Archivo adjunto no válido." : "Invalid uploaded file.",
+    };
   }
 
   if (file.size <= 0) {
-    return { ok: false, error: "Uploaded file is empty." };
+    return {
+      ok: false,
+      error: isEs
+        ? "El archivo adjunto está vacío."
+        : "Uploaded file is empty.",
+    };
   }
 
   if (file.size > maxBytes) {
+    const limitMb = Math.floor(maxBytes / (1024 * 1024));
     return {
       ok: false,
-      error: `Uploaded file exceeds the ${Math.floor(maxBytes / (1024 * 1024))} MB limit.`,
+      error: isEs
+        ? `El archivo adjunto supera el límite de ${limitMb} MB.`
+        : `Uploaded file exceeds the ${limitMb} MB limit.`,
     };
   }
 
@@ -608,18 +712,29 @@ export async function validateUploadedFile(
   if (!filename || lastDot <= 0 || lastDot === filename.length - 1) {
     return {
       ok: false,
-      error: "Uploaded file must have a valid extension.",
+      error: isEs
+        ? "El archivo adjunto debe tener una extensión válida."
+        : "Uploaded file must have a valid extension.",
     };
   }
 
   const extension = filename.slice(lastDot + 1).toLowerCase();
   const format = ALLOWED_UPLOAD_FORMATS.get(extension);
-  const mimeType = file.type.trim().toLowerCase();
+  const rawMimeType = file.type.trim().toLowerCase();
+  const normalizedMimeType =
+    rawMimeType === "image/jpg" ? "image/jpeg" : rawMimeType;
 
-  if (!format || mimeType !== format.mimeType) {
+  // Allow an empty browser MIME type when the extension is allowed, relying on
+  // strict magic-byte verification below to verify genuine file contents.
+  if (
+    !format ||
+    (normalizedMimeType !== "" && normalizedMimeType !== format.mimeType)
+  ) {
     return {
       ok: false,
-      error: "Only JPG, PNG, WebP, and PDF files are supported.",
+      error: isEs
+        ? "Solo se admiten archivos JPG, PNG, WebP y PDF."
+        : "Only JPG, PNG, WebP, and PDF files are supported.",
     };
   }
 
@@ -627,20 +742,29 @@ export async function validateUploadedFile(
   try {
     bytes = new Uint8Array(await file.arrayBuffer());
   } catch {
-    return { ok: false, error: "Unable to read uploaded file." };
+    return {
+      ok: false,
+      error: isEs
+        ? "No pudimos leer el archivo adjunto."
+        : "Unable to read uploaded file.",
+    };
   }
 
   if (bytes.byteLength <= 0 || bytes.byteLength > maxBytes) {
     return {
       ok: false,
-      error: "Uploaded file size is invalid or exceeds the allowed limit.",
+      error: isEs
+        ? "El tamaño del archivo adjunto no es válido o supera el límite permitido."
+        : "Uploaded file size is invalid or exceeds the allowed limit.",
     };
   }
 
   if (!format.matchesMagic(bytes)) {
     return {
       ok: false,
-      error: "File contents do not match the declared file type.",
+      error: isEs
+        ? "El contenido del archivo no coincide con el formato declarado."
+        : "File contents do not match the declared file type.",
     };
   }
 

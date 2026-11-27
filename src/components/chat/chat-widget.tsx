@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useLanguage } from "@/context/language-context";
 import { stripLocalePrefix } from "@/lib/urls";
+import { useTextZoomGuard } from "@/lib/use-text-zoom-guard";
 
 const ChatDrawer = dynamic(
   () => import("@/components/chat/chat-drawer").then((mod) => mod.ChatDrawer),
@@ -54,8 +55,15 @@ export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const [avoidingActionZone, setAvoidingActionZone] = useState(false);
+  const [isLauncherFocused, setIsLauncherFocused] = useState(false);
+  const isTextZoomed = useTextZoomGuard();
   const containerRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
+
+  const isLauncherVisible =
+    isOpen ||
+    isLauncherFocused ||
+    ((!isHome || scrolledPastHero) && !avoidingActionZone);
 
   useEffect(() => {
     if (!isHome) {
@@ -119,7 +127,18 @@ export function ChatWidget() {
     return () => observer.disconnect();
   }, [basePath, pathname]);
 
+  useEffect(() => {
+    if (
+      !isLauncherVisible &&
+      launcherRef.current &&
+      document.activeElement === launcherRef.current
+    ) {
+      launcherRef.current.blur();
+    }
+  }, [isLauncherVisible]);
+
   function handleClose() {
+    setIsLauncherFocused(true);
     setIsOpen(false);
     requestAnimationFrame(() => launcherRef.current?.focus());
   }
@@ -129,25 +148,25 @@ export function ChatWidget() {
   }
 
   const label = getLauncherLabel(basePath, isEs);
-  const isLauncherVisible =
-    isOpen || ((!isHome || scrolledPastHero) && !avoidingActionZone);
 
   return (
     <div
       ref={containerRef}
-      className="chat-widget-anchor pointer-events-none fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[var(--z-modal)] sm:end-6 sm:bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
+      className="chat-widget-anchor pointer-events-none fixed inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[var(--z-modal)] flex justify-end sm:bottom-[max(1.5rem,env(safe-area-inset-bottom))]"
     >
       {!isOpen ? (
         <button
           ref={launcherRef}
           type="button"
           onClick={() => setIsOpen(true)}
+          onFocus={() => setIsLauncherFocused(true)}
+          onBlur={() => setIsLauncherFocused(false)}
           aria-expanded="false"
           aria-controls="karmarise-chat-drawer"
-          aria-hidden={!isLauncherVisible}
+          aria-hidden={isLauncherVisible ? undefined : true}
           tabIndex={isLauncherVisible ? 0 : -1}
           data-visible={isLauncherVisible}
-          className="chat-launcher press-scale inline-flex min-h-[var(--tap-min)] cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-paper)] py-2 ps-2.5 pe-4 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+          className="chat-launcher press-scale inline-flex min-h-[var(--tap-min)] max-w-full cursor-pointer items-center gap-2.5 rounded-[var(--radius-pill)] border border-[var(--color-control-border)] bg-[var(--color-paper)] py-2 ps-2.5 pe-4 text-[length:var(--text-sm)] font-medium text-[var(--color-ink)] shadow-[var(--shadow-card)] hover:border-[var(--color-wood)] hover:bg-[var(--color-white)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
         >
           <span
             aria-hidden="true"
@@ -162,11 +181,17 @@ export function ChatWidget() {
               className="h-full w-full object-contain [filter:var(--filter-logo-light)]"
             />
           </span>
-          <span className="sm:hidden">{label.mobile}</span>
-          <span className="hidden sm:inline">{label.desktop}</span>
+          {isTextZoomed ? (
+            <span>{label.mobile}</span>
+          ) : (
+            <>
+              <span className="sm:hidden">{label.mobile}</span>
+              <span className="hidden sm:inline">{label.desktop}</span>
+            </>
+          )}
         </button>
       ) : (
-        <div className="pointer-events-auto">
+        <div className="pointer-events-auto w-full max-w-[400px]">
           <ChatDrawer
             pathname={pathname}
             basePath={basePath}

@@ -2,15 +2,25 @@
 
 import { useState } from "react";
 
-import type { HomeFaqItem } from "@/data/home-content";
 import type { SiteLanguage } from "@/lib/urls";
 
-interface HomeFaqAccordionProps {
-  items: readonly HomeFaqItem[];
-  language: SiteLanguage;
+export interface FaqAccordionItem {
+  readonly id: string;
+  readonly question: Record<SiteLanguage, string>;
+  readonly answer: Record<SiteLanguage, string>;
 }
 
-export function HomeFaqAccordion({ items, language }: HomeFaqAccordionProps) {
+interface HomeFaqAccordionProps {
+  items: readonly FaqAccordionItem[];
+  language: SiteLanguage;
+  idPrefix?: string;
+}
+
+export function HomeFaqAccordion({
+  items,
+  language,
+  idPrefix = "home-faq",
+}: HomeFaqAccordionProps) {
   const [openIds, setOpenIds] = useState<ReadonlySet<string>>(
     () => new Set(items[0] ? [items[0].id] : []),
   );
@@ -31,8 +41,8 @@ export function HomeFaqAccordion({ items, language }: HomeFaqAccordionProps) {
     <div className="divide-y divide-[var(--color-rule)] border-y border-[var(--color-rule)]">
       {items.map((item) => {
         const isOpen = openIds.has(item.id);
-        const triggerId = `home-faq-trigger-${item.id}`;
-        const panelId = `home-faq-panel-${item.id}`;
+        const triggerId = `${idPrefix}-trigger-${item.id}`;
+        const panelId = `${idPrefix}-panel-${item.id}`;
 
         return (
           <article key={item.id} className="faq-accordion-item">
@@ -43,14 +53,14 @@ export function HomeFaqAccordion({ items, language }: HomeFaqAccordionProps) {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggleItem(item.id)}
-                className="faq-accordion-trigger group flex min-h-[var(--control-height)] w-full cursor-pointer items-center justify-between gap-6 py-5 text-start font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.2] font-normal text-[var(--color-forest-deep)] transition-colors hover:text-[var(--color-clay-ink)] sm:py-6"
+                className="faq-accordion-trigger group flex min-h-[var(--control-height)] w-full cursor-pointer items-center justify-between gap-4 py-5 text-start font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.2] font-normal text-[var(--color-forest-deep)] transition-colors hover:text-[var(--color-clay-ink)] sm:gap-6 sm:py-6"
               >
-                <span className="max-w-[38ch] text-balance">
+                <span className="max-w-[38ch] min-w-0 text-balance break-words">
                   {item.question[language]}
                 </span>
                 <span
                   aria-hidden="true"
-                  className="faq-accordion-icon inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-pill)] border border-[var(--color-forest-deep)] bg-[var(--color-forest-deep)] text-[var(--color-paper)] group-hover:border-[var(--color-clay-ink)] group-hover:bg-[var(--color-clay-ink)]"
+                  className="faq-accordion-icon inline-flex h-9 max-h-[44px] w-9 max-w-[44px] shrink-0 items-center justify-center rounded-[var(--radius-pill)] border border-[var(--color-forest-deep)] bg-[var(--color-forest-deep)] text-[var(--color-paper)] group-hover:border-[var(--color-clay-ink)] group-hover:bg-[var(--color-clay-ink)]"
                   data-open={isOpen}
                 >
                   <svg
@@ -63,7 +73,7 @@ export function HomeFaqAccordion({ items, language }: HomeFaqAccordionProps) {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="m6 9 6 6 6-6" />
+                    <path d="m6 9 6 6 6-6" vectorEffect="non-scaling-stroke" />
                   </svg>
                 </span>
               </button>

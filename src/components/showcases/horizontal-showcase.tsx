@@ -35,6 +35,7 @@ import {
 } from "@/components/showcases/showcase-math";
 import { useLanguage } from "@/context/language-context";
 import { HOME_WORKING_PRINCIPLES as workingPrinciples } from "@/data/home-content";
+import { useTextZoomGuard } from "@/lib/use-text-zoom-guard";
 
 const IDLE_SETTLE_DELAY_MS = 280;
 
@@ -62,10 +63,27 @@ export function HorizontalShowcase() {
   const triggerRef = useRef<ScrollTrigger | null>(null);
   const mobileSwipeRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Used for touch / non-enhanced fallback (< 64rem, coarse pointer, or reduced motion)
   const [activeSlice, setActiveSlice] = useState(0);
   const [optimisticSlice, setOptimisticSlice] = useOptimistic(activeSlice);
   const activeSliceRef = useRef(0);
+  const programmaticTargetRef = useRef<number | null>(null);
+  const programmaticTimerRef = useRef<number | null>(null);
+  const isTextZoomed = useTextZoomGuard();
+  const [overflowBlockedKey, setOverflowBlockedKey] = useState<string | null>(
+    null,
+  );
+  const [viewportKey, setViewportKey] = useState("");
+  const isOverflowBlocked =
+    overflowBlockedKey !== null && overflowBlockedKey === viewportKey;
+
+  useEffect(() => {
+    const syncViewportKey = () => {
+      setViewportKey(`${window.innerWidth}x${window.innerHeight}`);
+    };
+    syncViewportKey();
+    window.addEventListener("resize", syncViewportKey, { passive: true });
+    return () => window.removeEventListener("resize", syncViewportKey);
+  }, []);
 
   useEffect(() => {
     activeSliceRef.current = activeSlice;
@@ -94,23 +112,67 @@ export function HorizontalShowcase() {
       return;
     }
 
+    const clearShowcaseInlineStyles = () => {
+      const sliceCards = Array.from(
+        sliceTrack.querySelectorAll<HTMLElement>("[data-slice-index]"),
+      );
+      pin.removeAttribute("style");
+      world.removeAttribute("style");
+      glow.removeAttribute("style");
+      concernsPanel.removeAttribute("style");
+      sliceTrack.removeAttribute("style");
+      enquiryShell.removeAttribute("style");
+      sliceCards.forEach((card, idx) => {
+        card.removeAttribute("style");
+        card
+          .querySelector<HTMLElement>(".concerns-slice-copy")
+          ?.removeAttribute("style");
+        card
+          .querySelector<HTMLElement>(".concerns-slice-copy-inner")
+          ?.removeAttribute("style");
+        card
+          .querySelector<HTMLElement>(".concerns-slice-media")
+          ?.removeAttribute("style");
+        const triggerEl = card.querySelector<HTMLElement>(
+          ".concerns-slice-trigger",
+        );
+        triggerEl?.removeAttribute("style");
+        const isActive = idx === activeSliceRef.current;
+        const dist = Math.abs(idx - activeSliceRef.current);
+        card.dataset.active = String(isActive);
+        card.dataset.tier =
+          dist === 0
+            ? "active"
+            : dist === 1
+              ? "near"
+              : dist === 2
+                ? "far"
+                : "hidden";
+      });
+    };
+
     gsap.registerPlugin(ScrollTrigger);
 
     const media = gsap.matchMedia();
 
     media.add(
       {
-        enhancedViewport:
-          "(min-width: 64rem) and (hover: hover) and (pointer: fine)",
+        enhancedViewport: "(min-width: 64rem) and (min-height: 35rem)",
         reducedMotion: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
         const { enhancedViewport, reducedMotion } = context.conditions ?? {};
 
-        if (!enhancedViewport || reducedMotion) {
+        if (
+          !enhancedViewport ||
+          reducedMotion ||
+          isTextZoomed ||
+          isOverflowBlocked
+        ) {
           delete root.dataset.enhanced;
           delete root.dataset.pinning;
           triggerRef.current = null;
+          clearShowcaseInlineStyles();
           return;
         }
 
@@ -129,7 +191,7 @@ export function HorizontalShowcase() {
           card.querySelector<HTMLElement>(".concerns-slice-media"),
         );
         const sliceTriggers = sliceCards.map((card) =>
-          card.querySelector<HTMLButtonElement>(".concerns-slice-trigger"),
+          card.querySelector<HTMLElement>(".concerns-slice-trigger"),
         );
 
         const rootStyles = getComputedStyle(document.documentElement);
@@ -174,16 +236,19 @@ export function HorizontalShowcase() {
           cachedViewportH = window.innerHeight;
           cachedDirSign = document.documentElement.dir === "rtl" ? -1 : 1;
           const isCompactDesktop = cachedViewportW < 1200;
+          const isShortLaptop = cachedViewportH < 740;
 
           dimActiveW = Math.round(
             Math.min(cachedViewportW * (isCompactDesktop ? 0.7 : 0.68), 980),
           );
           const verticalBudget =
-            cachedViewportH - (cachedViewportH < 780 ? 320 : 400);
+            cachedViewportH -
+            (isShortLaptop ? 256 : cachedViewportH < 820 ? 344 : 424);
+          const minCardH = isShortLaptop ? 284 : 356;
           dimActiveH = Math.round(
             Math.max(
-              380,
-              Math.min(cachedViewportH * 0.55, verticalBudget, 500),
+              minCardH,
+              Math.min(cachedViewportH * 0.53, verticalBudget, 476),
             ),
           );
           dimCardGap = isCompactDesktop ? 12 : 16;
@@ -198,7 +263,7 @@ export function HorizontalShowcase() {
           dimNearH = Math.round(dimActiveH * 0.78);
           dimFarH = Math.round(dimActiveH * 0.58);
 
-          dimActivePad = 14;
+          dimActivePad = isShortLaptop ? 12 : 14;
           dimActiveInnerW = Math.max(
             260,
             Math.round((dimActiveW - dimActivePad * 2) * 0.5),
@@ -238,6 +303,17 @@ export function HorizontalShowcase() {
               copyInnerEl.style.minWidth = activeInnerStr;
             }
           });
+
+          const hasCopyOverflow = sliceCopyInners.some(
+            (copyInnerEl) =>
+              copyInnerEl !== null &&
+              copyInnerEl.clientHeight > 0 &&
+              copyInnerEl.scrollHeight > copyInnerEl.clientHeight + 24,
+          );
+          const hasPinOverflow = pin.scrollHeight > cachedViewportH + 24;
+          if (hasCopyOverflow || hasPinOverflow) {
+            setOverflowBlockedKey(`${cachedViewportW}x${cachedViewportH}`);
+          }
         };
 
         const applyContinuousSliceLayout = (continuousIdx: number) => {
@@ -262,7 +338,7 @@ export function HorizontalShowcase() {
               w = lerp(dimActiveW, dimNearW, t);
               h = lerp(dimActiveH, dimNearH, t);
               pad = lerp(dimActivePad, dimNearPad, t);
-              cardAlpha = lerp(1, 0.9, t);
+              cardAlpha = lerp(1, 0.56, t);
               copyOpenRatio = 1 - t;
               // Copy exits cleanly before the card compresses past half-width,
               // and enters after space opens so text never collides or clips.
@@ -272,13 +348,13 @@ export function HorizontalShowcase() {
               w = lerp(dimNearW, dimFarW, t);
               h = lerp(dimNearH, dimFarH, t);
               pad = lerp(dimNearPad, dimFarPad, t);
-              cardAlpha = lerp(0.9, 0.62, t);
+              cardAlpha = lerp(0.56, 0.28, t);
             } else if (absD < 2.65) {
               const t = smoothstep((absD - 2) / 0.65);
               w = lerp(dimFarW, 0, t);
               h = lerp(dimFarH, dimFarH * 0.78, t);
               pad = lerp(dimFarPad, 0, t);
-              cardAlpha = lerp(0.62, 0, t);
+              cardAlpha = lerp(0.28, 0, t);
             }
 
             slotW[idx] = w;
@@ -375,7 +451,6 @@ export function HorizontalShowcase() {
                 triggerBtn.style.pointerEvents = isSideClickable
                   ? "auto"
                   : "none";
-                triggerBtn.tabIndex = isSideClickable ? 0 : -1;
               }
             }
 
@@ -415,9 +490,23 @@ export function HorizontalShowcase() {
         let lastActiveSliceIdx = -1;
 
         const updateActiveSliceState = (nearestIdx: number) => {
+          const pendingTarget = programmaticTargetRef.current;
+          if (pendingTarget !== null) {
+            if (nearestIdx === pendingTarget) {
+              programmaticTargetRef.current = null;
+              if (programmaticTimerRef.current !== null) {
+                window.clearTimeout(programmaticTimerRef.current);
+                programmaticTimerRef.current = null;
+              }
+            } else {
+              return;
+            }
+          }
+
           if (nearestIdx === lastActiveSliceIdx) return;
           lastActiveSliceIdx = nearestIdx;
           activeSliceRef.current = nearestIdx;
+          setActiveSlice(nearestIdx);
 
           sliceCards.forEach((card, idx) => {
             const isActive = idx === nearestIdx;
@@ -748,19 +837,8 @@ export function HorizontalShowcase() {
           root.removeEventListener("touchcancel", onTouchEnd);
           st.kill();
           triggerRef.current = null;
-          gsap.set([pin, world, concernsPanel, sliceTrack, enquiryShell], {
-            clearProps: "all",
-          });
-          sliceTrack.style.removeProperty("height");
-          sliceCards.forEach((c) => c.removeAttribute("style"));
-          sliceCopies.forEach((c) => c?.removeAttribute("style"));
-          sliceCopyInners.forEach((c) => c?.removeAttribute("style"));
-          sliceMedias.forEach((m) => m?.removeAttribute("style"));
-          sliceTriggers.forEach((t) => t?.removeAttribute("style"));
+          clearShowcaseInlineStyles();
           lastActiveSliceIdx = -1;
-          updateActiveSliceState(activeSliceRef.current);
-          pin.style.removeProperty("background-color");
-          glow.style.removeProperty("opacity");
           delete root.dataset.enhanced;
           delete root.dataset.pinning;
           ScrollTrigger.refresh();
@@ -768,8 +846,18 @@ export function HorizontalShowcase() {
       },
     );
 
-    return () => media.revert();
-  }, []);
+    return () => {
+      if (programmaticTimerRef.current !== null) {
+        window.clearTimeout(programmaticTimerRef.current);
+        programmaticTimerRef.current = null;
+      }
+      programmaticTargetRef.current = null;
+      media.revert();
+      clearShowcaseInlineStyles();
+      delete root.dataset.enhanced;
+      delete root.dataset.pinning;
+    };
+  }, [isTextZoomed, isOverflowBlocked]);
 
   function scrollToStopIndex(stopIdx: number) {
     const st = triggerRef.current;
@@ -786,22 +874,55 @@ export function HorizontalShowcase() {
     const clamped = Math.max(0, Math.min(principlesCount - 1, targetIndex));
 
     if (rootRef.current?.dataset.enhanced === "true") {
+      if (programmaticTimerRef.current !== null) {
+        window.clearTimeout(programmaticTimerRef.current);
+      }
+      programmaticTargetRef.current = clamped;
+      programmaticTimerRef.current = window.setTimeout(() => {
+        programmaticTargetRef.current = null;
+        programmaticTimerRef.current = null;
+      }, 920);
+      activeSliceRef.current = clamped;
       setActiveSlice(clamped);
       scrollToStopIndex(clamped);
       return;
     }
 
     if (clamped === activeSliceRef.current) return;
+    const directionSign = clamped > activeSliceRef.current ? 1 : -1;
     const directionType =
-      clamped > activeSliceRef.current
-        ? "showcase-slice-next"
-        : "showcase-slice-prev";
+      directionSign > 0 ? "showcase-slice-next" : "showcase-slice-prev";
 
     startTransition(() => {
       setOptimisticSlice(clamped);
       addTransitionType(directionType);
       setActiveSlice(clamped);
     });
+
+    // Crisp GPU slide-in on iPad portrait & iPhone where ViewTransition may be absent
+    if (
+      typeof window !== "undefined" &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      window.requestAnimationFrame(() => {
+        const nextCard = sliceTrackRef.current?.querySelector<HTMLElement>(
+          `[data-slice-index="${clamped}"]`,
+        );
+        if (!nextCard) return;
+        gsap.fromTo(
+          nextCard,
+          { opacity: 0.72, x: 16 * directionSign },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.3,
+            ease: "power2.out",
+            clearProps: "transform,opacity",
+            overwrite: "auto",
+          },
+        );
+      });
+    }
   }
 
   function handleDistanceFocusCapture() {
@@ -848,15 +969,15 @@ export function HorizontalShowcase() {
     mobileSwipeRef.current = null;
   }
 
-  const totalStepsLabel = String(principlesCount).padStart(2, "0");
+  const activePrinciple = workingPrinciples[optimisticSlice];
 
   return (
-    <section className="horizontal-showcase" ref={rootRef}>
+    <section className="horizontal-showcase" data-surface="dark" ref={rootRef}>
       <a
-        href="#faq"
+        href="#enquire"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-24 focus:z-[var(--z-modal)] focus:rounded-[var(--radius-pill)] focus:bg-[var(--color-gold)] focus:px-4 focus:py-2.5 focus:text-[length:var(--text-sm)] focus:font-semibold focus:text-[var(--color-night)] focus:no-underline"
       >
-        {isEs ? "Saltar al bloque de preguntas" : "Skip to FAQs"}
+        {isEs ? "Ir al formulario de idea" : "Skip to product enquiry"}
       </a>
 
       <div className="horizontal-showcase-pin" ref={pinRef}>
@@ -872,19 +993,20 @@ export function HorizontalShowcase() {
             <div
               className="horizontal-panel concerns-panel"
               id="distance"
+              data-chat-avoid
               ref={concernsPanelRef}
               onFocusCapture={handleDistanceFocusCapture}
             >
               <div className="concerns-header container">
                 <h2>
                   {isEs
-                    ? "Tú estás en España o en algún lugar de Europa. Nosotros estamos sobre el terreno en la India."
-                    : "You are in Spain or elsewhere in Europe. We are on the ground in India."}
+                    ? "Cuatro pasos claros antes de que salga tu pedido."
+                    : "Four checkpoints before a single order ships."}
                 </h2>
                 <p className="concerns-subtitle">
                   {isEs
-                    ? "Alma y Shirish trabajan como un solo equipo entre ambos países para que sigas de cerca cada muestra y cada costura."
-                    : "Alma and Shirish work as one team across both countries, keeping you close to every sample and stitch."}
+                    ? "Sin avanzar a ciegas entre dos continentes. Ves cada tono, muestra y costura antes de dar el sí."
+                    : "No blind faith across continents. You see every shade, sample, and seam before giving the nod."}
                 </p>
               </div>
 
@@ -923,48 +1045,24 @@ export function HorizontalShowcase() {
                             key={principle.id}
                             id={`principle-panel-${principle.id}`}
                             aria-label={principle.title[language]}
+                            aria-hidden={!isCurrent}
                             className="concerns-slice-card"
                             data-slice-index={index}
                             data-active={isCurrent}
                             data-tier={initialTier}
                           >
-                            <button
-                              type="button"
+                            <div
+                              aria-hidden="true"
                               className="concerns-slice-trigger"
-                              aria-label={
-                                isEs
-                                  ? `Ver paso ${principle.step}: ${principle.title[language]}`
-                                  : `View step ${principle.step}: ${principle.title[language]}`
-                              }
-                              tabIndex={isCurrent ? -1 : 0}
                               onClick={() => selectSliceIndex(index)}
                             />
 
                             <div className="concerns-slice-copy">
                               <div className="concerns-slice-copy-inner">
-                                <div className="concerns-slice-copy-top">
-                                  <p className="concerns-slice-step">
-                                    <span>{principle.step}</span>
-                                    <span aria-hidden="true">
-                                      / {totalStepsLabel}
-                                    </span>
-                                  </p>
-                                  <h3>{principle.title[language]}</h3>
-                                </div>
-
-                                <div className="concerns-slice-copy-bottom">
-                                  <p className="concerns-slice-body">
-                                    {principle.body[language]}
-                                  </p>
-                                  <div className="concerns-slice-pills">
-                                    <span className="concerns-slice-pill">
-                                      {principle.tag[language]}
-                                    </span>
-                                    <span className="concerns-slice-pill">
-                                      {principle.locationPill[language]}
-                                    </span>
-                                  </div>
-                                </div>
+                                <h3>{principle.title[language]}</h3>
+                                <p className="concerns-slice-body">
+                                  {principle.body[language]}
+                                </p>
                               </div>
                             </div>
 
@@ -1004,8 +1102,9 @@ export function HorizontalShowcase() {
                     </div>
                   </div>
                 </ViewTransition>
+              </div>
 
-                {/* Touch / reduced-motion linear step controls (hidden on desktop scroll mode) */}
+              <div className="concerns-footer container">
                 <div className="concerns-controls">
                   <button
                     type="button"
@@ -1029,10 +1128,25 @@ export function HorizontalShowcase() {
                     </svg>
                   </button>
 
-                  <p className="concerns-controls-counter" aria-live="polite">
-                    <span>{String(optimisticSlice + 1).padStart(2, "0")}</span>
-                    <span aria-hidden="true"> / {totalStepsLabel}</span>
-                  </p>
+                  <span className="concerns-controls-dots" aria-hidden="true">
+                    {workingPrinciples.map((principle, index) => (
+                      <span
+                        key={principle.id}
+                        className="concerns-controls-dot"
+                        data-active={index === optimisticSlice}
+                      />
+                    ))}
+                  </span>
+
+                  <span
+                    className="sr-only"
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    {isEs
+                      ? `Paso ${optimisticSlice + 1} de ${principlesCount}: ${activePrinciple?.title.es ?? ""}`
+                      : `Step ${optimisticSlice + 1} of ${principlesCount}: ${activePrinciple?.title.en ?? ""}`}
+                  </span>
 
                   <button
                     type="button"
@@ -1056,16 +1170,30 @@ export function HorizontalShowcase() {
                     </svg>
                   </button>
                 </div>
-              </div>
 
-              <div className="concerns-footer container">
                 <Link
-                  className="concerns-inline-link"
+                  className="concerns-inline-link editorial-arrow-link"
                   href={localizeHref("/how-we-work")}
                 >
-                  {isEs
-                    ? "Cómo trabajamos España-India →"
-                    : "See how we work across Spain, Europe, and India →"}
+                  <span>
+                    {isEs
+                      ? "Ver cómo nos organizamos"
+                      : "See how we split the work"}
+                  </span>
+                  <svg
+                    viewBox="0 0 16 16"
+                    width="15"
+                    height="15"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="editorial-arrow-icon shrink-0"
+                  >
+                    <path d="M3.5 8h9m0 0-3.5-3.5M12.5 8 9 11.5" />
+                  </svg>
                 </Link>
               </div>
             </div>

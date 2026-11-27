@@ -17,6 +17,7 @@
         --forest: #182d20;
         --muted: #584b44;
         --clay: #833e28;
+        --gold: #b99a58;
         --rule: #d4c4aa;
         --paper: #f2ecdf;
         --card: #faf7f0;
@@ -35,7 +36,7 @@
           "Segoe UI",
           Roboto,
           sans-serif;
-        font-size: 10pt;
+        font-size: 9.75pt;
         line-height: 1.5;
       }
       .toolbar {
@@ -43,26 +44,38 @@
         top: 0;
         z-index: 10;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
+        gap: 12px;
         padding: 12px 24px;
         background: var(--forest);
         color: var(--paper);
         font-size: 13px;
       }
       .toolbar button {
-        border: 1px solid #b99a58;
+        min-height: 44px;
+        border: 1px solid var(--gold);
         border-radius: 999px;
-        background: #b99a58;
+        background: var(--gold);
         color: #111914;
-        padding: 8px 18px;
+        padding: 10px 22px;
+        font: inherit;
         font-weight: 600;
         cursor: pointer;
+      }
+      .toolbar button:hover {
+        background: var(--paper);
+        border-color: var(--paper);
+      }
+      .toolbar button:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
       }
       .page {
         max-width: 210mm;
         margin: 24px auto;
-        padding: 20mm;
+        padding: 18mm 20mm;
         background: #ffffff;
         box-shadow: 0 16px 48px rgba(24, 45, 32, 0.14);
       }
@@ -76,7 +89,7 @@
         margin-bottom: 18px;
       }
       .brand-title {
-        font-family: Georgia, serif;
+        font-family: "Marcellus", Georgia, serif;
         font-size: 18pt;
         color: var(--forest);
         margin: 0;
@@ -91,29 +104,34 @@
         font-size: 8.5pt;
         color: var(--muted);
         line-height: 1.45;
+        font-variant-numeric: tabular-nums;
       }
       .entity-box strong {
         color: var(--forest);
       }
       h1 {
-        font-family: Georgia, serif;
+        font-family: "Marcellus", Georgia, serif;
         font-size: 15pt;
         font-weight: normal;
         color: var(--forest);
         margin: 0 0 6px;
+        line-height: 1.15;
       }
       .meta-bar {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
+        gap: 8px 16px;
         font-size: 9pt;
         color: var(--clay);
         font-weight: 600;
         margin-bottom: 16px;
         padding-bottom: 10px;
         border-bottom: 1px solid var(--rule);
+        font-variant-numeric: tabular-nums;
       }
       h2 {
-        font-family: Georgia, serif;
+        font-family: "Marcellus", Georgia, serif;
         font-size: 11pt;
         font-weight: normal;
         color: var(--forest);
@@ -124,12 +142,19 @@
       p,
       li {
         margin: 0 0 6px;
+        text-align: left;
+      }
+      ol,
+      ul {
+        margin: 0 0 10px;
+        padding-left: 20px;
       }
       table {
         width: 100%;
         border-collapse: collapse;
         margin: 8px 0 12px;
-        font-size: 9pt;
+        font-size: 8.75pt;
+        font-variant-numeric: tabular-nums;
       }
       th,
       td {
@@ -147,6 +172,22 @@
         background: #fff8dc;
         padding: 1px 4px;
         border-bottom: 1px dashed var(--clay);
+        border-radius: 2px;
+      }
+      td.editable {
+        border-bottom: 1px solid var(--rule);
+        padding: 6px 8px;
+        border-radius: 0;
+      }
+      .editable:focus-visible {
+        outline: 2px solid var(--forest);
+        outline-offset: 2px;
+        border-radius: 3px;
+      }
+      .note {
+        font-style: italic;
+        color: var(--muted);
+        font-size: 9pt;
       }
       .sig-grid {
         display: grid;
@@ -161,6 +202,7 @@
         padding: 14px;
         border-radius: 8px;
         font-size: 9pt;
+        font-variant-numeric: tabular-nums;
       }
       .sig-line {
         height: 36px;
@@ -174,7 +216,10 @@
         font-size: 8pt;
         color: var(--muted);
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
+        gap: 6px 16px;
+        font-variant-numeric: tabular-nums;
       }
       @media print {
         body {
@@ -192,6 +237,11 @@
         .editable {
           background: transparent;
           border-bottom: none;
+          padding: 0;
+        }
+        td.editable {
+          border-bottom: 1px solid var(--rule);
+          padding: 6px 8px;
         }
       }
     </style>
@@ -200,7 +250,7 @@
     <div class="toolbar">
       <span>
         <strong>Template 02:</strong> Product Brief &amp; Sampling Proposal
-        (Yellow fields are click-to-edit before printing)
+        (Highlighted fields are editable before printing)
       </span>
       <button type="button" onclick="window.print()">
         Print / Save as PDF
@@ -212,7 +262,7 @@
         <div>
           <p class="brand-title">KarmaRise D Global</p>
           <p class="brand-sub">
-            Product Brief &amp; Sampling Proposal (Phases 01 &amp; 02)
+            Product Brief &amp; Sampling Proposal (Stages 01 to 03)
           </p>
         </div>
         <div class="entity-box">
@@ -224,193 +274,718 @@
         </div>
       </header>
 
-      <h1>Product Brief &amp; Sampling Proposal Agreement</h1>
+      <h1>Product Brief &amp; Sampling Proposal Agreement (Stages 01 to 03)</h1>
       <div class="meta-bar">
         <span>
           Proposal Ref:
-          <span class="editable" contenteditable="true"
-            >KRDG-PROP-2026-001</span
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Proposal Reference"
+            >KRDG-PROP-[YYYY]-[001]</span
           >
         </span>
         <span>
           Issue Date:
-          <span class="editable" contenteditable="true">16 November 2026</span>
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Issue Date"
+            >[DD Month YYYY]</span
+          >
         </span>
         <span>
           Valid Until:
-          <span class="editable" contenteditable="true">16 December 2026</span>
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Valid Until Date"
+            >[DD Month YYYY (30 days from issue)]</span
+          >
         </span>
       </div>
 
-      <h2>1. Client &amp; Programme Details</h2>
+      <h2>1. Parties &amp; Programme Overview</h2>
+      <p>
+        <strong>Provider:</strong>
+        <strong>Karmarise Global LLP</strong> (trading as
+        <strong>KarmaRise D Global</strong>), LLPIN: <strong>ACO-3878</strong>,
+        GSTIN: <strong>27ABDFK8128R1ZL</strong>, Registered Office: 2nd floor,
+        Guru Charan Apartment, Ulhasnagar, Maharashtra, India, 421002.<br />
+        Designated Partner &amp; India Production Lead: Shirish
+        (shirish@karmarisedglobal.com · +91 8530009798)<br />
+        Client Operations Lead (Spain and the rest of Europe): Alma
+        (alma@karmarisedglobal.com / hola@karmarisedglobal.com · +34 611 722
+        276)<br />
+        Accounts &amp; Invoicing: accounts@karmarisedglobal.com
+      </p>
       <p>
         <strong>Client Legal Entity:</strong>
-        <span class="editable" contenteditable="true"
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Client Legal Entity Name"
           >[Client Legal Entity Name]</span
         >
         · <strong>Tax / VAT ID:</strong>
-        <span class="editable" contenteditable="true"
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Client Tax or VAT ID"
           >[NIF / CIF / VAT Number]</span
         ><br />
         <strong>Registered Address:</strong>
-        <span class="editable" contenteditable="true"
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Client Registered Address"
           >[Client Registered Address]</span
         ><br />
         <strong>Primary Contact:</strong>
-        <span class="editable" contenteditable="true"
-          >[Name, Email &amp; Phone]</span
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Client Primary Contact Name, Email and Phone"
+          >[Client Contact Name, Email &amp; Phone]</span
         >
       </p>
+      <p>
+        This Product Brief &amp; Sampling Proposal Agreement covers
+        <strong>Stage 01 (Brief and Product Study)</strong>,
+        <strong>Stage 02 (Material and Physical Swatch Approval)</strong>, and
+        <strong>Stage 03 (Physical Sample Review and Sign-Off)</strong> of
+        KarmaRise D Global's six-stage Manufacturing Programme. Indicative Bulk
+        Order estimates for <strong>Stages 04 to 06</strong> (Contracts and
+        Pre-Production Prep, Supervised Production and On-Site Checks, and EU
+        Labelling, Packing, and Door-to-Door Delivery) appear in Clause 5.
+      </p>
 
-      <h2>2. Agreed Product Brief Summary (Phase 01 Scope)</h2>
+      <h2>2. Agreed Product Brief Summary (Stages 01 &amp; 02 Scope)</h2>
+      <p class="note">
+        Selectable illustrative specifications across KarmaRise D Global's four
+        manufacturing categories (leather goods, clothing, textile accessories,
+        and textile home decor):
+      </p>
       <table>
         <thead>
           <tr>
             <th>SKU / Style</th>
-            <th>Product &amp; Category</th>
-            <th>Materials, Hardware &amp; Lining</th>
-            <th>Dimensions / Sizes</th>
+            <th>Product Name &amp; Category</th>
+            <th>Primary Materials, Hardware &amp; Lining</th>
+            <th>Sizes / Dimensions</th>
             <th>Target Colourways</th>
-            <th>Target Bulk Qty</th>
+            <th>Indicative Bulk Qty</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="editable" contenteditable="true">SKU-01</td>
-            <td class="editable" contenteditable="true">
-              Structured Leather Carryall
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 01 Code"
+            >
+              [SKU-01]
             </td>
-            <td class="editable" contenteditable="true">
-              Full-grain drum-dyed leather, brass hardware, cotton twill lining
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 01 Product and Category"
+            >
+              Leather goods: Structured Leather Tote
             </td>
-            <td class="editable" contenteditable="true">38 × 30 × 14 cm</td>
-            <td class="editable" contenteditable="true">Espresso, Tan</td>
-            <td class="editable" contenteditable="true">300 units</td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 01 Materials and Hardware"
+            >
+              Full-grain vegetable-tanned leather, antique brass hardware,
+              high-quality Japanese plastic YKK zippers, light cotton twill
+              lining
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 01 Dimensions"
+            >
+              38 × 30 × 14 cm
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 01 Colourways"
+            >
+              Espresso, Cognac
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 01 Indicative Bulk Quantity"
+            >
+              300 units
+            </td>
           </tr>
           <tr>
-            <td class="editable" contenteditable="true">SKU-02</td>
-            <td class="editable" contenteditable="true">
-              Woven Linen Capsule Dress
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 02 Code"
+            >
+              [SKU-02]
             </td>
-            <td class="editable" contenteditable="true">
-              100% Indian Linen 185 GSM, shell buttons
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 02 Product and Category"
+            >
+              Clothing: Indian Linen Midi Dress
             </td>
-            <td class="editable" contenteditable="true">XS – XL (5 sizes)</td>
-            <td class="editable" contenteditable="true">Ecru, Forest</td>
-            <td class="editable" contenteditable="true">500 units</td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 02 Materials and Hardware"
+            >
+              100% Indian flax linen 185 GSM, mother-of-pearl buttons
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 02 Sizes"
+            >
+              XS to XL (5 sizes)
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 02 Colourways"
+            >
+              Ecru, Olive
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 02 Indicative Bulk Quantity"
+            >
+              500 units
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 03 Code"
+            >
+              [SKU-03]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 03 Product and Category"
+            >
+              Textile accessories: Quilted Cotton Cosmetic Pouch
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 03 Materials and Hardware"
+            >
+              100% Indian cotton canvas, high-quality Japanese plastic YKK
+              zipper, light cotton lining, woven brand label
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 03 Dimensions"
+            >
+              22 × 14 × 8 cm
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 03 Colourways"
+            >
+              Oatmeal, Terracotta
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 03 Indicative Bulk Quantity"
+            >
+              400 units
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 04 Code"
+            >
+              [SKU-04]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 04 Product and Category"
+            >
+              Textile home decor: Kantha-Style Cotton Bedspread
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 04 Materials and Hardware"
+            >
+              Layered 100% Indian cotton with hand-stitched Kantha running
+              stitch, sewn-in EU care label
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 04 Dimensions"
+            >
+              240 × 260 cm
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 04 Colourways"
+            >
+              Natural Ecru, Sage
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="SKU 04 Indicative Bulk Quantity"
+            >
+              200 units
+            </td>
           </tr>
         </tbody>
       </table>
 
-      <h2>3. Sampling Deliverables &amp; Schedule (Phase 02 Scope)</h2>
-      <p>
-        <strong>3.1 Pattern Drafting &amp; First Prototype (Proto 1):</strong>
-        Dispatched within
-        <span class="editable" contenteditable="true">3 weeks</span> of receipt
-        of the Sampling Fee and written design sign-off.<br />
-        <strong>3.2 Included Revision Rounds:</strong> Includes up to
-        <span class="editable" contenteditable="true">1 revision round</span>
-        resulting in the pre-production Counter Sample (the
-        <strong>Golden Sample</strong>).<br />
-        <strong>3.3 Sample Delivery Address:</strong>
-        <span class="editable" contenteditable="true"
-          >[Client Sample Delivery Address, Spain / EU]</span
-        >.
-      </p>
+      <h2>
+        3. Physical Swatches, Sampling Deliverables &amp; Schedule (Stages 02
+        &amp; 03 Scope)
+      </h2>
+      <ol>
+        <li>
+          <strong>Physical Colour Swatch Approval (Stage 02):</strong> KarmaRise
+          guides material and dye specifications and prepares physical leather
+          or fabric colour swatches for written Client approval before sample
+          cutting begins. Colour is approved from physical swatches rather than
+          phone photographs.
+        </li>
+        <li>
+          <strong>Pattern Drafting &amp; Material Sourcing:</strong> KarmaRise
+          translates the approved Product Brief into production-ready patterns
+          and sources the agreed materials, trims, linings, antique brass
+          hardware, and high-quality Japanese plastic YKK zippers in India.
+        </li>
+        <li>
+          <strong>First Prototype (Proto 1):</strong> Reviewed in person in
+          India by KarmaRise and delivered within
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Proto 1 Delivery Lead Time"
+            >[2 to 4] weeks</span
+          >
+          of receipt of the Sampling Fee and written design and swatch sign-off.
+        </li>
+        <li>
+          <strong>Included Sample Revision Rounds:</strong> Up to
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Included Sample Revision Rounds"
+            >[1 / 2] round(s)</span
+          >
+          of construction, fit, or detail adjustments resulting in the
+          pre-production <strong>Counter Sample (Golden Sample)</strong> based
+          on the Client's written feedback.
+        </li>
+        <li>
+          <strong>Physical Sample Dispatch:</strong> Physical samples are
+          couriered via DHL / FedEx / UPS to the Client's nominated delivery
+          address:
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Sample Delivery Address"
+            >[Client Sample Delivery Address, Spain or elsewhere in the European
+            Union]</span
+          >.
+        </li>
+      </ol>
 
       <h2>4. Sampling Fee &amp; Commercial Terms</h2>
       <table>
         <thead>
           <tr>
             <th>Item</th>
-            <th>Scope Covered</th>
-            <th>Amount (EUR)</th>
+            <th>Description</th>
+            <th>Currency</th>
+            <th>Amount</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><strong>Sampling &amp; Pattern Fee</strong></td>
-            <td class="editable" contenteditable="true">
-              Pattern drafting, material sourcing, Proto 1, and 1 revision round
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Sampling and Pattern Fee Scope"
+            >
+              Covers pattern drafting, physical colour swatch creation, material
+              and trim sourcing, production unit setup, Proto 1, and [1]
+              revision round
             </td>
-            <td class="editable" contenteditable="true">€0.00</td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Sampling Fee Currency"
+            >
+              [EUR]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Sampling Fee Amount"
+            >
+              [€0.00]
+            </td>
           </tr>
           <tr>
-            <td><strong>Custom Tooling / Moulds</strong></td>
-            <td class="editable" contenteditable="true">
-              Custom hardware mould / woven brand labels
+            <td><strong>Custom Tooling / Moulds (if any)</strong></td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Custom Tooling Scope"
+            >
+              [Custom antique brass hardware mould / woven brand label setup /
+              embossing die]
             </td>
-            <td class="editable" contenteditable="true">€0.00</td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Custom Tooling Currency"
+            >
+              [EUR]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Custom Tooling Amount"
+            >
+              [€0.00]
+            </td>
           </tr>
           <tr>
-            <td><strong>International Express Courier</strong></td>
-            <td class="editable" contenteditable="true">
-              Door-to-door air courier from India to Spain/EU
+            <td><strong>International Express Courier Estimate</strong></td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Courier Scope"
+            >
+              Door-to-door air courier from India to [Spain or elsewhere in the
+              European Union]
             </td>
-            <td class="editable" contenteditable="true">€0.00</td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Courier Currency"
+            >
+              [EUR]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Courier Amount"
+            >
+              [€0.00]
+            </td>
           </tr>
           <tr>
             <td colspan="2">
-              <strong>Total Payable on Proposal Acceptance</strong> (100% due on
-              acceptance via <code>accounts@karmarisedglobal.com</code>)
+              <strong>Total Payable on Acceptance</strong> (100% due upon
+              approval of this Sampling Proposal, invoiced via
+              <strong>accounts@karmarisedglobal.com</strong>)
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Total Currency"
+            >
+              <strong>[EUR]</strong>
             </td>
             <td>
-              <strong class="editable" contenteditable="true">€0.00</strong>
+              <strong
+                class="editable"
+                contenteditable="true"
+                role="textbox"
+                aria-label="Total Payable Amount"
+                >[€0.00]</strong
+              >
             </td>
           </tr>
         </tbody>
       </table>
       <p>
-        <strong>Bulk Order Credit:</strong>
-        <span class="editable" contenteditable="true">50%</span> of the Sampling
-        Fee will be credited toward the first Bulk Order invoice if placed
-        within 90 days of Golden Sample approval.
+        <strong>Bulk Order Credit (Optional):</strong>
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Bulk Order Credit Percentage or Amount"
+          >[50% / 100% / €X]</span
+        >
+        of the Sampling Fee above will be credited toward the Client's first
+        Bulk Order invoice if the Bulk Order meets the minimum quantity of
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Bulk Order Credit Minimum Quantity"
+          >[X] units</span
+        >
+        within
+        <span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Bulk Order Credit Window in Days"
+          >[90] days</span
+        >
+        of written Golden Sample sign-off.
       </p>
 
-      <h2>5. Indicative Bulk Order Pricing &amp; Lead Times</h2>
+      <h2>
+        5. Indicative Bulk Order Pricing &amp; Lead Times (Stages 04 to 06
+        Estimate)
+      </h2>
+      <p class="note">
+        Note: Final Bulk Order unit pricing, EU labelling requirements, and
+        delivery Incoterms are confirmed upon Golden Sample sign-off and
+        governed by the signed Master Manufacturing Programme Agreement.
+      </p>
       <table>
         <thead>
           <tr>
             <th>SKU / Style</th>
             <th>MOQ per Style / Colour</th>
             <th>Indicative Unit Price (EXW / FOB Mumbai)</th>
-            <th>Estimated Bulk Production Lead Time</th>
+            <th>Estimated Production Lead Time</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="editable" contenteditable="true">SKU-01</td>
-            <td class="editable" contenteditable="true">
-              150 units (75 / colour)
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 01"
+            >
+              [SKU-01]
             </td>
-            <td class="editable" contenteditable="true">€00.00 / unit</td>
-            <td class="editable" contenteditable="true">
-              45–60 days from Golden Sample sign-off
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 01 MOQ"
+            >
+              [150 units / 75 per colour]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 01 Unit Price"
+            >
+              [€00.00 / unit]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 01 Lead Time"
+            >
+              [45 to 60 days after Golden Sample sign-off]
             </td>
           </tr>
           <tr>
-            <td class="editable" contenteditable="true">SKU-02</td>
-            <td class="editable" contenteditable="true">
-              200 units (100 / colour)
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 02"
+            >
+              [SKU-02]
             </td>
-            <td class="editable" contenteditable="true">€00.00 / unit</td>
-            <td class="editable" contenteditable="true">
-              45–60 days from Golden Sample sign-off
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 02 MOQ"
+            >
+              [200 units / 100 per colour]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 02 Unit Price"
+            >
+              [€00.00 / unit]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 02 Lead Time"
+            >
+              [45 to 60 days after Golden Sample sign-off]
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 03"
+            >
+              [SKU-03]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 03 MOQ"
+            >
+              [200 units / 100 per colour]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 03 Unit Price"
+            >
+              [€00.00 / unit]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 03 Lead Time"
+            >
+              [35 to 50 days after Golden Sample sign-off]
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 04"
+            >
+              [SKU-04]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 04 MOQ"
+            >
+              [100 units / 50 per colour]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 04 Unit Price"
+            >
+              [€00.00 / unit]
+            </td>
+            <td
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Pricing SKU 04 Lead Time"
+            >
+              [40 to 55 days after Golden Sample sign-off]
             </td>
           </tr>
         </tbody>
       </table>
 
-      <h2>6. IP Ownership, Confidentiality &amp; Governing Law</h2>
+      <h2>
+        6. Intellectual Property, Patterns, Confidentiality &amp; Governing Law
+      </h2>
       <p>
-        All Client designs, sketches, tech packs, and custom patterns/dies paid
-        for by the Client remain the
-        <strong>Client's sole intellectual property</strong>. Bulk production
-        (Phase 03) begins only after written sign-off on the physical Golden
-        Sample and execution of the Master Manufacturing Programme Agreement.
-        Governed by the laws of India (courts of Thane and Mumbai, Maharashtra).
+        <strong>6.1 Client Design Ownership:</strong> All Client-supplied
+        sketches, tech packs, brand marks, and custom patterns or dies paid for
+        by the Client under Clause 4 are the
+        <strong>sole and exclusive intellectual property of the Client</strong>.
+      </p>
+      <p>
+        <strong>6.2 Sample Approval Benchmark:</strong> Stage 04 pre-production
+        procurement and Stage 05 production cutting shall not commence until the
+        Client signs off in writing on the physical Counter Sample (the
+        <strong>Golden Sample</strong>) and executes the Master Manufacturing
+        Programme Agreement.
+      </p>
+      <p>
+        <strong>6.3 Confidentiality &amp; Governing Law:</strong> This Proposal
+        is subject to the Mutual Non-Disclosure, Intellectual Property
+        Protection &amp; Non-Circumvention Agreement (NDA / NNN) between the
+        Parties (or, if none is separately signed, Clause 2 of the KarmaRise D
+        Global Website Terms) and is governed by the
+        <strong>laws of India</strong>, with exclusive jurisdiction in the
+        courts of <strong>Thane and Mumbai, Maharashtra, India</strong>.
       </p>
 
+      <h2>7. Acceptance &amp; Authorization to Begin Sampling</h2>
       <div class="sig-grid">
         <div class="sig-box">
           <strong>For and on behalf of Karmarise Global LLP</strong>
@@ -422,8 +997,12 @@
           </div>
           <div>
             <strong>Date:</strong>
-            <span class="editable" contenteditable="true"
-              >16 November 2026</span
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="KarmaRise Signature Date"
+              >[DD Month YYYY]</span
             >
           </div>
         </div>
@@ -431,25 +1010,44 @@
         <div class="sig-box">
           <strong>
             Accepted by
-            <span class="editable" contenteditable="true"
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Signatory Entity Name"
               >[Client Legal Entity Name]</span
             >
           </strong>
           <div class="sig-line"></div>
           <div>
             <strong>Name &amp; Title:</strong>
-            <span class="editable" contenteditable="true"
-              >[Authorized Signatory]</span
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Authorized Signatory Name and Title"
+              >[Authorized Signatory Name · Director / Authorized
+              Signatory]</span
             >
           </div>
           <div>
             <strong>Tax / VAT ID:</strong>
-            <span class="editable" contenteditable="true">[NIF / VAT]</span>
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Signatory Tax or VAT ID"
+              >[NIF / CIF / VAT Number]</span
+            >
           </div>
           <div>
             <strong>Date:</strong>
-            <span class="editable" contenteditable="true"
-              >16 November 2026</span
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Signature Date"
+              >[DD Month YYYY]</span
             >
           </div>
         </div>
@@ -460,8 +1058,8 @@
           >Karmarise Global LLP · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL</span
         >
         <span>
-          India: +91 8530009798 (shirish@karmarisedglobal.com) · Spain: +34
-          611722276 (alma@karmarisedglobal.com)
+          India: +91 8530009798 (shirish@karmarisedglobal.com) · Spain: +34 611
+          722 276 (alma@karmarisedglobal.com)
         </span>
       </footer>
     </div>

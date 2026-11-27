@@ -126,14 +126,14 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         absolute: "Own-brand manufacturing in India | KarmaRise D Global",
       },
       description:
-        "Manufacture own-brand leather bags, clothing, sewn accessories, and home decor in India with Alma and Shirish on site. Samples first. Start your brief.",
+        "Manufacture own-brand leather goods, clothing, textile accessories, and textile home decor in India with Alma and Shirish on site. Samples first.",
     },
     es: {
       title: {
         absolute: "Fabricación de marca propia en la India | KarmaRise",
       },
       description:
-        "Fabrica en la India tus bolsos de piel, ropa, complementos y decoración del hogar con Alma y Shirish sobre el terreno. Muestra física primero. Empieza hoy.",
+        "Fabrica bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en la India con Alma y Shirish. Muestra física primero.",
     },
   },
   about: {
@@ -157,17 +157,17 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     path: "/almarise",
     en: {
       title: {
-        absolute: "AlmaRise D Brand: D Reborn, D Organic & Decor | KarmaRise",
+        absolute: "AlmaRise D Brand: Our Own Indian Craft Brand | KarmaRise",
       },
       description:
-        "AlmaRise D Brand by KarmaRise D Global: AlmaRise D Reborn sarees, AlmaRise D Organic fabrics, and D Home Decor, made in India for Spain and the rest of Europe.",
+        "AlmaRise D Brand by KarmaRise D Global: AlmaRise D Reborn, AlmaRise D Organic, and AlmaRise D Home Decor, made in India for Spain and the rest of Europe.",
     },
     es: {
       title: {
-        absolute: "AlmaRise D Brand: D Reborn, D Organic y hogar | KarmaRise",
+        absolute: "AlmaRise D Brand: Moda sostenible y hogar | KarmaRise",
       },
       description:
-        "AlmaRise D Brand de KarmaRise D Global: prendas AlmaRise D Reborn de saris, tejidos AlmaRise D Organic y decoración del hogar para España y el resto de Europa.",
+        "AlmaRise D Brand de KarmaRise D Global: AlmaRise D Reborn, AlmaRise D Organic y AlmaRise D Home Decor, hechos en la India para España y el resto de Europa.",
     },
   },
   "book-a-call": {
@@ -201,7 +201,7 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         absolute: "Contacto KarmaRise D Global | España y la India",
       },
       description:
-        "Contacta con KarmaRise D Global en español o inglés para Programas de producción, unidades en la India, AlmaRise D Brand o consultas generales.",
+        "Contacta con KarmaRise D Global en español o inglés para fabricar en la India, presentar tu fábrica, AlmaRise D Brand o consultas generales.",
     },
   },
   "cookie-policy": {
@@ -214,7 +214,7 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     es: {
       title: "Política de cookies",
       description:
-        "Información sobre las cookies utilizadas en el sitio web de KarmaRise D Global, sus finalidades y cómo puedes gestionarlas o desactivarlas en tu navegador.",
+        "Información sobre las cookies y el almacenamiento utilizados en el sitio web de KarmaRise D Global, sus finalidades y cómo gestionarlos o desactivarlos.",
     },
   },
   "legal-notice": {
@@ -222,7 +222,7 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     en: {
       title: "Legal notice",
       description:
-        "Statutory corporate registration disclosures (India LLP Act 2008 and Spain LSSI-CE Law 34/2002 Aviso Legal) and official communication channels for Karmarise Global LLP (operating KarmaRise D Global).",
+        "Corporate registration disclosures (India LLP Act 2008 and Spain LSSI-CE) and official channels for Karmarise Global LLP (KarmaRise D Global).",
     },
     es: {
       title: "Aviso legal",
@@ -237,14 +237,14 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         absolute: "Manufacturing in India for Europe | KarmaRise D Global",
       },
       description:
-        "Develop own-brand leather goods, clothing, sewn accessories, and home decor in India. Product study, vetted production units, samples, and EU delivery.",
+        "Develop own-brand leather goods, clothing, textile accessories, and textile home decor in India. Product study, vetted makers, samples, and EU delivery.",
     },
     es: {
       title: {
         absolute: "Diseño y fabricación en la India | KarmaRise D Global",
       },
       description:
-        "Diseña y fabrica bolsos de piel, ropa, complementos y decoración del hogar en la India. Unidades auditadas, muestra física y entrega en tu negocio.",
+        "Diseña y fabrica bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en la India. Unidades auditadas y muestra física.",
     },
   },
   "privacy-policy": {
@@ -252,12 +252,12 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     en: {
       title: "Privacy policy",
       description:
-        "How Karmarise Global LLP (operating KarmaRise D Global) handles contact details, Product Brief enquiries, and personal data under European and Indian data protection laws.",
+        "How Karmarise Global LLP (KarmaRise D Global) handles contact details, Product Brief enquiries, and personal data under EU GDPR and Indian law.",
     },
     es: {
       title: "Política de privacidad",
       description:
-        "Cómo trata Karmarise Global LLP (KarmaRise D Global) los datos de contacto y consultas de briefing de producto conforme al RGPD europeo, la LOPDGDD y la ley india.",
+        "Cómo trata Karmarise Global LLP (KarmaRise D Global) los datos de contacto y briefings de producto conforme al RGPD europeo, LOPDGDD y la ley india.",
     },
   },
   "product-brief": {
@@ -267,14 +267,14 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         absolute: "Start a Product Brief: India Manufacturing | KarmaRise",
       },
       description:
-        "Share your Product Brief in 3 quick steps to scope leather bags, clothing, sewn goods, or home decor in India. Alma replies within 1 to 2 business days.",
+        "Share your Product Brief in 3 quick steps to scope leather goods, clothing, textile accessories, or textile home decor in India. Alma replies in 1–2 days.",
     },
     es: {
       title: {
         absolute: "Briefing de producto: fabricación en la India | KarmaRise",
       },
       description:
-        "Comparte tu briefing de producto en 3 pasos para valorar bolsos de piel, ropa, complementos o decoración en la India. Alma responde en 1 o 2 días.",
+        "Envía tu briefing de producto en 3 pasos: bolsos y artículos de piel, ropa, complementos textiles o decoración textil en la India. Respuesta en 1–2 días.",
     },
   },
   stories: {
@@ -284,14 +284,14 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         absolute: "India Manufacturing & AlmaRise D Brand Stories | KarmaRise",
       },
       description:
-        "First-person Stories by Alma and Shirish from Indian production sites, leather ateliers, AlmaRise D Reborn & D Organic, and shared tables in India and Spain.",
+        "First-person Stories by Alma and Shirish from our work in India, leather ateliers, AlmaRise D Brand lines, and shared tables in India and Spain.",
     },
     es: {
       title: {
         absolute: "Historias de fabricación y AlmaRise D Brand | KarmaRise",
       },
       description:
-        "Historias de Alma y Shirish desde puntos de producción y marroquineros en la India, las líneas de AlmaRise D Brand y el día a día entre España y la India.",
+        "Historias de Alma y Shirish desde nuestro trabajo y marroquineros en la India, AlmaRise D Brand y el día a día entre España y la India.",
     },
   },
   terms: {
@@ -299,7 +299,7 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
     en: {
       title: "Website terms",
       description:
-        "Terms of use, Product Brief intellectual property and confidentiality protections, pre-contractual scope, and governing law for the KarmaRise D Global website operated by Karmarise Global LLP.",
+        "Terms of use, Product Brief IP and confidentiality protections, and governing law for the KarmaRise D Global website (Karmarise Global LLP).",
     },
     es: {
       title: "Condiciones de uso",
@@ -327,14 +327,14 @@ const ROUTE_METADATA: Record<StaticRouteKey, RouteMetaConfig> = {
         absolute: "How We Work: Spain & India Manufacturing | KarmaRise",
       },
       description:
-        "See how Alma and Shirish manage India manufacturing for Europe: call conclusions, physical colour swatches, reviewed samples, on-site checks, and EU delivery.",
+        "See how Alma and Shirish manage India manufacturing for Europe: written call notes, physical colour swatches, reviewed samples, site checks, and EU delivery.",
     },
     es: {
       title: {
         absolute: "Cómo trabajamos entre España y la India | KarmaRise",
       },
       description:
-        "Descubre cómo Alma y Shirish dirigen tu producción en la India: conclusiones de reunión, muestras de color, revisión previa, control en planta y envío.",
+        "Descubre cómo Alma y Shirish dirigen tu producción en la India: notas tras cada llamada, muestras de color, revisión previa, control en persona y envío.",
     },
   },
 };
@@ -364,8 +364,8 @@ export function getLayoutMetadata(lang: SiteLanguage): Metadata {
     ? "KarmaRise D Global | India y España"
     : "KarmaRise D Global | India & Spain";
   const description = isEs
-    ? "KarmaRise D Global desarrolla y fabrica bolsos de piel, ropa en tejidos naturales y variados, complementos y decoración del hogar en unidades de producción auditadas de la India para España y el resto de Europa."
-    : "KarmaRise D Global develops and manufactures own-brand leather goods, clothing in natural and varied fabrics, sewn accessories, and home decor across vetted production units in India for Spain and the rest of Europe.";
+    ? "KarmaRise D Global desarrolla y fabrica bolsos y artículos de piel, ropa, complementos textiles y decoración textil del hogar en unidades de producción auditadas de la India para España y el resto de Europa."
+    : "KarmaRise D Global develops and manufactures own-brand leather goods, clothing, textile accessories, and textile home decor with vetted Indian factories and ateliers for Spain and the rest of Europe.";
 
   return {
     metadataBase: new URL(siteUrl),
@@ -375,7 +375,7 @@ export function getLayoutMetadata(lang: SiteLanguage): Metadata {
     },
     description,
     other: {
-      "content-language": isEs ? "es-ES" : "en-GB",
+      "content-language": isEs ? "es" : "en",
     },
     openGraph: {
       type: "website",
@@ -404,6 +404,15 @@ export function getRouteMetadata(
       ? `${localized.title} | KarmaRise D Global`
       : localized.title.absolute;
   const isEs = lang === "es";
+  const defaultShareImage = {
+    url: "/opengraph-image.jpg",
+    width: 1200,
+    height: 630,
+    type: "image/jpeg",
+    alt: isEs
+      ? "KarmaRise D Global, desarrollo y fabricación de marca propia en la India para España y el resto de Europa"
+      : "KarmaRise D Global, own-brand product development and manufacturing in India for Spain and the rest of Europe",
+  };
 
   const baseAlternates = buildAlternates(config.path, lang);
   const alternates: NonNullable<Metadata["alternates"]> =
@@ -431,11 +440,13 @@ export function getRouteMetadata(
       url: localizePath(config.path, lang),
       locale: isEs ? "es_ES" : "en_GB",
       alternateLocale: [isEs ? "en_GB" : "es_ES"],
+      images: [defaultShareImage],
     },
     twitter: {
       card: "summary_large_image",
       title: ogTitle,
       description: localized.description,
+      images: [defaultShareImage.url],
     },
   };
 }

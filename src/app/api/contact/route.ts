@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 
 import { CONTACT_TOPICS } from "@/data/conversion-content";
+import { trackBrevoEvent } from "@/lib/brevo";
+import {
+  attributionToEventProperties,
+  EMAIL_ANALYTICS_EVENTS,
+  extractRequestAttribution,
+  formatAttributionLine,
+} from "@/lib/email-analytics";
 import { sendResendEmail } from "@/lib/resend";
 import { escapeHtml, guardFormRequest, readJsonObject } from "@/lib/security";
+import { buildContactConfirmationEmail } from "@/lib/transactional-emails";
 import type { SiteLanguage } from "@/lib/urls";
 import { isValidEmail, readTrimmedString } from "@/lib/validation";
 
@@ -40,135 +48,21 @@ function normalizeLanguage(rawLanguage: unknown): SiteLanguage {
   return "en";
 }
 
-function buildConfirmationEmail({
-  language,
-  name,
-  topicLabel,
-  note,
-  routedDepartmentEmail,
-}: {
-  language: SiteLanguage;
-  name: string;
-  topicLabel: string;
-  note: string;
-  routedDepartmentEmail: string;
-}): { subject: string; text: string; html: string } {
-  const safeName = escapeHtml(name);
-  const safeTopic = escapeHtml(topicLabel);
-  const safeDepartment = escapeHtml(routedDepartmentEmail);
-  const safeNoteHtml = escapeHtml(note).replaceAll("\n", "<br />");
-
-  if (language === "es") {
-    const subject = "Hemos recibido tu mensaje · KarmaRise D Global";
-    const text = [
-      `Hola ${name},`,
-      "",
-      `Gracias por escribirnos sobre "${topicLabel}". Hemos dirigido tu mensaje a nuestro equipo en ${routedDepartmentEmail}.`,
-      "",
-      "Alma o Shirish lo revisarán y te responderán directamente a este correo. Si mientras tanto quieres añadir algún detalle, puedes responder sin problema a este mismo mensaje.",
-      "",
-      `Asunto: ${topicLabel}`,
-      "Tu mensaje:",
-      note,
-      "",
-      "Un saludo cercano,",
-      "Alma y Shirish",
-      "KarmaRise D Global · España e India",
-    ].join("\n");
-
-    const html = `<!doctype html>
-<html lang="es">
-  <body style="margin:0;padding:24px;background-color:#F2ECDF;color:#182D20;font-family:Georgia, 'Times New Roman', serif;">
-    <div style="max-width:600px;margin:0 auto;background-color:#FFFFFF;border:1px solid #CDBB9C;border-radius:12px;padding:32px;">
-      <p style="margin:0 0 12px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#833E28;font-family:Arial,sans-serif;font-weight:700;">
-        KarmaRise D Global · España e India
-      </p>
-      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25;color:#182D20;font-weight:500;">
-        Gracias por escribirnos, ${safeName}.
-      </h1>
-      <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:#182D20;">
-        Hemos recibido tu mensaje sobre <strong>${safeTopic}</strong> y lo hemos dirigido a nuestro equipo en <a href="mailto:${safeDepartment}" style="color:#833E28;">${safeDepartment}</a>.
-      </p>
-      <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#182D20;">
-        Alma o Shirish lo revisarán y te responderán directamente a este correo. Si quieres añadir algo más mientras tanto, puedes responder a este mismo mensaje.
-      </p>
-      <div style="background-color:#F2ECDF;border-left:3px solid #833E28;padding:16px 18px;border-radius:6px;margin:0 0 22px;">
-        <p style="margin:0 0 8px;font-size:13px;font-family:Arial,sans-serif;color:#833E28;font-weight:700;">
-          Resumen de tu consulta
-        </p>
-        <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#182D20;">
-          <strong>Asunto:</strong> ${safeTopic}
-        </p>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#182D20;">
-          ${safeNoteHtml}
-        </p>
-      </div>
-      <p style="margin:0;font-size:15px;line-height:1.6;color:#182D20;">
-        Un saludo cercano,<br />
-        <strong>Alma y Shirish</strong><br />
-        <span style="color:#833E28;font-size:13px;">KarmaRise D Global · España e India</span>
-      </p>
-    </div>
-  </body>
-</html>`;
-
-    return { subject, text, html };
+function localizeGuardError(
+  status: 400 | 403 | 429,
+  fallbackError: string,
+  isEs: boolean,
+): string {
+  if (!isEs) {
+    return fallbackError;
   }
-
-  const subject = "We received your message · KarmaRise D Global";
-  const text = [
-    `Hello ${name},`,
-    "",
-    `Thank you for writing to us about "${topicLabel}". We have routed your message to ${routedDepartmentEmail}.`,
-    "",
-    "Alma or Shirish will review it and reply directly to your email address. If you want to add any further detail in the meantime, simply reply to this message.",
-    "",
-    `Topic: ${topicLabel}`,
-    "Your message:",
-    note,
-    "",
-    "Warm regards,",
-    "Alma and Shirish",
-    "KarmaRise D Global · India & Spain",
-  ].join("\n");
-
-  const html = `<!doctype html>
-<html lang="en">
-  <body style="margin:0;padding:24px;background-color:#F2ECDF;color:#182D20;font-family:Georgia, 'Times New Roman', serif;">
-    <div style="max-width:600px;margin:0 auto;background-color:#FFFFFF;border:1px solid #CDBB9C;border-radius:12px;padding:32px;">
-      <p style="margin:0 0 12px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#833E28;font-family:Arial,sans-serif;font-weight:700;">
-        KarmaRise D Global · India &amp; Spain
-      </p>
-      <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25;color:#182D20;font-weight:500;">
-        Thank you for writing, ${safeName}.
-      </h1>
-      <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:#182D20;">
-        We have received your message on <strong>${safeTopic}</strong> and routed it to <a href="mailto:${safeDepartment}" style="color:#833E28;">${safeDepartment}</a>.
-      </p>
-      <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#182D20;">
-        Alma or Shirish will review your note and reply directly to your email address. If you would like to add anything while we review it, feel free to reply to this email.
-      </p>
-      <div style="background-color:#F2ECDF;border-left:3px solid #833E28;padding:16px 18px;border-radius:6px;margin:0 0 22px;">
-        <p style="margin:0 0 8px;font-size:13px;font-family:Arial,sans-serif;color:#833E28;font-weight:700;">
-          Summary of your message
-        </p>
-        <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#182D20;">
-          <strong>Topic:</strong> ${safeTopic}
-        </p>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#182D20;">
-          ${safeNoteHtml}
-        </p>
-      </div>
-      <p style="margin:0;font-size:15px;line-height:1.6;color:#182D20;">
-        Warm regards,<br />
-        <strong>Alma and Shirish</strong><br />
-        <span style="color:#833E28;font-size:13px;">KarmaRise D Global · India &amp; Spain</span>
-      </p>
-    </div>
-  </body>
-</html>`;
-
-  return { subject, text, html };
+  if (status === 429) {
+    return "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.";
+  }
+  if (status === 400) {
+    return "Completa la verificación de seguridad antes de enviar.";
+  }
+  return "No pudimos completar la verificación de seguridad. Inténtalo de nuevo.";
 }
 
 export async function POST(request: Request) {
@@ -182,6 +76,7 @@ export async function POST(request: Request) {
 
   const payload = parsed.data;
   const language = normalizeLanguage(payload.language);
+  const isEs = language === "es";
 
   const guard = await guardFormRequest(
     request,
@@ -198,7 +93,10 @@ export async function POST(request: Request) {
 
   if (!guard.ok) {
     return NextResponse.json(
-      { ok: false, error: guard.error },
+      {
+        ok: false,
+        error: localizeGuardError(guard.status, guard.error, isEs),
+      },
       { status: guard.status },
     );
   }
@@ -212,15 +110,16 @@ export async function POST(request: Request) {
   const email = readTrimmedString(payload.email, 320, { singleLine: true });
   const topic = readTrimmedString(payload.topic, 160, { singleLine: true });
   const note = readTrimmedString(payload.note, 5000);
+  const { attribution, referralSource, referralCode, attributionConsent } =
+    extractRequestAttribution(payload);
 
   if (!name || !isValidEmail(email) || !topic || !note) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          language === "es"
-            ? "Completa tu nombre, un correo electrónico válido, el asunto y tu mensaje antes de enviar."
-            : "Complete your name, valid email, topic, and message before sending.",
+        error: isEs
+          ? "Completa tu nombre, un correo electrónico válido, el asunto y tu mensaje antes de enviar."
+          : "Complete your name, valid email, topic, and message before sending.",
       },
       { status: 400 },
     );
@@ -231,16 +130,16 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          language === "es"
-            ? "Selecciona un asunto válido antes de enviar."
-            : "Select a valid topic before sending.",
+        error: isEs
+          ? "Selecciona un asunto válido antes de enviar."
+          : "Select a valid topic before sending.",
       },
       { status: 400 },
     );
   }
 
   const routedDepartmentEmail = topicConfig.resolveRecipient();
+  const attributionLine = formatAttributionLine(attribution);
 
   const internalText = [
     `Name: ${name}`,
@@ -248,9 +147,14 @@ export async function POST(request: Request) {
     `Topic: ${topic}`,
     `Language: ${language.toUpperCase()}`,
     `Routed to: ${routedDepartmentEmail}`,
+    referralSource ? `How did you hear about us: ${referralSource}` : null,
+    referralCode ? `Referral code: ${referralCode}` : null,
+    attributionLine ? `Attribution: ${attributionLine}` : null,
     "",
     note,
-  ].join("\n");
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
 
   const internalHtml = `<!doctype html>
 <html lang="en">
@@ -260,7 +164,10 @@ export async function POST(request: Request) {
     <p style="margin:0 0 6px;"><strong>Email:</strong> ${escapeHtml(email)}</p>
     <p style="margin:0 0 6px;"><strong>Topic:</strong> ${escapeHtml(topic)}</p>
     <p style="margin:0 0 6px;"><strong>Language:</strong> ${escapeHtml(language.toUpperCase())}</p>
-    <p style="margin:0 0 16px;"><strong>Routed to:</strong> ${escapeHtml(routedDepartmentEmail)}</p>
+    <p style="margin:0 0 6px;"><strong>Routed to:</strong> ${escapeHtml(routedDepartmentEmail)}</p>
+    ${referralSource ? `<p style="margin:0 0 6px;"><strong>How did you hear about us:</strong> ${escapeHtml(referralSource)}</p>` : ""}
+    ${referralCode ? `<p style="margin:0 0 6px;"><strong>Referral code:</strong> ${escapeHtml(referralCode)}</p>` : ""}
+    ${attributionLine ? `<p style="margin:0 0 16px;color:#584B44;"><strong>Attribution:</strong> ${escapeHtml(attributionLine)}</p>` : ""}
     <div style="padding:14px;background:#F2ECDF;border-left:3px solid #833E28;">
       ${escapeHtml(note).replaceAll("\n", "<br />")}
     </div>
@@ -277,14 +184,20 @@ export async function POST(request: Request) {
 
   if (!internalResult.ok) {
     return NextResponse.json(
-      { ok: false, error: internalResult.error },
+      {
+        ok: false,
+        error: isEs
+          ? "No pudimos enviar tu mensaje ahora mismo. Inténtalo de nuevo o escríbenos directamente por correo."
+          : internalResult.error,
+      },
       { status: internalResult.status },
     );
   }
 
-  const confirmation = buildConfirmationEmail({
+  const confirmation = buildContactConfirmationEmail({
     language,
     name,
+    topicValue: topic,
     topicLabel: topicConfig.labels[language],
     note,
     routedDepartmentEmail,
@@ -297,6 +210,23 @@ export async function POST(request: Request) {
     text: confirmation.text,
     html: confirmation.html,
   });
+
+  if (process.env.BREVO_API_KEY?.trim() && attributionConsent === true) {
+    await trackBrevoEvent({
+      email,
+      eventName: EMAIL_ANALYTICS_EVENTS.contactSubmitted,
+      contactProperties: {
+        FIRSTNAME: name,
+        ...(referralCode ? { REFERRAL_CODE: referralCode } : {}),
+        ...(referralSource ? { REFERRAL_SOURCE: referralSource } : {}),
+      },
+      eventProperties: {
+        language,
+        topic,
+        ...attributionToEventProperties(attribution),
+      },
+    });
+  }
 
   if (!confirmationResult.ok) {
     console.error(

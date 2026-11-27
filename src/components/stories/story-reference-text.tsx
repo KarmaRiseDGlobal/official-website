@@ -8,8 +8,7 @@ import {
   useId,
   useRef,
   useState,
-  type FocusEvent,
-  type KeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
@@ -26,7 +25,7 @@ import type { StoryLanguage } from "@/data/story-types";
 
 export { segmentParagraphWithReferences, type TextSegment };
 
-// Coordinate so only one tooltip stays open at a time across the page
+// Coordinate so only one reference dialog stays open at a time across the page.
 const openTooltipDismissers = new Set<() => void>();
 
 function notifyTooltipOpened(currentDismiss: () => void): void {
@@ -49,6 +48,9 @@ const CARD_WIDTH_PX = 288;
 const VIEWPORT_MARGIN_PX = 12;
 const TOP_SAFE_PX = 124;
 const BOTTOM_SAFE_PX = 16;
+
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function isSheetViewport(): boolean {
   if (typeof window === "undefined") {
@@ -91,7 +93,7 @@ function measureTooltipCoords(
     CARD_WIDTH_PX - 18,
   );
 
-  // Respect fixed header clearance (TOP_SAFE_PX = 124) and clamp rendered card height within the viewport
+  // Respect fixed header clearance (TOP_SAFE_PX = 124) and clamp rendered card height within the viewport.
   const maxCardH = Math.max(160, vh - 160);
   const cardH = Math.min(
     measuredHeight && measuredHeight > 0
@@ -140,13 +142,11 @@ function renderReferenceVisual(
   switch (visual.kind) {
     case "map":
       return (
-        <div className="relative h-48 w-full overflow-hidden border-b border-[var(--color-rule)]/70 bg-[var(--color-pale-sage)]">
+        <div className="relative h-48 w-full overflow-hidden bg-[var(--color-pale-sage)]">
           <Image
             src={visual.mapSrc}
             alt={visual.alt[lang]}
             fill
-            unoptimized
-            loading="eager"
             sizes="(max-width: 767px) 100vw, 480px"
             className="object-cover"
           />
@@ -157,7 +157,7 @@ function renderReferenceVisual(
       const isContain = visual.fit === "contain";
       return (
         <div
-          className={`relative h-48 w-full overflow-hidden border-b border-[var(--color-rule)]/70 ${
+          className={`relative h-48 w-full overflow-hidden ${
             isContain ? "bg-[var(--color-paper)]" : "bg-[var(--color-paper-2)]"
           }`}
         >
@@ -165,8 +165,6 @@ function renderReferenceVisual(
             src={visual.src}
             alt={visual.alt[lang]}
             fill
-            unoptimized
-            loading="eager"
             sizes="(max-width: 767px) 100vw, 480px"
             style={
               isContain
@@ -194,13 +192,13 @@ interface ReferenceTriggerProps {
 
 function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isActivated, setIsActivated] = useState(false);
   const [coords, setCoords] = useState<TooltipCoords | null>(null);
-  const anchorRef = useRef<HTMLSpanElement | null>(null);
+  const anchorRef = useRef<HTMLButtonElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wasOpenBeforePointerDownRef = useRef(false);
-  const lastPointerDownAtRef = useRef(0);
-  const lastHoverOpenAtRef = useRef(0);
+  const isActivatedRef = useRef(false);
   const tooltipId = useId();
   const hasVisual = entry.visual !== undefined;
   const isSpanish = lang === "es";
@@ -212,38 +210,77 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
     }
   }, []);
 
-  const closeNow = useCallback(() => {
-    clearCloseTimer();
-    setIsOpen(false);
-  }, [clearCloseTimer]);
+  const closeNow = useCallback(
+    (restoreFocus = false) => {
+      clearCloseTimer();
+      isActivatedRef.current = false;
+      setIsActivated(false);
+      setIsOpen(false);
+      if (restoreFocus) {
+        window.requestAnimationFrame(() => {
+          anchorRef.current?.focus({ preventScroll: true });
+        });
+      }
+    },
+    [clearCloseTimer],
+  );
 
-  const openNow = useCallback(() => {
-    clearCloseTimer();
-    const el = anchorRef.current;
-    if (!el) {
+  const dismissPassive = useCallback(() => {
+    closeNow(false);
+  }, [closeNow]);
+
+  const openNow = useCallback(
+    (activated: boolean) => {
+      clearCloseTimer();
+      const el = anchorRef.current;
+      if (!el) {
+        return;
+      }
+      notifyTooltipOpened(dismissPassive);
+      setCoords(
+        measureTooltipCoords(el, hasVisual, cardRef.current?.offsetHeight),
+      );
+      if (activated) {
+        isActivatedRef.current = true;
+        setIsActivated(true);
+      }
+      setIsOpen(true);
+    },
+    [clearCloseTimer, dismissPassive, hasVisual],
+  );
+
+  const schedulePassiveClose = useCallback(() => {
+    if (isActivatedRef.current) {
       return;
     }
-    notifyTooltipOpened(closeNow);
-    setCoords(
-      measureTooltipCoords(el, hasVisual, cardRef.current?.offsetHeight),
-    );
-    setIsOpen(true);
-  }, [clearCloseTimer, closeNow, hasVisual]);
-
-  const scheduleClose = useCallback(() => {
     clearCloseTimer();
     closeTimerRef.current = setTimeout(() => {
-      setIsOpen(false);
-    }, 120);
+      if (!isActivatedRef.current) {
+        setIsOpen(false);
+      }
+    }, 140);
   }, [clearCloseTimer]);
 
   useEffect(() => {
-    openTooltipDismissers.add(closeNow);
+    openTooltipDismissers.add(dismissPassive);
     return () => {
-      openTooltipDismissers.delete(closeNow);
+      openTooltipDismissers.delete(dismissPassive);
       clearCloseTimer();
     };
-  }, [clearCloseTimer, closeNow]);
+  }, [clearCloseTimer, dismissPassive]);
+
+  useEffect(() => {
+    if (!isOpen || !isActivated) {
+      return;
+    }
+    const rafId = window.requestAnimationFrame(() => {
+      const target = closeButtonRef.current ?? cardRef.current;
+      target?.focus({ preventScroll: true });
+    });
+    return () => {
+      window.cancelAnimationFrame(rafId);
+    };
+  }, [isActivated, isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -255,10 +292,12 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
       if (!anchor) {
         return;
       }
-      const rect = anchor.getBoundingClientRect();
-      if (rect.bottom < TOP_SAFE_PX - 12 || rect.top > window.innerHeight) {
-        closeNow();
-        return;
+      if (!isSheetViewport()) {
+        const rect = anchor.getBoundingClientRect();
+        if (rect.bottom < TOP_SAFE_PX - 12 || rect.top > window.innerHeight) {
+          closeNow(false);
+          return;
+        }
       }
       setCoords(
         measureTooltipCoords(anchor, hasVisual, cardRef.current?.offsetHeight),
@@ -288,12 +327,13 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
       ) {
         return;
       }
-      closeNow();
+      closeNow(false);
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
-        closeNow();
+        event.preventDefault();
+        closeNow(true);
       }
     };
 
@@ -311,66 +351,69 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
     };
   }, [closeNow, hasVisual, isOpen]);
 
-  const handlePointerDownTrigger = () => {
-    lastPointerDownAtRef.current = Date.now();
-    wasOpenBeforePointerDownRef.current = isOpen;
-  };
-
-  const handlePointerEnter = (event: ReactPointerEvent<HTMLSpanElement>) => {
-    if (event.pointerType === "mouse") {
-      if (!isOpen) {
-        lastHoverOpenAtRef.current = Date.now();
-      }
-      openNow();
+  const handlePointerEnter = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.pointerType === "mouse" && !isSheetViewport()) {
+      openNow(false);
     }
   };
 
-  const handlePointerLeave = (event: ReactPointerEvent<HTMLSpanElement>) => {
-    if (event.pointerType === "mouse") {
-      scheduleClose();
+  const handlePointerLeave = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.pointerType === "mouse" && !isActivatedRef.current) {
+      schedulePassiveClose();
     }
   };
 
-  const handleFocus = () => {
-    if (Date.now() - lastPointerDownAtRef.current > 250) {
-      openNow();
-    }
-  };
-
-  const handleBlur = (event: FocusEvent<HTMLSpanElement>) => {
-    const nextTarget = event.relatedTarget;
-    if (nextTarget instanceof Node && cardRef.current?.contains(nextTarget)) {
-      return;
-    }
-    if (!isSheetViewport()) {
-      scheduleClose();
-    }
-  };
-
-  const handleClick = (event: MouseEvent<HTMLSpanElement>) => {
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    if (Date.now() - lastHoverOpenAtRef.current < 450) {
-      openNow();
-      return;
-    }
-    if (wasOpenBeforePointerDownRef.current) {
-      closeNow();
+    if (isOpen && isActivatedRef.current) {
+      closeNow(true);
     } else {
-      openNow();
+      openNow(true);
     }
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
-    if (event.key === "Enter" || event.key === " ") {
+  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape") {
       event.preventDefault();
-      if (isOpen) {
-        closeNow();
-      } else {
-        openNow();
+      event.stopPropagation();
+      closeNow(true);
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const container = cardRef.current;
+    if (!container) {
+      return;
+    }
+
+    const focusables = Array.from(
+      container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+    );
+    if (focusables.length === 0) {
+      event.preventDefault();
+      container.focus({ preventScroll: true });
+      return;
+    }
+
+    const first = focusables[0]!;
+    const last = focusables[focusables.length - 1]!;
+    const active = document.activeElement;
+
+    if (event.shiftKey) {
+      if (
+        active === first ||
+        active === container ||
+        !container.contains(active)
+      ) {
+        event.preventDefault();
+        last.focus({ preventScroll: true });
       }
-    } else if (event.key === "Escape" && isOpen) {
+    } else if (active === last || !container.contains(active)) {
       event.preventDefault();
-      closeNow();
+      first.focus({ preventScroll: true });
     }
   };
 
@@ -378,103 +421,129 @@ function ReferenceTrigger({ text, entry, lang }: ReferenceTriggerProps) {
 
   return (
     <>
-      <span
+      <button
         ref={anchorRef}
-        role="button"
-        tabIndex={0}
+        type="button"
         aria-expanded={isOpen}
+        aria-haspopup="dialog"
         aria-controls={isOpen ? tooltipId : undefined}
-        onPointerDown={handlePointerDownTrigger}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        className={`cursor-help rounded-[var(--space-2xs)] underline decoration-[var(--color-clay)] decoration-2 underline-offset-[0.26em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] ${
+        className={`inline cursor-help appearance-none rounded-[var(--space-2xs)] border-0 bg-transparent p-0 text-start text-inherit underline decoration-[var(--color-clay)] decoration-2 underline-offset-[0.26em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] ${
           isOpen
             ? "bg-[var(--color-clay)]/20 text-[var(--color-forest-deep)] decoration-solid"
             : "decoration-dotted hover:bg-[var(--color-clay)]/14 hover:text-[var(--color-forest-deep)]"
         }`}
       >
         {text}
-      </span>
+      </button>
 
       {isOpen && coords && typeof document !== "undefined"
         ? createPortal(
-            <div
-              ref={cardRef}
-              id={tooltipId}
-              role="dialog"
-              aria-label={entry.title[lang]}
-              onMouseEnter={isSheet ? undefined : clearCloseTimer}
-              onMouseLeave={isSheet ? undefined : scheduleClose}
-              style={
-                isSheet
-                  ? undefined
-                  : {
-                      position: "fixed",
-                      left: `${coords.left}px`,
-                      top: `${coords.top}px`,
-                      width: `${CARD_WIDTH_PX}px`,
-                    }
-              }
-              className={
-                isSheet
-                  ? "fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[var(--z-tooltip)] mx-auto max-h-[68dvh] max-w-[30rem] overflow-y-auto rounded-[var(--radius-panel)] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[var(--shadow-popover)]"
-                  : "z-[var(--z-tooltip)] rounded-[var(--radius-panel)] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[var(--shadow-popover)]"
-              }
-            >
-              <div
-                className={
-                  isSheet
-                    ? "rounded-[calc(var(--radius-panel)-1px)]"
-                    : "max-h-[calc(100dvh-10rem)] overflow-y-auto rounded-[calc(var(--radius-panel)-1px)]"
-                }
-              >
-                <div className="sticky top-0 z-[var(--z-raised)] flex items-center justify-between gap-2 border-b border-[var(--color-rule)]/70 bg-[var(--color-white)] py-0.5 pr-1 pl-3.5">
-                  <p className="m-0 text-[length:var(--text-xs)] font-semibold tracking-[var(--tracking-label)] text-[var(--color-clay-ink)] uppercase">
-                    {REFERENCE_KIND_LABELS[entry.category][lang]}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      closeNow();
-                    }}
-                    aria-label={
-                      isSpanish ? "Cerrar referencia" : "Close reference"
-                    }
-                    className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-[length:var(--text-lg)] leading-none text-[var(--color-forest-deep)] transition-colors hover:bg-[var(--color-paper-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
-                  >
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-
-                {renderReferenceVisual(entry.visual, lang)}
-
-                <div className="grid gap-1.5 p-3.5">
-                  <p className="m-0 font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-[1.2] font-normal text-[var(--color-forest-deep)]">
-                    {entry.title[lang]}
-                  </p>
-                  <p className="m-0 text-[length:var(--text-xs)] leading-[1.45] text-[var(--color-muted)]">
-                    {entry.description[lang]}
-                  </p>
-                </div>
-              </div>
-
-              {!isSheet ? (
-                <span
+            <>
+              {isSheet ? (
+                <div
                   aria-hidden="true"
-                  style={{ left: `${coords.arrowLeft}px` }}
-                  className={`pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-[var(--color-rule)] bg-[var(--color-white)] ${
-                    coords.placement === "above"
-                      ? "-bottom-[6px] border-r border-b"
-                      : "-top-[6px] border-t border-l"
-                  }`}
+                  onClick={() => closeNow(true)}
+                  className="fixed inset-0 z-[var(--z-tooltip)] bg-[var(--color-night)]/35"
                 />
               ) : null}
-            </div>,
+
+              <div
+                ref={cardRef}
+                id={tooltipId}
+                role="dialog"
+                aria-modal={isSheet ? "true" : undefined}
+                aria-label={entry.title[lang]}
+                tabIndex={-1}
+                data-lenis-prevent
+                onKeyDown={handleDialogKeyDown}
+                onMouseEnter={isSheet ? undefined : clearCloseTimer}
+                onMouseLeave={
+                  isSheet || isActivated ? undefined : schedulePassiveClose
+                }
+                style={
+                  isSheet
+                    ? undefined
+                    : {
+                        position: "fixed",
+                        left: `${coords.left}px`,
+                        top: `${coords.top}px`,
+                        width: `${CARD_WIDTH_PX}px`,
+                      }
+                }
+                className={
+                  isSheet
+                    ? "fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[var(--z-tooltip)] mx-auto max-h-[68dvh] max-w-[30rem] overflow-y-auto overscroll-contain rounded-[var(--radius-panel)] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[var(--shadow-popover)] focus:outline-none"
+                    : "z-[var(--z-tooltip)] rounded-[var(--radius-panel)] border border-[var(--color-rule)] bg-[var(--color-white)] text-[var(--color-ink)] shadow-[var(--shadow-popover)] focus:outline-none"
+                }
+              >
+                <div
+                  data-lenis-prevent
+                  className={
+                    isSheet
+                      ? "rounded-[calc(var(--radius-panel)-1px)]"
+                      : "max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain rounded-[calc(var(--radius-panel)-1px)]"
+                  }
+                >
+                  <div className="sticky top-0 z-[var(--z-raised)] flex items-center justify-between gap-2 bg-[var(--color-white)] py-0.5 ps-3.5 pe-1">
+                    <p className="m-0 text-[length:var(--text-xs)] font-semibold tracking-[var(--tracking-label)] text-[var(--color-clay-ink)] uppercase">
+                      {REFERENCE_KIND_LABELS[entry.category][lang]}
+                    </p>
+                    <button
+                      ref={closeButtonRef}
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        closeNow(true);
+                      }}
+                      aria-label={
+                        isSpanish ? "Cerrar referencia" : "Close reference"
+                      }
+                      className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-pill)] border-0 bg-transparent text-[var(--color-forest-deep)] transition-colors hover:bg-[var(--color-paper-2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M6 6l12 12M18 6 6 18" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {renderReferenceVisual(entry.visual, lang)}
+
+                  <div className="grid gap-1.5 p-3.5">
+                    <p className="m-0 font-[family-name:var(--font-display)] text-[length:var(--text-md)] leading-[1.2] font-normal text-[var(--color-forest-deep)]">
+                      {entry.title[lang]}
+                    </p>
+                    <p className="m-0 text-[length:var(--text-xs)] leading-[1.45] text-[var(--color-muted)]">
+                      {entry.description[lang]}
+                    </p>
+                  </div>
+                </div>
+
+                {!isSheet ? (
+                  <span
+                    aria-hidden="true"
+                    style={{ left: `${coords.arrowLeft}px` }}
+                    className={`pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 rotate-45 border-[var(--color-rule)] bg-[var(--color-white)] ${
+                      coords.placement === "above"
+                        ? "-bottom-[6px] border-e border-b"
+                        : "-top-[6px] border-s border-t"
+                    }`}
+                  />
+                ) : null}
+              </div>
+            </>,
             document.body,
           )
         : null}

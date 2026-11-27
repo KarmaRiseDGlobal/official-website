@@ -3,7 +3,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { requestSmoothScrollTo } from "@/components/motion/smooth-scroll";
 import {
@@ -11,6 +11,7 @@ import {
   type HomeClosingOption,
 } from "@/data/home-content";
 import { localizePath, type SiteLanguage } from "@/lib/urls";
+import { useTextZoomGuard } from "@/lib/use-text-zoom-guard";
 
 const WHATSAPP_CTA_HREF = {
   en: `https://wa.me/34611722276?text=${encodeURIComponent("Hello Alma, I would like to ask about manufacturing with KarmaRise D Global.")}`,
@@ -51,6 +52,7 @@ function easeInOutQuad(t: number): number {
 function getOptionHref(
   option: HomeClosingOption,
   language: SiteLanguage,
+  whatsappHref: Record<SiteLanguage, string>,
 ): string {
   if (option.id === "product-brief") {
     return localizePath("/product-brief", language);
@@ -58,15 +60,29 @@ function getOptionHref(
   if (option.id === "book-call") {
     return localizePath("/book-a-call?duration=15", language);
   }
-  return WHATSAPP_CTA_HREF[language];
+  return whatsappHref[language];
+}
+
+export interface ClosingConversationCopy {
+  readonly heading: Record<SiteLanguage, string>;
+  readonly confidentialityNote: Record<SiteLanguage, string>;
+  readonly advanceCue: Record<SiteLanguage, string>;
+  readonly optionsAriaLabel: Record<SiteLanguage, string>;
+  readonly options: readonly HomeClosingOption[];
 }
 
 interface ClosingConversationSectionProps {
   readonly language: SiteLanguage;
+  readonly copy?: ClosingConversationCopy;
+  readonly whatsappHref?: Record<SiteLanguage, string>;
+  readonly enableScrollPin?: boolean;
 }
 
 export function ClosingConversationSection({
   language,
+  copy = HOME_CLOSING_CONVERSATION,
+  whatsappHref = WHATSAPP_CTA_HREF,
+  enableScrollPin = true,
 }: ClosingConversationSectionProps) {
   const rootRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
@@ -77,6 +93,22 @@ export function ClosingConversationSection({
   const choicesLayerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<ScrollTrigger | null>(null);
   const progressRef = useRef(0);
+  const isTextZoomed = useTextZoomGuard();
+  const [overflowBlockedKey, setOverflowBlockedKey] = useState<string | null>(
+    null,
+  );
+  const [viewportKey, setViewportKey] = useState("");
+  const isOverflowBlocked =
+    overflowBlockedKey !== null && overflowBlockedKey === viewportKey;
+
+  useEffect(() => {
+    const syncViewportKey = () => {
+      setViewportKey(`${window.innerWidth}x${window.innerHeight}`);
+    };
+    syncViewportKey();
+    window.addEventListener("resize", syncViewportKey, { passive: true });
+    return () => window.removeEventListener("resize", syncViewportKey);
+  }, []);
 
   const scrollToChoices = useCallback(() => {
     const st = triggerRef.current;
@@ -127,24 +159,57 @@ export function ClosingConversationSection({
       return;
     }
 
+    const clearClosingInlineStyles = () => {
+      const archItems = Array.from(
+        choicesLayer.querySelectorAll<HTMLElement>("[data-closing-choice]"),
+      );
+      statement.removeAttribute("style");
+      statement.removeAttribute("aria-hidden");
+      statementHeading.removeAttribute("style");
+      statementFooter.removeAttribute("style");
+      advanceButton.removeAttribute("tabindex");
+      choicesLayer.removeAttribute("style");
+      for (const arch of archItems) {
+        arch.removeAttribute("style");
+        arch
+          .querySelector<HTMLElement>("[data-closing-body]")
+          ?.removeAttribute("style");
+      }
+    };
+
+    if (!enableScrollPin) {
+      delete root.dataset.enhanced;
+      delete root.dataset.pinning;
+      delete root.dataset.settled;
+      triggerRef.current = null;
+      progressRef.current = 0;
+      clearClosingInlineStyles();
+      return;
+    }
+
     gsap.registerPlugin(ScrollTrigger);
     const media = gsap.matchMedia();
 
     media.add(
       {
-        enhancedViewport:
-          "(min-width: 64rem) and (hover: hover) and (pointer: fine)",
+        enhancedViewport: "(min-width: 64rem) and (min-height: 35rem)",
         reducedMotion: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
         const { enhancedViewport, reducedMotion } = context.conditions ?? {};
 
-        if (!enhancedViewport || reducedMotion) {
+        if (
+          !enhancedViewport ||
+          reducedMotion ||
+          isTextZoomed ||
+          isOverflowBlocked
+        ) {
           delete root.dataset.enhanced;
           delete root.dataset.pinning;
           delete root.dataset.settled;
           triggerRef.current = null;
           progressRef.current = 0;
+          clearClosingInlineStyles();
           return;
         }
 
@@ -156,6 +221,23 @@ export function ClosingConversationSection({
         const archBodies = archItems.map((el) =>
           el.querySelector<HTMLElement>("[data-closing-body]"),
         );
+
+        const hasBodyOverflow = () => {
+          const maxBandHeight = Math.max(window.innerHeight * 0.34, 210);
+          return archBodies.some(
+            (body) => body !== null && body.scrollHeight > maxBandHeight + 20,
+          );
+        };
+
+        if (hasBodyOverflow()) {
+          delete root.dataset.enhanced;
+          delete root.dataset.pinning;
+          delete root.dataset.settled;
+          triggerRef.current = null;
+          progressRef.current = 0;
+          setOverflowBlockedKey(`${window.innerWidth}x${window.innerHeight}`);
+          return;
+        }
 
         let viewportH = window.innerHeight;
         let lastStatementInteractive: boolean | null = null;
@@ -393,6 +475,12 @@ export function ClosingConversationSection({
           },
           onRefresh: (self) => {
             viewportH = window.innerHeight;
+            if (hasBodyOverflow()) {
+              setOverflowBlockedKey(
+                `${window.innerWidth}x${window.innerHeight}`,
+              );
+              return;
+            }
             syncFromProgress(self.progress);
           },
           onUpdate: (self) => {
@@ -424,20 +512,7 @@ export function ClosingConversationSection({
           st.kill();
           triggerRef.current = null;
           progressRef.current = 0;
-
-          gsap.set([statementHeading, statementFooter, ...archItems], {
-            clearProps: "all",
-          });
-          statement.removeAttribute("style");
-          statement.removeAttribute("aria-hidden");
-          advanceButton.removeAttribute("tabindex");
-          choicesLayer.removeAttribute("style");
-          for (const arch of archItems) {
-            arch.removeAttribute("style");
-          }
-          for (const body of archBodies) {
-            body?.removeAttribute("style");
-          }
+          clearClosingInlineStyles();
 
           delete root.dataset.enhanced;
           delete root.dataset.pinning;
@@ -447,8 +522,14 @@ export function ClosingConversationSection({
       },
     );
 
-    return () => media.revert();
-  }, []);
+    return () => {
+      media.revert();
+      clearClosingInlineStyles();
+      delete root.dataset.enhanced;
+      delete root.dataset.pinning;
+      delete root.dataset.settled;
+    };
+  }, [enableScrollPin, isTextZoomed, isOverflowBlocked]);
 
   const headingId = "closing-conversation-heading";
 
@@ -470,12 +551,12 @@ export function ClosingConversationSection({
               id={headingId}
               className="closing-statement-title"
             >
-              {HOME_CLOSING_CONVERSATION.heading[language]}
+              {copy.heading[language]}
             </h2>
 
             <div ref={statementFooterRef} className="closing-statement-foot">
               <p className="closing-statement-note">
-                {HOME_CLOSING_CONVERSATION.confidentialityNote[language]}
+                {copy.confidentialityNote[language]}
               </p>
               <button
                 ref={advanceButtonRef}
@@ -483,7 +564,7 @@ export function ClosingConversationSection({
                 onClick={scrollToChoices}
                 className="closing-advance-cue"
               >
-                <span>{HOME_CLOSING_CONVERSATION.advanceCue[language]}</span>
+                <span>{copy.advanceCue[language]}</span>
                 <svg
                   viewBox="0 0 16 16"
                   width="14"
@@ -506,10 +587,10 @@ export function ClosingConversationSection({
           ref={choicesLayerRef}
           className="closing-choices-layer"
           role="group"
-          aria-label={HOME_CLOSING_CONVERSATION.optionsAriaLabel[language]}
+          aria-label={copy.optionsAriaLabel[language]}
         >
-          {HOME_CLOSING_CONVERSATION.options.map((option) => {
-            const href = getOptionHref(option, language);
+          {copy.options.map((option) => {
+            const href = getOptionHref(option, language, whatsappHref);
             const content = (
               <>
                 <span className="closing-choice-surface" aria-hidden="true" />

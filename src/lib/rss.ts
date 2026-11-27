@@ -28,18 +28,30 @@ export function buildStoriesRssXml(
     ? "Historias de KarmaRise D Global"
     : "KarmaRise D Global Stories";
   const channelDescription = isEs
-    ? "Relatos en primera persona de Alma y Shirish sobre unidades de producción y marroquineros en la India, pruebas físicas, AlmaRise D Reborn, AlmaRise D Organic y costumbres compartidas entre España y la India."
-    : "First-person Stories by Alma and Shirish from Indian production units and leather ateliers, physical sample reviews, AlmaRise D Reborn, AlmaRise D Organic, and everyday life between Spain and India.";
+    ? "Relatos en primera persona de Alma y Shirish sobre unidades de producción y marroquineros en la India, pruebas físicas, AlmaRise D Reborn, AlmaRise D Organic, AlmaRise D Home Decor y costumbres compartidas entre España y la India."
+    : "First-person Stories by Alma and Shirish from Indian production units and leather ateliers, physical sample reviews, AlmaRise D Reborn, AlmaRise D Organic, AlmaRise D Home Decor, and everyday life between Spain and India.";
 
-  const latestDate = stories.reduce<string>((latest, story) => {
+  const sortedStories = [...stories].sort((a, b) => {
+    const timeA = Date.parse(a.publishedAt);
+    const timeB = Date.parse(b.publishedAt);
+    if (!Number.isNaN(timeA) && !Number.isNaN(timeB) && timeA !== timeB) {
+      return timeB - timeA;
+    }
+    return b.publishedAt.localeCompare(a.publishedAt);
+  });
+
+  const latestDate = sortedStories.reduce<string>((latest, story) => {
     const candidate = story.updatedAt || story.publishedAt || "";
     return candidate > latest ? candidate : latest;
-  }, stories[0]?.publishedAt || new Date().toISOString());
+  }, sortedStories[0]?.publishedAt || new Date().toISOString());
 
-  const itemsXml = stories
+  const itemsXml = sortedStories
     .map((story) => {
       const localized = getLocalizedStory(story, lang);
       const itemUrl = `${siteUrl}${localizePath(`/stories/${story.slug}`, lang)}`;
+      const authorName = isEs
+        ? story.author.name.replace(/\s*&\s*/g, " y ")
+        : story.author.name;
       const categories = [localized.categoryLabel, ...localized.tags]
         .filter(Boolean)
         .map((cat) => `      <category>${escapeXml(cat)}</category>`)
@@ -50,7 +62,7 @@ export function buildStoriesRssXml(
       <link>${escapeXml(itemUrl)}</link>
       <guid isPermaLink="true">${escapeXml(itemUrl)}</guid>
       <pubDate>${escapeXml(toRfc2822(story.publishedAt))}</pubDate>
-      <author>stories@karmarisedglobal.com (${escapeXml(story.author.name)})</author>
+      <author>stories@karmarisedglobal.com (${escapeXml(authorName)})</author>
       <description>${escapeXml(localized.summary)}</description>
 ${categories}
     </item>`;

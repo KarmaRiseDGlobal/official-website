@@ -53,8 +53,16 @@ export const HEADER_COPY = {
     es: "Iniciativas y contacto directo",
   },
   showcaseAria: {
-    en: "Manufacturing categories and AlmaRise D Brand",
-    es: "Categorías de fabricación y AlmaRise D Brand",
+    en: "Manufacturing categories",
+    es: "Categorías de fabricación",
+  },
+  showcaseHeading: {
+    en: "Start a brief by category",
+    es: "Empezar por categoría",
+  },
+  showcaseHint: {
+    en: "No tech pack needed",
+    es: "Sin ficha técnica previa",
   },
   brandHomeAria: {
     en: "KarmaRise D Global home",
@@ -122,8 +130,8 @@ export const MENU_SHOWCASE_CARDS: readonly MenuShowcaseCard[] = [
     id: "leather-bags",
     href: "/product-brief?product=bags",
     title: {
-      en: "Leather bags & leather goods",
-      es: "Bolsos y otros artículos de piel",
+      en: "Leather goods",
+      es: "Bolsos y artículos de piel",
     },
     pillLabel: {
       en: "Start brief",
@@ -140,8 +148,8 @@ export const MENU_SHOWCASE_CARDS: readonly MenuShowcaseCard[] = [
     id: "clothing-capsules",
     href: "/product-brief?product=garments",
     title: {
-      en: "Clothing in natural & varied fabrics",
-      es: "Prendas de diversos tejidos",
+      en: "Clothing",
+      es: "Ropa y prendas",
     },
     pillLabel: {
       en: "Start brief",
@@ -155,58 +163,39 @@ export const MENU_SHOWCASE_CARDS: readonly MenuShowcaseCard[] = [
     },
   },
   {
-    id: "custom-sewn-goods",
-    href: "/product-brief?product=other",
+    id: "textile-accessories",
+    href: "/product-brief?product=textile-accessories",
     title: {
-      en: "Custom sewn accessories",
-      es: "Complementos a medida",
+      en: "Textile accessories",
+      es: "Complementos textiles",
     },
     pillLabel: {
       en: "Start brief",
       es: "Empezar briefing",
     },
-    image: "/images/capabilities/sewn-accessories-machine.jpg",
-    imagePosition: "object-[50%_62%]",
+    image: "/images/capabilities/textile-accessories.jpg",
+    imagePosition: "object-center",
     imageAlt: {
-      en: "Cast-iron stitching machine in a sunlit sewing studio",
-      es: "Máquina de coser de hierro fundido en un espacio de confección soleado",
+      en: "Woven pashmina scarf, quilted cotton-linen tote bag, embroidered evening clutch, and padded linen headband on a sunlit stone surface",
+      es: "Pashmina tejida, tote acolchado de algodón y lino, clutch bordado y diadema de lino sobre una superficie de piedra soleada",
     },
   },
   {
     id: "home-decor",
     href: "/product-brief?product=home-decor",
     title: {
-      en: "Home decor",
-      es: "Decoración del hogar",
+      en: "Textile home decor",
+      es: "Decoración textil del hogar",
     },
     pillLabel: {
       en: "Start brief",
       es: "Empezar briefing",
     },
-    image: "/images/capabilities/home-decor-ceramics.jpg",
-    imagePosition: "object-[50%_65%]",
+    image: "/images/culture/maharashtra-handloom-zari-border.jpg",
+    imagePosition: "object-center",
     imageAlt: {
-      en: "Matte ceramic vessels, dried grasses, and linen books on a sunlit table",
-      es: "Jarrones cerámicos mate, espigas secas y libros de lino sobre una mesa soleada",
-    },
-  },
-  {
-    id: "almarise",
-    href: "/almarise",
-    title: {
-      en: "AlmaRise D Brand",
-      es: "AlmaRise D Brand",
-    },
-    pillLabel: {
-      en: "Explore AlmaRise D Brand",
-      es: "Ver AlmaRise D Brand",
-    },
-    image:
-      "/images/almarise/almarise-reborn-olive-pallu-shrug-madrid-street.jpeg",
-    imagePosition: "object-[50%_18%]",
-    imageAlt: {
-      en: "Model wearing an AlmaRise D Reborn embroidered saree shrug on a Madrid street",
-      es: "Modelo vistiendo un shrug bordado de AlmaRise D Reborn en una calle de Madrid",
+      en: "Artisan hands weaving a gold and crimson patterned cloth border on a wooden handloom with wooden shuttles beside skeins of natural yarn",
+      es: "Manos artesanas tejiendo una cenefa dorada y carmesí en un telar de madera con lanzaderas junto a madejas de hilo natural",
     },
   },
 ];

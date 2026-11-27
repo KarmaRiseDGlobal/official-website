@@ -41,7 +41,7 @@ export const REFERENCE_KIND_LABELS: Readonly<
 > = {
   place: { en: "Place in India", es: "Lugar en la India" },
   spainPlace: { en: "Craft town in Spain", es: "Pueblo artesano en España" },
-  workshop: { en: "Workshop role", es: "Oficio en taller" },
+  workshop: { en: "Production role", es: "Oficio de producción" },
   craft: { en: "Leathercraft & cutting", es: "Marroquinería y corte" },
   woman: { en: "Women in the story", es: "Mujeres en la historia" },
   person: { en: "Historical figure", es: "Figura histórica" },
@@ -393,69 +393,6 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
       },
     },
   },
-  {
-    id: "nandurbar",
-    category: "place",
-    title: { en: "Nandurbar", es: "Nandurbar" },
-    description: {
-      en: "District in far northwestern Maharashtra bordering Gujarat and Madhya Pradesh.",
-      es: "Distrito del extremo noroccidental de Maharashtra junto a Gujarat y Madhya Pradesh.",
-    },
-    terms: {
-      en: ["Nandurbar"],
-      es: ["Nandurbar"],
-    },
-    visual: {
-      kind: "map",
-      mapSrc: "/references/map-nandurbar.png",
-      alt: {
-        en: "Map of India and zoomed Maharashtra inset marking Nandurbar in northwestern Maharashtra",
-        es: "Mapa de la India y detalle de Maharashtra marcando Nandurbar en el noroeste del estado",
-      },
-    },
-  },
-  {
-    id: "latur",
-    category: "place",
-    title: { en: "Latur", es: "Latur" },
-    description: {
-      en: "District on the Marathwada plateau in southeastern Maharashtra.",
-      es: "Distrito situado en la meseta interior de Marathwada, al sureste de Maharashtra.",
-    },
-    terms: {
-      en: ["Latur"],
-      es: ["Latur"],
-    },
-    visual: {
-      kind: "map",
-      mapSrc: "/references/map-latur.png",
-      alt: {
-        en: "Map of India and zoomed Maharashtra inset marking Latur in southeastern Maharashtra",
-        es: "Mapa de la India y detalle de Maharashtra marcando Latur en el sureste del estado",
-      },
-    },
-  },
-  {
-    id: "versova",
-    category: "place",
-    title: { en: "Versova, Mumbai", es: "Versova, Bombay" },
-    description: {
-      en: "Historic Koli fishing harbour and coastal neighbourhood in western Mumbai.",
-      es: "Histórico puerto pesquero de la comunidad koli en la costa occidental de Bombay.",
-    },
-    terms: {
-      en: ["Versova"],
-      es: ["Versova"],
-    },
-    visual: {
-      kind: "map",
-      mapSrc: "/references/map-versova.png",
-      alt: {
-        en: "Map of India and zoomed Maharashtra inset marking Versova on the Mumbai coast",
-        es: "Mapa de la India y detalle de Maharashtra marcando Versova en la costa de Bombay",
-      },
-    },
-  },
 
   // --- Women Mentioned Across Stories ---
   {
@@ -481,19 +418,6 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
   },
   {
-    id: "vaishali-shadangule",
-    category: "woman",
-    title: { en: "Vaishali Shadangule", es: "Vaishali Shadangule" },
-    description: {
-      en: "Designer born in Vidarbha, Maharashtra, known for bringing handwoven khun and Paithani cloth to international runways.",
-      es: "Diseñadora nacida en Maharashtra conocida por llevar los tejidos manuales khun y Paithani a pasarelas internacionales.",
-    },
-    terms: {
-      en: ["Vaishali Shadangule"],
-      es: ["Vaishali Shadangule"],
-    },
-  },
-  {
     id: "shashikala-bhosale",
     category: "woman",
     title: {
@@ -507,111 +431,6 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     terms: {
       en: ["Shashikala Ramdas Bhosale's", "Shashikala Ramdas Bhosale"],
       es: ["Shashikala Ramdas Bhosale"],
-    },
-  },
-  {
-    id: "gauravi-khadye",
-    category: "woman",
-    title: { en: "Gauravi Khadye", es: "Gauravi Khadye" },
-    description: {
-      en: "Mumbai dhol drummer interviewed on choosing a nine-yard nauvari saree for Gudi Padwa street processions.",
-      es: "Percusionista de Bombay entrevistada sobre por qué viste el sari nauvari de nueve yardas en Gudi Padwa.",
-    },
-    terms: {
-      en: ["Gauravi Khadye"],
-      es: ["Gauravi Khadye"],
-    },
-  },
-  {
-    id: "amruta-mane",
-    category: "woman",
-    title: { en: "Amruta Mane", es: "Amruta Mane" },
-    description: {
-      en: "Mumbai motorcyclist interviewed on riding in a nine-yard nauvari saree at Gudi Padwa rallies.",
-      es: "Motorista de Bombay entrevistada por conducir con sari nauvari de nueve yardas en los desfiles de Gudi Padwa.",
-    },
-    terms: {
-      en: ["Amruta Mane"],
-      es: ["Amruta Mane"],
-    },
-  },
-  {
-    id: "rukhabai-padavi",
-    category: "woman",
-    title: { en: "Rukhabai Padavi", es: "Rukhabai Padavi" },
-    description: {
-      en: "Bhil elder in Nandurbar whose memories of her pink cotton wedding saree were recorded by the People's Archive of Rural India.",
-      es: "Mujer mayor de Nandurbar cuyo relato sobre su sari rosa de boda recogió el People's Archive of Rural India.",
-    },
-    terms: {
-      en: ["Rukhabai Padavi"],
-      es: ["Rukhabai Padavi"],
-    },
-  },
-  {
-    id: "koli-women",
-    category: "woman",
-    title: { en: "Koli women of Mumbai", es: "Mujeres koli de Bombay" },
-    description: {
-      en: "Women of Mumbai's indigenous fishing community, known for running fish markets in practical working saree drapes.",
-      es: "Mujeres de la comunidad pesquera originaria de Bombay, conocidas por dirigir las lonjas con el sari recogido para faenar.",
-    },
-    terms: {
-      en: ["Koli women"],
-      es: ["mujeres koli"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/koli-woman-mumbai.jpg",
-      fit: "contain",
-      alt: {
-        en: "Archival full-length portrait of a Koli woman in Mumbai wearing a tucked working saree and carrying a fish basket",
-        es: "Retrato histórico de cuerpo entero de una mujer koli en Bombay con su sari de trabajo y cesto de pesca",
-      },
-    },
-  },
-  {
-    id: "banjara-women",
-    category: "woman",
-    title: { en: "Banjara women", es: "Mujeres banjara" },
-    description: {
-      en: "Community across Maharashtra and the Deccan known for geometric hand embroidery, mirror work, and stacked bangles.",
-      es: "Comunidad del Decán y Maharashtra conocida por sus bordados geométricos a mano con espejos y pulseras blancas.",
-    },
-    terms: {
-      en: ["Banjara women"],
-      es: ["mujeres banjara"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/banjara-woman.jpg",
-      objectPosition: "50% 34%",
-      alt: {
-        en: "Banjara woman wearing mirror-embroidered traditional attire, silver ornaments, and stacked bangles",
-        es: "Mujer banjara con vestido tradicional bordado con espejos, joyas de plata y pulseras",
-      },
-    },
-  },
-  {
-    id: "warli-women",
-    category: "woman",
-    title: { en: "Warli women", es: "Mujeres warli" },
-    description: {
-      en: "Indigenous Adivasi community of northern Maharashtra known for shorter farm-work saree drapes and geometric paintings of village life.",
-      es: "Comunidad indígena del norte de Maharashtra conocida por su sari corto de labranza y su pintura geométrica tradicional.",
-    },
-    terms: {
-      en: ["Warli women"],
-      es: ["mujeres warli"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/warli-painting-thane.jpg",
-      objectPosition: "50% 50%",
-      alt: {
-        en: "Traditional Warli painting on earthen ground from Thane district showing women and village life",
-        es: "Pintura tradicional warli sobre fondo terroso del distrito de Thane que representa la vida comunitaria",
-      },
     },
   },
 
@@ -844,14 +663,14 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
   {
     id: "modi-script",
     category: "script",
-    title: { en: "Modi script", es: "Escritura modi" },
+    title: { en: "Modi script", es: "Escritura Modi" },
     description: {
       en: "Cursive Marathi script used until the mid-twentieth century for administrative letters, seals, and signatures.",
       es: "Escritura cursiva maratí empleada hasta mediados del siglo XX en cartas oficiales, sellos y firmas.",
     },
     terms: {
       en: ["Modi script", "Modi"],
-      es: ["escritura modi", "modi"],
+      es: ["escritura Modi", "Modi"],
     },
     visual: {
       kind: "photo",
@@ -859,7 +678,7 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
       objectPosition: "50% 50%",
       alt: {
         en: "Close view of an eighteenth-century Marathi letter written by hand in cursive Modi script",
-        es: "Detalle de una carta maratí del siglo XVIII manuscrita en escritura cursiva modi",
+        es: "Detalle de una carta maratí del siglo XVIII manuscrita en escritura cursiva Modi",
       },
     },
   },
@@ -912,19 +731,6 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
   },
   {
-    id: "choli",
-    category: "textile",
-    title: { en: "Choli blouse", es: "Blusa choli" },
-    description: {
-      en: "Short, tailored blouse cut to match an individual saree, usually stitched to measure by a local Indian tailor.",
-      es: "Blusa corta y ajustada que acompaña al sari y suele confeccionarse a medida en un taller local en la India.",
-    },
-    terms: {
-      en: ["choli"],
-      es: ["choli"],
-    },
-  },
-  {
     id: "nauvari",
     category: "textile",
     title: {
@@ -968,72 +774,6 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
       alt: {
         en: "Close view of folded family silk sarees with woven gold borders held in an Indian home",
         es: "Detalle de saris familiares de seda doblados con cenefas doradas en una casa de la India",
-      },
-    },
-  },
-  {
-    id: "khun",
-    category: "textile",
-    title: { en: "Khun blouse cloth", es: "Tejido khun para blusas" },
-    description: {
-      en: "Lightweight handloom fabric woven in Maharashtra and northern Karnataka with tiny geometric motifs and contrast borders.",
-      es: "Tejido ligero de telar manual elaborado en Maharashtra y el norte de Karnataka con diminutos motivos geométricos y cenefa.",
-    },
-    terms: {
-      en: ["khun"],
-      es: ["khun"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/khun-blouse-weave.jpg",
-      objectPosition: "50% 50%",
-      alt: {
-        en: "Close view of handloom khun blouse fabric showing tiny geometric motifs and a red and white woven border",
-        es: "Detalle de tejido artesanal khun con diminutos motivos geométricos y cenefa roja y blanca",
-      },
-    },
-  },
-  {
-    id: "nath",
-    category: "textile",
-    title: { en: "Maharashtrian nath", es: "Nath tradicional" },
-    description: {
-      en: "Crescent nose ornament set with white pearls and a ruby stone, worn on the left nostril at festive occasions.",
-      es: "Joya nasal tradicional engarzada con perlas blancas y piedra roja que se lleva en la aleta izquierda.",
-    },
-    terms: {
-      en: ["pearl nath", "nath"],
-      es: ["nath de perlas", "nath"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/nath-closeup.jpg",
-      objectPosition: "50% 50%",
-      alt: {
-        en: "Close view of a pearl and ruby Maharashtrian nath worn on the left nostril",
-        es: "Primer plano de un nath tradicional de perlas y piedra roja en la aleta izquierda de la nariz",
-      },
-    },
-  },
-  {
-    id: "thushi",
-    category: "textile",
-    title: { en: "Gold thushi choker", es: "Gargantilla thushi de oro" },
-    description: {
-      en: "Closely threaded traditional gold bead choker worn high on the neck across Maharashtra.",
-      es: "Gargantilla tradicional de pequeñas cuentas de oro finamente ensartadas típica de Maharashtra.",
-    },
-    terms: {
-      en: ["thushi"],
-      es: ["thushi"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/thushi-choker.jpg",
-      objectPosition: "50% 50%",
-      alt: {
-        en: "Close view of a traditional Kolhapuri gold bead thushi choker with a ruby pendant",
-        es: "Primer plano de una gargantilla tradicional thushi de cuentas de oro con colgante rojo",
       },
     },
   },
@@ -1194,153 +934,7 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
   },
 
-  // --- Craft Hubs & Workshop Terms ---
-  {
-    id: "ubrique",
-    category: "spainPlace",
-    title: { en: "Ubrique, Cádiz", es: "Ubrique, Cádiz" },
-    description: {
-      en: "Town in southern Spain known across Europe for traditional handbag and small leather goods craftsmanship.",
-      es: "Localidad gaditana del sur de España reconocida en toda Europa por su tradición marroquinera en bolsos y pequeña piel.",
-    },
-    terms: {
-      en: ["Ubrique"],
-      es: ["Ubrique"],
-    },
-    visual: {
-      kind: "map",
-      mapSrc: "/references/map-ubrique.jpg",
-      alt: {
-        en: "Map of Spain and inset of western Andalusia highlighting Ubrique in Cádiz",
-        es: "Mapa de España y detalle de Andalucía occidental situando Ubrique en Cádiz",
-      },
-    },
-  },
-  {
-    id: "kaat-table",
-    category: "craft",
-    title: {
-      en: "Kaat table (Cutting table)",
-      es: "Kaat table (Mesa de corte)",
-    },
-    description: {
-      en: "Wide workshop surface where whole hides are unrolled and inspected individually for grain, scratches, and stretch before cutting.",
-      es: "Amplia mesa de taller donde cada piel se extiende entera para revisar su flor, marcas naturales y elasticidad antes del corte.",
-    },
-    terms: {
-      en: ["kaat table"],
-      es: ["kaat table"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/kaat-cutting-table.jpg",
-      objectPosition: "50% 45%",
-      alt: {
-        en: "Craftsperson cutting leather pattern pieces by hand across a wide cutting table",
-        es: "Artesano cortando piezas de piel a mano sobre una amplia mesa de corte",
-      },
-    },
-  },
-  {
-    id: "master-ji",
-    category: "workshop",
-    title: {
-      en: "Master-ji (Pattern master)",
-      es: "Master-ji (Maestro patronista)",
-    },
-    description: {
-      en: "Respectful title used in Indian tailoring and leather ateliers for the head pattern master who translates a design into stiff cutting templates.",
-      es: "Tratamiento respetuoso en marroquinería y confección en la India para el maestro patronista encargado de pasar un diseño a plantillas físicas de corte.",
-    },
-    terms: {
-      en: ["master-ji"],
-      es: ["master-ji"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/pattern-templates-master.jpg",
-      objectPosition: "50% 50%",
-      alt: {
-        en: "Heavy paper cutting templates, steel dies, and workshop shears arranged on a pattern wall",
-        es: "Plantillas físicas de corte en cartón, troqueles metálicos y tijeras de taller en la zona de patronaje",
-      },
-    },
-  },
-  {
-    id: "skiving",
-    category: "craft",
-    title: {
-      en: "Skived seam edge",
-      es: "Rebaje de cantos",
-    },
-    description: {
-      en: "Shaving a leather edge down to a smooth taper so turned seams and corners fold flat over lining without bulk.",
-      es: "Afinar progresivamente el grosor del borde de la piel para que las costuras dobladas giren planas sobre el forro sin abultar.",
-    },
-    terms: {
-      en: ["skived"],
-      es: ["rebaje"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/skiving-edge-seam.jpg",
-      fit: "contain",
-      alt: {
-        en: "Diagram showing a tapered skived leather bevel and the thinned edge folded flat over an ivory lining",
-        es: "Diagrama que muestra el rebaje en bisel del canto de piel y el borde doblado plano sobre el forro",
-      },
-    },
-  },
-  {
-    id: "hide-butt-anatomy",
-    category: "craft",
-    title: {
-      en: "Hide zones: butt vs. belly",
-      es: "Zonas de la piel: lomo y crupón",
-    },
-    description: {
-      en: "The centre spine and butt hold the tightest fibres for structured panels, while the outer belly stretches easily.",
-      es: "El lomo y el crupón concentran las fibras más firmes para paneles estructurados, mientras que la falda exterior cede con facilidad.",
-    },
-    terms: {
-      en: ["spine and the butt"],
-      es: ["lomo y el crupón"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/hide-anatomy-cut.jpg",
-      fit: "contain",
-      alt: {
-        en: "Illustration of a whole leather hide showing the shoulder, the central butt zone with bag pattern templates, and the stretchy outer belly flanks",
-        es: "Ilustración de una piel entera con la zona del cuello, el crupón central con plantillas de bolso y las faldas laterales elásticas",
-      },
-    },
-  },
-  {
-    id: "karigar",
-    category: "workshop",
-    title: {
-      en: "Karigar (Skilled artisan)",
-      es: "Karigar (Artesano de taller)",
-    },
-    description: {
-      en: "Skilled craftsperson in India specialising in hand cutting, edge skiving, or heavy-duty stitching.",
-      es: "Artesano especializado en la India dedicado al corte manual, al rebaje de cantos o al cosido pesado de piel y prendas.",
-    },
-    terms: {
-      en: ["karigars", "karigar"],
-      es: ["karigars", "karigar"],
-    },
-    visual: {
-      kind: "photo",
-      src: "/references/karigar-leather-tools.jpg",
-      objectPosition: "50% 50%",
-      alt: {
-        en: "Traditional leatherworking bench tools including a half-moon cutting knife, awl, brass buckle, waxed linen thread, shears, and wooden mallet",
-        es: "Herramientas tradicionales de marroquinería sobre banco de madera: cuchilla de media luna, lezna, hebilla de latón, hilo encerado, tijeras y mazo",
-      },
-    },
-  },
+  // --- Craft & Legal Terms ---
   {
     id: "goxo-goxo",
     category: "script",
@@ -1362,7 +956,7 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     category: "craft",
     title: {
       en: "Vegetable tanning",
-      es: "Curtición vegetal",
+      es: "Curtido vegetal",
     },
     description: {
       en: "Leather tanning method using natural plant tannins from tree bark, leaves, and pods rather than heavy chrome salts, valued for warm hand-feel and natural ageing.",
@@ -1370,7 +964,7 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
     terms: {
       en: ["vegetable tanning"],
-      es: ["curtición vegetal"],
+      es: ["curtido vegetal"],
     },
   },
   {
@@ -1382,7 +976,7 @@ export const STORY_REFERENCES: readonly StoryReferenceEntry[] = [
     },
     description: {
       en: "Trial piece sewn on the actual factory line using the exact bulk hides, fabrics, linings, and metal hardware before full cutting begins, distinct from an early design prototype made with substitute stock.",
-      es: "Pieza de prueba cosida en la línea real del taller con las mismas pieles, telas, forros y herrajes del lote definitivo antes de cortar el pedido, a diferencia de un primer prototipo hecho con materiales aproximados.",
+      es: "Pieza de prueba cosida en la línea real de producción con las mismas pieles, telas, forros y herrajes del lote definitivo antes de cortar el pedido, a diferencia de un primer prototipo hecho con materiales aproximados.",
     },
     terms: {
       en: ["pre-production sample"],

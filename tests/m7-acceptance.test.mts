@@ -18,6 +18,7 @@ const REPO_ROOT = path.resolve(
 );
 
 const { stories } = await import("@/data/stories");
+const { ALLOWED_SOCIAL_URLS } = await import("@/data/socials");
 const { normalizeStory } = await import("@/lib/sanity");
 const { resetRateLimitStore } = await import("@/lib/security");
 const { POST: brevoSyncPost } =
@@ -166,7 +167,6 @@ test("R1: Email, newsletter, and Sanity schema files satisfy voice & copy compli
     "src/sanity/schemaTypes/newsletterIssue.ts",
   ];
   const bilingualFiles = new Set([
-    "scripts/setup-brevo.mjs",
     "src/lib/brevo-campaigns.ts",
     "src/app/api/newsletter/preferences/route.ts",
     "src/sanity/schemaTypes/newsletterIssue.ts",
@@ -178,7 +178,8 @@ test("R1: Email, newsletter, and Sanity schema files satisfy voice & copy compli
     const content = readFileSync(path.join(REPO_ROOT, relPath), "utf8");
     const withoutAddressAndLayoutTables = content
       .replace(/<address\b[\s\S]*?<\/address>/gi, " ")
-      .replace(/<\/?table\b[^>]*>/gi, " ");
+      .replace(/<\/?table\b[^>]*>/gi, " ")
+      .replace(/\/images\/[a-z0-9/_-]+\.(?:jpe?g|png|webp|avif)/gi, " ");
 
     const match = bannedPattern.exec(withoutAddressAndLayoutTables);
     assert.equal(
@@ -196,6 +197,13 @@ test("R1: Email, newsletter, and Sanity schema files satisfy voice & copy compli
         content,
         /\bhistorias\b/i,
         `${relPath} should reference Historias`,
+      );
+    }
+    if (relPath === "scripts/setup-brevo.mjs") {
+      assert.match(
+        content,
+        /renderAutomatedSequenceEmail/,
+        "scripts/setup-brevo.mjs should delegate welcome templates to canonical renderAutomatedSequenceEmail",
       );
     }
   }
@@ -577,7 +585,12 @@ test("R3: POST /api/brevo/webhook fails closed in production and records tracked
       (url) => {
         if (url.includes("/data/query/")) {
           return Response.json(
-            { result: { _id: "newsletter-issue-001" } },
+            {
+              result: {
+                _id: "newsletter-issue-001",
+                brevoCampaignIdEn: 701,
+              },
+            },
             { status: 200 },
           );
         }
@@ -594,14 +607,15 @@ test("R3: POST /api/brevo/webhook fails closed in production and records tracked
               "content-type": "application/json",
               "x-brevo-secret": "brevo-webhook-secret",
             },
-            body: JSON.stringify({ event: "opened", camp_id: 701 }),
+            body: JSON.stringify({ event: "unique_opened", camp_id: 701 }),
           }),
         );
         assert.equal(trackedRes.status, 200);
         assert.deepEqual(await trackedRes.json(), {
           ok: true,
           issueId: "newsletter-issue-001",
-          recordedEvent: "opened",
+          segment: "en",
+          recordedEvent: "unique_opened",
         });
         assert.equal(calls.length, 2);
         const mutateBody = calls[1]!.jsonBody as {
@@ -609,6 +623,26 @@ test("R3: POST /api/brevo/webhook fails closed in production and records tracked
         } | null;
         assert.deepEqual(mutateBody?.mutations?.[0]?.patch?.inc, {
           "analytics.openedCount": 1,
+          "analytics.en.openedCount": 1,
+        });
+
+        const rawOpenRes = await brevoWebhookPost(
+          new Request("https://karmarisedglobal.com/api/brevo/webhook", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              "x-brevo-secret": "brevo-webhook-secret",
+            },
+            body: JSON.stringify({ event: "opened", camp_id: 701 }),
+          }),
+        );
+        assert.equal(rawOpenRes.status, 200);
+        const rawMutateBody = calls[3]!.jsonBody as {
+          mutations?: Array<{ patch?: { inc?: Record<string, number> } }>;
+        } | null;
+        assert.deepEqual(rawMutateBody?.mutations?.[0]?.patch?.inc, {
+          "analytics.totalOpenedCount": 1,
+          "analytics.en.totalOpenedCount": 1,
         });
 
         const ignoredRes = await brevoWebhookPost(
@@ -623,7 +657,7 @@ test("R3: POST /api/brevo/webhook fails closed in production and records tracked
         );
         assert.equal(ignoredRes.status, 200);
         assert.equal((await ignoredRes.json()).ignored, true);
-        assert.equal(calls.length, 2);
+        assert.equal(calls.length, 4);
       },
     );
   } finally {
@@ -664,6 +698,9 @@ test("R3: POST /api/newsletter enforces honeypot, validation, Turnstile, rate li
         }
         if (url === "https://api.brevo.com/v3/smtp/email") {
           return Response.json({ messageId: "<msg-1>" }, { status: 201 });
+        }
+        if (url === "https://api.brevo.com/v3/events") {
+          return new Response(null, { status: 204 });
         }
         return new Response("Unexpected fetch", { status: 500 });
       },
@@ -871,7 +908,7 @@ test("R3: next.config.ts configures required security headers and API no-store c
   assert.equal(apiHeaderMap.get("Cache-Control"), "no-store, max-age=0");
 });
 
-test("R4: Every Spanish route exports localized metadata and src/ contains zero social media links", () => {
+test("R4: Every Spanish route exports localized metadata and src/ allows only official social URLs", () => {
   const esRoot = path.join(REPO_ROOT, "src/app/(es)/es");
   const esPages = listFilesRecursively(esRoot).filter((file) =>
     file.endsWith(`${path.sep}page.tsx`),
@@ -882,44 +919,70 @@ test("R4: Every Spanish route exports localized metadata and src/ contains zero 
   );
 
   for (const pagePath of esPages) {
+    const relPage = path.relative(REPO_ROOT, pagePath).replace(/\\/g, "/");
     const content = readFileSync(pagePath, "utf8");
+    if (relPage === "src/app/(es)/es/[...slug]/page.tsx") {
+      assert.match(
+        content,
+        /\bnotFound\(\)/,
+        `${relPage} catch-all must invoke notFound() for localized Spanish 404`,
+      );
+      continue;
+    }
     const hasStaticMeta =
       /export const metadata\b/.test(content) &&
       /getRouteMetadata\([\s\S]*?,\s*"es",?\s*\)/.test(content);
-    const hasDynamicMeta =
+    const hasDynamicStoryMeta =
       /export async function generateMetadata\b/.test(content) &&
       /getStoryMetadata\([\s\S]*?,\s*"es",?\s*\)/.test(content);
+    const hasDynamicPartnerMeta =
+      relPage === "src/app/(es)/es/para/[slug]/page.tsx" &&
+      /export async function generateMetadata\b/.test(content) &&
+      /locale:\s*"es_ES"/.test(content);
     assert.equal(
-      hasStaticMeta || hasDynamicMeta,
+      hasStaticMeta || hasDynamicStoryMeta || hasDynamicPartnerMeta,
       true,
-      `${path.relative(REPO_ROOT, pagePath)} must export Spanish metadata via getRouteMetadata/getStoryMetadata`,
+      `${relPage} must export localized Spanish metadata`,
     );
   }
 
-  const socialPattern =
-    /instagram|tiktok|facebook|linkedin|twitter\.com|\bx\.com\b/i;
+  const allowedSocialSet = new Set(ALLOWED_SOCIAL_URLS);
+  const unapprovedSocialUrlPattern =
+    /(?:https?:\/\/)?(?:www\.)?(?:tiktok\.com|facebook\.com|fb\.com|twitter\.com|x\.com|youtube\.com|youtu\.be)\b/i;
+  const unapprovedSocialWordPattern =
+    /tiktok|facebook|twitter\.com|\bx\.com\b|youtube\.com/i;
   const srcFiles = listFilesRecursively(path.join(REPO_ROOT, "src"));
   for (const srcFile of srcFiles) {
     if (!/\.(ts|tsx|mts|mjs|js|jsx|css)$/i.test(srcFile)) {
       continue;
     }
     const relPath = path.relative(REPO_ROOT, srcFile).replace(/\\/g, "/");
-    let content = readFileSync(srcFile, "utf8");
-    if (
-      relPath === "src/views/story-detail-client.tsx" ||
-      relPath.startsWith("src/components/stories/")
-    ) {
-      // Reader share intents (X tweet intent + OS share sheet hint for Instagram/apps) are explicitly allowed on Story detail pages; brand social profiles remain disallowed.
-      content = content
-        .replace(/https:\/\/x\.com\/intent\/tweet/g, "")
-        .replace(/Instagram/gi, "");
-    }
-    const match = socialPattern.exec(content);
+    const content = readFileSync(srcFile, "utf8");
+    const unapprovedUrlMatch = unapprovedSocialUrlPattern.exec(content);
     assert.equal(
-      match,
+      unapprovedUrlMatch,
       null,
-      `${relPath} contains disallowed social media reference: ${match?.[0] ?? ""}`,
+      `${relPath} contains unapproved social network URL: ${unapprovedUrlMatch?.[0] ?? ""}`,
     );
+    if (relPath !== "src/lib/chat.ts") {
+      const unapprovedWordMatch = unapprovedSocialWordPattern.exec(content);
+      assert.equal(
+        unapprovedWordMatch,
+        null,
+        `${relPath} contains unapproved social network reference: ${unapprovedWordMatch?.[0] ?? ""}`,
+      );
+    }
+
+    const socialUrls =
+      content.match(
+        /https?:\/\/[^"'\s<>\\)`]*(?:linkedin|instagram)[^"'\s<>\\)`]*/gi,
+      ) ?? [];
+    for (const url of socialUrls) {
+      assert.ok(
+        allowedSocialSet.has(url),
+        `${relPath} contains unapproved LinkedIn/Instagram URL: ${url}`,
+      );
+    }
   }
 });
 

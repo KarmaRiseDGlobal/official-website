@@ -50,6 +50,12 @@ export const authorType = defineType({
       rows: 3,
     }),
     defineField({
+      name: "spanishBio",
+      title: "Short bio (Spanish)",
+      type: "text",
+      rows: 3,
+    }),
+    defineField({
       name: "portrait",
       title: "Portrait photograph",
       type: "image",

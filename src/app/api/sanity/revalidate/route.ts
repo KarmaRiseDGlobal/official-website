@@ -80,6 +80,9 @@ export async function POST(request: Request) {
 
   revalidatePath("/stories");
   revalidatePath("/es/stories");
+  revalidatePath("/stories/rss.xml");
+  revalidatePath("/es/stories/rss.xml");
+  revalidatePath("/sitemap.xml");
   revalidatePath("/stories/[slug]", "page");
   revalidatePath("/es/stories/[slug]", "page");
   if (slug) {

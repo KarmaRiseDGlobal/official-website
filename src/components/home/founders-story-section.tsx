@@ -20,6 +20,7 @@ import { requestSmoothScrollTo } from "@/components/motion/smooth-scroll";
 import { SectionBridge } from "@/components/shell/section-bridge";
 import { HOME_FOUNDERS_COPY, HOME_PROOF_ITEMS } from "@/data/home-content";
 import { localizePath, type SiteLanguage } from "@/lib/urls";
+import { useTextZoomGuard } from "@/lib/use-text-zoom-guard";
 
 type FoundersStagePhase = "cover" | "split";
 
@@ -131,13 +132,71 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
 
   const [isEnhanced, setIsEnhanced] = useState(false);
   const [phase, setPhase] = useState<FoundersStagePhase>("cover");
+  const isTextZoomed = useTextZoomGuard();
+  const [overflowBlockedKey, setOverflowBlockedKey] = useState<string | null>(
+    null,
+  );
+  const [viewportKey, setViewportKey] = useState("");
+  const isOverflowBlocked =
+    overflowBlockedKey !== null && overflowBlockedKey === viewportKey;
+
+  useEffect(() => {
+    const syncViewportKey = () => {
+      setViewportKey(`${window.innerWidth}x${window.innerHeight}`);
+    };
+    syncViewportKey();
+    window.addEventListener("resize", syncViewportKey, { passive: true });
+    return () => window.removeEventListener("resize", syncViewportKey);
+  }, []);
 
   const phaseRef = useRef<FoundersStagePhase>("cover");
+  const triggerRef = useRef<ScrollTrigger | null>(null);
+  const pendingBeatFocusRef = useRef<number | null>(null);
   const isPinActiveRef = useRef(false);
   const transitionGuardUntilRef = useRef(0);
   const progressRef = useRef(0);
   const beatTopsRef = useRef<number[]>([]);
   const beatNodesRef = useRef<HTMLElement[]>([]);
+
+  const enterSplitFromCover = useCallback(() => {
+    const st = triggerRef.current;
+    pendingBeatFocusRef.current = 0;
+    if (!st || rootRef.current?.dataset.enhanced !== "true") {
+      return;
+    }
+    const targetTop = st.start + (st.end - st.start) * POINT1_LANDING_PROGRESS;
+    requestSmoothScrollTo({
+      top: targetTop,
+      duration: 0.56,
+    });
+  }, []);
+
+  const handleBeatFocus = useCallback(
+    (beatIndex: number) => {
+      const st = triggerRef.current;
+      if (!st || rootRef.current?.dataset.enhanced !== "true") {
+        return;
+      }
+      const maxIndex = Math.max(1, itemCount - 1);
+      const beatProgress =
+        beatIndex === 0
+          ? POINT1_LANDING_PROGRESS
+          : lerp(
+              PARAGRAPH_SCROLL_START,
+              PARAGRAPH_SCROLL_END,
+              beatIndex / maxIndex,
+            );
+      const targetTop = st.start + (st.end - st.start) * beatProgress;
+      if (Math.abs(window.scrollY - targetTop) < 12) {
+        return;
+      }
+      requestSmoothScrollTo({
+        top: targetTop,
+        duration: 0.42,
+      });
+    },
+    [itemCount],
+  );
 
   const applyParagraphProgress = useCallback(
     (scrollProgress: number) => {
@@ -170,7 +229,7 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
 
         const dist = Math.abs(idx - continuousIndex);
         const focus = 1 - smoothstep(Math.min(1, dist * 1.12));
-        const opacity = lerp(0.32, 1, focus);
+        const opacity = lerp(0.62, 1, focus);
         beatEl.style.opacity = opacity.toFixed(3);
       }
     },
@@ -214,26 +273,46 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
       return;
     }
 
+    let skipRafId: number | null = null;
     if (!isPinActiveRef.current) {
       skipActiveViewTransition();
-      const rafId = window.requestAnimationFrame(() => {
+      skipRafId = window.requestAnimationFrame(() => {
         if (!isPinActiveRef.current) {
           skipActiveViewTransition();
         }
       });
-      return () => window.cancelAnimationFrame(rafId);
     }
 
     if (phase !== "split") {
-      return;
+      return () => {
+        if (skipRafId !== null) {
+          window.cancelAnimationFrame(skipRafId);
+        }
+      };
     }
 
     measureParagraphTrack();
 
+    let focusRafId: number | null = null;
+    if (pendingBeatFocusRef.current !== null) {
+      const targetIndex = pendingBeatFocusRef.current;
+      pendingBeatFocusRef.current = null;
+      focusRafId = window.requestAnimationFrame(() => {
+        beatNodesRef.current[targetIndex]?.focus({ preventScroll: true });
+      });
+    }
+
     const viewport = viewportRef.current;
     const track = trackRef.current;
     if (!viewport || !track) {
-      return;
+      return () => {
+        if (skipRafId !== null) {
+          window.cancelAnimationFrame(skipRafId);
+        }
+        if (focusRafId !== null) {
+          window.cancelAnimationFrame(focusRafId);
+        }
+      };
     }
 
     const resizeObserver = new ResizeObserver(() => {
@@ -243,6 +322,12 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
     resizeObserver.observe(track);
 
     return () => {
+      if (skipRafId !== null) {
+        window.cancelAnimationFrame(skipRafId);
+      }
+      if (focusRafId !== null) {
+        window.cancelAnimationFrame(focusRafId);
+      }
       resizeObserver.disconnect();
       beatTopsRef.current = [];
       beatNodesRef.current = [];
@@ -261,24 +346,85 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
 
     media.add(
       {
-        enhancedViewport:
-          "(min-width: 64rem) and (hover: hover) and (pointer: fine)",
+        enhancedViewport: "(min-width: 64rem) and (min-height: 35rem)",
         reducedMotion: "(prefers-reduced-motion: reduce)",
       },
       (context) => {
         const { enhancedViewport, reducedMotion } = context.conditions ?? {};
 
-        if (!enhancedViewport || reducedMotion) {
+        if (
+          !enhancedViewport ||
+          reducedMotion ||
+          isTextZoomed ||
+          isOverflowBlocked
+        ) {
           delete root.dataset.enhanced;
           delete root.dataset.pinning;
+          triggerRef.current = null;
           phaseRef.current = "cover";
           setIsEnhanced(false);
           setPhase("cover");
-          return;
+
+          if (reducedMotion) {
+            return;
+          }
+
+          // Smooth GPU-accelerated reveals on iPad portrait, iPhone, and short landscape without scroll-jacking
+          const fallbackCtx = gsap.context(() => {
+            const isCompactPhone = window.innerWidth < 736;
+            const revealNodes = Array.from(
+              root.querySelectorAll<HTMLElement>(
+                ".founders-fallback-hero, .founders-fallback-beat",
+              ),
+            );
+
+            for (const node of revealNodes) {
+              const rect = node.getBoundingClientRect();
+              if (rect.top <= window.innerHeight * 0.92) {
+                continue;
+              }
+              gsap.set(node, { opacity: 0, y: isCompactPhone ? 16 : 22 });
+              gsap.to(node, {
+                opacity: 1,
+                y: 0,
+                duration: isCompactPhone ? 0.5 : 0.62,
+                ease: "power3.out",
+                clearProps: "transform,opacity",
+                scrollTrigger: {
+                  trigger: node,
+                  start: "top 86%",
+                  once: true,
+                },
+              });
+            }
+            ScrollTrigger.sort();
+          }, root);
+
+          return () => fallbackCtx.revert();
         }
 
         root.dataset.enhanced = "true";
         setIsEnhanced(true);
+
+        const checkPinOverflow = () => {
+          // Never measure overflow against the unenhanced stacked fallback DOM
+          // before React commits setIsEnhanced(true) and mounts .founders-stage-grid.
+          const stageGrid = pin.querySelector<HTMLElement>(
+            ".founders-stage-grid",
+          );
+          if (!stageGrid || pin.dataset.phase === "static") {
+            return false;
+          }
+          const stageRect = stageGrid.getBoundingClientRect();
+          const hasStageOverflow =
+            stageGrid.scrollHeight >
+            Math.max(window.innerHeight, stageRect.height) + 24;
+          if (hasStageOverflow) {
+            setOverflowBlockedKey(`${window.innerWidth}x${window.innerHeight}`);
+            return true;
+          }
+          return false;
+        };
 
         const commitPhase = (
           nextPhase: FoundersStagePhase,
@@ -308,7 +454,7 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
           pin,
           start: "top top",
           end: () =>
-            `+=${Math.round(Math.max(window.innerHeight * 2.55, 2000))}`,
+            `+=${Math.round(Math.max(window.innerHeight * 2.1, 1650))}`,
           scrub: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
@@ -322,6 +468,9 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
           onRefresh: (self) => {
             isPinActiveRef.current = self.isActive;
             progressRef.current = self.progress;
+            if (checkPinOverflow()) {
+              return;
+            }
             const desiredPhase: FoundersStagePhase =
               self.progress >= SPLIT_ENTER_PROGRESS ? "split" : "cover";
             commitPhase(desiredPhase, false);
@@ -345,7 +494,6 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
                 requestSmoothScrollTo({
                   top: point1ScrollTop,
                   duration: 0.46,
-                  lock: true,
                 });
               }
             } else if (
@@ -362,6 +510,8 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
             }
           },
         });
+
+        triggerRef.current = st;
 
         const handleWindowScroll = () => {
           if (performance.now() > transitionGuardUntilRef.current) {
@@ -380,13 +530,19 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
           passive: true,
         });
 
-        ScrollTrigger.sort();
-        ScrollTrigger.refresh();
+        const fitCheckRaf = window.requestAnimationFrame(() => {
+          if (!checkPinOverflow()) {
+            ScrollTrigger.sort();
+            ScrollTrigger.refresh();
+          }
+        });
 
         return () => {
+          window.cancelAnimationFrame(fitCheckRaf);
           window.removeEventListener("scroll", handleWindowScroll);
           skipActiveViewTransition();
           st.kill();
+          triggerRef.current = null;
           delete root.dataset.enhanced;
           delete root.dataset.pinning;
           isPinActiveRef.current = false;
@@ -399,7 +555,12 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
     );
 
     return () => media.revert();
-  }, [applyParagraphProgress, measureParagraphTrack]);
+  }, [
+    applyParagraphProgress,
+    isOverflowBlocked,
+    isTextZoomed,
+    measureParagraphTrack,
+  ]);
 
   function renderCtaButtons(variant: "cover" | "split" | "static") {
     return (
@@ -433,9 +594,9 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
           src={HOME_FOUNDERS_COPY.imageSrc}
           alt={HOME_FOUNDERS_COPY.imageAlt[language]}
           fill
-          sizes="100vw"
-          loading="eager"
-          decoding="sync"
+          sizes="(max-width: 64rem) 100vw, 96vw"
+          loading="lazy"
+          decoding="async"
           className="founders-portrait-img object-cover object-[50%_18%]"
         />
       </figure>
@@ -446,6 +607,7 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
     <section
       className="founders"
       id="company-story"
+      data-chat-avoid
       ref={rootRef}
       aria-label={HOME_FOUNDERS_COPY.heading[language]}
     >
@@ -455,7 +617,11 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
         data-phase={isEnhanced ? phase : "static"}
       >
         {isEnhanced ? (
-          <div className="founders-stage-grid" data-phase={phase}>
+          <div
+            className="founders-stage-grid"
+            data-phase={phase}
+            data-surface="dark"
+          >
             {phase === "cover" ? (
               <ViewTransition
                 key="cover-portrait"
@@ -498,6 +664,55 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
               </ViewTransition>
             ) : null}
 
+            {phase === "cover" ? (
+              <ViewTransition
+                key="cover-cue"
+                enter={COVER_ENTER}
+                exit={COVER_EXIT}
+                default="none"
+              >
+                <button
+                  type="button"
+                  className="founders-cover-cue"
+                  aria-controls="founders-proof-list"
+                  aria-expanded={false}
+                  onClick={enterSplitFromCover}
+                >
+                  <span>{HOME_FOUNDERS_COPY.coverCue[language]}</span>
+                  <svg
+                    viewBox="0 0 16 16"
+                    width="15"
+                    height="15"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 3.5v9m0 0-3.5-3.5M8 12.5 11.5 9" />
+                  </svg>
+                </button>
+              </ViewTransition>
+            ) : null}
+
+            {phase === "cover" ? (
+              <div
+                id="founders-proof-list"
+                className="sr-only"
+                role="region"
+                aria-label={HOME_FOUNDERS_COPY.proofRegionAria[language]}
+                data-founders-cover-proof
+              >
+                {HOME_PROOF_ITEMS.map((proof, index) => (
+                  <article key={proof.id} data-founder-beat-sr={index}>
+                    <h3>{proof.value[language]}</h3>
+                    <p>{proof.detail[language]}</p>
+                  </article>
+                ))}
+              </div>
+            ) : null}
+
             {phase === "split" ? (
               <ViewTransition
                 key="split-portrait"
@@ -527,7 +742,7 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
                 exit={STORY_EXIT}
                 default="none"
               >
-                <div className="founders-split-right">
+                <div className="founders-split-right" id="founders-proof-list">
                   <h2 className="sr-only">
                     {HOME_FOUNDERS_COPY.heading[language]}
                   </h2>
@@ -538,6 +753,8 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
                           key={proof.id}
                           className="founders-beat"
                           data-founder-beat={index}
+                          tabIndex={0}
+                          onFocus={() => handleBeatFocus(index)}
                         >
                           <h3 className="founders-beat-heading">
                             {proof.value[language]}
@@ -568,7 +785,7 @@ export function FoundersStorySection({ language }: FoundersStorySectionProps) {
               </div>
             </div>
 
-            <div className="founders-fallback-beats">
+            <div className="founders-fallback-beats" data-chat-avoid>
               {HOME_PROOF_ITEMS.map((proof) => (
                 <article key={proof.id} className="founders-fallback-beat">
                   <h3 className="founders-beat-heading">

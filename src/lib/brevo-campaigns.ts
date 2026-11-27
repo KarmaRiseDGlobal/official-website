@@ -1,15 +1,30 @@
 import "server-only";
 
+import { OFFICIAL_SOCIALS } from "@/data/socials";
 import { stories as fallbackStories } from "@/data/stories-fallback.server";
 import {
   getLocalizedCategory,
   storyCategoryDetails,
   type StoryCategory,
 } from "@/data/story-types";
+import { appendEmailUtm, normalizeUtmToken } from "@/lib/email-analytics";
+import {
+  EMAIL_COLORS,
+  EMAIL_FONT_SANS,
+  EMAIL_FONT_SERIF,
+  renderEmailLetterHtml,
+  renderEmailLetterText,
+  resolveCanonicalSiteBase,
+  resolveEmailLogoUrl,
+  splitEmailParagraphs,
+  type EmailLetterOptions,
+} from "@/lib/email-layout";
 import type { SanityNewsletterIssue } from "@/lib/sanity";
 import { escapeHtml, isSafeHttpUrl } from "@/lib/security";
 
 const BREVO_CAMPAIGNS_API_URL = "https://api.brevo.com/v3/emailCampaigns";
+const DIGEST_FALLBACK_HERO_PATH =
+  "/images/founders/alma-shirish-planning-table-window-india.jpeg";
 
 function appendQueryParams(url: string, params: string): string {
   return `${url}${url.includes("?") ? "&" : "?"}${params}`;
@@ -38,9 +53,10 @@ const SPANISH_LOCATION_FALLBACKS: Record<string, string> = {
   "India & Spain": "India y España",
   "Spain & India": "España e India",
   "Across India": "Por toda la India",
-  "Spain, Europe & India": "España, Europa e India",
-  "India, Spain & Europe": "India, España y Europa",
-  "Spain & Europe": "España y Europa",
+  "Spain, Europe & India": "España, el resto de Europa e India",
+  "India, Spain & Europe": "India, España y el resto de Europa",
+  "Spain & Europe": "España y el resto de Europa",
+  "Spain and the rest of Europe": "España y el resto de Europa",
   India: "India",
   Spain: "España",
 };
@@ -95,26 +111,6 @@ function resolveNewsletterLocationLabel(
   }
 
   return rawLocation || "India y España";
-}
-
-function formatInlineLetterMarkup(rawParagraph: string): string {
-  const escaped = escapeHtml(rawParagraph);
-  return escaped
-    .replace(
-      /\*\*([^*]+)\*\*/g,
-      '<strong style="font-weight:600;color:#182D20;">$1</strong>',
-    )
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
-}
-
-function splitParagraphs(rawText: string | undefined): string[] {
-  if (!rawText) {
-    return [];
-  }
-  return rawText
-    .split(/\r?\n\s*\r?\n/)
-    .map((part) => part.trim())
-    .filter((part) => part.length > 0);
 }
 
 function resolveLocalizedStoryCtaUrl(
@@ -244,273 +240,121 @@ function resolveNarratorDetails(
   };
 }
 
-function renderLetterNewsletterHtml(
+function buildLetterNewsletterOptions(
   issue: SanityNewsletterIssue,
   language: "en" | "es",
   assetBase: string,
-): string {
+): EmailLetterOptions {
   const isEs = language === "es";
-  const escapedAssetBase = escapeHtml(assetBase);
-  const fontSerif =
-    "'Lora', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
-  const fontSans =
-    "'Plus Jakarta Sans', 'Trebuchet MS', 'Gill Sans', Helvetica, sans-serif";
-
   const rawIssueNumber =
     issue.issueNumber?.trim() || (isEs ? "Edición #001" : "Issue #001");
-  const issueNumber = escapeHtml(
-    isEs
-      ? rawIssueNumber.trim().replace(/^Issue\b/i, "Edición")
-      : rawIssueNumber,
-  );
+  const normalizedIssueNumber = isEs
+    ? rawIssueNumber.replace(/^Issue\b/i, "Edición")
+    : rawIssueNumber;
   const brandTitle = isEs ? "Historias de KarmaRise" : "KarmaRise Stories";
-  const trackLabel = escapeHtml(resolveTrackEyebrow(issue.track, language));
+  const trackLabel = resolveTrackEyebrow(issue.track, language);
 
   const headingText =
     (isEs ? issue.titleEs || issue.titleEn : issue.titleEn) ||
     (isEs
       ? "Historias entre España y la India"
       : "Stories from Spain and India");
-  const heading = escapeHtml(headingText);
-  const preheader = escapeHtml(
+  const preheaderText =
     (isEs ? issue.previewTextEs || issue.previewTextEn : issue.previewTextEn) ||
-      headingText,
-  );
+    headingText;
 
   const narrator = resolveNarratorDetails(issue, language);
-  const introParagraphs = splitParagraphs(
+  const introParagraphs = splitEmailParagraphs(
     isEs ? issue.introEs || issue.introEn : issue.introEn,
   );
-  const bodyParagraphs = splitParagraphs(
+  const bodyParagraphs = splitEmailParagraphs(
     isEs ? issue.bodyEs || issue.bodyEn : issue.bodyEn,
   );
   const allParagraphs = [...introParagraphs, ...bodyParagraphs];
 
-  const ctaUrl = escapeHtml(
-    resolveLocalizedStoryCtaUrl(issue, assetBase, language),
-  );
-  const ctaLabel = escapeHtml(
+  const rawCtaUrl = resolveLocalizedStoryCtaUrl(issue, assetBase, language);
+  const campaignSlug = `${normalizeUtmToken(issue.issueNumber || "issue", 32) || "issue"}-${language}`;
+  const ctaUrl = appendEmailUtm(rawCtaUrl, {
+    source: "brevo",
+    campaign: campaignSlug,
+    content: "ps-cta",
+  });
+  const heroCtaUrl = appendEmailUtm(rawCtaUrl, {
+    source: "brevo",
+    campaign: campaignSlug,
+    content: "hero-image",
+  });
+  const ctaLabel =
     (isEs ? issue.ctaTextEs || issue.ctaTextEn : issue.ctaTextEn) ||
-      (isEs
-        ? "Leer la historia completa en la web"
-        : "Read the full Story on our website"),
-  );
+    (isEs
+      ? "Leer la historia completa en la web"
+      : "Read the full Story on our website");
 
-  const rawLogoOverride = process.env.BREVO_LOGO_CDN_URL?.trim() ?? "";
-  const logoUrl = escapeHtml(
-    rawLogoOverride && isSafeHttpUrl(rawLogoOverride)
-      ? rawLogoOverride
-      : `${assetBase}/brand/main-logo-transparent.png`,
-  );
   const resolvedHero = resolveHeroImageUrl(issue.heroImageUrl, assetBase);
-  const heroAlt = escapeHtml(
+  const heroAlt =
     (isEs
       ? issue.heroImageAltEs || issue.heroImageAltEn
-      : issue.heroImageAltEn) || headingText,
-  );
-  const heroCaption = (
-    isEs
-      ? issue.heroImageCaptionEs || issue.heroImageCaptionEn
-      : issue.heroImageCaptionEn
-  )?.trim();
+      : issue.heroImageAltEn) || headingText;
 
   const photoInsertIndex =
     allParagraphs.length >= 4 ? 2 : Math.min(1, allParagraphs.length);
   const beforePhotoParagraphs = allParagraphs.slice(0, photoInsertIndex);
   const afterPhotoParagraphs = allParagraphs.slice(photoInsertIndex);
 
-  const renderParagraphBlock = (paragraph: string): string => {
-    if (paragraph.startsWith("> ")) {
-      const quoteText = formatInlineLetterMarkup(paragraph.slice(2).trim());
-      return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:22px 0;">
-        <tr>
-          <td style="border-left:3px solid #BD7057;padding:4px 0 4px 18px;font-family:${fontSerif};font-size:18px;font-style:italic;line-height:1.65;color:#182D20;">
-            ${quoteText}
-          </td>
-        </tr>
-      </table>`;
-    }
-
-    return `<p style="margin:0 0 18px;font-family:${fontSerif};font-size:17px;line-height:1.78;color:#25201D;">
-      ${formatInlineLetterMarkup(paragraph)}
-    </p>`;
-  };
-
-  const photoHtml = resolvedHero
-    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:24px 0 26px;">
-        <tr>
-          <td style="padding:0;line-height:0;">
-            <a href="${ctaUrl}" style="display:block;text-decoration:none;">
-              <img src="${escapeHtml(resolvedHero)}" alt="${heroAlt}" width="512" style="display:block;width:100%;max-width:512px;height:auto;border-radius:12px;border:0;" />
-            </a>
-          </td>
-        </tr>
-        ${
-          heroCaption
-            ? `<tr>
-                <td style="padding:10px 4px 0;font-family:${fontSerif};font-size:13.5px;font-style:italic;line-height:1.58;color:#584B44;">
-                  ${escapeHtml(heroCaption)}
-                </td>
-              </tr>`
-            : ""
-        }
-      </table>`
-    : "";
-
-  const replyPrompt = (
+  const replyPromptText = (
     isEs ? issue.replyPromptEs || issue.replyPromptEn : issue.replyPromptEn
   )?.trim();
   const replyHelper = isEs
     ? "Dale a responder a este correo. Llega directamente a nuestra bandeja."
     : "Hit reply to this email. Every answer lands straight in our inbox.";
 
-  const replyHtml = replyPrompt
-    ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:26px 0 28px;background-color:#E8DEC9;border-radius:12px;">
-        <tr>
-          <td style="padding:20px 22px;border-left:3px solid #BD7057;border-radius:12px;">
-            <p style="margin:0 0 8px;font-family:${fontSerif};font-size:17px;line-height:1.65;color:#182D20;font-weight:500;">
-              ${formatInlineLetterMarkup(replyPrompt)}
-            </p>
-            <p style="margin:0;font-family:${fontSans};font-size:12.5px;line-height:1.55;color:#584B44;">
-              ${replyHelper}
-            </p>
-          </td>
-        </tr>
-      </table>`
-    : "";
-
   const psText = (isEs ? issue.psEs || issue.psEn : issue.psEn)?.trim();
-  const psLabel = isEs ? "P.D." : "P.S.";
-  const psHtml =
-    psText || ctaUrl
-      ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;border-top:1px solid #CDBB9C;">
-          <tr>
-            <td style="padding-top:22px;font-family:${fontSerif};font-size:15.5px;line-height:1.72;color:#3E332C;">
-              ${
-                psText
-                  ? `<p style="margin:0 0 12px;">
-                      <strong style="font-family:${fontSans};font-size:12px;letter-spacing:0.8px;color:#833E28;text-transform:uppercase;">${psLabel}</strong>&nbsp; ${formatInlineLetterMarkup(psText)}
-                    </p>`
-                  : ""
-              }
-              <p style="margin:0;font-family:${fontSans};font-size:13.5px;line-height:1.6;">
-                <a href="${ctaUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">${ctaLabel} &rarr;</a>
-              </p>
-            </td>
-          </tr>
-        </table>`
-      : "";
 
-  const prefEnUrl = escapeHtml(
-    `${assetBase}/api/newsletter/preferences?email={{ contact.EMAIL }}&lang=EN`,
+  return {
+    language,
+    siteBaseUrl: assetBase,
+    brandTitle,
+    issueTag: `${normalizedIssueNumber} · ${trackLabel}`,
+    heading: headingText,
+    preheader: preheaderText,
+    dateline: narrator.dateline,
+    beforePhotoParagraphs,
+    heroPhoto: resolvedHero
+      ? {
+          url: resolvedHero,
+          alt: heroAlt,
+          linkHref: heroCtaUrl,
+        }
+      : null,
+    afterPhotoParagraphs,
+    replyPrompt: replyPromptText
+      ? {
+          question: replyPromptText,
+          helper: replyHelper,
+        }
+      : null,
+    signoffLead: narrator.signoffLead,
+    signoffName: narrator.name,
+    signoffLocation: narrator.location,
+    ps: {
+      ...(psText ? { text: psText } : {}),
+      ctaLabel,
+      ctaHref: ctaUrl,
+    },
+    footerMode: "marketing",
+    footerEmail: "stories@karmarisedglobal.com",
+  };
+}
+
+/** Renders the plain-text companion body for a KarmaRise letter newsletter issue. */
+export function renderNewsletterText(
+  issue: SanityNewsletterIssue,
+  language: "en" | "es",
+): string {
+  const assetBase = resolveCanonicalSiteBase();
+  return renderEmailLetterText(
+    buildLetterNewsletterOptions(issue, language, assetBase),
   );
-  const prefEsUrl = escapeHtml(
-    `${assetBase}/api/newsletter/preferences?email={{ contact.EMAIL }}&lang=ES`,
-  );
-
-  const footerNote = isEs
-    ? "Te escribimos porque te apuntaste a Historias de KarmaRise."
-    : "You are receiving this letter because you signed up for KarmaRise Stories.";
-  const unsubscribeLabel = isEs
-    ? "Darte de baja cuando quieras"
-    : "Unsubscribe anytime";
-
-  return `<!DOCTYPE html>
-<html lang="${language}">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${heading}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-</head>
-<body style="margin:0;padding:0;background-color:#D9DFD3;font-family:${fontSerif};color:#25201D;-webkit-font-smoothing:antialiased;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
-    ${preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
-  </div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#D9DFD3;padding:34px 14px 40px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background-color:#F2ECDF;border:1px solid #DDD2BD;border-radius:20px;overflow:hidden;box-shadow:0 12px 34px rgba(24,45,32,0.08);">
-          <tr>
-            <td style="padding:22px 44px 18px;border-bottom:1px solid #DFD4BF;background-color:#F2ECDF;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td align="left" valign="middle">
-                    <a href="${escapedAssetBase}" style="text-decoration:none;display:inline-block;">
-                      <img src="${logoUrl}" alt="KarmaRise D Global" width="52" style="display:block;width:52px;height:auto;border:0;" />
-                    </a>
-                  </td>
-                  <td align="right" valign="middle" style="font-family:${fontSans};font-size:11px;line-height:1.55;color:#584B44;">
-                    <span style="display:block;letter-spacing:1.5px;text-transform:uppercase;color:#833E28;font-weight:600;">${brandTitle}</span>
-                    <span style="display:block;color:#584B44;">${issueNumber} &middot; ${trackLabel}</span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:32px 44px 36px;background-color:#F2ECDF;">
-              <h1 style="margin:0 0 12px;font-family:${fontSerif};font-size:30px;line-height:1.22;font-weight:400;font-style:italic;color:#182D20;">
-                ${heading}
-              </h1>
-              <p style="margin:0 0 26px;padding-bottom:18px;border-bottom:1px solid #DFD4BF;font-family:${fontSans};font-size:12px;letter-spacing:0.3px;color:#584B44;">
-                ${escapeHtml(narrator.dateline)}
-              </p>
-
-              ${beforePhotoParagraphs.map(renderParagraphBlock).join("")}
-              ${photoHtml}
-              ${afterPhotoParagraphs.map(renderParagraphBlock).join("")}
-              ${replyHtml}
-
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;">
-                <tr>
-                  <td>
-                    <p style="margin:0 0 4px;font-family:${fontSerif};font-size:16px;font-style:italic;color:#4D342F;">
-                      ${narrator.signoffLead}
-                    </p>
-                    <p style="margin:0 0 4px;font-family:${fontSerif};font-size:23px;line-height:1.2;color:#182D20;">
-                      ${escapeHtml(narrator.name)}
-                    </p>
-                    <p style="margin:0;font-family:${fontSans};font-size:12px;letter-spacing:0.5px;color:#833E28;">
-                      ${escapeHtml(narrator.location)}
-                    </p>
-                  </td>
-                </tr>
-              </table>
-
-              ${psHtml}
-            </td>
-          </tr>
-        </table>
-
-        <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;padding:22px 18px 6px;">
-          <tr>
-            <td align="center" style="font-family:${fontSans};font-size:12px;line-height:1.7;color:#29482F;">
-              <p style="margin:0 0 6px;">
-                ${
-                  isEs
-                    ? `Leyendo en español &nbsp;&middot;&nbsp; <a href="${prefEnUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">Prefer English? Switch here</a>`
-                    : `Reading in English &nbsp;&middot;&nbsp; <a href="${prefEsUrl}" style="color:#833E28;font-weight:600;text-decoration:underline;">¿Prefieres español? Cambia aquí</a>`
-                }
-              </p>
-              <p style="margin:0 0 4px;">
-                ${footerNote}
-              </p>
-              <p style="margin:0;">
-                <a href="mailto:stories@karmarisedglobal.com" style="color:#833E28;text-decoration:underline;">stories@karmarisedglobal.com</a>
-                &nbsp;&middot;&nbsp;
-                <a href="{{ unsubscribe }}" style="color:#29482F;text-decoration:underline;">${unsubscribeLabel}</a>
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
 }
 
 /** Renders the KarmaRise Stories HTML email template for English or Spanish editions. */
@@ -519,31 +363,20 @@ export function renderNewsletterHtml(
   language: "en" | "es",
 ): string {
   const isEs = language === "es";
-  const rawSiteUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL || "https://karmarisedglobal.com"
-  )
-    .trim()
-    .replace(/\/$/, "");
-  const candidateBase = rawSiteUrl.includes("localhost")
-    ? "https://karmarisedglobal.com"
-    : rawSiteUrl;
-  const assetBase = isSafeHttpUrl(candidateBase)
-    ? candidateBase
-    : "https://karmarisedglobal.com";
+  const assetBase = resolveCanonicalSiteBase();
 
   const hasLetterBody = Boolean(
     (isEs ? issue.bodyEs || issue.bodyEn : issue.bodyEn)?.trim(),
   );
   if (issue.format === "letter" || hasLetterBody) {
-    return renderLetterNewsletterHtml(issue, language, assetBase);
+    return renderEmailLetterHtml(
+      buildLetterNewsletterOptions(issue, language, assetBase),
+    );
   }
 
+  // Fallback digest renderer for legacy Sanity issues without letter body text.
   const escapedAssetBase = escapeHtml(assetBase);
-
-  const fontSerif =
-    "'Lora', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
-  const fontSans =
-    "'Plus Jakarta Sans', 'Trebuchet MS', 'Gill Sans', Helvetica, sans-serif";
+  const campaignSlug = `${normalizeUtmToken(issue.issueNumber || "digest", 32) || "digest"}-${language}`;
 
   const rawIssueNumber =
     issue.issueNumber?.trim() || (isEs ? "Edición #001" : "Issue #001");
@@ -578,31 +411,66 @@ export function renderNewsletterHtml(
     (isEs ? issue.ctaTextEs || issue.ctaTextEn : issue.ctaTextEn) ||
       (isEs ? "Ven a leer nuestras historias" : "Read our latest Stories"),
   );
-  const rawCtaUrl = issue.ctaUrl?.trim() ?? "";
+
+  const rawCtaBase = (() => {
+    if (isEs) {
+      const explicitEs = issue.ctaUrlEs?.trim() ?? "";
+      if (explicitEs && isSafeHttpUrl(explicitEs)) {
+        return explicitEs;
+      }
+    }
+    const rawCta = issue.ctaUrl?.trim() ?? "";
+    if (rawCta && isSafeHttpUrl(rawCta)) {
+      if (
+        isEs &&
+        rawCta.startsWith(assetBase) &&
+        !rawCta.startsWith(`${assetBase}/es/`)
+      ) {
+        const pathPart = rawCta.slice(assetBase.length);
+        if (pathPart.startsWith("/stories")) {
+          return `${assetBase}/es${pathPart}`;
+        }
+      }
+      return rawCta;
+    }
+    return isEs ? `${assetBase}/es/stories` : `${assetBase}/stories`;
+  })();
+
   const ctaUrl = escapeHtml(
-    isSafeHttpUrl(rawCtaUrl) ? rawCtaUrl : `${assetBase}/stories`,
+    appendEmailUtm(rawCtaBase, {
+      source: "brevo",
+      campaign: campaignSlug,
+      content: "primary-cta",
+    }),
   );
-  const readMoreLabel = isEs ? "Leer esta historia →" : "Read this Story →";
-  const signoff = isEs ? "Un abrazo enorme," : "Can't wait to hear from you,";
+  const readMoreLabel = isEs ? "Leer esta historia" : "Read this Story";
+  const signoff = isEs ? "Un abrazo," : "Warmly,";
   const founders = isEs ? "Alma y Shirish" : "Alma & Shirish";
   const footerNote = isEs
-    ? "Te escribimos porque te apuntaste para recibir nuestras historias en KarmaRise."
+    ? "Te escribimos porque te apuntaste a Historias de KarmaRise."
     : "You are receiving this letter because you signed up for KarmaRise Stories.";
   const unsubscribeLabel = isEs
     ? "Darte de baja cuando quieras"
     : "Unsubscribe anytime";
 
-  const rawLogoOverride = process.env.BREVO_LOGO_CDN_URL?.trim() ?? "";
-  const logoUrl = escapeHtml(
-    rawLogoOverride && isSafeHttpUrl(rawLogoOverride)
-      ? rawLogoOverride
-      : `${assetBase}/brand/main-logo-transparent.png`,
-  );
+  const logoUrl = escapeHtml(resolveEmailLogoUrl(assetBase));
   const rawHeroImageUrl = issue.heroImageUrl?.trim() ?? "";
   const heroImageUrl = escapeHtml(
     isSafeHttpUrl(rawHeroImageUrl)
       ? appendQueryParams(rawHeroImageUrl, "w=1100&q=85&auto=format")
-      : `${assetBase}/images/founders/alma-and-shirish-founders.jpg`,
+      : `${assetBase}${DIGEST_FALLBACK_HERO_PATH}`,
+  );
+  const heroAlt = escapeHtml(
+    (isEs
+      ? issue.heroImageAltEs || issue.heroImageAltEn
+      : issue.heroImageAltEn) || headingText,
+  );
+
+  const prefEnUrl = escapeHtml(
+    `${assetBase}/api/newsletter/preferences?email={{ contact.EMAIL }}&lang=EN`,
+  );
+  const prefEsUrl = escapeHtml(
+    `${assetBase}/api/newsletter/preferences?email={{ contact.EMAIL }}&lang=ES`,
   );
 
   const storiesHtml = (issue.selectedStories ?? [])
@@ -629,7 +497,14 @@ export function renderNewsletterHtml(
         resolveNewsletterLocationLabel(story, language),
       );
       const storyUrl = escapeHtml(
-        `${assetBase}${isEs ? "/es" : ""}/stories/${encodeURIComponent(story.slug || "")}`,
+        appendEmailUtm(
+          `${assetBase}${isEs ? "/es" : ""}/stories/${encodeURIComponent(story.slug || "")}`,
+          {
+            source: "brevo",
+            campaign: campaignSlug,
+            content: `story-${normalizeUtmToken(story.slug || "item", 32)}`,
+          },
+        ),
       );
       const rawLeadImageUrl = story.leadImageUrl?.trim() ?? "";
       const safeLeadImageUrl = isSafeHttpUrl(rawLeadImageUrl)
@@ -643,18 +518,18 @@ export function renderNewsletterHtml(
 
       return `
         <tr>
-          <td style="padding: 24px 0; border-bottom: 1px solid #CDBB9C;">
+          <td style="padding: 24px 0; border-bottom: 1px solid ${EMAIL_COLORS.paperDivider};">
             ${storyImageHtml}
-            <p style="margin: 0 0 8px; font-family: ${fontSans}; font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #833E28;">
+            <p style="margin: 0 0 8px; font-family: ${EMAIL_FONT_SANS}; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: ${EMAIL_COLORS.clayInk};">
               ${category} &middot; ${location}
             </p>
-            <h2 style="margin: 0 0 10px; font-family: ${fontSerif}; font-size: 22px; font-weight: 500; line-height: 1.25; color: #182D20;">
-              <a href="${storyUrl}" style="color: #182D20; text-decoration: none;">${title}</a>
+            <h2 style="margin: 0 0 10px; font-family: ${EMAIL_FONT_SERIF}; font-size: 22px; font-weight: 400; line-height: 1.25; color: ${EMAIL_COLORS.forestDeep};">
+              <a href="${storyUrl}" style="color: ${EMAIL_COLORS.forestDeep}; text-decoration: none;">${title}</a>
             </h2>
-            <p style="margin: 0 0 14px; font-family: ${fontSerif}; font-size: 16px; line-height: 1.7; color: #25201D;">
+            <p style="margin: 0 0 14px; font-family: ${EMAIL_FONT_SERIF}; font-size: 16px; line-height: 1.7; color: ${EMAIL_COLORS.bodyInk};">
               ${summary}
             </p>
-            <a href="${storyUrl}" style="font-family: ${fontSans}; font-size: 13px; font-weight: 600; color: #833E28; text-decoration: underline;">
+            <a href="${storyUrl}" style="font-family: ${EMAIL_FONT_SANS}; font-size: 14px; font-weight: 600; color: ${EMAIL_COLORS.clayInk}; text-decoration: underline;">
               ${readMoreLabel}
             </a>
           </td>
@@ -668,35 +543,52 @@ export function renderNewsletterHtml(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="supported-color-schemes" content="light" />
   <title>${heading}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      supported-color-schemes: light;
+    }
+    @media only screen and (max-width: 600px) {
+      .kr-outer { padding: 14px 8px 24px !important; }
+      .kr-pad { padding: 24px 20px !important; }
+      .kr-h1 { font-size: 25px !important; line-height: 1.24 !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background-color:#D9DFD3;font-family:${fontSerif};color:#25201D;-webkit-font-smoothing:antialiased;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-    ${preheader}
+<body style="margin:0;padding:0;background-color:${EMAIL_COLORS.outerBg};font-family:${EMAIL_FONT_SERIF};color:${EMAIL_COLORS.bodyInk};-webkit-font-smoothing:antialiased;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">
+    ${preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#D9DFD3;padding:40px 14px;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="kr-outer" style="background-color:${EMAIL_COLORS.outerBg};padding:40px 14px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="580" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:580px;background-color:#F2ECDF;border-radius:24px;overflow:hidden;box-shadow:0 14px 38px rgba(24,45,32,0.08);">
+        <!--[if mso]>
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" align="center" style="width:600px;">
+        <tr><td>
+        <![endif]-->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background-color:${EMAIL_COLORS.paper};border:1px solid ${EMAIL_COLORS.paperBorder};border-radius:20px;overflow:hidden;box-shadow:0 12px 34px rgba(24,45,32,0.08);">
           <tr>
-            <td align="center" style="padding:42px 36px 20px;background-color:#F2ECDF;">
-              <a href="${escapedAssetBase}" style="text-decoration:none;display:inline-block;">
-                <img src="${logoUrl}" alt="KarmaRise" width="84" style="display:block;width:84px;height:auto;margin:0 auto;border:0;" />
+            <td align="center" class="kr-pad" style="padding:36px 36px 20px;background-color:${EMAIL_COLORS.paper};">
+              <a href="${escapedAssetBase}${isEs ? "/es" : ""}" style="text-decoration:none;display:inline-block;background-color:${EMAIL_COLORS.paper};padding:6px 8px;border-radius:10px;">
+                <img src="${logoUrl}" alt="KarmaRise D Global" width="84" style="display:block;width:84px;height:auto;margin:0 auto;border:0;" />
               </a>
-              <p style="margin:14px 0 0;font-family:${fontSans};font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#BD7057;font-weight:600;">
+              <p style="margin:14px 0 0;font-family:${EMAIL_FONT_SANS};font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:${EMAIL_COLORS.clayInk};font-weight:600;">
                 ${isEs ? "Historias de KarmaRise" : "KarmaRise Stories"} &middot; ${issueNumber}
               </p>
             </td>
           </tr>
           <tr>
-            <td style="padding:10px 44px 28px;background-color:#F2ECDF;">
-              <h1 style="margin:0 0 20px;font-family:${fontSerif};font-size:30px;line-height:1.22;font-weight:400;font-style:italic;color:#182D20;text-align:center;">
+            <td class="kr-pad" style="padding:10px 44px 28px;background-color:${EMAIL_COLORS.paper};">
+              <h1 class="kr-h1" style="margin:0 0 20px;font-family:${EMAIL_FONT_SERIF};font-size:30px;line-height:1.22;font-weight:400;font-style:italic;color:${EMAIL_COLORS.forestDeep};text-align:center;">
                 ${heading}
               </h1>
-              <p style="margin:0;font-family:${fontSerif};font-size:17px;line-height:1.8;color:#25201D;">
+              <p style="margin:0;font-family:${EMAIL_FONT_SERIF};font-size:17px;line-height:1.8;color:${EMAIL_COLORS.bodyInk};">
                 ${intro}
               </p>
             </td>
@@ -704,37 +596,37 @@ export function renderNewsletterHtml(
           <tr>
             <td style="padding:0;line-height:0;font-size:0;">
               <a href="${ctaUrl}" style="display:block;text-decoration:none;">
-                <img src="${heroImageUrl}" alt="${heading}" width="580" style="display:block;width:100%;max-width:580px;height:auto;border:0;" />
+                <img src="${heroImageUrl}" alt="${heroAlt}" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
               </a>
             </td>
           </tr>
           <tr>
-            <td style="padding:28px 44px 36px;background-color:#F2ECDF;">
+            <td class="kr-pad" style="padding:28px 44px 36px;background-color:${EMAIL_COLORS.paper};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 ${storiesHtml}
               </table>
-              <p style="margin:28px 0 28px;font-family:${fontSerif};font-size:17px;font-style:italic;line-height:1.75;color:#833E28;">
+              <p style="margin:28px 0 28px;font-family:${EMAIL_FONT_SERIF};font-size:17px;font-style:italic;line-height:1.75;color:${EMAIL_COLORS.clayInk};">
                 ${closing}
               </p>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 36px;">
                 <tr>
-                  <td align="center" bgcolor="#BD7057" style="border-radius:999px;background-color:#BD7057;">
-                    <a href="${ctaUrl}" style="display:inline-block;padding:15px 36px;font-family:${fontSans};font-size:14px;font-weight:600;letter-spacing:0.4px;color:#FAF6EE;text-decoration:none;border-radius:999px;">
+                  <td align="center" bgcolor="${EMAIL_COLORS.buttonBg}" style="border-radius:999px;background-color:${EMAIL_COLORS.buttonBg};">
+                    <a href="${ctaUrl}" style="display:inline-block;padding:15px 36px;mso-padding-alt:15px 36px;font-family:${EMAIL_FONT_SANS};font-size:14px;font-weight:600;letter-spacing:0.4px;color:${EMAIL_COLORS.buttonText};text-decoration:none;border-radius:999px;">
                       ${ctaLabel}
                     </a>
                   </td>
                 </tr>
               </table>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #CDBB9C;padding-top:24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid ${EMAIL_COLORS.paperDivider};padding-top:24px;">
                 <tr>
                   <td>
-                    <p style="margin:0 0 6px;font-family:${fontSerif};font-size:16px;font-style:italic;color:#4D342F;">
+                    <p style="margin:0 0 6px;font-family:${EMAIL_FONT_SERIF};font-size:16px;font-style:italic;color:${EMAIL_COLORS.signoffWarm};">
                       ${signoff}
                     </p>
-                    <p style="margin:0 0 4px;font-family:${fontSerif};font-size:22px;color:#182D20;">
+                    <p style="margin:0 0 4px;font-family:${EMAIL_FONT_SERIF};font-size:22px;color:${EMAIL_COLORS.forestDeep};">
                       ${founders}
                     </p>
-                    <p style="margin:0;font-family:${fontSans};font-size:12px;letter-spacing:0.6px;color:#833E28;">
+                    <p style="margin:0;font-family:${EMAIL_FONT_SANS};font-size:13px;letter-spacing:0.4px;color:${EMAIL_COLORS.clayInk};">
                       ${isEs ? "España &middot; India" : "Spain &middot; India"}
                     </p>
                   </td>
@@ -743,16 +635,35 @@ export function renderNewsletterHtml(
             </td>
           </tr>
         </table>
-        <table role="presentation" width="540" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:540px;padding:24px 20px 8px;">
+        <!--[if mso]>
+        </td></tr>
+        </table>
+        <![endif]-->
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;padding:24px 18px 8px;">
           <tr>
-            <td align="center" style="font-family:${fontSans};font-size:12px;line-height:1.7;color:#29482F;">
+            <td align="center" style="font-family:${EMAIL_FONT_SANS};font-size:13px;line-height:1.7;color:${EMAIL_COLORS.forestFooter};">
+              <p style="margin:0 0 6px;">
+                ${
+                  isEs
+                    ? `Leyendo en español &nbsp;&middot;&nbsp; <a href="${prefEnUrl}" style="color:${EMAIL_COLORS.clayInk};font-weight:600;text-decoration:underline;">Prefer English? Switch here</a>`
+                    : `Reading in English &nbsp;&middot;&nbsp; <a href="${prefEsUrl}" style="color:${EMAIL_COLORS.clayInk};font-weight:600;text-decoration:underline;">¿Prefieres español? Cambia aquí</a>`
+                }
+              </p>
+              <p style="margin:0 0 6px;">
+                ${isEs ? "También en:" : "Follow along:"}
+                &nbsp;<a href="${escapeHtml(OFFICIAL_SOCIALS.karmariseLinkedIn)}" target="_blank" rel="noopener noreferrer" style="color:${EMAIL_COLORS.clayInk};text-decoration:underline;">LinkedIn</a>
+                &nbsp;&middot;&nbsp;
+                <a href="${escapeHtml(OFFICIAL_SOCIALS.karmariseInstagram)}" target="_blank" rel="noopener noreferrer" style="color:${EMAIL_COLORS.clayInk};text-decoration:underline;">Instagram</a>
+                &nbsp;&middot;&nbsp;
+                <a href="${escapeHtml(OFFICIAL_SOCIALS.almariseInstagram)}" target="_blank" rel="noopener noreferrer" style="color:${EMAIL_COLORS.clayInk};text-decoration:underline;">AlmaRise D Brand</a>
+              </p>
               <p style="margin:0 0 4px;">
                 ${footerNote}
               </p>
               <p style="margin:0;">
-                <a href="mailto:stories@karmarisedglobal.com" style="color:#833E28;text-decoration:underline;">stories@karmarisedglobal.com</a>
+                <a href="mailto:stories@karmarisedglobal.com" style="color:${EMAIL_COLORS.clayInk};text-decoration:underline;">stories@karmarisedglobal.com</a>
                 &nbsp;&middot;&nbsp;
-                <a href="{{ unsubscribe }}" style="color:#29482F;text-decoration:underline;">${unsubscribeLabel}</a>
+                <a href="{{ unsubscribe }}" style="color:${EMAIL_COLORS.forestFooter};text-decoration:underline;">${unsubscribeLabel}</a>
               </p>
             </td>
           </tr>
@@ -805,8 +716,8 @@ function resolveCampaignSenderName(
   return (
     process.env.BREVO_SENDER_NAME?.trim() ||
     (language === "es"
-      ? "Alma y Shirish · KarmaRise"
-      : "Alma & Shirish · KarmaRise")
+      ? "Alma y Shirish · KarmaRise D Global"
+      : "Alma & Shirish · KarmaRise D Global")
   );
 }
 
@@ -1046,7 +957,6 @@ export async function syncNewsletterIssueToBrevo(
     if (enResult.ok) {
       brevoCampaignIdEn = enResult.id;
     } else {
-      brevoCampaignIdEn = undefined;
       errors.push(`EN: ${enResult.error}`);
     }
   }
@@ -1073,7 +983,6 @@ export async function syncNewsletterIssueToBrevo(
     if (esResult.ok) {
       brevoCampaignIdEs = esResult.id;
     } else {
-      brevoCampaignIdEs = undefined;
       errors.push(`ES: ${esResult.error}`);
     }
   }

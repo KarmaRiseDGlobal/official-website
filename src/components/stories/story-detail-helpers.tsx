@@ -386,7 +386,6 @@ export function convertSectionsToPortableChapters(
         _type: "image",
         url: img.url,
         alt: img.alt,
-        caption: img.caption,
         aspectRatio: img.aspectRatio,
         objectPosition: img.objectPosition,
       });
@@ -533,7 +532,7 @@ export function renderPortableProseBlocks(
         elements.push(
           <ListTag
             key={`list-${listItems[0]!.key}`}
-            className={`m-0 grid max-w-[60ch] gap-2.5 pl-6 text-[length:var(--text-md)] leading-[1.82] text-[var(--color-ink)] ${
+            className={`m-0 grid max-w-[var(--measure-copy)] gap-2.5 ps-6 text-[length:var(--text-md)] leading-[1.68] text-[var(--color-ink)] ${
               listKind === "number" ? "list-decimal" : "list-disc"
             } marker:font-semibold marker:text-[var(--color-clay-ink)]`}
           >
@@ -563,7 +562,7 @@ export function renderPortableProseBlocks(
         elements.push(
           <h3
             key={block._key}
-            className="max-w-[60ch] pt-3 font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.2] font-normal text-[var(--color-forest-deep)]"
+            className="max-w-[var(--measure-copy)] pt-3 font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.2] font-normal text-[var(--color-forest-deep)]"
           >
             {renderedChildren}
           </h3>,
@@ -572,9 +571,9 @@ export function renderPortableProseBlocks(
         elements.push(
           <blockquote
             key={block._key}
-            className="m-0 my-4 grid max-w-[56ch] gap-3 border-l-2 border-[var(--color-clay)] py-2 pl-6 sm:pl-8"
+            className="m-0 my-4 grid max-w-[var(--measure-copy)] gap-3 border-s border-[var(--color-clay)] py-2 ps-6 sm:ps-8"
           >
-            <p className="font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.28] text-[var(--color-forest-deep)] md:text-[length:var(--text-2xl)]">
+            <p className="font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.32] text-[var(--color-forest-deep)] md:text-[length:var(--text-2xl)]">
               &ldquo;{renderedChildren}&rdquo;
             </p>
           </blockquote>,
@@ -585,9 +584,9 @@ export function renderPortableProseBlocks(
         elements.push(
           <p
             key={block._key}
-            className={`max-w-[60ch] text-[length:var(--text-md)] leading-[1.82] text-[var(--color-ink)] ${
+            className={`max-w-[var(--measure-copy)] text-[length:var(--text-md)] leading-[1.68] text-[var(--color-ink)] ${
               isFirst
-                ? "first-letter:float-left first-letter:mr-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[length:var(--text-display-s)] first-letter:leading-[0.94] first-letter:text-[var(--color-forest-deep)]"
+                ? "first-letter:float-start first-letter:me-3 first-letter:font-[family-name:var(--font-display)] first-letter:text-[length:var(--text-display-s)] first-letter:leading-[0.94] first-letter:text-[var(--color-forest-deep)]"
                 : ""
             }`}
           >
@@ -599,9 +598,9 @@ export function renderPortableProseBlocks(
       elements.push(
         <blockquote
           key={block._key}
-          className="m-0 my-4 grid max-w-[56ch] gap-3 border-l-2 border-[var(--color-clay)] py-2 pl-6 sm:pl-8"
+          className="m-0 my-4 grid max-w-[var(--measure-copy)] gap-3 border-s border-[var(--color-clay)] py-2 ps-6 sm:ps-8"
         >
-          <p className="font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.28] text-[var(--color-forest-deep)] md:text-[length:var(--text-2xl)]">
+          <p className="font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.32] text-[var(--color-forest-deep)] md:text-[length:var(--text-2xl)]">
             &ldquo;{block.text}&rdquo;
           </p>
           {block.attribution ? (

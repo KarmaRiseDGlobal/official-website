@@ -3,25 +3,25 @@
 *::after {
   box-sizing: border-box;
 }
-body {
-  overflow-x: clip;
-}
 html {
   scrollbar-color: var(--color-muted) var(--color-paper);
-  scroll-padding-top: calc(var(--nav-height, 112px) + var(--space-md));
+  scrollbar-gutter: stable;
+  scroll-padding-block-start: 4.5rem;
 }
 body {
   margin: 0;
+  overflow-x: clip;
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: var(--text-md);
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   caret-color: var(--color-accent);
 }
 ::selection {
-  background: color-mix(in oklab, var(--color-accent) 22%, transparent);
+  background: color-mix(in oklab, var(--color-clay) 28%, transparent);
 }
 :focus-visible {
   outline: 2px solid var(--color-focus);

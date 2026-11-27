@@ -32,11 +32,6 @@ export interface ContactDepartmentEntry {
   readonly areaServed: string | readonly string[];
 }
 
-export const REPLY_SLA: LocalizedText = {
-  en: "within 1–2 business days",
-  es: "en 1 o 2 días laborables",
-};
-
 export const PRODUCT_BRIEF_POST_STEPS: readonly ProductBriefStep[] = [
   {
     number: "01",
@@ -45,8 +40,8 @@ export const PRODUCT_BRIEF_POST_STEPS: readonly ProductBriefStep[] = [
       es: "Alma lee tu briefing",
     },
     body: {
-      en: "She replies personally within 1–2 business days in English, Spanish, or Portuguese with initial thoughts and practical questions.",
-      es: "Te contesta personalmente en 1 o 2 días laborables en español, inglés o portugués con primeras impresiones y preguntas prácticas.",
+      en: "She replies personally in English, Spanish, or Portuguese with initial thoughts and practical questions.",
+      es: "Te contesta personalmente en español, inglés o portugués con primeras impresiones y preguntas prácticas.",
     },
   },
   {
@@ -56,8 +51,8 @@ export const PRODUCT_BRIEF_POST_STEPS: readonly ProductBriefStep[] = [
       es: "Lo hablamos cara a cara",
     },
     body: {
-      en: "On a relaxed Google Meet call, we look at your brand, what your customers reach for in your shop, and what the finished piece needs to do.",
-      es: "En una videollamada tranquila por Google Meet hablamos de tu marca, de lo que busca la gente que entra en tu tienda y de cómo debe comportarse la pieza terminada.",
+      en: "On a relaxed video call, we look at your brand, what your customers reach for in your shop, and what the finished piece needs to do.",
+      es: "En una videollamada tranquila hablamos de tu marca, de lo que busca la gente en tu tienda y de cómo debe comportarse la pieza.",
     },
   },
   {
@@ -67,19 +62,19 @@ export const PRODUCT_BRIEF_POST_STEPS: readonly ProductBriefStep[] = [
       es: "Recibes una propuesta clara",
     },
     body: {
-      en: "We check materials, specialist workshop fit across India, physical sampling, and your likely Bulk Order scope before sending anything over.",
-      es: "Revisamos materiales, el encaje con talleres colaboradores en la India, el muestreo físico y el alcance del pedido de producción antes de enviarte nada.",
+      en: "We check materials, the right Indian production units, physical sampling, and your planned production run before sending anything over.",
+      es: "Revisamos materiales, la unidad de producción adecuada en la India, el muestreo y el alcance de la tirada antes de enviarte nada.",
     },
   },
   {
     number: "04",
     title: {
       en: "Swatches and physical samples first",
-      es: "Primero retal de color y muestras físicas",
+      es: "Primero muestra física de color y prototipos",
     },
     body: {
-      en: "Once you approve the proposal, we match colour from a physical swatch and pre-screen physical samples in India before bulk cutting ever starts.",
-      es: "Cuando apruebas la propuesta, fijamos el tono sobre un retal físico de color y preparamos cada muestra para valoración en la India antes de cortar una sola unidad del pedido.",
+      en: "Once you approve the proposal, we match colour from a physical swatch and check samples ourselves in India before cutting starts.",
+      es: "Cuando apruebas la propuesta, creamos una muestra física de color para tu aprobación y revisamos cada muestra en la India antes de comenzar con el corte de las piezas.",
     },
   },
 ];
@@ -96,8 +91,8 @@ export const BOOK_CALL_OPTIONS: readonly BookCallOption[] = [
       es: "Consulta rápida",
     },
     summary: {
-      en: "Ideal when you have a fresh idea, a piece from your shop floor you want to upgrade, or open questions about producing own-brand goods in India.",
-      es: "Ideal cuando tienes una idea recién salida, una pieza de tu tienda que quieres mejorar o dudas abiertas sobre fabricar marca propia en la India.",
+      en: "Ideal when you have a fresh idea, a piece from your shop you want to upgrade, or open questions about producing your own line in India.",
+      es: "Ideal cuando tienes una idea recién salida, una pieza de tu tienda que quieres mejorar o dudas sobre fabricar marca propia en la India.",
     },
     bestFor: {
       en: "Boutique owners, first-time founders, and fast feasibility checks.",
@@ -115,8 +110,8 @@ export const BOOK_CALL_OPTIONS: readonly BookCallOption[] = [
       es: "Revisión de briefing de producto",
     },
     summary: {
-      en: "Built for walking through sketches, physical reference pieces, leather or cloth options, hardware, EU care labels, sampling rounds, and seasonal launch dates together.",
-      es: "Pensada para repasar juntos bocetos, piezas de referencia en mano, opciones de piel o tela, herrajes, etiquetado europeo, rondas de muestreo y fechas de campaña.",
+      en: "Built for walking through sketches, physical reference pieces, leather or fabric options, hardware, EU labels, sampling rounds, and launch dates together.",
+      es: "Pensada para repasar juntos bocetos, piezas de referencia, opciones de piel o tela, herrajes, etiquetado europeo, muestras y fechas de campaña.",
     },
     bestFor: {
       en: "Brands with sketches, samples in hand, or an active line moving to India.",
@@ -129,23 +124,12 @@ export const BOOK_CALL_FAQS: readonly ConversionFaqItem[] = [
   {
     id: "prepare",
     question: {
-      en: "Do I need a finished tech pack before booking a call?",
-      es: "¿Necesito una ficha técnica cerrada antes de reservar la llamada?",
+      en: "Do I need a finished tech pack before booking?",
+      es: "¿Necesito una ficha técnica cerrada antes de reservar?",
     },
     answer: {
-      en: "No. Bring a rough sketch, phone photos, or an existing bag or dress from your shop. Alma writes up clear minutes right after the call and helps turn your ideas into a written Product Brief.",
-      es: "No. Trae un boceto rápido, fotos del móvil o un bolso o vestido de tu tienda. Alma te envía notas por escrito nada más terminar y te ayuda a dar forma a tu idea en un briefing de producto.",
-    },
-  },
-  {
-    id: "after-call",
-    question: {
-      en: "What happens after the video call with Alma?",
-      es: "¿Qué pasa después de la videollamada con Alma?",
-    },
-    answer: {
-      en: "Alma sends written call notes summarizing your product, materials, and practical next steps. When you are ready to move forward, we check specialist Manufacturing Partners across India and send an individual proposal.",
-      es: "Alma te manda un resumen por escrito con tu pieza, los materiales comentados y los pasos siguientes. Cuando quieras seguir adelante, buscamos el taller colaborador en la India y te enviamos una propuesta a medida.",
+      en: "No. Bring a rough sketch, phone photos, or an item from your shop. Alma emails clear meeting notes right after the call and helps turn your ideas into a written brief before we quote.",
+      es: "No. Trae un boceto rápido, fotos del móvil o una pieza de tu tienda. Alma te envía las conclusiones de la reunión por escrito tras la llamada y te ayuda a dar forma a tu idea antes de presupuestar.",
     },
   },
   {
@@ -155,8 +139,8 @@ export const BOOK_CALL_FAQS: readonly ConversionFaqItem[] = [
       es: "¿Podemos hablar abiertamente de primeras tiradas cortas o cantidades?",
     },
     answer: {
-      en: "Yes. Every workshop cluster and material behaves differently, so we do not publish fixed price lists or rigid minimums. We talk through realistic quantities and lead times openly on the call.",
-      es: "Sí. Cada región artesana y cada material tienen sus propios requisitos, por eso no publicamos tarifas cerradas ni mínimos rígidos. En la llamada valoramos cantidades y plazos realistas con total claridad.",
+      en: "Yes. Every craft region and material works at its own scale, so we do not publish fixed price lists or rigid minimums. We discuss realistic quantities and lead times openly on the call.",
+      es: "Sí. Cada región artesana y cada material tienen sus propios requisitos, así que no publicamos tarifas cerradas ni mínimos rígidos. Valoramos cantidades y plazos realistas con claridad en la llamada.",
     },
   },
   {
@@ -166,8 +150,8 @@ export const BOOK_CALL_FAQS: readonly ConversionFaqItem[] = [
       es: "¿Mis ideas y bocetos quedan bajo confidencialidad?",
     },
     answer: {
-      en: "Yes. Only Alma and Shirish review your designs during evaluation, and every sketch, pattern, and reference stays your sole intellectual property.",
-      es: "Sí. Solo Alma y Shirish revisan tus diseños durante la valoración, y cada boceto, patrón o referencia sigue siendo de tu exclusiva propiedad intelectual.",
+      en: "Yes. Only Alma and Shirish review your files during evaluation, mutual NDA protection is available whenever you want it, and every sketch and pattern remains yours.",
+      es: "Sí. Solo Alma y Shirish revisan tus archivos durante la valoración, dispones de acuerdo NDA cuando quieras y cada boceto o patrón sigue siendo tuyo.",
     },
   },
 ];
@@ -177,8 +161,8 @@ export const CONTACT_DEPARTMENTS: readonly ContactDepartmentEntry[] = [
     id: "product-briefs",
     email: "inquiry@karmarisedglobal.com",
     role: {
-      en: "New Product Briefs & project enquiries",
-      es: "Nuevos briefings de producto y proyectos",
+      en: "New briefs & project enquiries",
+      es: "Nuevos briefings y proyectos",
     },
     areaServed: ["ES", "EU"],
   },
@@ -186,8 +170,8 @@ export const CONTACT_DEPARTMENTS: readonly ContactDepartmentEntry[] = [
     id: "alma",
     email: "alma@karmarisedglobal.com",
     role: {
-      en: "Alma · Spain & Europe Clients (ES, EN, PT)",
-      es: "Alma · Clientes en España y Europa (ES, EN, PT)",
+      en: "Alma · Spain & rest of Europe (ES, EN, PT)",
+      es: "Alma · España y resto de Europa (ES, EN, PT)",
     },
     areaServed: ["ES", "EU"],
   },
@@ -195,8 +179,8 @@ export const CONTACT_DEPARTMENTS: readonly ContactDepartmentEntry[] = [
     id: "partners",
     email: "partners@karmarisedglobal.com",
     role: {
-      en: "Manufacturing Partners & artisans in India",
-      es: "Talleres colaboradores y artesanos en la India",
+      en: "Makers & factories in India",
+      es: "Fábricas y artesanos en la India",
     },
     areaServed: "IN",
   },
@@ -229,39 +213,59 @@ export interface ContactTopicEntry {
     | "CONTACT_INQUIRY_EMAIL"
     | "CONTACT_PARTNERS_EMAIL"
     | "CONTACT_STORIES_EMAIL";
+  readonly showInPicker?: boolean;
 }
 
 export const CONTACT_TOPICS: readonly ContactTopicEntry[] = [
   {
     value: "General enquiry",
-    label: { en: "General question", es: "Consulta general" },
+    label: {
+      en: "Own-brand project or question",
+      es: "Proyecto propio o consulta",
+    },
     emailLabels: { en: "General enquiry", es: "Consulta general" },
     directEmail: "inquiry@karmarisedglobal.com",
     envOverrideKey: "CONTACT_INQUIRY_EMAIL",
+    showInPicker: true,
   },
   {
     value: "Manufacturing Partner introduction",
-    label: { en: "Workshop in India", es: "Taller en la India" },
+    label: {
+      en: "Factory or atelier in India",
+      es: "Fábrica o unidad de producción en la India",
+    },
     emailLabels: {
       en: "Manufacturing Partner introduction",
-      es: "Presentación de taller o socio de fabricación",
+      es: "Presentación de fábrica o unidad de producción",
     },
     directEmail: "partners@karmarisedglobal.com",
     envOverrideKey: "CONTACT_PARTNERS_EMAIL",
+    showInPicker: true,
   },
   {
     value: "AlmaRise D Brand",
-    label: { en: "AlmaRise D Brand", es: "AlmaRise D Brand" },
+    label: {
+      en: "AlmaRise D Brand",
+      es: "AlmaRise D Brand",
+    },
     emailLabels: { en: "AlmaRise D Brand", es: "AlmaRise D Brand" },
     directEmail: "stories@karmarisedglobal.com",
     envOverrideKey: "CONTACT_STORIES_EMAIL",
+    showInPicker: true,
   },
   {
     value: "Stories and editorial",
-    label: { en: "Stories & press", es: "Historias y prensa" },
-    emailLabels: { en: "Stories and editorial", es: "Historias y prensa" },
+    label: {
+      en: "Press, podcasts & collaborations",
+      es: "Prensa, pódcasts y colaboraciones",
+    },
+    emailLabels: {
+      en: "Press, podcasts & collaborations",
+      es: "Prensa, pódcasts y colaboraciones",
+    },
     directEmail: "stories@karmarisedglobal.com",
     envOverrideKey: "CONTACT_STORIES_EMAIL",
+    showInPicker: true,
   },
   {
     value: "Women's Training Initiative",
@@ -272,8 +276,12 @@ export const CONTACT_TOPICS: readonly ContactTopicEntry[] = [
     },
     directEmail: "inquiry@karmarisedglobal.com",
     envOverrideKey: "CONTACT_INQUIRY_EMAIL",
+    showInPicker: true,
   },
 ];
+
+export const CONTACT_PICKER_TOPICS: readonly ContactTopicEntry[] =
+  CONTACT_TOPICS.filter((item) => item.showInPicker !== false);
 
 export function getLocalizedText(
   text: LocalizedText,

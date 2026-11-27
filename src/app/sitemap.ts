@@ -5,7 +5,7 @@ import { localizePath, siteUrl, STATIC_ROUTES } from "@/lib/seo";
 
 export const revalidate = 300;
 
-const STATIC_ROUTE_LAST_MODIFIED = new Date("2026-11-24T00:00:00.000Z");
+const STATIC_ROUTE_LAST_MODIFIED = new Date("2026-11-27T00:00:00.000Z");
 
 function parseLastModified(value: string | undefined, fallback: Date): Date {
   if (!value) {

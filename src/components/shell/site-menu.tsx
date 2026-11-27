@@ -22,9 +22,9 @@ import {
   SECONDARY_NAV_LINKS,
 } from "@/data/navigation";
 import { resolveAdaptiveLightHeaderBg } from "@/lib/adaptive-header-surface";
+import { DARK_HERO_ROUTES } from "@/lib/loader";
 import { localizePath, stripLocalePrefix } from "@/lib/urls";
 
-const DARK_HERO_ROUTES = new Set(["/", "/about", "/how-we-work", "/almarise"]);
 const SCROLL_THRESHOLD = 120;
 const SCROLL_HIDE_DELTA = 8;
 const SCROLL_SHOW_DELTA = 14;
@@ -59,6 +59,25 @@ function isLinkCurrent(linkHref: string, basePath: string): boolean {
   return currentBase === targetBase || currentBase.startsWith(`${targetBase}/`);
 }
 
+function isModifiedLinkClick(event: MouseEvent<HTMLAnchorElement>): boolean {
+  return (
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    event.button !== 0
+  );
+}
+
+export function SkipToContentLink() {
+  const { language } = useLanguage();
+  return (
+    <a className="skip-link" href="#main">
+      {language === "es" ? "Saltar al contenido" : "Skip to content"}
+    </a>
+  );
+}
+
 export function SiteMenu() {
   const { language, setLanguage, languages, localizeHref } = useLanguage();
   const pathname = usePathname();
@@ -69,6 +88,8 @@ export function SiteMenu() {
 
   const [open, setOpen] = useState(false);
   const [panelVisible, setPanelVisible] = useState(false);
+  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
+  const [activeSearch, setActiveSearch] = useState("");
   const [scrollState, setScrollState] =
     useState<HeaderScrollState>(INITIAL_SCROLL_STATE);
 
@@ -127,6 +148,16 @@ export function SiteMenu() {
     }
     navigatingOutRef.current = false;
   }, [clearMenuTimeline]);
+
+  // Keep query parameters synchronized on the language switcher hrefs so new-tab opens preserve form context.
+  useEffect(() => {
+    const syncSearch = () => {
+      setActiveSearch(window.location.search || "");
+    };
+    syncSearch();
+    window.addEventListener("popstate", syncSearch);
+    return () => window.removeEventListener("popstate", syncSearch);
+  }, [pathname, open]);
 
   // Headroom-style scroll state machine with accumulated hysteresis for Lenis and native scroll.
   useEffect(() => {
@@ -370,8 +401,11 @@ export function SiteMenu() {
       }
 
       const isDesktopPanel = window.innerWidth >= DESKTOP_MENU_MIN_WIDTH;
-      const panelRadius = isDesktopPanel ? "12px" : "0px";
-      const closedClip = `inset(0% 100% 100% 0% round ${panelRadius})`;
+      const isRtl = window.getComputedStyle(surface).direction === "rtl";
+      const panelRadius = isDesktopPanel ? "20px" : "0px";
+      const closedClip = isRtl
+        ? `inset(0% 0% 100% 100% round ${panelRadius})`
+        : `inset(0% 100% 100% 0% round ${panelRadius})`;
       const openClip = `inset(0% 0% 0% 0% round ${panelRadius})`;
 
       const tl = gsap.timeline({
@@ -381,14 +415,14 @@ export function SiteMenu() {
       tl.fromTo(
         backdrop,
         { opacity: 0 },
-        { opacity: 1, duration: 0.65, ease: "power3.inOut" },
+        { opacity: 1, duration: 0.36, ease: "power3.out" },
         0,
       );
 
       tl.fromTo(
         surface,
         { clipPath: closedClip, opacity: 1 },
-        { clipPath: openClip, duration: 0.68, ease: "power3.inOut" },
+        { clipPath: openClip, duration: 0.42, ease: "power3.out" },
         0,
       );
 
@@ -396,46 +430,38 @@ export function SiteMenu() {
         tl.fromTo(
           headerBar,
           { opacity: 0 },
-          { opacity: 1, duration: 0.36, ease: "power2.out" },
-          0.34,
+          { opacity: 1, duration: 0.24, ease: "power2.out" },
+          0.14,
         );
       }
 
       if (showcaseCards.length > 0) {
         tl.fromTo(
           showcaseCards,
-          { opacity: 0, filter: "blur(8px)", y: 12 },
+          { opacity: 0, y: 10 },
           {
             opacity: 1,
-            filter: "blur(0px)",
             y: 0,
-            duration: 0.48,
+            duration: 0.3,
             ease: "power2.out",
-            stagger: 0.08,
-            onComplete: () => {
-              gsap.set(showcaseCards, { clearProps: "filter" });
-            },
+            stagger: 0.045,
           },
-          0.42,
+          0.18,
         );
       }
 
       if (primaryItems.length > 0) {
         tl.fromTo(
           primaryItems,
-          { y: 20, opacity: 0, filter: "blur(8px)" },
+          { y: 14, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            filter: "blur(0px)",
-            duration: 0.34,
+            duration: 0.26,
             ease: "power2.out",
-            stagger: 0.05,
-            onComplete: () => {
-              gsap.set(primaryItems, { clearProps: "filter" });
-            },
+            stagger: 0.035,
           },
-          0.56,
+          0.18,
         );
       }
 
@@ -445,11 +471,11 @@ export function SiteMenu() {
           { yPercent: 105 },
           {
             yPercent: 0,
-            duration: 0.32,
+            duration: 0.24,
             ease: "power2.out",
-            stagger: 0.045,
+            stagger: 0.03,
           },
-          0.7,
+          0.26,
         );
       }
 
@@ -469,13 +495,30 @@ export function SiteMenu() {
     }
 
     if (timelineRef.current) {
-      timelineRef.current.timeScale(reducedMotion ? 1 : 1.25).reverse();
+      timelineRef.current.timeScale(reducedMotion ? 1 : 1.55).reverse();
       return;
     }
 
     const frame = window.requestAnimationFrame(finalizeMenuClose);
     return () => window.cancelAnimationFrame(frame);
   }, [open, panelVisible, finalizeMenuClose]);
+
+  // Mark background landmarks inert while the modal menu dialog is open.
+  useEffect(() => {
+    const backgroundNodes = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        ".skip-link, main, footer.site-footer, .chat-widget-anchor, .cookie-consent-banner",
+      ),
+    );
+    for (const node of backgroundNodes) {
+      node.inert = open;
+    }
+    return () => {
+      for (const node of backgroundNodes) {
+        node.inert = false;
+      }
+    };
+  }, [open]);
 
   // Cleanup on unmount so scroll lock and GSAP timelines are always reverted.
   useEffect(() => {
@@ -485,7 +528,7 @@ export function SiteMenu() {
     };
   }, [clearMenuTimeline]);
 
-  // Escape key & focus trap while the menu dialog is open.
+  // Escape key & hardened focus trap while the menu dialog is open.
   useEffect(() => {
     if (!open) {
       return;
@@ -515,6 +558,12 @@ export function SiteMenu() {
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (!first || !last) {
+        return;
+      }
+
+      if (!surfaceRef.current.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
         return;
       }
 
@@ -553,8 +602,15 @@ export function SiteMenu() {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [open, pathname]);
 
+  function prewarmMenuMedia() {
+    if (!hasOpenedMenu) {
+      setHasOpenedMenu(true);
+    }
+  }
+
   function openMenu() {
     navigatingOutRef.current = false;
+    setHasOpenedMenu(true);
     setPanelVisible(true);
     setOpen(true);
   }
@@ -572,6 +628,10 @@ export function SiteMenu() {
   }
 
   function handleNavigate(href: string, event: MouseEvent<HTMLAnchorElement>) {
+    if (isModifiedLinkClick(event)) {
+      return;
+    }
+
     const hasQuery = href.includes("?");
     const samePathname = normalizePath(href) === normalizePath(pathname || "/");
 
@@ -595,6 +655,9 @@ export function SiteMenu() {
     nextCode: (typeof languages)[number]["code"],
     event: MouseEvent<HTMLAnchorElement>,
   ) {
+    if (isModifiedLinkClick(event)) {
+      return;
+    }
     event.preventDefault();
     if (nextCode === language) {
       return;
@@ -625,7 +688,7 @@ export function SiteMenu() {
       >
         {languages.map((option, index) => {
           const isSelected = option.code === language;
-          const targetHref = localizePath(basePath, option.code);
+          const targetHref = `${localizePath(basePath, option.code)}${activeSearch}`;
           return (
             <Fragment key={option.code}>
               {index > 0 ? (
@@ -635,6 +698,7 @@ export function SiteMenu() {
               ) : null}
               <Link
                 href={targetHref}
+                lang={option.code}
                 hrefLang={option.code}
                 aria-current={isSelected ? "true" : undefined}
                 className="header-lang-link"
@@ -642,6 +706,7 @@ export function SiteMenu() {
                 onClick={(event) => handleLanguageSelect(option.code, event)}
               >
                 {option.shortLabel}
+                <span className="sr-only"> ({option.label})</span>
               </Link>
             </Fragment>
           );
@@ -654,7 +719,6 @@ export function SiteMenu() {
     <>
       <header
         ref={headerRef}
-        role="banner"
         aria-label={HEADER_COPY.bannerLabel[language]}
         className={headerClasses}
         data-hero-tone={heroTone}
@@ -665,13 +729,10 @@ export function SiteMenu() {
             ref={triggerRef}
             className="header-link header-menu-toggle"
             type="button"
-            aria-label={
-              open
-                ? HEADER_COPY.closeMenuAria[language]
-                : HEADER_COPY.openMenuAria[language]
-            }
             aria-expanded={open}
             aria-controls="site-menu"
+            onPointerEnter={prewarmMenuMedia}
+            onFocus={prewarmMenuMedia}
             onClick={() => (open ? closeMenu() : openMenu())}
           >
             {HEADER_COPY.menuButton[language]}
@@ -733,7 +794,6 @@ export function SiteMenu() {
               ref={closeRef}
               className="menu-close"
               type="button"
-              aria-label={HEADER_COPY.closeMenuAria[language]}
               onClick={closeMenu}
             >
               {HEADER_COPY.closeButton[language]}
@@ -745,13 +805,15 @@ export function SiteMenu() {
               aria-label={HEADER_COPY.brandHomeAria[language]}
               onClick={(event) => handleNavigate(localizeHref("/"), event)}
             >
-              <Image
-                src="/brand/emblem-transparent.png"
-                alt=""
-                width={768}
-                height={768}
-                sizes="32px"
-              />
+              {hasOpenedMenu ? (
+                <Image
+                  src="/brand/emblem-transparent.png"
+                  alt=""
+                  width={768}
+                  height={768}
+                  sizes="32px"
+                />
+              ) : null}
             </Link>
 
             {renderLanguageSwitcher("menu")}
@@ -816,6 +878,14 @@ export function SiteMenu() {
             aria-label={HEADER_COPY.showcaseAria[language]}
             data-lenis-prevent
           >
+            <div className="menu-showcase-header">
+              <p className="menu-showcase-heading">
+                {HEADER_COPY.showcaseHeading[language]}
+              </p>
+              <p className="menu-showcase-hint">
+                {HEADER_COPY.showcaseHint[language]}
+              </p>
+            </div>
             <div className="menu-showcase-track">
               {MENU_SHOWCASE_CARDS.map((card) => {
                 const localizedHref = localizeHref(card.href);
@@ -827,34 +897,36 @@ export function SiteMenu() {
                     onClick={(event) => handleNavigate(localizedHref, event)}
                   >
                     <div className="menu-card-media">
-                      <Image
-                        src={card.image}
-                        alt={card.imageAlt[language]}
-                        fill
-                        sizes="(max-width: 859px) 44vw, 340px"
-                        className={`menu-card-img object-cover ${card.imagePosition}`}
-                      />
-                      <div className="menu-card-pills" aria-hidden="true">
-                        <span className="menu-card-pill menu-card-pill-label">
-                          {card.pillLabel[language]}
-                        </span>
-                        <span className="menu-card-pill menu-card-pill-arrow">
-                          <svg
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M3.5 8h9" />
-                            <path d="m8.75 4.25 3.75 3.75-3.75 3.75" />
-                          </svg>
-                        </span>
-                      </div>
+                      {hasOpenedMenu ? (
+                        <Image
+                          src={card.image}
+                          alt=""
+                          fill
+                          sizes="(max-width: 859px) 160px, 112px"
+                          className={`menu-card-img object-cover ${card.imagePosition}`}
+                        />
+                      ) : null}
                     </div>
-                    <span className="menu-card-title">
-                      {card.title[language]}
+                    <div className="menu-card-copy">
+                      <span className="menu-card-title">
+                        {card.title[language]}
+                      </span>
+                      <span className="menu-card-meta">
+                        {card.pillLabel[language]}
+                      </span>
+                    </div>
+                    <span className="menu-card-arrow" aria-hidden="true">
+                      <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3.5 8h9" />
+                        <path d="m8.75 4.25 3.75 3.75-3.75 3.75" />
+                      </svg>
                     </span>
                   </Link>
                 );

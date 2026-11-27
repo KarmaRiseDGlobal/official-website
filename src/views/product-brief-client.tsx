@@ -9,46 +9,24 @@ import { SiteFooter } from "@/components/shell/site-footer";
 import { useLanguage, type SiteLanguage } from "@/context/language-context";
 import { PRODUCT_BRIEF_POST_STEPS } from "@/data/conversion-content";
 
-const checklistItems: ReadonlyArray<{
-  id: string;
-  text: Record<SiteLanguage, string>;
-}> = [
-  {
-    id: "quality",
-    text: {
-      en: "The piece you want to build and the hand-feel or finish you expect",
-      es: "La pieza que quieres hacer junto con el tacto o acabado que buscas",
-    },
-  },
-  {
-    id: "references",
-    text: {
-      en: "Any reference you already have: sketches, photos of a favourite piece (up to 3 files in the form), or a link",
-      es: "Cualquier referencia que ya tengas: bocetos, fotos de una pieza que te guste (hasta 3 archivos en el formulario) o un enlace",
-    },
-  },
-  {
-    id: "materials",
-    text: {
-      en: "Hides, woven fabrics, linings, zippers, or trims you have in mind",
-      es: "Pieles, telas planas, forros, cremalleras o herrajes que tengas en mente",
-    },
-  },
-  {
-    id: "quantity",
-    text: {
-      en: "Your rough Bulk Order quantity, including if you are planning a smaller first run",
-      es: "Una cantidad aproximada para el pedido de producción, también si planteas una primera tirada corta",
-    },
-  },
-  {
-    id: "destination",
-    text: {
-      en: "Where the shipment needs to land and your target launch season",
-      es: "El país de entrega y la temporada en la que te gustaría lanzar",
-    },
-  },
-];
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="editorial-arrow-icon shrink-0"
+    >
+      <path d="M3.5 8h9m0 0-3.5-3.5M12.5 8 9 11.5" />
+    </svg>
+  );
+}
 
 export function ProductBriefPageClient({
   lang,
@@ -62,205 +40,203 @@ export function ProductBriefPageClient({
   return (
     <>
       <main id="main">
-        <section className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-xl))] pb-[var(--space-2xl)] text-[var(--color-forest-deep)]">
-          <div className="container grid gap-[var(--space-lg)]">
-            {/* Top 1px Hairline Breadcrumb & Context Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-b border-[var(--color-rule)] py-3.5 text-[length:var(--text-xs)] font-semibold tracking-[0.08em] uppercase">
-              <nav
-                aria-label={isEs ? "Ruta de navegación" : "Breadcrumb"}
-                className="flex items-center gap-2"
-              >
-                <ol className="m-0 flex list-none flex-wrap items-center gap-2 p-0">
-                  <li>
-                    <Link
-                      className="text-[var(--color-muted)] no-underline transition-colors hover:text-[var(--color-forest-deep)]"
-                      href={localizeHref("/")}
-                    >
-                      {isEs ? "Inicio" : "Home"}
-                    </Link>
-                  </li>
-                  <li aria-hidden="true" className="text-[var(--color-muted)]">
-                    /
-                  </li>
-                  <li
-                    aria-current="page"
-                    className="text-[var(--color-clay-ink)]"
+        {/* Band 1: Warm Parchment Atelier Header */}
+        <section className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-sm))] pb-[var(--space-lg)] text-[var(--color-forest-deep)]">
+          <div className="container grid gap-[var(--space-md)]">
+            <nav
+              aria-label={isEs ? "Ruta de navegación" : "Breadcrumb"}
+              className="flex items-center text-[length:var(--text-xs)] font-medium"
+            >
+              <ol className="m-0 flex list-none flex-wrap items-center gap-2 p-0">
+                <li>
+                  <Link
+                    className="inline-flex min-h-[var(--tap-min)] min-w-[var(--tap-min)] items-center text-[var(--color-muted)] no-underline transition-colors hover:text-[var(--color-forest-deep)]"
+                    href={localizeHref("/")}
                   >
-                    {isEs ? "Briefing de producto" : "Start a Product Brief"}
-                  </li>
-                </ol>
-              </nav>
-              <span className="text-[var(--color-muted)]">
-                {isEs
-                  ? "Respuesta personal de Alma en 1 o 2 días laborables"
-                  : "Personal reply from Alma within 1–2 business days"}
-              </span>
-            </div>
-
-            <div className="grid gap-[var(--space-md)]">
-              <h1 className="max-w-[18ch] text-[clamp(2.25rem,4.8vw,4.5rem)] leading-[0.98] font-medium">
-                {isEs
-                  ? "Empieza tu briefing de producto para la India."
-                  : "Start your Product Brief for India."}
-              </h1>
-              <p className="lead max-w-[56ch] text-[var(--color-ink-2)]">
-                {isEs
-                  ? "Parte de lo que tengas hoy sobre la mesa. Un boceto rápido de cuatro líneas, una foto hecha con el móvil o un bolso que ya vendes en tu tienda bastan para que Alma y Shirish estudien pieles, tejidos y el taller adecuado en la India."
-                  : "Start with whatever sits on your table today. A four-line sketch, a phone photo, or a bag from your shop floor is enough for Alma and Shirish to study hides, woven cloth, and workshop fit across India."}
-              </p>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-[length:var(--text-sm)]">
-                <span className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] border border-[var(--color-rule)] bg-[var(--color-paper-2)] px-3.5 py-1.5 font-medium text-[var(--color-forest-deep)]">
-                  <span
-                    aria-hidden="true"
-                    className="h-1.5 w-1.5 rounded-full bg-[var(--color-clay)]"
-                  />
-                  <span>
-                    {isEs
-                      ? "3 pasos breves · alrededor de 1 minuto · guardado automático"
-                      : "3 quick steps · about 1 minute · saves as you go"}
-                  </span>
-                </span>
-                <Link
-                  href={localizeHref("/book-a-call?duration=15")}
-                  className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                    {isEs ? "Inicio" : "Home"}
+                  </Link>
+                </li>
+                <li aria-hidden="true" className="text-[var(--color-muted)]">
+                  /
+                </li>
+                <li
+                  aria-current="page"
+                  className="inline-flex min-h-[var(--tap-min)] items-center font-semibold text-[var(--color-clay-ink)]"
                 >
+                  {isEs ? "Briefing de producto" : "Product Brief"}
+                </li>
+              </ol>
+            </nav>
+
+            <div className="grid items-center gap-[var(--space-lg)] lg:grid-cols-12 lg:gap-[var(--gap-columns)]">
+              <div className="grid gap-3 lg:col-span-7">
+                <h1 className="m-0 max-w-[14ch] text-[length:var(--text-display-s)] leading-[1.06] font-normal">
                   {isEs
-                    ? "¿Prefieres comentarlo antes? Reserva una llamada gratis de 15 min con Alma"
-                    : "Prefer to talk it over first? Book a free 15-min call with Alma"}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <SectionBridge from="paper" to="wood" />
-
-        <section className="bg-[var(--color-wood)] py-[var(--section-gap-s)] text-[var(--color-paper)] lg:py-[var(--section-gap)]">
-          <div className="container grid items-start gap-[var(--gap-columns)] lg:grid-cols-12">
-            {/* Form first on mobile so visitors can start immediately; right column on desktop */}
-            <div className="order-1 min-w-0 lg:order-2 lg:col-span-7">
-              <h2 className="mb-6 text-[length:var(--text-2xl)] font-medium text-[var(--color-paper)]">
-                {isEs ? "Tu briefing de producto" : "Your Product Brief"}
-              </h2>
-              <ProductBriefForm />
-            </div>
-
-            {/* Founder trust card + checklist second on mobile; left column on desktop */}
-            <div className="order-2 grid min-w-0 gap-[var(--space-xl)] lg:order-1 lg:col-span-5">
-              <div className="grid gap-4 rounded-[var(--radius-card)] border border-[var(--color-paper)]/18 bg-[var(--color-night)]/25 p-5">
-                <div className="flex items-center gap-3.5">
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-[var(--color-paper)]/25">
-                    <Image
-                      src="/images/founders/alma-and-shirish-avatar.jpg"
-                      alt={
-                        isEs
-                          ? "Alma y Shirish, cofundadores de KarmaRise D Global"
-                          : "Alma and Shirish, co-founders of KarmaRise D Global"
-                      }
-                      fill
-                      sizes="56px"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="grid min-w-0 gap-0.5">
-                    <p className="m-0 text-[length:var(--text-md)] font-semibold text-[var(--color-paper)]">
-                      {isEs ? "Alma y Shirish" : "Alma & Shirish"}
-                    </p>
-                    <p className="m-0 text-[length:var(--text-xs)] text-[var(--color-paper-2)]/80">
-                      {isEs
-                        ? "España e India · Respuesta personal en 1 o 2 días laborables"
-                        : "Spain & India · Personal reply within 1–2 business days"}
-                    </p>
-                  </div>
-                </div>
-                <p className="m-0 text-[length:var(--text-xs)] leading-relaxed text-[var(--color-paper-2)]">
+                    ? "Trae tu idea a la mesa."
+                    : "Bring your idea to the table."}
+                </h1>
+                <p className="lead m-0 max-w-[46ch] text-[var(--color-ink-2)]">
                   {isEs
-                    ? "Alma lee cada briefing personalmente y te contesta en español, inglés o portugués. Solo Alma y Shirish, abogado colegiado en el Bar Council de la India, ven tus bocetos y referencias comerciales durante la valoración."
-                    : "Alma reads every brief herself and writes back in English, Spanish, or Portuguese. Only Alma and Shirish, a registered Bar Council advocate in India, see your sketches, references, and commercial plans during evaluation."}
+                    ? "Parte de lo que tengas hoy sobre la mesa. Un boceto rápido, una foto del móvil o una pieza de tu tienda bastan para que Alma y Shirish valoren materiales y la unidad de producción adecuada en la India."
+                    : "Start with whatever sits on your table today. A four-line sketch, a phone photo, or a bag from your shop is enough for Alma and Shirish to check materials and the right makers across India."}
+                </p>
+                <p className="m-0 text-[length:var(--text-sm)] font-medium text-[var(--color-muted)]">
+                  {isEs
+                    ? "3 pasos breves · Guardado automático · Acuerdo NDA disponible"
+                    : "3 short steps · Saves as you go · Mutual NDA available"}
                 </p>
               </div>
 
-              <div className="grid gap-4">
-                <h2 className="text-[length:var(--text-display-s)] leading-[1.04] font-medium text-[var(--color-paper)]">
-                  {isEs
-                    ? "Qué nos ayuda a arrancar"
-                    : "What helps us get started"}
-                </h2>
-                <ul className="m-0 grid list-none gap-3 p-0 text-[var(--color-paper-2)]">
-                  {checklistItems.map((item) => (
-                    <li
-                      key={item.id}
-                      className="border-t border-[var(--color-paper)]/15 pt-3 text-[length:var(--text-sm)]"
-                    >
-                      {item.text[language]}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <figure className="editorial-photo-frame m-0 aspect-[16/10] w-full max-w-[380px] lg:col-span-5 lg:ms-auto">
+                <Image
+                  src="/images/founders/alma-shirish-planning-table-window-india.jpeg"
+                  alt={
+                    isEs
+                      ? "Alma y Shirish sentados frente a frente con una tableta junto a una ventana luminosa en la India"
+                      : "Alma and Shirish seated face to face across a table with a tablet by a sunlit window in India"
+                  }
+                  fill
+                  priority
+                  sizes="(max-width: 64rem) 100vw, 380px"
+                  className="object-cover object-[50%_38%]"
+                />
+              </figure>
             </div>
           </div>
         </section>
 
-        <SectionBridge from="wood" to="pale-sage" />
+        <SectionBridge from="paper" to="dune" />
 
+        {/* Band 2: Single-Screen Sunlit Swatch Desk Workspace on Warm Dune */}
+        <section className="bg-[var(--color-dune)] pt-[var(--space-lg)] pb-[var(--space-2xl)] text-[var(--color-forest-deep)]">
+          <div className="container grid gap-[var(--space-3xl)]">
+            <div className="min-w-0">
+              <ProductBriefForm />
+            </div>
+
+            {/* Companion CTA & design protection placed calmly below the form on all larger screens */}
+            <aside className="mx-auto grid w-full max-w-[58rem] min-w-0 items-center gap-[var(--space-xl)] md:grid-cols-12 lg:gap-[var(--gap-columns)]">
+              <div className="editorial-photo-frame aspect-[5/6] w-full max-w-[260px] md:col-span-4 md:max-w-none lg:col-span-3">
+                <Image
+                  src="/images/founders/alma-swing-laughing.jpeg"
+                  alt={
+                    isEs
+                      ? "Alma riendo con cercanía en un columpio de madera en la India"
+                      : "Alma laughing warmly on a wooden porch swing in India"
+                  }
+                  fill
+                  sizes="(max-width: 48rem) 260px, 24vw"
+                  className="object-cover object-[50%_42%]"
+                />
+              </div>
+
+              <div className="grid min-w-0 gap-3.5 md:col-span-4 lg:col-span-5">
+                <h2 className="m-0 text-[length:var(--text-2xl)] leading-[1.16] font-normal text-[var(--color-forest-deep)]">
+                  {isEs
+                    ? "¿Prefieres comentarlo primero?"
+                    : "Prefer to talk it through first?"}
+                </h2>
+                <p className="m-0 max-w-[44ch] text-[length:var(--text-sm)] leading-[1.64] text-[var(--color-ink-2)]">
+                  {isEs
+                    ? "Charla con Alma en una videollamada gratuita por Google Meet en español, inglés o portugués antes de escribir una sola línea."
+                    : "Sit down with Alma on a free Google Meet call in English, Spanish, or Portuguese before writing a single word."}
+                </p>
+                <Link
+                  href={localizeHref("/book-a-call?duration=15")}
+                  className="secondary-button-light w-full sm:w-fit"
+                >
+                  {isEs ? "Reservar llamada con Alma" : "Book a call with Alma"}
+                </Link>
+              </div>
+
+              <div className="grid min-w-0 content-start gap-2.5 md:col-span-4 lg:col-span-4">
+                <h2 className="m-0 text-[length:var(--text-xl)] leading-[1.18] font-normal text-[var(--color-forest-deep)]">
+                  {isEs
+                    ? "Cómo protegemos tus diseños"
+                    : "How your designs stay yours"}
+                </h2>
+                <p className="m-0 max-w-[42ch] text-[length:var(--text-sm)] leading-[1.64] text-[var(--color-ink-2)]">
+                  {isEs
+                    ? "Alma lee cada briefing personalmente y te escribe en 1 o 2 días laborables. Solo Alma y Shirish, abogado colegiado en el Bar Council de la India, ven tus bocetos y archivos durante la valoración."
+                    : "Alma reads every brief herself and writes back within 1 to 2 business days. Only Alma and Shirish, a registered Bar Council advocate in India, see your sketches and files during evaluation."}
+                </p>
+                <Link
+                  href={localizeHref("/contact")}
+                  className="editorial-arrow-link inline-flex min-h-[var(--tap-min)] w-fit items-center gap-2 text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 transition-colors hover:text-[var(--color-clay-ink)]"
+                >
+                  <span>
+                    {isEs
+                      ? "Escribir una consulta general"
+                      : "Send a general note instead"}
+                  </span>
+                  <ArrowIcon />
+                </Link>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <SectionBridge from="dune" to="pale-sage" />
+
+        {/* Band 3: Editorial What Happens Next Spread on Pale Sage */}
         <section
           id="after-submission"
           className="bg-[var(--color-pale-sage)] py-[var(--section-gap-s)] text-[var(--color-forest-deep)]"
         >
-          <div className="container grid gap-[var(--space-xl)]">
-            <h2 className="text-[length:var(--text-2xl)] font-medium">
-              {isEs ? "Qué pasa a continuación" : "What happens next"}
-            </h2>
-
-            <ol className="m-0 grid list-none gap-[var(--gap-columns)] p-0 sm:grid-cols-2 lg:grid-cols-4">
-              {PRODUCT_BRIEF_POST_STEPS.map((step) => (
-                <li
-                  key={step.number}
-                  className="grid content-start gap-3 border-t border-[var(--color-forest)]/25 pt-5"
-                >
-                  <span className="num text-[length:var(--text-sm)] font-semibold text-[var(--color-clay-ink)]">
-                    {step.number}
-                  </span>
-                  <h3 className="text-[length:var(--text-title)] font-medium">
-                    {step.title[language]}
-                  </h3>
-                  <p className="text-[length:var(--text-sm)] text-[var(--color-muted)]">
-                    {step.body[language]}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <SectionBridge from="pale-sage" to="dune" />
-
-        <section className="bg-[var(--color-paper-2)] py-[var(--space-2xl)] text-[var(--color-forest-deep)]">
-          <div className="container flex flex-wrap items-center justify-between gap-6">
-            <div className="grid gap-1">
-              <p className="font-semibold">
+          <div className="container grid items-start gap-[var(--space-xl)] lg:grid-cols-12 lg:gap-[var(--gap-columns)]">
+            <div className="grid gap-7 lg:col-span-7">
+              <h2 className="m-0 max-w-[18ch] text-[length:var(--text-section)] leading-[1.06] font-normal">
                 {isEs
-                  ? "¿Prefieres llamarnos o escribirnos directamente?"
-                  : "Rather pick up the phone or write directly?"}
-              </p>
-              <p className="text-[length:var(--text-sm)] text-[var(--color-muted)]">
-                {isEs
-                  ? "Llama o escribe por WhatsApp a Alma en España y Europa en el +34 611 722 276, llama a Shirish en la India en el +91 8530009798 o escribe a hola@karmarisedglobal.com."
-                  : "Call or WhatsApp Alma in Spain and Europe on +34 611 722 276, call Shirish in India on +91 8530009798, or write to hola@karmarisedglobal.com."}
-              </p>
+                  ? "Qué ocurre cuando envías tu briefing."
+                  : "What happens after you send your brief."}
+              </h2>
+
+              <ol className="m-0 grid list-none gap-x-8 gap-y-7 p-0 sm:grid-cols-2">
+                {PRODUCT_BRIEF_POST_STEPS.map((item) => (
+                  <li key={item.number} className="grid content-start gap-2">
+                    <span className="num text-[length:var(--text-xs)] font-semibold text-[var(--color-clay-ink)]">
+                      {item.number} / 04
+                    </span>
+                    <h3 className="m-0 text-[length:var(--text-title)] leading-[1.2] font-normal text-[var(--color-forest-deep)]">
+                      {item.title[language]}
+                    </h3>
+                    <p className="m-0 max-w-[44ch] text-[length:var(--text-sm)] leading-[1.64] text-[var(--color-ink-2)]">
+                      {item.body[language]}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+
+              <Link
+                href={localizeHref("/manufacturing")}
+                className="editorial-arrow-link inline-flex min-h-[var(--tap-min)] w-fit items-center gap-2 text-[length:var(--text-sm)] font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 transition-colors hover:text-[var(--color-clay-ink)]"
+              >
+                <span>
+                  {isEs
+                    ? "Explorar el Programa de producción completo"
+                    : "Explore the full Manufacturing Programme"}
+                </span>
+                <ArrowIcon />
+              </Link>
             </div>
-            <Link
-              className="inline-flex min-h-[44px] items-center font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
-              href={localizeHref("/contact")}
-            >
-              {isEs
-                ? "Ver todos los contactos directos"
-                : "See all direct contacts"}
-            </Link>
+
+            <figure className="editorial-photo-frame m-0 aspect-[4/3] w-full lg:sticky lg:top-[calc(var(--nav-height)+1.5rem)] lg:col-span-5">
+              <Image
+                src="/images/Leather/pexels-vlada-karpovich-4452603.jpg"
+                alt={
+                  isEs
+                    ? "Piezas de piel cortadas junto a cuchilla de marroquinería, lezna y herramientas de costura"
+                    : "Cut vegetable-tanned leather panels beside skiving knives, awls, and stitching tools"
+                }
+                fill
+                sizes="(max-width: 64rem) 100vw, 38vw"
+                className="object-cover object-center"
+              />
+            </figure>
           </div>
         </section>
 
-        <SectionBridge from="dune" to="night" />
+        <SectionBridge from="pale-sage" to="night" size="gentle" />
       </main>
 
       <SiteFooter hideNewsletter />

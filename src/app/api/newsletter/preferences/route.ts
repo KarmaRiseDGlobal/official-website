@@ -3,6 +3,12 @@ import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { updateBrevoSubscriberLanguage } from "@/lib/brevo";
+import { normalizeUtmToken } from "@/lib/email-analytics";
+import {
+  EMAIL_COLORS,
+  EMAIL_FONT_SANS,
+  EMAIL_FONT_SERIF,
+} from "@/lib/email-layout";
 import {
   checkRateLimit,
   escapeHtml,
@@ -19,6 +25,7 @@ const PREFERENCES_RATE_LIMIT = 10;
 const PREFERENCES_RATE_WINDOW_MS = 10 * 60 * 1000;
 
 type PreferenceLang = "EN" | "ES";
+type PreferenceAction = "language" | "stay";
 type PageMode = "confirm" | "updated" | "error";
 
 function getPreferencesSigningSecret(): string {
@@ -55,6 +62,13 @@ function verifyPreferencesSignature(
   );
 }
 
+function parsePreferenceAction(raw: unknown): PreferenceAction {
+  return readTrimmedString(raw, 24, { singleLine: true }).toLowerCase() ===
+    "stay"
+    ? "stay"
+    : "language";
+}
+
 function htmlResponse(html: string, status = 200): NextResponse {
   return new NextResponse(html, {
     status,
@@ -68,11 +82,14 @@ function htmlResponse(html: string, status = 200): NextResponse {
 
 function renderPreferencesHtml(options: {
   mode: PageMode;
+  action: PreferenceAction;
   email: string;
   lang: PreferenceLang;
+  campaign?: string;
   errorMessage?: string;
 }): string {
   const isEs = options.lang === "ES";
+  const isStay = options.action === "stay";
   const otherLang: PreferenceLang = isEs ? "EN" : "ES";
   const hasValidEmail = isValidEmail(options.email);
   const storiesHref = isEs ? "/es/stories" : "/stories";
@@ -89,16 +106,29 @@ function renderPreferencesHtml(options: {
   let body: string;
 
   if (options.mode === "updated") {
-    heading = isEs
-      ? "¡Listo! Te escribiremos en español."
-      : "All set! We will write to you in English.";
-    body = hasValidEmail
-      ? isEs
-        ? `Hemos guardado tu preferencia para ${options.email}. A partir de ahora recibirás nuestras cartas e historias de KarmaRise en español.`
-        : `We updated the preference for ${options.email}. From now on, you will receive our KarmaRise letters and Stories in English.`
-      : isEs
-        ? "Hemos guardado tu preferencia de idioma para recibir nuestras cartas e historias de KarmaRise en español."
-        : "We updated your language preference for our KarmaRise letters and Stories.";
+    if (isStay) {
+      heading = isEs
+        ? "¡Qué alegría que sigas con nosotros!"
+        : "Glad you are staying with us!";
+      body = hasValidEmail
+        ? isEs
+          ? `Hemos mantenido ${options.email} activo en Historias de KarmaRise en español. Te llegará nuestra próxima carta desde España y la India.`
+          : `We have kept ${options.email} active on KarmaRise Stories in English. Look out for our next letter from Spain and India.`
+        : isEs
+          ? "Hemos confirmado tu suscripción a Historias de KarmaRise en español."
+          : "We have confirmed your subscription to KarmaRise Stories in English.";
+    } else {
+      heading = isEs
+        ? "¡Listo! Te escribiremos en español."
+        : "All set! We will write to you in English.";
+      body = hasValidEmail
+        ? isEs
+          ? `Hemos guardado tu preferencia para ${options.email}. A partir de ahora recibirás nuestras cartas e historias de KarmaRise en español.`
+          : `We updated the preference for ${options.email}. From now on, you will receive our KarmaRise letters and Stories in English.`
+        : isEs
+          ? "Hemos guardado tu preferencia de idioma para recibir nuestras cartas e historias de KarmaRise en español."
+          : "We updated your language preference for our KarmaRise letters and Stories.";
+    }
   } else if (options.mode === "error") {
     heading = isEs
       ? "No hemos podido guardar tu preferencia."
@@ -107,7 +137,18 @@ function renderPreferencesHtml(options: {
       options.errorMessage?.trim() ||
       (isEs
         ? "Comprueba el correo electrónico e inténtalo de nuevo."
-        : "Please check your email address and try again.");
+        : "Check your email address and try again.");
+  } else if (isStay) {
+    heading = isEs
+      ? "Confirma que quieres seguir recibiendo las cartas"
+      : "Confirm you want to keep receiving our letters";
+    body = hasValidEmail
+      ? isEs
+        ? `Confirma debajo para mantener ${options.email} en Historias de KarmaRise en español y seguir recibiendo nuestras cartas cada dos semanas.`
+        : `Confirm below to keep ${options.email} active on KarmaRise Stories in English and keep receiving our letters every two weeks.`
+      : isEs
+        ? "Escribe tu correo electrónico para seguir recibiendo Historias de KarmaRise en español."
+        : "Enter your email address below to keep receiving KarmaRise Stories in English.";
   } else {
     heading = isEs
       ? "Confirma tu preferencia de idioma"
@@ -124,7 +165,13 @@ function renderPreferencesHtml(options: {
   const ctaLabel = isEs
     ? "Ir a leer nuestras historias"
     : "Read our KarmaRise Stories";
-  const submitLabel = isEs ? "Confirmar español" : "Confirm English";
+  const submitLabel = isStay
+    ? isEs
+      ? "Seguir recibiendo las cartas"
+      : "Keep sending the letters"
+    : isEs
+      ? "Confirmar español"
+      : "Confirm English";
   const emailLabel = isEs ? "Correo electrónico" : "Email address";
   const emailPlaceholder = isEs ? "tu@empresa.com" : "you@company.com";
   const switchLabel = isEs
@@ -134,8 +181,8 @@ function renderPreferencesHtml(options: {
   const emailFieldHtml = hasValidEmail
     ? `<input type="hidden" name="email" value="${escapeHtml(options.email)}" />`
     : `<div style="margin:0 0 18px;text-align:left;">
-        <label for="pref-email" style="display:block;margin:0 0 6px;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#182D20;">${escapeHtml(emailLabel)}</label>
-        <input id="pref-email" type="email" name="email" required autocomplete="email" placeholder="${escapeHtml(emailPlaceholder)}" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:1px solid #CDBB9C;background-color:#FAF6EE;font-family:Arial,sans-serif;font-size:16px;color:#182D20;" />
+        <label for="pref-email" style="display:block;margin:0 0 6px;font-family:${EMAIL_FONT_SANS};font-size:13px;font-weight:600;color:${EMAIL_COLORS.forestDeep};">${escapeHtml(emailLabel)}</label>
+        <input id="pref-email" type="email" name="email" required autocomplete="email" placeholder="${escapeHtml(emailPlaceholder)}" style="width:100%;box-sizing:border-box;min-height:48px;padding:12px 14px;border-radius:12px;border:1px solid #9A816F;background-color:#FFFDF8;font-family:${EMAIL_FONT_SANS};font-size:16px;color:${EMAIL_COLORS.forestDeep};" />
       </div>`;
 
   const turnstileHtml =
@@ -143,34 +190,43 @@ function renderPreferencesHtml(options: {
       ? `<div class="cf-turnstile" data-sitekey="${escapeHtml(turnstileSiteKey)}" data-language="${isEs ? "es" : "en"}" style="margin:0 auto 20px;display:flex;justify-content:center;"></div>`
       : "";
 
+  const actionFieldHtml = isStay
+    ? `<input type="hidden" name="action" value="stay" />`
+    : "";
+  const campaignFieldHtml = options.campaign
+    ? `<input type="hidden" name="campaign" value="${escapeHtml(options.campaign)}" />`
+    : "";
+
   const formHtml =
     options.mode === "confirm"
       ? `<form method="POST" action="/api/newsletter/preferences" style="margin:0 0 22px;">
           ${emailFieldHtml}
           <input type="hidden" name="lang" value="${escapeHtml(options.lang)}" />
+          ${actionFieldHtml}
+          ${campaignFieldHtml}
           <div style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;" aria-hidden="true">
             <label>Website <input type="text" name="companyWebsite" tabindex="-1" autocomplete="off" /></label>
           </div>
           ${turnstileHtml}
-          <button type="submit" style="display:inline-block;padding:14px 32px;background-color:#BD7057;color:#FAF6EE;border:0;border-radius:999px;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;cursor:pointer;">
+          <button type="submit" class="kr-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:14px 32px;background-color:${EMAIL_COLORS.buttonBg};color:${EMAIL_COLORS.buttonText};border:0;border-radius:999px;font-family:${EMAIL_FONT_SANS};font-size:14px;font-weight:600;letter-spacing:0.3px;cursor:pointer;">
             ${escapeHtml(submitLabel)}
           </button>
         </form>
-        <p style="margin:0 0 18px;font-family:Arial,sans-serif;font-size:12px;color:#584B44;">
-          <a href="${escapeHtml(switchUrl)}" style="color:#833E28;text-decoration:underline;">${escapeHtml(switchLabel)}</a>
+        <p style="margin:0 0 14px;font-family:${EMAIL_FONT_SANS};font-size:13px;line-height:1.6;color:${EMAIL_COLORS.bodyMuted};">
+          <a href="${escapeHtml(switchUrl)}" style="display:inline-block;padding:8px 4px;color:${EMAIL_COLORS.clayInk};font-weight:600;text-decoration:underline;">${escapeHtml(switchLabel)}</a>
         </p>
-        <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;">
-          <a href="${escapeHtml(storiesHref)}" style="color:#182D20;text-decoration:underline;">${escapeHtml(ctaLabel)}</a>
+        <p style="margin:0;font-family:${EMAIL_FONT_SANS};font-size:13.5px;line-height:1.6;">
+          <a href="${escapeHtml(storiesHref)}" style="display:inline-block;padding:8px 4px;color:${EMAIL_COLORS.forestDeep};font-weight:600;text-decoration:underline;">${escapeHtml(ctaLabel)}</a>
         </p>`
-      : `<div style="margin-bottom:24px;">
-          <a href="${escapeHtml(storiesHref)}" style="display:inline-block;padding:14px 32px;background-color:#BD7057;color:#FAF6EE;text-decoration:none;border-radius:999px;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;">
+      : `<div style="margin-bottom:22px;">
+          <a href="${escapeHtml(storiesHref)}" class="kr-btn" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:14px 32px;background-color:${EMAIL_COLORS.buttonBg};color:${EMAIL_COLORS.buttonText};text-decoration:none;border-radius:999px;font-family:${EMAIL_FONT_SANS};font-size:14px;font-weight:600;letter-spacing:0.3px;">
             ${escapeHtml(ctaLabel)}
           </a>
         </div>
         ${
           options.mode === "updated" && hasValidEmail
-            ? `<p style="margin:0;font-family:Arial,sans-serif;font-size:12px;color:#584B44;">
-                <a href="${escapeHtml(switchUrl)}" style="color:#833E28;text-decoration:underline;">${escapeHtml(switchLabel)}</a>
+            ? `<p style="margin:0;font-family:${EMAIL_FONT_SANS};font-size:13px;line-height:1.6;color:${EMAIL_COLORS.bodyMuted};">
+                <a href="${escapeHtml(switchUrl)}" style="display:inline-block;padding:8px 4px;color:${EMAIL_COLORS.clayInk};font-weight:600;text-decoration:underline;">${escapeHtml(switchLabel)}</a>
               </p>`
             : ""
         }`;
@@ -180,23 +236,49 @@ function renderPreferencesHtml(options: {
       ? `<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>`
       : "";
 
+  const eyebrowRight = isStay
+    ? isEs
+      ? "Confirmar suscripción"
+      : "Keep subscription active"
+    : isEs
+      ? "Preferencia de idioma"
+      : "Language preference";
+
   return `<!DOCTYPE html>
 <html lang="${isEs ? "es" : "en"}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="supported-color-schemes" content="light" />
   <title>${escapeHtml(heading)}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: light; }
+    .kr-btn:hover { background-color: ${EMAIL_COLORS.clayInk} !important; }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px solid #44693D;
+      outline-offset: 2px;
+    }
+    @media (max-width: 560px) {
+      body { padding: 20px 12px !important; }
+      main { padding: 28px 20px !important; }
+      h1 { font-size: 24px !important; }
+    }
+  </style>
   ${turnstileScriptTag}
 </head>
-<body style="margin:0;padding:40px 16px;background-color:#D9DFD3;font-family:Georgia,'Times New Roman',serif;color:#182D20;display:flex;align-items:center;justify-content:center;min-height:85vh;">
-  <main style="max-width:520px;width:100%;box-sizing:border-box;background-color:#F2ECDF;border-radius:24px;padding:44px 36px;text-align:center;box-shadow:0 14px 38px rgba(24,45,32,0.08);">
-    <p style="margin:0 0 12px;font-family:Arial,sans-serif;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:#BD7057;font-weight:bold;">
-      ${isEs ? "Historias de KarmaRise" : "KarmaRise Stories"} &middot; ${isEs ? "Preferencia de idioma" : "Language preference"}
+<body style="margin:0;padding:40px 16px;background-color:${EMAIL_COLORS.outerBg};font-family:${EMAIL_FONT_SERIF};color:${EMAIL_COLORS.forestDeep};display:flex;align-items:center;justify-content:center;min-height:100svh;box-sizing:border-box;">
+  <main style="max-width:520px;width:100%;box-sizing:border-box;background-color:${EMAIL_COLORS.paper};border:1px solid ${EMAIL_COLORS.paperBorder};border-radius:20px;padding:40px 36px;text-align:center;">
+    <p style="margin:0 0 12px;font-family:${EMAIL_FONT_SANS};font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:${EMAIL_COLORS.clayInk};font-weight:600;">
+      ${isEs ? "Historias de KarmaRise" : "KarmaRise Stories"} &middot; ${eyebrowRight}
     </p>
-    <h1 style="margin:0 0 16px;font-size:28px;line-height:1.2;font-weight:normal;font-style:italic;color:#182D20;">
+    <h1 style="margin:0 0 16px;font-family:${EMAIL_FONT_SERIF};font-size:28px;line-height:1.22;font-weight:400;font-style:italic;color:${EMAIL_COLORS.forestDeep};">
       ${escapeHtml(heading)}
     </h1>
-    <p style="margin:0 0 28px;font-size:17px;line-height:1.7;color:#25201D;">
+    <p style="margin:0 0 28px;font-family:${EMAIL_FONT_SERIF};font-size:17px;line-height:1.7;color:${EMAIL_COLORS.bodyInk};">
       ${escapeHtml(body)}
     </p>
     ${formHtml}
@@ -209,6 +291,7 @@ function respondError(options: {
   wantsHtml: boolean;
   status: number;
   error: string;
+  action?: PreferenceAction;
   email?: string;
   lang?: PreferenceLang;
 }): NextResponse {
@@ -216,6 +299,7 @@ function respondError(options: {
     return htmlResponse(
       renderPreferencesHtml({
         mode: "error",
+        action: options.action ?? "language",
         email: options.email ?? "",
         lang: options.lang ?? "EN",
         errorMessage: options.error,
@@ -239,6 +323,10 @@ export async function GET(request: Request) {
     singleLine: true,
   }).toUpperCase();
   const lang: PreferenceLang = rawLang === "ES" ? "ES" : "EN";
+  const action = parsePreferenceAction(url.searchParams.get("action"));
+  const campaign =
+    normalizeUtmToken(url.searchParams.get("utm_campaign") ?? "", 64) ||
+    undefined;
   const sig = readTrimmedString(url.searchParams.get("sig"), 128, {
     singleLine: true,
   });
@@ -249,6 +337,7 @@ export async function GET(request: Request) {
       return htmlResponse(
         renderPreferencesHtml({
           mode: "error",
+          action,
           email: "",
           lang,
           errorMessage:
@@ -269,22 +358,32 @@ export async function GET(request: Request) {
       return htmlResponse(
         renderPreferencesHtml({
           mode: "error",
+          action,
           email: rawEmail,
           lang,
           errorMessage:
             lang === "ES"
               ? "Demasiadas solicitudes. Espera un momento antes de volver a intentarlo."
-              : "Too many requests. Please wait a moment and try again.",
+              : "Too many requests. Wait a moment and try again.",
         }),
         429,
       );
     }
 
-    const updated = await updateBrevoSubscriberLanguage(rawEmail, lang);
+    const updated = await updateBrevoSubscriberLanguage(
+      rawEmail,
+      lang,
+      action === "stay"
+        ? { markReengaged: true, campaign }
+        : campaign
+          ? { campaign }
+          : undefined,
+    );
     if (!updated) {
       return htmlResponse(
         renderPreferencesHtml({
           mode: "error",
+          action,
           email: rawEmail,
           lang,
           errorMessage:
@@ -299,6 +398,7 @@ export async function GET(request: Request) {
     return htmlResponse(
       renderPreferencesHtml({
         mode: "updated",
+        action,
         email: rawEmail,
         lang,
       }),
@@ -309,8 +409,10 @@ export async function GET(request: Request) {
   return htmlResponse(
     renderPreferencesHtml({
       mode: "confirm",
+      action,
       email: isValidEmail(rawEmail) ? rawEmail : "",
       lang,
+      campaign,
     }),
     200,
   );
@@ -326,6 +428,8 @@ export async function POST(request: Request) {
 
   let rawEmailValue: unknown;
   let rawLangValue: unknown;
+  let rawActionValue: unknown;
+  let rawCampaignValue: unknown;
   let companyWebsite: unknown;
   let turnstileToken: unknown;
 
@@ -345,6 +449,8 @@ export async function POST(request: Request) {
     const params = new URLSearchParams(bodyResult.text);
     rawEmailValue = params.get("email");
     rawLangValue = params.get("lang") ?? params.get("language");
+    rawActionValue = params.get("action");
+    rawCampaignValue = params.get("campaign");
     companyWebsite = params.get("companyWebsite");
     turnstileToken =
       params.get("turnstileToken") ?? params.get("cf-turnstile-response");
@@ -363,6 +469,8 @@ export async function POST(request: Request) {
 
     rawEmailValue = jsonResult.data.email;
     rawLangValue = jsonResult.data.lang ?? jsonResult.data.language;
+    rawActionValue = jsonResult.data.action;
+    rawCampaignValue = jsonResult.data.campaign;
     companyWebsite = jsonResult.data.companyWebsite;
     turnstileToken = jsonResult.data.turnstileToken;
   }
@@ -371,6 +479,12 @@ export async function POST(request: Request) {
     singleLine: true,
   }).toUpperCase();
   const displayLang: PreferenceLang = parsedLang === "ES" ? "ES" : "EN";
+  const action = parsePreferenceAction(rawActionValue);
+  const campaign =
+    normalizeUtmToken(
+      readTrimmedString(rawCampaignValue, 64, { singleLine: true }),
+      64,
+    ) || undefined;
   const email = readTrimmedString(rawEmailValue, 320, {
     singleLine: true,
   }).toLowerCase();
@@ -385,10 +499,19 @@ export async function POST(request: Request) {
     },
   );
   if (!guard.ok) {
+    const localizedGuardError =
+      displayLang === "ES"
+        ? guard.status === 429
+          ? "Demasiadas solicitudes. Espera un momento antes de volver a intentarlo."
+          : guard.status === 400
+            ? "Completa la verificación de seguridad antes de confirmar."
+            : "No pudimos completar la verificación de seguridad."
+        : guard.error;
     return respondError({
       wantsHtml,
       status: guard.status,
-      error: guard.error,
+      error: localizedGuardError,
+      action,
       email: isValidEmail(email) ? email : "",
       lang: displayLang,
     });
@@ -399,6 +522,7 @@ export async function POST(request: Request) {
       return htmlResponse(
         renderPreferencesHtml({
           mode: "updated",
+          action,
           email: isValidEmail(email) ? email : "",
           lang: displayLang,
         }),
@@ -416,6 +540,7 @@ export async function POST(request: Request) {
         displayLang === "ES"
           ? "Introduce un correo electrónico válido."
           : "Enter a valid email address.",
+      action,
       lang: displayLang,
     });
   }
@@ -425,13 +550,22 @@ export async function POST(request: Request) {
       wantsHtml,
       status: 400,
       error: "Select a valid language preference (EN or ES).",
+      action,
       email,
       lang: "EN",
     });
   }
 
   const lang: PreferenceLang = parsedLang;
-  const updated = await updateBrevoSubscriberLanguage(email, lang);
+  const updated = await updateBrevoSubscriberLanguage(
+    email,
+    lang,
+    action === "stay"
+      ? { markReengaged: true, campaign }
+      : campaign
+        ? { campaign }
+        : undefined,
+  );
   if (!updated) {
     return respondError({
       wantsHtml,
@@ -440,6 +574,7 @@ export async function POST(request: Request) {
         lang === "ES"
           ? "No pudimos actualizar tu preferencia en este momento."
           : "Unable to update language preference right now.",
+      action,
       email,
       lang,
     });
@@ -449,6 +584,7 @@ export async function POST(request: Request) {
     return htmlResponse(
       renderPreferencesHtml({
         mode: "updated",
+        action,
         email,
         lang,
       }),

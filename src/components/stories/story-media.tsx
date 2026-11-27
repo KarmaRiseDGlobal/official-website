@@ -9,15 +9,16 @@ interface StoryMediaProps {
   ratio: string;
   aspectClass: string;
   title: string;
-  description: string;
+  description?: string;
   sizes: string;
   priority?: boolean;
   interactive?: boolean;
   variant?: "card" | "editorial";
+  dark?: boolean;
   className?: string;
 }
 
-/** Renders a Sanity or local Story photograph, or the editorial MediaPlaceholder when no image exists. */
+/** Renders a Sanity or local Story photograph, or a clean caption-free tonal placeholder when absent. */
 export function StoryMedia({
   image,
   kind,
@@ -29,20 +30,22 @@ export function StoryMedia({
   priority = false,
   interactive = false,
   variant = "card",
+  dark = false,
   className = "",
 }: StoryMediaProps) {
   if (image?.url) {
-    const isEditorial = variant === "editorial";
+    const frameClass = [
+      "editorial-photo-frame",
+      variant === "card" ? "editorial-photo-frame--nested" : "",
+      dark ? "editorial-photo-frame--dark" : "",
+      aspectClass,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     return (
       <figure className={`m-0 ${className}`}>
-        <div
-          className={`relative overflow-hidden bg-[var(--color-paper-2)] ${
-            isEditorial
-              ? "rounded-[var(--radius-input)]"
-              : "rounded-[var(--radius-card)] border border-[var(--color-rule)]/70"
-          } ${aspectClass}`}
-        >
+        <div className={frameClass}>
           <Image
             src={image.url}
             alt={image.alt || title}
@@ -54,9 +57,9 @@ export function StoryMedia({
                 ? { objectPosition: image.objectPosition }
                 : undefined
             }
-            className={`object-cover ${
+            className={`story-media-img object-cover ${
               interactive
-                ? "transition-transform duration-[var(--dur-slow)] ease-[var(--ease-out)] group-hover:scale-[1.03]"
+                ? "motion-safe:transition-transform motion-safe:duration-[var(--dur-slow)] motion-safe:ease-[var(--ease-out)] motion-safe:group-hover:scale-[1.03]"
                 : ""
             }`}
           />
@@ -70,7 +73,8 @@ export function StoryMedia({
       kind={kind}
       ratio={ratio}
       aspectClass={aspectClass}
-      tone="light"
+      tone={dark ? "dark" : "light"}
+      variant={variant}
       title={title}
       description={description}
       className={className}

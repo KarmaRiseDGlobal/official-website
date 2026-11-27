@@ -17,6 +17,7 @@
         --forest: #182d20;
         --muted: #584b44;
         --clay: #833e28;
+        --gold: #b99a58;
         --rule: #d4c4aa;
         --paper: #f2ecdf;
         --card: #faf7f0;
@@ -35,7 +36,7 @@
           "Segoe UI",
           Roboto,
           sans-serif;
-        font-size: 10pt;
+        font-size: 9.75pt;
         line-height: 1.5;
       }
       .toolbar {
@@ -43,26 +44,38 @@
         top: 0;
         z-index: 10;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
+        gap: 12px;
         padding: 12px 24px;
         background: var(--forest);
         color: var(--paper);
         font-size: 13px;
       }
       .toolbar button {
-        border: 1px solid #b99a58;
+        min-height: 44px;
+        border: 1px solid var(--gold);
         border-radius: 999px;
-        background: #b99a58;
+        background: var(--gold);
         color: #111914;
-        padding: 8px 18px;
+        padding: 10px 22px;
+        font: inherit;
         font-weight: 600;
         cursor: pointer;
+      }
+      .toolbar button:hover {
+        background: var(--paper);
+        border-color: var(--paper);
+      }
+      .toolbar button:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
       }
       .page {
         max-width: 210mm;
         margin: 24px auto;
-        padding: 20mm;
+        padding: 18mm 20mm;
         background: #ffffff;
         box-shadow: 0 16px 48px rgba(24, 45, 32, 0.14);
       }
@@ -76,7 +89,7 @@
         margin-bottom: 18px;
       }
       .brand-title {
-        font-family: Georgia, serif;
+        font-family: "Marcellus", Georgia, serif;
         font-size: 18pt;
         color: var(--forest);
         margin: 0;
@@ -91,29 +104,34 @@
         font-size: 8.5pt;
         color: var(--muted);
         line-height: 1.45;
+        font-variant-numeric: tabular-nums;
       }
       .entity-box strong {
         color: var(--forest);
       }
       h1 {
-        font-family: Georgia, serif;
+        font-family: "Marcellus", Georgia, serif;
         font-size: 15pt;
         font-weight: normal;
         color: var(--forest);
         margin: 0 0 6px;
+        line-height: 1.15;
       }
       .meta-bar {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
+        gap: 8px 16px;
         font-size: 9pt;
         color: var(--clay);
         font-weight: 600;
         margin-bottom: 16px;
         padding-bottom: 10px;
         border-bottom: 1px solid var(--rule);
+        font-variant-numeric: tabular-nums;
       }
       h2 {
-        font-family: Georgia, serif;
+        font-family: "Marcellus", Georgia, serif;
         font-size: 11pt;
         font-weight: normal;
         color: var(--forest);
@@ -123,8 +141,8 @@
       }
       p,
       li {
-        margin: 0 0 7px;
-        text-align: justify;
+        margin: 0 0 6px;
+        text-align: left;
       }
       ol,
       ul {
@@ -135,12 +153,18 @@
         background: #fff8dc;
         padding: 1px 4px;
         border-bottom: 1px dashed var(--clay);
+        border-radius: 2px;
+      }
+      .editable:focus-visible {
+        outline: 2px solid var(--forest);
+        outline-offset: 2px;
+        border-radius: 3px;
       }
       .sig-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 24px;
-        margin-top: 22px;
+        margin-top: 20px;
         page-break-inside: avoid;
       }
       .sig-box {
@@ -149,6 +173,7 @@
         padding: 14px;
         border-radius: 8px;
         font-size: 9pt;
+        font-variant-numeric: tabular-nums;
       }
       .sig-line {
         height: 36px;
@@ -162,7 +187,10 @@
         font-size: 8pt;
         color: var(--muted);
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
+        gap: 6px 16px;
+        font-variant-numeric: tabular-nums;
       }
       @media print {
         body {
@@ -180,6 +208,7 @@
         .editable {
           background: transparent;
           border-bottom: none;
+          padding: 0;
         }
       }
     </style>
@@ -188,7 +217,7 @@
     <div class="toolbar">
       <span>
         <strong>Template 03:</strong> Master Manufacturing Programme Agreement
-        (Yellow fields are click-to-edit before printing)
+        (Highlighted fields are editable before printing)
       </span>
       <button type="button" onclick="window.print()">
         Print / Save as PDF
@@ -200,7 +229,7 @@
         <div>
           <p class="brand-title">KarmaRise D Global</p>
           <p class="brand-sub">
-            Master Manufacturing Programme Agreement (Phases 01 to 04)
+            Master Manufacturing Programme Agreement (Stages 01 to 06)
           </p>
         </div>
         <div class="entity-box">
@@ -212,131 +241,339 @@
         </div>
       </header>
 
-      <h1>Master Manufacturing Programme Agreement</h1>
+      <h1>Master Manufacturing Programme Agreement (Stages 01 to 06)</h1>
       <div class="meta-bar">
         <span>
-          Agreement Ref:
-          <span class="editable" contenteditable="true">KRDG-MPA-2026-001</span>
+          Agreement Reference:
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Agreement Reference"
+            >KRDG-MPA-[YYYY]-[001]</span
+          >
         </span>
         <span>
           Effective Date:
-          <span class="editable" contenteditable="true">16 November 2026</span>
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Effective Date"
+            >[DD Month YYYY]</span
+          >
         </span>
       </div>
 
       <h2>1. Parties</h2>
       <p>
         This Master Manufacturing Programme Agreement (the
-        <strong>"Agreement"</strong>) is entered into between
-        <strong>Karmarise Global LLP</strong> (LLPIN: <strong>ACO-3878</strong>,
-        GSTIN: <strong>27ABDFK8128R1ZL</strong>), registered at 2nd floor, Guru
-        Charan Apartment, Ulhasnagar, Maharashtra, India, 421002, operating the
-        <strong>KarmaRise D Global</strong> brand
-        (<strong>"KarmaRise"</strong>), and
-        <strong class="editable" contenteditable="true"
-          >[Client Legal Entity Name]</strong
-        >, registered in
-        <span class="editable" contenteditable="true">[Spain / Country]</span>
-        under tax/VAT ID
-        <span class="editable" contenteditable="true"
-          >[NIF / CIF / VAT Number]</span
-        >, with registered address at
-        <span class="editable" contenteditable="true"
-          >[Client Registered Address]</span
-        >
-        (the <strong>"Client"</strong>).
+        <strong>"Agreement"</strong>) is entered into on the Effective Date by
+        and between:
       </p>
+      <ol>
+        <li>
+          <strong>Karmarise Global LLP</strong>, a Limited Liability Partnership
+          incorporated in India on 15 May 2025 under the Limited Liability
+          Partnership Act, 2008, bearing <strong>LLPIN: ACO-3878</strong> and
+          <strong>GSTIN: 27ABDFK8128R1ZL</strong>, having its registered office
+          at 2nd floor, Guru Charan Apartment, Ulhasnagar, Maharashtra, India,
+          421002, operating the <strong>KarmaRise D Global</strong> brand
+          (hereinafter <strong>"KarmaRise"</strong>); and
+        </li>
+        <li>
+          <strong
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Legal Entity Name"
+            >[Client Legal Entity Name]</strong
+          >, incorporated under the laws of
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Country of Registration"
+            >[Country, e.g., Spain]</span
+          >, bearing tax or VAT identification number
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Tax or VAT ID"
+            >[NIF / CIF / VAT Number]</span
+          >, having its registered office at
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Registered Address"
+            >[Client Registered Address]</span
+          >
+          (hereinafter the <strong>"Client"</strong>).
+        </li>
+      </ol>
 
-      <h2>2. Four-Phase Manufacturing Programme Structure</h2>
+      <h2>2. Six-Stage Manufacturing Programme Structure</h2>
       <p>
-        KarmaRise develops, coordinates, supervises, and delivers the Client's
-        commissioned products through vetted Indian
-        <strong>Manufacturing Partners</strong> across four phases:
-        <strong>Phase 01 (Design Approval)</strong>,
-        <strong>Phase 02 (Sample Approval)</strong>,
-        <strong>Phase 03 (Bulk Order Production)</strong>, and
-        <strong>Phase 04 (Pre-Shipment Inspection &amp; Shipping)</strong>. Each
-        Bulk Order is confirmed via a signed Purchase Order / Programme Schedule
-        referencing this Agreement.
-      </p>
-
-      <h2>3. Golden Sample Standard &amp; Production Tolerances</h2>
-      <p>
-        <strong>3.1 No Bulk Cut Without Approval:</strong> Phase 03 bulk
-        material cutting shall not begin until the Client signs off in writing
-        on the physical Counter Sample (the <strong>"Golden Sample"</strong>).
-        Duplicate sealed Golden Samples are held by the Client and by
-        KarmaRise's production supervision team in India.<br />
-        <strong>3.2 Tolerances:</strong> Unless otherwise stated in the Product
-        Brief, standard textile and leather craft tolerances of ±1.0 cm on
-        dimensions and approved dye-lot shade bands apply.
-      </p>
-
-      <h2>4. Pricing, Payment Milestones &amp; Invoicing</h2>
-      <p>
-        All invoices are issued by <strong>Karmarise Global LLP</strong>
-        (<code>accounts@karmarisedglobal.com</code>) in
-        <span class="editable" contenteditable="true">EUR (€)</span>:
+        KarmaRise manages the end-to-end development, sampling, production
+        supervision, quality inspection, and dispatch readiness of the Client's
+        own-brand products in India across six sequential stages:
       </p>
       <ul>
         <li>
-          <strong>50% Deposit:</strong> Payable upon Golden Sample approval and
-          issuance of the Bulk Order invoice to commence material procurement
-          and production scheduling.
+          <strong>Stage 01: Brief and Product Study.</strong> Alignment on the
+          written <strong>Product Brief</strong>, bill of materials, retail
+          ergonomics, hardware and trim specifications, target cost, and
+          packaging expectations.
         </li>
         <li>
-          <strong>50% Balance + Agreed Freight/Testing:</strong> Payable within
-          5 business days of KarmaRise delivering the passed Pre-Shipment
-          Quality Inspection Report (with photographs and video of packed goods)
-          prior to shipment release.
+          <strong>Stage 02: Material and Physical Swatch Approval.</strong>
+          Partner matching across India's specialist craft hubs (including
+          Kolkata, Kanpur, Agra, and Chennai, overseen from Maharashtra) and
+          preparation of physical leather or fabric colour swatches for written
+          Client approval.
+        </li>
+        <li>
+          <strong>Stage 03: Physical Sample Review and Sign-Off.</strong>
+          Development, in-person review in India, and physical inspection of
+          prototypes until the Client approves and signs off in writing on the
+          reference pre-production sample (the
+          <strong>"Golden Sample"</strong>).
+        </li>
+        <li>
+          <strong>Stage 04: Contracts and Pre-Production Prep.</strong>
+          Execution of written Indian supplier contracts with the vetted
+          <strong>Manufacturing Partner</strong>, locking raw materials, dye
+          lots, antique brass hardware, high-quality Japanese plastic YKK
+          zippers, woven labels, and EU compliance specs prior to cutting.
+        </li>
+        <li>
+          <strong>Stage 05: Supervised Production and On-Site Checks.</strong>
+          Placement and execution of the <strong>Bulk Order</strong> at the
+          matched Indian production unit, with on-site production supervision,
+          dye-batch verification, in-line quality checks, and live progress
+          updates by KarmaRise in India.
+        </li>
+        <li>
+          <strong
+            >Stage 06: EU Labelling, Packing, and Door-to-Door Delivery.</strong
+          >
+          Final inspection of finished goods, sewn-in EU fibre or leather
+          composition labels, care hangtags, dust bags, export carton packing,
+          and customs clearance handover under the agreed Incoterms.
         </li>
       </ul>
-
-      <h2>5. Quality Inspection (AQL), Pre-Shipment Checks &amp; Remedies</h2>
       <p>
-        Shirish and KarmaRise's team in India conduct in-line floor checks
-        during Phase 03 and a final pre-shipment inspection during Phase 04
-        against the Golden Sample using
-        <strong>ISO 2859-1 (AQL 2.5 Major / 4.0 Minor)</strong>. Units failing
-        pre-shipment inspection in India are repaired or remade before dispatch
-        at no cost to the Client. Post-arrival claims for latent manufacturing
-        defects must be submitted with photographic evidence within 14 calendar
-        days of delivery to <code>support@karmarisedglobal.com</code>; verified
-        defects are remedied via replacement run, rework, or pro-rata credit
-        note.
+        Each individual Bulk Order under this Agreement shall be documented in a
+        written <strong>Purchase Order / Programme Schedule</strong> signed by
+        both Parties.
       </p>
 
-      <h2>6. Delivery Incoterms (ICC Incoterms® 2020)</h2>
+      <h2>3. Golden Sample Standard &amp; Manufacturing Tolerances</h2>
       <p>
-        Each Programme Schedule specifies the agreed Incoterm (<span
+        <strong>3.1 No Production Without Sample Approval:</strong> KarmaRise
+        shall not authorize production cutting or Stage 05 manufacturing until
+        the Client has approved the physical Golden Sample in writing.
+      </p>
+      <p>
+        <strong>3.2 Duplicate Golden Samples:</strong> Two identical Golden
+        Samples shall be sealed: one held by the Client and one held at the
+        Indian production site by KarmaRise for side-by-side inspection during
+        Stage 05 and Stage 06.
+      </p>
+      <p>
+        <strong>3.3 Handcraft &amp; Textile Tolerances:</strong> Unless
+        otherwise specified in the Product Brief, industry-standard tolerances
+        apply (±1.0 cm on garment, accessory, home decor, or bag dimensions and
+        natural grain or vegetable-dye shade variation within approved shade
+        bands).
+      </p>
+
+      <h2>4. Pricing, Payment Milestones, Taxes &amp; Invoicing</h2>
+      <p>
+        Unless otherwise stated in a specific Programme Schedule, all Bulk
+        Orders are invoiced by <strong>Karmarise Global LLP</strong>
+        (<strong>accounts@karmarisedglobal.com</strong>) in
+        <span
           class="editable"
           contenteditable="true"
-          >FOB Mumbai / EXW / DDP Spain</span
-        >). Title to the goods transfers to the Client upon receipt of full
-        payment of the Bulk Order invoice by Karmarise Global LLP.
+          role="textbox"
+          aria-label="Invoicing Currency"
+          >[EUR / USD]</span
+        >
+        under the following milestone schedule:
+      </p>
+      <ol>
+        <li>
+          <strong>Deposit (50% of Bulk Order Value):</strong> Due upon written
+          Golden Sample approval (Stage 03) and issuance of the Stage 04 Bulk
+          Order invoice to initiate raw material procurement and production
+          scheduling. Production lead time begins on the business day the
+          deposit clears.
+        </li>
+        <li>
+          <strong
+            >Balance Payment (50% of Bulk Order Value + Agreed Freight /
+            Testing):</strong
+          >
+          Due within <strong>five (5) business days</strong> of KarmaRise
+          delivering the passed
+          <strong>Pre-Shipment Quality Inspection Report</strong> (including
+          high-resolution photographs and video of packed goods) and prior to
+          physical release or dispatch of the shipment.
+        </li>
+        <li>
+          <strong
+            >Taxes &amp; Duties (Including Spanish and EU VAT / IVA):</strong
+          >
+          Export prices from India are quoted net of destination country import
+          duties, Spanish and European Union VAT (<em>IVA</em>), and customs
+          brokerage unless <strong>DDP</strong> Incoterms are explicitly agreed
+          in the Programme Schedule.
+        </li>
+      </ol>
+
+      <h2>5. Quality Inspection, AQL Standards &amp; Remedies</h2>
+      <p>
+        <strong>5.1 In-Line &amp; Pre-Shipment Inspection:</strong> Shirish and
+        KarmaRise's India team conduct in-line on-site checks during Stage 05
+        and a final pre-shipment inspection during Stage 06 against the Golden
+        Sample based on <strong>ISO 2859-1 (AQL 2.5 Major / 4.0 Minor)</strong>
+        unless a stricter standard is specified in the Product Brief.
+      </p>
+      <p>
+        <strong>5.2 Pre-Dispatch Rectification:</strong> Any units failing
+        pre-shipment inspection in India are repaired or remade at the
+        production unit prior to packing at no additional cost to the Client.
+      </p>
+      <p>
+        <strong>5.3 Post-Arrival Claims:</strong> The Client shall inspect
+        delivered goods within <strong>fourteen (14) calendar days</strong> of
+        arrival at destination and notify KarmaRise (<strong
+          >support@karmarisedglobal.com</strong
+        >
+        and <strong>hola@karmarisedglobal.com</strong>) with photographic
+        evidence of any manufacturing defect exceeding agreed AQL tolerances.
+        For verified manufacturing defects attributable to production, KarmaRise
+        shall, at the Client's election, provide a replacement run, rework
+        credit, or pro-rata credit note on the defective units.
       </p>
 
-      <h2>7. Client IP Ownership &amp; 36-Month Non-Circumvention</h2>
+      <h2>
+        6. Delivery, EU REACH &amp; Labelling Compliance &amp; Incoterms (ICC
+        Incoterms® 2020)
+      </h2>
       <p>
-        All Client designs, patterns, tech packs, trademarks, and paid custom
-        tooling remain the
+        <strong>6.1 Incoterms &amp; Title Retention:</strong> Each Programme
+        Schedule shall specify the delivery term (<span
+          class="editable"
+          contenteditable="true"
+          role="textbox"
+          aria-label="Agreed Delivery Incoterm and Destination"
+          >EXW / FOB Mumbai / CIF / DDP [Destination City, Spain or elsewhere in
+          the European Union]</span
+        >). Risk transfers in accordance with ICC Incoterms® 2020, provided that
+        title to the goods shall not pass to the Client until full payment of
+        the Bulk Order invoice is received by Karmarise Global LLP.
+      </p>
+      <p>
+        <strong>6.2 EU REACH &amp; Labelling Compliance:</strong> Destination
+        market compliance requirements, including EU textile fibre composition
+        regulations, REACH material testing, and custom sewn-in care labels or
+        hangtags in Spanish, English, or Portuguese, must be specified in the
+        Product Brief prior to Stage 04.
+      </p>
+
+      <h2>7. Intellectual Property, Exclusivity &amp; Non-Circumvention</h2>
+      <p>
+        <strong>7.1 Client IP Ownership:</strong> All Client designs, patterns,
+        tech packs, brand labels, and custom tooling paid for by the Client
+        remain the
         <strong>exclusive intellectual property of the Client</strong> and shall
-        never be produced for third parties. During this Agreement and for
-        <strong>36 months</strong> after the final Bulk Order, the Client shall
-        not bypass KarmaRise to solicit or place orders directly or indirectly
-        with any Indian Manufacturing Partner introduced by KarmaRise, subject
-        to the 25% liquidated damages provision of the Mutual NDA/NNN Agreement.
+        never be produced for or shown to third parties or used for KarmaRise's
+        own brands (including <strong>AlmaRise D Brand</strong>,
+        <strong>AlmaRise D Reborn</strong>, <strong>AlmaRise D Organic</strong>,
+        and <strong>AlmaRise D Home Decor</strong>).
+      </p>
+      <p>
+        <strong>7.2 Protection of Manufacturing Partner Network:</strong> During
+        the term of this Agreement and for
+        <strong>thirty-six (36) months</strong> after the final Bulk Order
+        delivery, the Client shall not circumvent KarmaRise by contacting or
+        placing orders directly or indirectly with any Indian Manufacturing
+        Partner, production unit, or supplier introduced by KarmaRise, subject
+        to the liquidated damages (25% of gross order value or KarmaRise's
+        standard programme margin, whichever is greater) set out in the Mutual
+        NDA / NNN Agreement.
       </p>
 
-      <h2>8. Liability Cap, Term &amp; Governing Law</h2>
+      <h2>8. Limitation of Liability &amp; Force Majeure</h2>
       <p>
-        Aggregate liability under any Bulk Order shall not exceed 100% of the
-        invoice value of that Bulk Order. This Agreement remains in force for an
-        initial term of 2 years with automatic 1-year renewals unless terminated
-        on 60 days' written notice. Governed by the
-        <strong>laws of India</strong>, with exclusive jurisdiction in the
-        courts of <strong>Thane and Mumbai, Maharashtra, India</strong>.
+        <strong>8.1 Liability Cap:</strong> Each Party's aggregate liability
+        under any Bulk Order (other than for payment of invoices, breach of
+        confidentiality, IP infringement, or non-circumvention) shall not exceed
+        <strong>100% of the total invoice value</strong> of the specific Bulk
+        Order giving rise to the claim.
       </p>
+      <p>
+        <strong>8.2 Force Majeure:</strong> Neither Party shall be liable for
+        delays caused by events beyond reasonable control (including natural
+        disasters, port closures, sovereign export or import restrictions, or
+        severe utility disruptions), provided the affected Party notifies the
+        other in writing within <strong>five (5) business days</strong> and
+        takes all reasonable steps to mitigate delay.
+      </p>
+
+      <h2>9. Term, Termination &amp; Governing Law</h2>
+      <p>
+        <strong>9.1 Term:</strong> This Agreement commences on the Effective
+        Date and continues for <strong>two (2) years</strong>, automatically
+        renewing for successive 1-year periods unless either Party gives
+        <strong>sixty (60) days'</strong> written notice (without affecting any
+        Bulk Order already in production).
+      </p>
+      <p>
+        <strong>9.2 Governing Law &amp; Jurisdiction:</strong> This Agreement is
+        governed by the <strong>laws of India</strong>, with exclusive
+        jurisdiction in the competent courts of
+        <strong>Thane and Mumbai, Maharashtra, India</strong>.
+      </p>
+
+      <h2>10. Official Notices &amp; Contact Channels</h2>
+      <ul>
+        <li>
+          <strong>For Karmarise Global LLP (KarmaRise D Global):</strong><br />
+          Registered Office: 2nd floor, Guru Charan Apartment, Ulhasnagar,
+          Maharashtra, India, 421002<br />
+          Designated Partner &amp; India Operations: Shirish
+          (shirish@karmarisedglobal.com / support@karmarisedglobal.com · +91
+          8530009798)<br />
+          Client Operations (Spain and the rest of Europe): Alma
+          (alma@karmarisedglobal.com / hola@karmarisedglobal.com · +34 611 722
+          276)<br />
+          Billing &amp; GST Documentation: accounts@karmarisedglobal.com
+        </li>
+        <li>
+          <strong>For the Client:</strong><br />
+          Address:
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Notice Address"
+            >[Client Registered Address]</span
+          ><br />
+          Attention &amp; Email:
+          <span
+            class="editable"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Client Notice Attention and Email"
+            >[Client Contact Name &amp; Email]</span
+          >
+        </li>
+      </ul>
 
       <div class="sig-grid">
         <div class="sig-box">
@@ -349,8 +586,12 @@
           </div>
           <div>
             <strong>Date:</strong>
-            <span class="editable" contenteditable="true"
-              >16 November 2026</span
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="KarmaRise Signature Date"
+              >[DD Month YYYY]</span
             >
           </div>
         </div>
@@ -358,25 +599,44 @@
         <div class="sig-box">
           <strong>
             For and on behalf of
-            <span class="editable" contenteditable="true"
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Signatory Entity Name"
               >[Client Legal Entity Name]</span
             >
           </strong>
           <div class="sig-line"></div>
           <div>
             <strong>Name &amp; Title:</strong>
-            <span class="editable" contenteditable="true"
-              >[Authorized Signatory]</span
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Authorized Signatory Name and Title"
+              >[Authorized Signatory Name · Director / Authorized
+              Signatory]</span
             >
           </div>
           <div>
             <strong>Tax / VAT ID:</strong>
-            <span class="editable" contenteditable="true">[NIF / VAT]</span>
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Signatory Tax or VAT ID"
+              >[NIF / CIF / VAT Number]</span
+            >
           </div>
           <div>
             <strong>Date:</strong>
-            <span class="editable" contenteditable="true"
-              >16 November 2026</span
+            <span
+              class="editable"
+              contenteditable="true"
+              role="textbox"
+              aria-label="Client Signature Date"
+              >[DD Month YYYY]</span
             >
           </div>
         </div>
@@ -387,8 +647,8 @@
           >Karmarise Global LLP · LLPIN: ACO-3878 · GSTIN: 27ABDFK8128R1ZL</span
         >
         <span>
-          India: +91 8530009798 (shirish@karmarisedglobal.com) · Spain: +34
-          611722276 (alma@karmarisedglobal.com)
+          India: +91 8530009798 (shirish@karmarisedglobal.com) · Spain: +34 611
+          722 276 (alma@karmarisedglobal.com)
         </span>
       </footer>
     </div>

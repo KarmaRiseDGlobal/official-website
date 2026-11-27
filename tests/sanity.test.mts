@@ -171,14 +171,18 @@ test("fetchSanity enforces perspective=published, supports server env fallback, 
     assert.equal(recordedCalls.length, 2);
     assert.match(
       recordedCalls[0]!.url,
-      /^https:\/\/proj1234\.api\.sanity\.io\/v2025-01-01\/data\/query\/production\?/,
+      /^https:\/\/proj1234\.apicdn\.sanity\.io\/v2025-01-01\/data\/query\/production\?/,
     );
     assert.match(recordedCalls[0]!.url, /perspective=published/);
     assert.deepEqual(recordedCalls[0]!.next, {
-      revalidate: 30,
+      revalidate: 300,
       tags: ["stories"],
     });
 
+    assert.match(
+      recordedCalls[1]!.url,
+      /^https:\/\/proj1234\.api\.sanity\.io\/v2025-01-01\/data\/query\/production\?/,
+    );
     assert.match(recordedCalls[1]!.url, /perspective=published/);
     assert.equal(recordedCalls[1]!.cache, "no-store");
     assert.equal(recordedCalls[1]!.next, undefined);

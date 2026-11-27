@@ -104,11 +104,7 @@ export function formatMonthTitle(monthKey: string, locale: string): string {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-export function formatDateHeading(
-  dateKey: string,
-  locale: string,
-  timeZone: string,
-): string {
+export function formatDateHeading(dateKey: string, locale: string): string {
   const [yStr, mStr, dStr] = dateKey.split("-");
   const date = new Date(
     Date.UTC(Number(yStr), Number(mStr) - 1, Number(dStr), 12, 0, 0),
@@ -119,8 +115,35 @@ export function formatDateHeading(
     month: "long",
     timeZone: "UTC",
   }).format(date);
-  void timeZone;
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
+export function formatShortDatePill(dateKey: string, locale: string): string {
+  const [yStr, mStr, dStr] = dateKey.split("-");
+  const date = new Date(
+    Date.UTC(Number(yStr), Number(mStr) - 1, Number(dStr), 12, 0, 0),
+  );
+  const formatted = new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(date);
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
+export function getSlotHour(isoString: string, timeZone: string): number {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) {
+    return 12;
+  }
+  const hourPart = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    hour12: false,
+    timeZone,
+  }).format(date);
+  const parsed = Number.parseInt(hourPart, 10);
+  return Number.isFinite(parsed) ? parsed : 12;
 }
 
 export function formatSlotTime(

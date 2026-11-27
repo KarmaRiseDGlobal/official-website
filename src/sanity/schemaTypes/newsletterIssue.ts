@@ -75,7 +75,7 @@ export const newsletterIssueType = defineType({
       name: "narrator",
       title: "Narrator / sender voice",
       description:
-        "One founder narrates each personal letter in first person, including the photo caption and signature.",
+        "One founder narrates each personal letter in first person, including the signature.",
       type: "string",
       group: ["editorial", "delivery"],
       initialValue: "alma",
@@ -156,15 +156,21 @@ export const newsletterIssueType = defineType({
     }),
     defineField({
       name: "heroImageCaptionEn",
-      title: "Photo caption (English, first person)",
+      title: "Photo caption (English, deprecated)",
+      description:
+        "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
       type: "string",
       group: "english",
+      hidden: true,
     }),
     defineField({
       name: "heroImageCaptionEs",
-      title: "Photo caption (Spanish, first person)",
+      title: "Photo caption (Spanish, deprecated)",
+      description:
+        "Deprecated: KarmaRise never renders visible explanatory captions beneath images.",
       type: "string",
       group: "spanish",
+      hidden: true,
     }),
     defineField({
       name: "selectedStories",
@@ -376,7 +382,13 @@ export const newsletterIssueType = defineType({
         }),
         defineField({
           name: "openedCount",
-          title: "Opened",
+          title: "Unique opened",
+          type: "number",
+          initialValue: 0,
+        }),
+        defineField({
+          name: "totalOpenedCount",
+          title: "Total opens (including repeats)",
           type: "number",
           initialValue: 0,
         }),
@@ -408,6 +420,104 @@ export const newsletterIssueType = defineType({
           name: "lastEventAt",
           title: "Last webhook event at",
           type: "datetime",
+        }),
+        defineField({
+          name: "en",
+          title: "English edition (EN) segment",
+          type: "object",
+          fields: [
+            defineField({
+              name: "deliveredCount",
+              title: "Delivered",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "openedCount",
+              title: "Unique opened",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "totalOpenedCount",
+              title: "Total opens",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "clickedCount",
+              title: "Clicked",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "bouncedCount",
+              title: "Bounced",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "unsubscribedCount",
+              title: "Unsubscribed",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "spamCount",
+              title: "Spam complaints",
+              type: "number",
+              initialValue: 0,
+            }),
+          ],
+        }),
+        defineField({
+          name: "es",
+          title: "Spanish edition (ES) segment",
+          type: "object",
+          fields: [
+            defineField({
+              name: "deliveredCount",
+              title: "Delivered",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "openedCount",
+              title: "Unique opened",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "totalOpenedCount",
+              title: "Total opens",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "clickedCount",
+              title: "Clicked",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "bouncedCount",
+              title: "Bounced",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "unsubscribedCount",
+              title: "Unsubscribed",
+              type: "number",
+              initialValue: 0,
+            }),
+            defineField({
+              name: "spamCount",
+              title: "Spam complaints",
+              type: "number",
+              initialValue: 0,
+            }),
+          ],
         }),
       ],
     }),

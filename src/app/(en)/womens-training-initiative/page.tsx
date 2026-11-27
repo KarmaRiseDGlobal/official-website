@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 
-import { WomensTrainingInitiativePageClient } from "@/views/womens-training-initiative-client";
 import { getRouteMetadata } from "@/lib/seo";
+import {
+  getWomensTrainingInitiativeStructuredData,
+  serializeJsonLd,
+} from "@/lib/structured-data";
+import { WomensTrainingInitiativePageClient } from "@/views/womens-training-initiative-client";
 
 export const metadata: Metadata = getRouteMetadata(
   "womens-training-initiative",
@@ -9,5 +13,15 @@ export const metadata: Metadata = getRouteMetadata(
 );
 
 export default function WomensTrainingInitiativePage() {
-  return <WomensTrainingInitiativePageClient lang="en" />;
+  const structuredData = getWomensTrainingInitiativeStructuredData("en");
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
+      />
+      <WomensTrainingInitiativePageClient lang="en" />
+    </>
+  );
 }

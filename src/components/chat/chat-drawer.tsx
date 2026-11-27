@@ -42,6 +42,10 @@ export function ChatDrawer({
   const [messages, setMessages] = useState<ChatMessage[]>(
     () => readStoredChatState().messages,
   );
+  const [clearedSnapshot, setClearedSnapshot] = useState<ChatMessage[] | null>(
+    null,
+  );
+  const [assistantAnnouncement, setAssistantAnnouncement] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [companyWebsite, setCompanyWebsite] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -65,6 +69,7 @@ export function ChatDrawer({
   );
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
+  const [turnstileFailed, setTurnstileFailed] = useState(false);
   const [statusError, setStatusError] = useState("");
   const [drawerMaxHeight, setDrawerMaxHeight] = useState<number | null>(null);
 
@@ -72,13 +77,16 @@ export function ChatDrawer({
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const latestAnswerRef = useRef<HTMLDivElement>(null);
-  const lastFocusedAnswerIdRef = useRef<string | null>(null);
+  const lastAnnouncedAnswerIdRef = useRef<string | null>(null);
   const hasSyncedConfigRef = useRef(false);
   const turnstileTokenRef = useRef("");
 
   function handleTurnstileTokenChange(token: string) {
     turnstileTokenRef.current = token;
     setTurnstileToken(token);
+    if (token) {
+      setTurnstileFailed(false);
+    }
   }
 
   async function waitForTurnstileToken(timeoutMs = 2500): Promise<string> {
@@ -151,6 +159,10 @@ export function ChatDrawer({
   }
 
   useEffect(() => {
+    const initialLast = readStoredChatState().messages.at(-1);
+    if (initialLast?.role === "assistant") {
+      lastAnnouncedAnswerIdRef.current = initialLast.id;
+    }
     requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
@@ -276,11 +288,9 @@ export function ChatDrawer({
       );
       container.scrollTop = targetTop;
 
-      if (lastFocusedAnswerIdRef.current !== lastMessage.id) {
-        lastFocusedAnswerIdRef.current = lastMessage.id;
-        if (document.activeElement !== inputRef.current) {
-          latestAnswerRef.current.focus({ preventScroll: true });
-        }
+      if (lastAnnouncedAnswerIdRef.current !== lastMessage.id) {
+        lastAnnouncedAnswerIdRef.current = lastMessage.id;
+        setAssistantAnnouncement(lastMessage.content);
       }
       return;
     }
@@ -289,12 +299,40 @@ export function ChatDrawer({
   }, [messages, isSending]);
 
   function clearConversation() {
+    if (messages.length > 0) {
+      setClearedSnapshot(messages);
+    }
     setMessages([]);
     setInputValue("");
     setShowFallbackActions(false);
     setStatusError("");
+    setAssistantAnnouncement(
+      isEs ? "Conversación borrada." : "Conversation cleared.",
+    );
     writeStoredChatState({
       messages: [],
+      sessionVerified,
+    });
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }
+
+  function undoClearConversation() {
+    if (!clearedSnapshot || clearedSnapshot.length === 0) {
+      return;
+    }
+    const restored = clearedSnapshot;
+    const lastRestored = restored.at(-1);
+    if (lastRestored?.role === "assistant") {
+      lastAnnouncedAnswerIdRef.current = lastRestored.id;
+    }
+    setMessages(restored);
+    setClearedSnapshot(null);
+    setShowFallbackActions(Boolean(lastRestored?.isFallbackNotice));
+    setAssistantAnnouncement(
+      isEs ? "Conversación restaurada." : "Conversation restored.",
+    );
+    writeStoredChatState({
+      messages: restored,
       sessionVerified,
     });
     requestAnimationFrame(() => inputRef.current?.focus());
@@ -305,6 +343,8 @@ export function ChatDrawer({
     if (!trimmed || isSending) {
       return;
     }
+
+    setClearedSnapshot(null);
 
     let synced: {
       turnstileRequired: boolean;
@@ -328,7 +368,7 @@ export function ChatDrawer({
       setStatusError(
         isEs
           ? "La verificación de seguridad no está configurada en este entorno. Usa el briefing de producto, Contacto o WhatsApp."
-          : "Security verification is not configured on this environment. Please use Product Brief, Contact, or WhatsApp.",
+          : "Security verification is not configured on this environment. Use Product Brief, Contact, or WhatsApp.",
       );
       setShowFallbackActions(true);
       return;
@@ -341,10 +381,15 @@ export function ChatDrawer({
       activeTurnstileToken = await waitForTurnstileToken();
       if (!activeTurnstileToken) {
         setIsSending(false);
+        setShowFallbackActions(turnstileFailed);
         setStatusError(
-          isEs
-            ? "Completa la verificación de seguridad antes de enviar tu primera pregunta."
-            : "Please complete the security check before sending your first question.",
+          turnstileFailed
+            ? isEs
+              ? "La verificación de seguridad no ha podido cargarse. Usa el briefing de producto, reserva una llamada o escríbenos por WhatsApp."
+              : "The security check could not load. Use the Product Brief, book a call, or message us on WhatsApp."
+            : isEs
+              ? "Completa la verificación de seguridad antes de enviar tu primera pregunta."
+              : "Complete the security check before sending your first question.",
         );
         return;
       }
@@ -426,7 +471,7 @@ export function ChatDrawer({
           payload.error ||
             (isEs
               ? "Completa la verificación de seguridad para continuar."
-              : "Please complete the security check to continue."),
+              : "Complete the security check to continue."),
         );
         return;
       }
@@ -479,6 +524,15 @@ export function ChatDrawer({
 
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!inputValue.trim()) {
+      setStatusError(
+        isEs
+          ? "Escribe una pregunta antes de enviarla."
+          : "Write a question before sending.",
+      );
+      inputRef.current?.focus();
+      return;
+    }
     void sendMessage(inputValue);
   }
 
@@ -508,8 +562,17 @@ export function ChatDrawer({
           ? { maxHeight: `${drawerMaxHeight}px` }
           : undefined
       }
-      className="flex max-h-[min(660px,calc(100dvh-2.5rem))] min-h-0 w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
+      className="flex max-h-[min(660px,calc(100dvh-2.5rem))] min-h-0 w-full max-w-[400px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-[var(--color-rule)] bg-[var(--color-paper)] text-[var(--color-ink)] shadow-[var(--shadow-card)]"
     >
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {assistantAnnouncement}
+      </div>
+
       <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--color-rule)]/70 px-5 py-2.5">
         <div className="flex min-w-0 items-center gap-2.5">
           <BrandMarkBadge size="sm" />
@@ -522,7 +585,7 @@ export function ChatDrawer({
             <button
               type="button"
               onClick={clearConversation}
-              className="inline-flex min-h-[var(--tap-min)] cursor-pointer items-center px-2.5 text-[length:var(--text-xs)] font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)]"
+              className="inline-flex min-h-[var(--tap-min)] cursor-pointer items-center px-2.5 text-[length:var(--text-xs)] font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 transition-colors hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
             >
               {isEs ? "Limpiar" : "Clear"}
             </button>
@@ -532,7 +595,7 @@ export function ChatDrawer({
             type="button"
             onClick={onClose}
             aria-label={isEs ? "Cerrar chat" : "Close chat"}
-            className="inline-flex h-11 min-h-[var(--tap-min)] w-11 min-w-[var(--tap-min)] cursor-pointer items-center justify-center rounded-full border border-[var(--color-rule)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/70 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+            className="inline-flex h-11 min-h-[var(--tap-min)] w-11 min-w-[var(--tap-min)] cursor-pointer items-center justify-center rounded-full border border-[var(--color-control-border)] text-[var(--color-ink-2)] transition-colors hover:border-[var(--color-wood)] hover:bg-[var(--color-white)]/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
           >
             <svg
               aria-hidden="true"
@@ -555,6 +618,21 @@ export function ChatDrawer({
         className="karmarise-chat-scroll relative min-h-0 flex-auto touch-pan-y overflow-y-auto overscroll-y-contain px-5 py-4"
       >
         <div className="flex flex-col gap-3.5">
+          {clearedSnapshot && messages.length === 0 ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-input)] border border-[var(--color-control-border)] bg-[var(--color-white)]/85 px-3.5 py-2 text-[length:var(--text-xs)] text-[var(--color-ink-2)]">
+              <span>
+                {isEs ? "Conversación borrada." : "Conversation cleared."}
+              </span>
+              <button
+                type="button"
+                onClick={undoClearConversation}
+                className="inline-flex min-h-[var(--tap-min)] cursor-pointer items-center px-1 font-semibold text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/60 underline-offset-4 transition-colors hover:text-[var(--color-wood)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
+              >
+                {isEs ? "Deshacer" : "Undo"}
+              </button>
+            </div>
+          ) : null}
+
           <p className="text-[length:var(--text-sm)] leading-relaxed text-[var(--color-ink-2)]">
             {greetingText}
           </p>
@@ -566,39 +644,50 @@ export function ChatDrawer({
               <div
                 key={item.id}
                 ref={isLatestAssistant ? latestAnswerRef : undefined}
-                tabIndex={isLatestAssistant ? -1 : undefined}
                 className={
                   item.role === "user"
-                    ? "ml-auto max-w-[85%] rounded-[var(--radius-panel)] rounded-br-sm bg-[var(--color-wood)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
-                    : "mr-auto max-w-[92%] rounded-[var(--radius-panel)] rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)] focus:outline-none"
+                    ? "ms-auto max-w-[85%] rounded-[var(--radius-panel)] rounded-ee-sm bg-[var(--color-wood)] px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed text-[var(--color-paper)]"
+                    : "me-auto max-w-[92%] rounded-[var(--radius-panel)] rounded-es-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-sm)] leading-relaxed whitespace-pre-line text-[var(--color-ink)]"
                 }
               >
                 {item.role === "assistant"
-                  ? renderMessageContent(item.content, localizeHref, onClose)
+                  ? renderMessageContent(
+                      item.content,
+                      localizeHref,
+                      onClose,
+                      language,
+                    )
                   : item.content}
               </div>
             );
           })}
 
-          {isSending ? (
-            <div
-              role="status"
-              className="mr-auto inline-flex items-center gap-2 rounded-[var(--radius-panel)] rounded-bl-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-xs)] text-[var(--color-muted)]"
-            >
-              <span
-                aria-hidden="true"
-                className="inline-flex items-center gap-1"
-              >
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)]" />
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)] [animation-delay:var(--dur-micro)]" />
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--color-clay)] [animation-delay:var(--dur-short)]" />
-              </span>
-              <span>{activeLoadingMessage}</span>
-            </div>
-          ) : null}
+          <div
+            role="status"
+            aria-live="polite"
+            className={
+              isSending
+                ? "me-auto inline-flex items-center gap-2 rounded-[var(--radius-panel)] rounded-es-sm border border-[var(--color-rule)]/80 bg-[var(--color-white)]/90 px-3.5 py-2.5 text-[length:var(--text-xs)] text-[var(--color-muted)]"
+                : "sr-only"
+            }
+          >
+            {isSending ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="inline-flex items-center gap-1"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-clay)] motion-safe:animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-clay)] [animation-delay:var(--dur-micro)] motion-safe:animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-clay)] [animation-delay:var(--dur-short)] motion-safe:animate-pulse" />
+                </span>
+                <span>{activeLoadingMessage}</span>
+              </>
+            ) : null}
+          </div>
 
           {messages.length === 0 && !isSending ? (
-            <div className="divide-y divide-[var(--color-rule)]/55 overflow-hidden rounded-[var(--radius-input)] border border-[var(--color-rule)]/80 bg-[var(--color-white)]/65">
+            <div className="divide-y divide-[var(--color-rule)]/55 overflow-hidden rounded-[var(--radius-input)] border border-[var(--color-control-border)] bg-[var(--color-white)]/75">
               {presetQuestions.map((prompt) => (
                 <button
                   key={prompt}
@@ -607,15 +696,21 @@ export function ChatDrawer({
                   onClick={() => {
                     void sendMessage(prompt);
                   }}
-                  className="group flex w-full cursor-pointer touch-pan-y items-center justify-between gap-3 px-3.5 py-2.5 text-left text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-white)] disabled:cursor-not-allowed disabled:opacity-55"
+                  className="group flex min-h-[var(--tap-min)] w-full cursor-pointer touch-pan-y items-center justify-between gap-3 px-3.5 py-2.5 text-start text-[length:var(--text-xs)] leading-snug font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-white)] disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   <span>{prompt}</span>
-                  <span
+                  <svg
                     aria-hidden="true"
-                    className="shrink-0 text-[var(--color-muted)] transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-wood)]"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-[15px] w-[15px] shrink-0 text-[var(--color-muted)] transition-transform group-hover:text-[var(--color-wood)] motion-safe:group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:motion-safe:group-hover:-translate-x-0.5"
                   >
-                    →
-                  </span>
+                    <path d="M3.5 8h9M8.5 4l4 4-4 4" />
+                  </svg>
                 </button>
               ))}
             </div>
@@ -628,20 +723,22 @@ export function ChatDrawer({
                 onClick={onClose}
                 className="inline-flex min-h-[var(--tap-min)] items-center rounded-[var(--radius-pill)] bg-[var(--color-forest-deep)] px-3.5 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
               >
-                {isEs ? "Empezar briefing" : "Start brief"}
+                {isEs
+                  ? "Empezar briefing de producto"
+                  : "Start a Product Brief"}
               </Link>
               <Link
                 href={localizeHref("/book-a-call?duration=15")}
                 onClick={onClose}
                 className="inline-flex min-h-[var(--tap-min)] items-center rounded-[var(--radius-pill)] bg-[var(--color-wood)] px-3.5 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-paper)] no-underline"
               >
-                {isEs ? "Llamada de 15 min" : "Book a 15-min call"}
+                {isEs ? "Reservar llamada con Alma" : "Book a call with Alma"}
               </Link>
               <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[var(--tap-min)] items-center rounded-[var(--radius-pill)] border border-[var(--color-forest)]/35 bg-[var(--color-white)]/85 px-3.5 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-forest-deep)] no-underline"
+                className="inline-flex min-h-[var(--tap-min)] items-center rounded-[var(--radius-pill)] border border-[var(--color-forest)]/45 bg-[var(--color-white)]/85 px-3.5 py-1.5 text-[length:var(--text-xs)] font-semibold text-[var(--color-forest-deep)] no-underline"
               >
                 WhatsApp
               </a>
@@ -655,7 +752,7 @@ export function ChatDrawer({
           isEs ? "Preguntar a KarmaRise D Global" : "Ask KarmaRise D Global"
         }
         onSubmit={handleFormSubmit}
-        className="grid max-h-[52%] shrink-0 touch-pan-y gap-2 overflow-y-auto border-t border-[var(--color-rule)]/70 px-5 py-3"
+        className="grid max-h-[52%] shrink-0 touch-pan-y gap-2 overflow-y-auto overscroll-y-contain border-t border-[var(--color-rule)]/70 px-5 py-3"
       >
         <input
           type="text"
@@ -677,19 +774,23 @@ export function ChatDrawer({
             size="flexible"
             resetSignal={turnstileResetSignal}
             onTokenChange={handleTurnstileTokenChange}
+            onError={setTurnstileFailed}
           />
         ) : null}
 
-        {statusError ? (
-          <p
-            role="status"
-            className="text-[length:var(--text-xs)] font-medium text-[var(--color-clay-ink)]"
-          >
-            {statusError}
-          </p>
-        ) : null}
+        <p
+          role="alert"
+          aria-live="assertive"
+          className={
+            statusError
+              ? "text-[length:var(--text-xs)] font-medium text-[var(--color-clay-ink)]"
+              : "sr-only"
+          }
+        >
+          {statusError}
+        </p>
 
-        <div className="flex items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--color-rule-2)] bg-[var(--color-white)] p-1 pl-4 focus-within:border-[var(--color-wood)]">
+        <div className="flex items-center gap-1 rounded-[var(--radius-pill)] border border-[var(--color-control-border)] bg-[var(--color-white)] p-1 ps-4 has-[:focus-visible]:border-[var(--color-wood)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--color-focus)]">
           <label htmlFor="karmarise-chat-input" className="sr-only">
             {isEs ? "Escribe tu pregunta" : "Write your question"}
           </label>
@@ -699,13 +800,20 @@ export function ChatDrawer({
             type="text"
             maxLength={MAX_MESSAGE_CHARS}
             value={inputValue}
-            onChange={(event) => setInputValue(event.target.value)}
-            placeholder={isEs ? "Escribe tu pregunta..." : "Ask a question..."}
-            className="h-11 min-w-0 flex-1 bg-transparent text-[length:var(--text-md)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)]/75 focus:outline-none"
+            onChange={(event) => {
+              setInputValue(event.target.value);
+              if (statusError) setStatusError("");
+            }}
+            placeholder={
+              isEs
+                ? "Ej.: ¿Necesito ficha técnica?"
+                : "e.g. Do I need a tech pack?"
+            }
+            className="h-11 min-w-0 flex-1 bg-transparent text-[length:var(--text-md)] text-[var(--color-ink)] placeholder:text-[var(--color-muted)] focus:outline-none"
           />
           <button
             type="submit"
-            disabled={isSending || !inputValue.trim()}
+            disabled={isSending}
             aria-label={isEs ? "Enviar" : "Send"}
             className="inline-flex h-11 min-h-[var(--tap-min)] w-11 min-w-[var(--tap-min)] shrink-0 cursor-pointer items-center justify-center rounded-full bg-[var(--color-wood)] text-[var(--color-paper)] transition-colors hover:bg-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -717,27 +825,27 @@ export function ChatDrawer({
               strokeWidth="1.6"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-4 w-4"
+              className="h-4 w-4 rtl:-scale-x-100"
             >
               <path d="M3 8h10M9 4l4 4-4 4" />
             </svg>
           </button>
         </div>
 
-        <div className="flex items-center justify-between gap-4 px-1 text-[length:var(--text-xs)]">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-0 px-1 text-[length:var(--text-xs)]">
           <Link
             href={localizeHref("/product-brief")}
             onClick={onClose}
-            className="font-medium text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-4 hover:text-[var(--color-wood)]"
+            className="inline-flex min-h-[var(--tap-min)] items-center font-medium text-[var(--color-clay-ink)] underline decoration-[var(--color-clay)]/50 underline-offset-4 hover:text-[var(--color-wood)]"
           >
             {isEs ? "Empezar briefing de producto" : "Start a Product Brief"}
           </Link>
           <Link
             href={localizeHref("/book-a-call?duration=15")}
             onClick={onClose}
-            className="font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-ink)]"
+            className="inline-flex min-h-[var(--tap-min)] items-center font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-ink)]"
           >
-            {isEs ? "Llamada de 15 min" : "Book a 15-min call"}
+            {isEs ? "Reservar llamada con Alma" : "Book a call with Alma"}
           </Link>
         </div>
       </form>

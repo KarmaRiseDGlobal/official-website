@@ -6,7 +6,7 @@
   --text-xl: 1.5625rem;
   --text-2xl: 1.953rem;
   --text-3xl: 2.441rem;
-  --text-display-s: clamp(2rem, 3.3vw + 0.5rem, 3.25rem);
+  --text-display-s: clamp(1.875rem, 3.3vw + 0.5rem, 3.25rem);
   --text-display: clamp(2.5rem, 4.2vw + 0.75rem, 4.5rem);
   --text-section: clamp(1.875rem, 2.3vw + 0.9rem, 3.125rem);
   --text-title: clamp(1.25rem, 0.65vw + 0.9rem, 1.5625rem);
@@ -14,8 +14,6 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --color-error: oklch(52% 0.19 27);
-  --color-success: oklch(50% 0.12 150);
   --color-paper: #f2ecdf;
   --color-paper-2: #e6dac4;
   --color-paper-3: #cdbb9c;
@@ -24,9 +22,16 @@
   --color-muted: #584b44;
   --color-rule: #d4c4aa;
   --color-rule-2: #9a816f;
+  --color-control-border: color-mix(
+    in srgb,
+    var(--color-wood) 62%,
+    var(--color-dune)
+  );
   --color-accent: #bd7057;
   --color-accent-ink: #2d2522;
   --color-focus: #44693d;
+  --color-error: oklch(52% 0.19 27);
+  --color-success: oklch(50% 0.12 150);
   --color-forest: #35563a;
   --color-forest-lush: #29482f;
   --color-forest-deep: #182d20;
@@ -43,6 +48,7 @@
   --color-white: #fffdf8;
   --color-gold: #b99a58;
   --color-night: #111914;
+  --color-overlay: color-mix(in oklch, var(--color-night) 62%, transparent);
   --font-display: var(--font-marcellus), Georgia, serif;
   --font-body: var(--font-jakarta), system-ui, sans-serif;
   --font-technical: var(--font-jakarta), system-ui, sans-serif;
@@ -83,7 +89,12 @@
   --container: 1440px;
   --gutter: 64px;
   --gap-columns: 32px;
+  --nav-height: 112px;
+  --control-height: 54px;
   --tap-min: 44px;
+  --hero-min-height: 780px;
+  --measure-copy: 62ch;
+  --measure-narrow: 42ch;
   --section-gap-s: 120px;
   --section-gap: 144px;
   --section-gap-l: 176px;

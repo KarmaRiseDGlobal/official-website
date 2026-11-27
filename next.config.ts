@@ -24,9 +24,6 @@ const nextConfig: NextConfig = {
   experimental: {
     globalNotFound: true,
   },
-  compiler: {
-    styledComponents: true,
-  },
   images: {
     loader: "custom",
     loaderFile: "./src/lib/image-loader.ts",

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import test from "node:test";
@@ -63,6 +63,8 @@ registerHooks({
 });
 
 const { stories } = await import("@/data/stories");
+const { ALLOWED_SOCIAL_URLS, OFFICIAL_SOCIALS } =
+  await import("@/data/socials");
 const {
   STATIC_ROUTES,
   getLayoutMetadata,
@@ -79,10 +81,12 @@ const {
   getContactStructuredData,
   getHomeStructuredData,
   getHowWeWorkStructuredData,
+  getLegalPageStructuredData,
   getManufacturingProgrammeStructuredData,
   getProductBriefStructuredData,
   getStoriesIndexStructuredData,
   getStoryDetailStructuredData,
+  getWomensTrainingInitiativeStructuredData,
   serializeJsonLd,
 } = await import("@/lib/structured-data");
 const { buildStoriesRssXml } = await import("@/lib/rss");
@@ -93,10 +97,43 @@ const { default: sitemap } = await import("@/app/sitemap");
 const { POST: revalidatePost } =
   await import("@/app/api/sanity/revalidate/route");
 
-const SOCIAL_PATTERN =
-  /instagram|tiktok|youtube|facebook|linkedin|twitter\.com|x\.com|sameAs/i;
+const ALLOWED_SOCIAL_URL_SET = new Set(ALLOWED_SOCIAL_URLS);
+const UNAPPROVED_SOCIAL_PATTERN =
+  /tiktok|youtube|facebook|twitter\.com|\bx\.com\b/i;
 const FORBIDDEN_COPY_PATTERN =
   /\u2014|&mdash;|&#8212;|ulhasnagar|journal|worktable|\bchai\b/i;
+
+function assertOnlyApprovedSocialUrls(content: string, label: string): void {
+  const unapproved = UNAPPROVED_SOCIAL_PATTERN.exec(content);
+  assert.equal(
+    unapproved,
+    null,
+    `${label} contains unapproved social network reference: ${unapproved?.[0] ?? ""}`,
+  );
+  const socialUrls =
+    content.match(
+      /https?:\/\/[^"'\s<>\\)`]*(?:linkedin|instagram)[^"'\s<>\\)`]*/gi,
+    ) ?? [];
+  for (const url of socialUrls) {
+    assert.ok(
+      ALLOWED_SOCIAL_URL_SET.has(url),
+      `${label} contains unapproved LinkedIn/Instagram URL: ${url}`,
+    );
+  }
+}
+
+function collectTsxFiles(dir: string): string[] {
+  const results: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...collectTsxFiles(fullPath));
+    } else if (entry.isFile() && /\.(ts|tsx)$/.test(entry.name)) {
+      results.push(fullPath);
+    }
+  }
+  return results;
+}
 
 test("stripLocalePrefix normalizes EN and ES paths safely", () => {
   assert.equal(stripLocalePrefix("/"), "/");
@@ -147,6 +184,8 @@ test("getLayoutMetadata sets localized OpenGraph locales and card-only Twitter m
   assert.deepEqual(enMeta.openGraph?.alternateLocale, ["es_ES"]);
   assert.equal(esMeta.openGraph?.locale, "es_ES");
   assert.deepEqual(esMeta.openGraph?.alternateLocale, ["en_GB"]);
+  assert.equal(enMeta.other?.["content-language"], "en");
+  assert.equal(esMeta.other?.["content-language"], "es");
 
   assert.deepEqual(Object.keys(enMeta.twitter ?? {}), [
     "card",
@@ -233,6 +272,24 @@ test("getRouteMetadata returns compliant EN/ES titles, descriptions, and hreflan
 
     assert.equal(enMeta.openGraph?.locale, "en_GB");
     assert.equal(esMeta.openGraph?.locale, "es_ES");
+    assert.ok(
+      Array.isArray(enMeta.openGraph?.images) &&
+        enMeta.openGraph.images.length > 0,
+      `${route.key} EN openGraph.images missing`,
+    );
+    assert.ok(
+      Array.isArray(esMeta.openGraph?.images) &&
+        esMeta.openGraph.images.length > 0,
+      `${route.key} ES openGraph.images missing`,
+    );
+    assert.ok(
+      Array.isArray(enMeta.twitter?.images) && enMeta.twitter.images.length > 0,
+      `${route.key} EN twitter.images missing`,
+    );
+    assert.ok(
+      Array.isArray(esMeta.twitter?.images) && esMeta.twitter.images.length > 0,
+      `${route.key} ES twitter.images missing`,
+    );
 
     for (const value of [
       enTitleText,
@@ -245,11 +302,7 @@ test("getRouteMetadata returns compliant EN/ES titles, descriptions, and hreflan
         false,
         `${route.key} metadata violated copy compliance: ${value}`,
       );
-      assert.equal(
-        SOCIAL_PATTERN.test(value),
-        false,
-        `${route.key} metadata violated no-social-links rule: ${value}`,
-      );
+      assertOnlyApprovedSocialUrls(value, `${route.key} metadata`);
     }
   }
 });
@@ -448,6 +501,9 @@ test("sanity revalidate endpoint fails closed when secret is unset or invalid an
     assert.deepEqual(revalidatedPaths, [
       { path: "/stories", type: undefined },
       { path: "/es/stories", type: undefined },
+      { path: "/stories/rss.xml", type: undefined },
+      { path: "/es/stories/rss.xml", type: undefined },
+      { path: "/sitemap.xml", type: undefined },
       { path: "/stories/[slug]", type: "page" },
       { path: "/es/stories/[slug]", type: "page" },
       { path: "/stories/test-story", type: undefined },
@@ -528,6 +584,9 @@ test("sanity revalidate endpoint rejects invalid explicit slugs with 400 without
       assert.deepEqual(revalidatedPaths, [
         { path: "/stories", type: undefined },
         { path: "/es/stories", type: undefined },
+        { path: "/stories/rss.xml", type: undefined },
+        { path: "/es/stories/rss.xml", type: undefined },
+        { path: "/sitemap.xml", type: undefined },
         { path: "/stories/[slug]", type: "page" },
         { path: "/es/stories/[slug]", type: "page" },
       ]);
@@ -577,16 +636,30 @@ test("sitemap skips empty or whitespace slugs and deduplicates duplicate story s
   }
 });
 
-test("site footer and root layouts enforce no-social-media-links compliance", () => {
+test("site footer, views, components, and root layouts allow only the 5 official social URLs", () => {
+  assert.equal(ALLOWED_SOCIAL_URLS.length, 5);
+
   const footerSource = readFileSync(
     path.join(REPO_ROOT, "src/components/shell/site-footer.tsx"),
     "utf8",
   );
-  assert.equal(SOCIAL_PATTERN.test(footerSource), false);
-  assert.equal(/Contact and social channels/i.test(footerSource), false);
-  assert.equal(/Canales de contacto y redes/i.test(footerSource), false);
+  assertOnlyApprovedSocialUrls(footerSource, "site-footer.tsx");
+  assert.match(footerSource, /OFFICIAL_SOCIALS\.karmariseLinkedIn/);
+  assert.match(footerSource, /OFFICIAL_SOCIALS\.karmariseInstagram/);
+  assert.match(footerSource, /OFFICIAL_SOCIALS\.almariseInstagram/);
+  assert.match(footerSource, /openCookieSettings/);
   assert.match(footerSource, /"Contact channels"/);
   assert.match(footerSource, /"Canales de contacto"/);
+
+  const uiFiles = [
+    ...collectTsxFiles(path.join(REPO_ROOT, "src/views")),
+    ...collectTsxFiles(path.join(REPO_ROOT, "src/components")),
+  ];
+  for (const filePath of uiFiles) {
+    const rel = path.relative(REPO_ROOT, filePath).replaceAll("\\", "/");
+    const source = readFileSync(filePath, "utf8");
+    assertOnlyApprovedSocialUrls(source, rel);
+  }
 
   const enLayoutSource = readFileSync(
     path.join(REPO_ROOT, "src/app/(en)/layout.tsx"),
@@ -600,7 +673,7 @@ test("site footer and root layouts enforce no-social-media-links compliance", ()
   assert.match(esLayoutSource, /getLayoutMetadata\("es"\)/);
 });
 
-test("getManufacturingProgrammeStructuredData emits compliant EN and ES graphs with BreadcrumbList, Service, 6-step HowTo, and 9-item FAQPage", () => {
+test("getManufacturingProgrammeStructuredData emits compliant EN and ES graphs with BreadcrumbList, Service, 6-step HowTo, and 5-item FAQPage", () => {
   for (const lang of ["en", "es"] as const) {
     const data = getManufacturingProgrammeStructuredData(lang);
     const serialized = serializeJsonLd(data);
@@ -609,10 +682,9 @@ test("getManufacturingProgrammeStructuredData emits compliant EN and ES graphs w
       false,
       `Manufacturing structured data (${lang}) violated copy compliance`,
     );
-    assert.equal(
-      SOCIAL_PATTERN.test(serialized),
-      false,
-      `Manufacturing structured data (${lang}) violated no-social-links rule`,
+    assertOnlyApprovedSocialUrls(
+      serialized,
+      `Manufacturing structured data (${lang})`,
     );
 
     const graph = data["@graph"] as Array<Record<string, unknown>>;
@@ -633,18 +705,24 @@ test("getManufacturingProgrammeStructuredData emits compliant EN and ES graphs w
       );
     }
 
+    const org = graph.find((node) => node["@type"] === "Organization");
+    assert.deepEqual(org?.sameAs, [
+      OFFICIAL_SOCIALS.karmariseLinkedIn,
+      OFFICIAL_SOCIALS.karmariseInstagram,
+    ]);
+
     const howTo = graph.find((node) => node["@type"] === "HowTo");
     assert.equal((howTo?.step as unknown[]).length, 6);
 
     const faq = graph.find((node) => node["@type"] === "FAQPage");
-    assert.equal((faq?.mainEntity as unknown[]).length, 9);
+    assert.equal((faq?.mainEntity as unknown[]).length, 5);
 
     const homeData = getHomeStructuredData(lang);
     assert.ok(Array.isArray(homeData["@graph"]));
   }
 });
 
-test("getHowWeWorkStructuredData emits compliant EN and ES graphs with BreadcrumbList, 5-step HowTo, and 6-item FAQPage", () => {
+test("getHowWeWorkStructuredData emits compliant EN and ES graphs with BreadcrumbList, 5-step HowTo, and 4-item FAQPage", () => {
   for (const lang of ["en", "es"] as const) {
     const data = getHowWeWorkStructuredData(lang);
     const serialized = serializeJsonLd(data);
@@ -658,10 +736,9 @@ test("getHowWeWorkStructuredData emits compliant EN and ES graphs with Breadcrum
       false,
       `How We Work structured data (${lang}) contained confidential or banned terminology`,
     );
-    assert.equal(
-      SOCIAL_PATTERN.test(serialized),
-      false,
-      `How We Work structured data (${lang}) violated no-social-links rule`,
+    assertOnlyApprovedSocialUrls(
+      serialized,
+      `How We Work structured data (${lang})`,
     );
 
     const graph = data["@graph"] as Array<Record<string, unknown>>;
@@ -686,11 +763,11 @@ test("getHowWeWorkStructuredData emits compliant EN and ES graphs with Breadcrum
     assert.equal((howTo?.step as unknown[]).length, 5);
 
     const faq = graph.find((node) => node["@type"] === "FAQPage");
-    assert.equal((faq?.mainEntity as unknown[]).length, 6);
+    assert.equal((faq?.mainEntity as unknown[]).length, 4);
   }
 });
 
-test("getAboutStructuredData emits compliant EN and ES graphs with AboutPage, Organization, two Person founders, BreadcrumbList, and 6-item FAQPage", () => {
+test("getAboutStructuredData emits compliant EN and ES graphs with AboutPage, Organization, two Person founders, BreadcrumbList, and 3-item FAQPage", () => {
   for (const lang of ["en", "es"] as const) {
     const data = getAboutStructuredData(lang);
     const serialized = serializeJsonLd(data);
@@ -706,11 +783,7 @@ test("getAboutStructuredData emits compliant EN and ES graphs with AboutPage, Or
       false,
       `About structured data (${lang}) contained confidential or banned terminology`,
     );
-    assert.equal(
-      SOCIAL_PATTERN.test(serialized),
-      false,
-      `About structured data (${lang}) violated no-social-links rule`,
-    );
+    assertOnlyApprovedSocialUrls(serialized, `About structured data (${lang})`);
 
     const graph = data["@graph"] as Array<Record<string, unknown>>;
     assert.ok(Array.isArray(graph));
@@ -736,10 +809,12 @@ test("getAboutStructuredData emits compliant EN and ES graphs with AboutPage, Or
     const shirish = persons.find((node) => node.name === "Shirish");
     assert.deepEqual(alma?.knowsLanguage, ["es", "en", "pt"]);
     assert.deepEqual(shirish?.knowsLanguage, ["en", "mr", "hi"]);
+    assert.deepEqual(alma?.sameAs, [OFFICIAL_SOCIALS.almaLinkedIn]);
+    assert.deepEqual(shirish?.sameAs, [OFFICIAL_SOCIALS.shirishLinkedIn]);
     assert.match(String(shirish?.jobTitle ?? ""), /Bar Council/i);
 
     const faq = graph.find((node) => node["@type"] === "FAQPage");
-    assert.equal((faq?.mainEntity as unknown[]).length, 6);
+    assert.equal((faq?.mainEntity as unknown[]).length, 3);
   }
 });
 
@@ -752,14 +827,14 @@ test("getAlmariseStructuredData emits compliant EN and ES graphs with Organizati
       false,
       `AlmaRise structured data (${lang}) violated copy compliance`,
     );
-    assert.equal(
-      SOCIAL_PATTERN.test(serialized),
-      false,
-      `AlmaRise structured data (${lang}) violated no-social-links rule`,
+    assertOnlyApprovedSocialUrls(
+      serialized,
+      `AlmaRise structured data (${lang})`,
     );
     assert.match(serialized, /AlmaRise D Brand/);
     assert.match(serialized, /AlmaRise D Reborn/);
     assert.match(serialized, /AlmaRise D Organic/);
+    assert.match(serialized, /AlmaRise D Home Decor/);
     assert.equal(/(?<!\/)Almarise/.test(serialized), false);
     assert.equal(
       /AlmaRise(?! D (?:Brand|Reborn|Organic|Home Decor))/.test(serialized),
@@ -782,6 +857,8 @@ test("getAlmariseStructuredData emits compliant EN and ES graphs with Organizati
         `Missing ${requiredType} node in AlmaRise ${lang} structured data`,
       );
     }
+    const brand = graph.find((node) => node["@type"] === "Brand");
+    assert.deepEqual(brand?.sameAs, [OFFICIAL_SOCIALS.almariseInstagram]);
   }
 });
 
@@ -790,7 +867,7 @@ test("conversion pages emit compliant EN and ES structured data (Product Brief, 
     const briefData = getProductBriefStructuredData(lang);
     const briefSerialized = serializeJsonLd(briefData);
     assert.equal(FORBIDDEN_COPY_PATTERN.test(briefSerialized), false);
-    assert.equal(SOCIAL_PATTERN.test(briefSerialized), false);
+    assertOnlyApprovedSocialUrls(briefSerialized, `Product Brief (${lang})`);
     const briefGraph = briefData["@graph"] as Array<Record<string, unknown>>;
     const briefTypes = new Set(briefGraph.map((node) => node["@type"]));
     for (const required of [
@@ -811,7 +888,7 @@ test("conversion pages emit compliant EN and ES structured data (Product Brief, 
     const callData = getBookACallStructuredData(lang);
     const callSerialized = serializeJsonLd(callData);
     assert.equal(FORBIDDEN_COPY_PATTERN.test(callSerialized), false);
-    assert.equal(SOCIAL_PATTERN.test(callSerialized), false);
+    assertOnlyApprovedSocialUrls(callSerialized, `Book a Call (${lang})`);
     const callGraph = callData["@graph"] as Array<Record<string, unknown>>;
     const callTypes = new Set(callGraph.map((node) => node["@type"]));
     for (const required of [
@@ -824,11 +901,11 @@ test("conversion pages emit compliant EN and ES structured data (Product Brief, 
       assert.ok(callTypes.has(required), `Missing ${required} on call ${lang}`);
     }
     const callFaq = callGraph.find((node) => node["@type"] === "FAQPage");
-    assert.equal((callFaq?.mainEntity as unknown[]).length, 4);
+    assert.equal((callFaq?.mainEntity as unknown[]).length, 3);
 
     const contactData = getContactStructuredData(lang);
     const contactSerialized = serializeJsonLd(contactData);
-    assert.equal(SOCIAL_PATTERN.test(contactSerialized), false);
+    assertOnlyApprovedSocialUrls(contactSerialized, `Contact (${lang})`);
     assert.equal(/\u2014|&mdash;|&#8212;/.test(contactSerialized), false);
     const contactGraph = contactData["@graph"] as Array<
       Record<string, unknown>
@@ -849,6 +926,58 @@ test("conversion pages emit compliant EN and ES structured data (Product Brief, 
     assert.match(contactSerialized, /partners@karmarisedglobal\.com/);
     assert.match(contactSerialized, /accounts@karmarisedglobal\.com/);
     assert.match(contactSerialized, /support@karmarisedglobal\.com/);
+  }
+});
+
+test("Women's Training Initiative and all 4 Legal pages emit compliant EN and ES structured data", () => {
+  const legalKeys = [
+    "legalNotice",
+    "privacyPolicy",
+    "terms",
+    "cookiePolicy",
+  ] as const;
+
+  for (const lang of ["en", "es"] as const) {
+    const wtiData = getWomensTrainingInitiativeStructuredData(lang);
+    const wtiSerialized = serializeJsonLd(wtiData);
+    assert.equal(FORBIDDEN_COPY_PATTERN.test(wtiSerialized), false);
+    assertOnlyApprovedSocialUrls(wtiSerialized, `WTI (${lang})`);
+    const wtiGraph = wtiData["@graph"] as Array<Record<string, unknown>>;
+    const wtiTypes = new Set(wtiGraph.map((node) => node["@type"]));
+    for (const required of [
+      "Organization",
+      "WebSite",
+      "WebPage",
+      "BreadcrumbList",
+    ]) {
+      assert.ok(wtiTypes.has(required), `Missing ${required} on WTI ${lang}`);
+    }
+    const wtiWebPage = wtiGraph.find((node) => node["@type"] === "WebPage");
+    assert.equal(wtiWebPage?.inLanguage, lang);
+
+    for (const key of legalKeys) {
+      const legalData = getLegalPageStructuredData(lang, key);
+      const legalSerialized = serializeJsonLd(legalData);
+      assert.equal(FORBIDDEN_COPY_PATTERN.test(legalSerialized), false);
+      assertOnlyApprovedSocialUrls(legalSerialized, `Legal ${key} (${lang})`);
+      const legalGraph = legalData["@graph"] as Array<Record<string, unknown>>;
+      const legalTypes = new Set(legalGraph.map((node) => node["@type"]));
+      for (const required of [
+        "Organization",
+        "WebSite",
+        "WebPage",
+        "BreadcrumbList",
+      ]) {
+        assert.ok(
+          legalTypes.has(required),
+          `Missing ${required} on Legal ${key} (${lang})`,
+        );
+      }
+      const legalWebPage = legalGraph.find(
+        (node) => node["@type"] === "WebPage",
+      );
+      assert.equal(legalWebPage?.inLanguage, lang);
+    }
   }
 });
 
@@ -884,10 +1013,9 @@ test("Stories index and Story detail emit compliant EN and ES structured data an
       false,
       `Stories index structured data (${lang}) violated copy compliance`,
     );
-    assert.equal(
-      SOCIAL_PATTERN.test(indexSerialized),
-      false,
-      `Stories index structured data (${lang}) violated no-social-links rule`,
+    assertOnlyApprovedSocialUrls(
+      indexSerialized,
+      `Stories index structured data (${lang})`,
     );
     const indexGraph = indexData["@graph"] as Array<Record<string, unknown>>;
     const indexTypes = new Set(indexGraph.map((node) => node["@type"]));
@@ -917,10 +1045,9 @@ test("Stories index and Story detail emit compliant EN and ES structured data an
         false,
         `Story detail structured data (${lang}, ${story.slug}) violated copy compliance`,
       );
-      assert.equal(
-        SOCIAL_PATTERN.test(detailSerialized),
-        false,
-        `Story detail structured data (${lang}, ${story.slug}) violated no-social-links rule`,
+      assertOnlyApprovedSocialUrls(
+        detailSerialized,
+        `Story detail structured data (${lang}, ${story.slug})`,
       );
       const detailGraph = detailData["@graph"] as Array<
         Record<string, unknown>

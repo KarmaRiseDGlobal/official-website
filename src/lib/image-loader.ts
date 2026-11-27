@@ -1,3 +1,5 @@
+import { LOCAL_IMAGE_VARIANTS } from "@/lib/local-image-variants";
+
 interface ImageLoaderParams {
   src: string;
   width: number;
@@ -21,6 +23,16 @@ export default function karmariseImageLoader({
       return parsed.toString();
     } catch {
       return src;
+    }
+  }
+
+  const variantSet = LOCAL_IMAGE_VARIANTS[src];
+  if (variantSet) {
+    const selectedWidth =
+      variantSet.widths.find((candidate) => candidate >= width) ??
+      variantSet.widths[variantSet.widths.length - 1];
+    if (selectedWidth !== undefined) {
+      return `${variantSet.basePath}-w${selectedWidth}.webp`;
     }
   }
 

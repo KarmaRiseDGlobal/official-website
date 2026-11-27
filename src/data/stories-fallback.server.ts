@@ -9,7 +9,7 @@ export const stories: StoryEntry[] = [
     issueNumber: "01",
     publishedAt: "2026-11-14",
     updatedAt: "2026-11-24",
-    readingTimeMinutes: 6,
+    readingTimeMinutes: 7,
     category: "India Meets Europe",
     location: "Spain & India",
     spanishLocation: "España e India",
@@ -41,15 +41,12 @@ export const stories: StoryEntry[] = [
       "Fábricas de corte familiar",
     ],
     leadImage: {
-      url: "/images/founders/alma-and-shirish-founders.jpg",
-      alt: "Shirish and Alma reviewing written Product Brief notes alongside leather hides and fabric swatches in India",
-      caption:
-        "We go over written call notes, leather hides, and fabric swatches together in our studio in India before visiting production units.",
+      url: "/images/founders/alma-shirish-planning-table-window-india.jpeg",
+      alt: "Shirish and Alma sitting across from each other beside a window in India with a tablet and cup of tea while planning production",
+      objectPosition: "50% 62%",
     },
     spanishLeadAlt:
-      "Shirish y Alma revisando anotaciones escritas de un briefing de producto junto a muestras de piel y tejidos en la India",
-    spanishLeadCaption:
-      "Repasamos juntos en nuestro estudio en la India las notas de una llamada, varias pieles y muestras de tejido antes de salir a visitar unidades de producción.",
+      "Shirish y Alma sentados frente a frente junto a una ventana en la India con una tableta y una taza mientras planifican la producción",
     leadSlot: {
       kind: "Photo",
       ratio: "16:10 horizontal",
@@ -69,23 +66,15 @@ export const stories: StoryEntry[] = [
       {
         url: "/images/workshops/alma-reviewing-leather-hides-workshop.jpeg",
         alt: "Alma inspecting a brown leather bag sample beside full hides inside a family-run leather atelier in India",
-        caption:
-          "I check a brown leather bag prototype in person beside full hides before the Client approves the sample and cutting starts.",
       },
       {
         url: "/images/workshops/shirish-inspecting-leather-cutting-table.jpeg",
         alt: "Shirish checking leather panels and written specifications at the pattern bench inside a production site in India",
-        caption:
-          "I check the patterns, leather batches, and written terms on site with our Manufacturing Partner.",
       },
     ],
     spanishPairAlts: [
       "Alma revisando una muestra de bolso en piel marrón junto a pieles enteras dentro de una marroquinería familiar en la India",
       "Shirish comprobando piezas de piel y especificaciones escritas sobre la mesa de patrón de un punto de producción en la India",
-    ],
-    spanishPairCaptions: [
-      "Reviso en persona un prototipo de bolso de piel marrón junto a las pieles enteras antes de que el cliente apruebe la muestra y empiece el corte de las piezas.",
-      "Compruebo en planta los patrones, las partidas de piel y las condiciones por escrito junto a nuestra unidad de producción colaboradora.",
     ],
     pairSlots: [
       {
@@ -171,7 +160,7 @@ export const stories: StoryEntry[] = [
         paragraphs: [
           "Alma: Tengo que decir que dar con las unidades de producción adecuadas es lo más difícil de [nuestro Programa de producción en la India](/es/manufacturing). No paramos nunca de buscar. La India crece a un ritmo bárbaro y cada semana surgen materiales y oficios nuevos, desde piel de curtido vegetal y algodón o lino naturales hasta alternativas de piel vegana que ya arrojan resultados serios. Evitamos las grandes plantas de fabricación masiva. Visitamos fábricas de corte familiar bien asentadas, con una cadena controlada donde bolsos y prendas se cosen a mano o con máquinas de pedal, junto a colectivos de artesanas para oficios concretos. Son muchos kilómetros por carretera y trato continuo. Nuestro límite ético no se negocia: tolerancia cero ante la explotación de menores, de personas adultas y, sobre todo, de mujeres. KarmaRise suma una pata comercial y otra pata social pensada para brindar una segunda oportunidad a mujeres con muy pocas salidas. Si un dueño mantiene las puertas cerradas pasada la cautela normal del primer día, recogemos y nos marchamos.",
           "Shirish: Un contrato firmado jamás asegura un sitio eterno a ninguna fábrica colaboradora. Cada punto de producción renueva la confianza encargo tras encargo, tanto por la constancia del material como por su franqueza cuando toca corregir un patrón o un remate. Viajamos entre estados y permanecemos junto a las líneas de costura mientras avanza el lote. Así atajamos fallos sobre el terreno en la India antes de precintar una sola caja rumbo a Madrid o Donostia.",
-          'Alma: Recuerdo la emoción del dueño de aquella boutique española al recibir sus muestras dentro de bolsas guardapolvo de algodón con su marca. Sin ser alguien habituado a grabar vídeos, publicó un adelanto enseñando una bolsa vacía a cámara: "¡Tengo un secreto para vosotros! No os voy a estropear la sorpresa, pero viene en esta bolsa." Cuando llegaron los bolsos terminados, llenó con ellos su escaparate principal. Comprar a un mayorista equivale a descolgar una camisa de un perchero: te la pruebas y te la quedas o la dejas. Ofrecer moda a medida significa seguir cómo nace cada pieza, desde la primera videollamada en España hasta las manos que la rematan en la India.',
+          "Alma: Recuerdo la emoción del dueño de aquella boutique española al recibir sus muestras dentro de bolsas guardapolvo de algodón con su marca. Sin ser alguien habituado a grabar vídeos, publicó un adelanto enseñando una bolsa vacía a cámara: «¡Tengo un secreto para vosotros! No os voy a estropear la sorpresa, pero viene en esta bolsa». Cuando llegaron los bolsos terminados, llenó con ellos su escaparate principal. Comprar a un mayorista equivale a descolgar una camisa de un perchero: te la pruebas y te la quedas o la dejas. Ofrecer moda a medida significa seguir cómo nace cada pieza, desde la primera videollamada en España hasta las manos que la rematan en la India.",
         ],
       },
     ],
@@ -229,14 +218,10 @@ export const stories: StoryEntry[] = [
     leadImage: {
       url: "/images/culture/alma-brown-idli-sambar-india-table.jpg",
       alt: "Alma smiling over a steel thali of steamed brown idlis, sambar, and chutney at the office table in India",
-      caption:
-        "I am eating brown idlis with sambar and chutney at our office table in India. It was my first time trying brown idli, and I was surprised that it tasted completely different from the white ones.",
       objectPosition: "50% 78%",
     },
     spanishLeadAlt:
       "Alma sonriendo frente a un thali de acero con idlis oscuros al vapor, sambar y chutney en la mesa de la oficina en la India",
-    spanishLeadCaption:
-      "Aquí estoy comiendo idlis oscuros con sambar y chutney en la mesa de nuestra oficina en la India. Era la primera vez que probaba el idli oscuro y me sorprendió que supiera completamente distinto a los blancos.",
     leadSlot: {
       kind: "Photo",
       ratio: "16:10 horizontal",
@@ -256,23 +241,15 @@ export const stories: StoryEntry[] = [
       {
         url: "/images/culture/home-cooked-chicken-biryani-raita.jpg",
         alt: "Home-cooked chicken biryani served in a glass dish alongside raita and spiced gravy",
-        caption:
-          "Last year on Eid we were invited to so many homes that I ate three full meals of home-cooked chicken biryani like this one, with raita and spiced gravy, in a single day.",
       },
       {
         url: "/images/culture/spanish-minced-meat-croquetas-bechamel.jpg",
         alt: "Large oblong Spanish minced-meat croquetas broken open on a plate showing soft creamy béchamel inside",
-        caption:
-          "These huge minced-meat croquetas in thick béchamel, crisp outside and creamy inside, take me straight back to the ones my mum used to make in Spain for the eight of us.",
       },
     ],
     spanishPairAlts: [
       "Biryani casero de pollo servido en una fuente de cristal junto a raita y salsa especiada",
       "Croquetas españolas grandes y alargadas de carne picada abiertas en un plato mostrando la bechamel suave y cremosa por dentro",
-    ],
-    spanishPairCaptions: [
-      "El año pasado en Eid nos invitaron en tantas casas que comí tres platos completos de biryani casero de pollo como este, con su raita y su salsa especiada, en un solo día.",
-      "Estas croquetas enormes de carne picada con bechamel espesa, crujientes por fuera y cremosas por dentro, me llevan directa a las que preparaba mi madre en España para los ocho de casa.",
     ],
     pairSlots: [
       {
@@ -298,15 +275,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/english-roast-chicken-family-dinner.jpg",
             alt: "Family seated for an early evening roast chicken and potato dinner in England",
-            caption:
-              "From what I have seen in England, families sit down to a heavy, non-spicy dinner at six or seven in the evening, hours before we even start dinner here in India.",
             aspectRatio: "4:3",
           },
           {
             url: "/images/culture/steamed-brown-idli-spiced-chutney.jpg",
             alt: "Close-up of steamed brown idlis served with spiced chutney on a ceramic plate",
-            caption:
-              "Here I am looking closely at the brown idlis with spiced chutney I tried at our office table. In India it still strikes me that freshly cooked food is waiting at almost any hour of the day or night.",
             aspectRatio: "4:3",
           },
         ],
@@ -322,15 +295,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/diwali-spiral-chakli-masala-chai.jpg",
             alt: "Crisp spiral chakli arranged beside a brass press and two glasses of hot chai",
-            caption:
-              "I love these spiral Diwali chakli with hot chai, even though I still forget the Marathi name and every home I visit makes them with a different level of spice.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/culture/serving-spiced-chicken-biryani-pot.jpg",
             alt: "Cook plating spiced biryani rice from a wide metal vessel",
-            caption:
-              "The moment I taste biryani served straight from the pot like this, I can tell whether the cook folded every spice into the grain or left plain white rice beside chicken.",
             aspectRatio: "4:5",
           },
         ],
@@ -356,15 +325,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/english-roast-chicken-family-dinner.jpg",
             alt: "Familia sentada cenando pollo asado con patatas al caer la tarde en Inglaterra",
-            caption:
-              "Por lo que he visto en Inglaterra, las familias se sientan a hacer una cena contundente y sin picante sobre las seis o las siete, horas antes de que empecemos a cenar aquí en la India.",
             aspectRatio: "4:3",
           },
           {
             url: "/images/culture/steamed-brown-idli-spiced-chutney.jpg",
             alt: "Primer plano de idlis oscuros al vapor servidos con chutney especiado en un plato de cerámica",
-            caption:
-              "Aquí veo de cerca los idlis oscuros con chutney especiado que probé en nuestra oficina. En la India todavía me llama la atención encontrar comida recién hecha a casi cualquier hora del día o de la noche.",
             aspectRatio: "4:3",
           },
         ],
@@ -380,15 +345,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/diwali-spiral-chakli-masala-chai.jpg",
             alt: "Crujientes chakli en espiral dispuestos junto a una prensa de latón y dos vasos de chai caliente",
-            caption:
-              "Me encantan estos chakli en espiral de Diwali con chai caliente, aunque todavía se me olvida el nombre en maratí y en cada casa me los encuentro con un punto de picante distinto.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/culture/serving-spiced-chicken-biryani-pot.jpg",
             alt: "Cocinero sirviendo arroz biryani especiado desde una gran cazuela metálica",
-            caption:
-              "En cuanto pruebo un biryani servido así de la cazuela, noto enseguida si quien cocina ha integrado cada especia en el grano o ha dejado arroz blanco aparte con pollo.",
             aspectRatio: "4:5",
           },
         ],
@@ -421,7 +382,7 @@ export const stories: StoryEntry[] = [
     issueNumber: "01",
     publishedAt: "2026-11-11",
     updatedAt: "2026-11-24",
-    readingTimeMinutes: 6,
+    readingTimeMinutes: 7,
     category: "Sustainable Fashion",
     location: "India & Spain",
     spanishLocation: "India y España",
@@ -430,16 +391,16 @@ export const stories: StoryEntry[] = [
     spanishTitle:
       "Saris guardados en la India, una maleta en Madrid y una segunda vida para dos armarios",
     summary:
-      "You cannot say we pre-planned AlmaRise D Brand on paper. We set out to make organic clothing without the starting funds for new fabric rolls from a mill, looked inside Indian cupboards full of treasured sarees, thevnitlya sadya, and shaped AlmaRise D Reborn alongside AlmaRise D Organic using fruit and plant-waste fibres, among other natural materials, while leaving room for AlmaRise D Brand to grow into home decor.",
+      "You cannot say we pre-planned AlmaRise D Brand on paper. We set out to make organic clothing without the starting funds for new fabric rolls from a mill, looked inside Indian cupboards full of treasured sarees, thevnitlya sadya, and shaped AlmaRise D Reborn alongside AlmaRise D Organic using fruit and plant-waste fibres, among other natural materials, while leaving room for AlmaRise D Brand to grow into AlmaRise D Home Decor.",
     spanishSummary:
-      "No se puede decir que planeáramos AlmaRise D Brand sobre el papel. Queríamos confeccionar ropa orgánica sin fondos iniciales para encargar rollos nuevos a una fábrica textil, miramos dentro de los armarios indios llenos de saris guardados, los thevnitlya sadya, y dimos forma a AlmaRise D Reborn junto a AlmaRise D Organic con fibras de residuos de fruta y plantas, entre otros materiales naturales, dejando margen para crecer hacia la decoración del hogar.",
+      "No se puede decir que planeáramos AlmaRise D Brand sobre el papel. Queríamos confeccionar ropa orgánica sin fondos iniciales para encargar rollos nuevos a una fábrica textil, miramos dentro de los armarios indios llenos de saris guardados, los thevnitlya sadya, y dimos forma a AlmaRise D Reborn junto a AlmaRise D Organic con fibras de residuos de fruta y plantas, entre otros materiales naturales, dejando margen para crecer hacia AlmaRise D Home Decor (decoración del hogar).",
     author: {
       name: "Shirish",
       role: "Co-founder, KarmaRise D Global",
       spanishRole: "Cofundador de KarmaRise D Global",
       location: "India",
       spanishLocation: "India",
-      portraitUrl: "/images/founders/shirish-portrait.jpeg",
+      portraitUrl: "/images/workshops/shirish-at-leather-warehouse-desk.jpeg",
     },
     tags: [
       "AlmaRise D Brand",
@@ -456,13 +417,9 @@ export const stories: StoryEntry[] = [
     leadImage: {
       url: "/images/almarise/almarise-saree-design-review.jpeg",
       alt: "Alma and a young Indian tailor fitting an open floor-length turquoise embroidered saree piece on a dressmaker form beside a sewing machine in our studio in India",
-      caption:
-        "In our studio in India, we fit an open turquoise embroidered saree garment on the dressmaker form, working through one kept saree at a time.",
     },
     spanishLeadAlt:
       "Alma y una joven sastre india ajustando una prenda abierta y larga hasta el suelo de sari turquesa bordado sobre un maniquí junto a una máquina de coser en nuestro estudio en la India",
-    spanishLeadCaption:
-      "En nuestro estudio en la India ajustamos sobre el maniquí una prenda abierta de sari turquesa bordado, trabajando un sari guardado cada vez.",
     leadSlot: {
       kind: "Photo",
       ratio: "16:9 wide",
@@ -482,23 +439,15 @@ export const stories: StoryEntry[] = [
       {
         url: "/images/almarise/almarise-reborn-olive-pallu-shrug-madrid-street.jpeg",
         alt: "Maria walking across a sunlit brick apartment street in Madrid wearing an olive floral saree shrug with purple striped pallu sleeves and a paisley hem over a black dress",
-        caption:
-          "We cut this AlmaRise D Reborn shrug in India so the saree's striped pallu forms the sleeves and the paisley border runs along the hem, worn here by Maria in Madrid.",
       },
       {
         url: "/images/almarise/almarise-reborn-geometric-saree-tunic-madrid-station.jpeg",
         alt: "Maria standing on a commuter rail platform in Madrid in front of a red-and-white Renfe Cercanías train wearing an asymmetric tunic cut from a geometric rust-and-black saree",
-        caption:
-          "On a commuter rail platform in Madrid, Maria wears an asymmetric tunic we cut from a single geometric saree in our studio. No second copy exists anywhere.",
       },
     ],
     spanishPairAlts: [
       "María caminando por una calle soleada de edificios de ladrillo en Madrid con un shrug de sari floral verde oliva, mangas a rayas moradas del pallu y bajo con estampado cachemir sobre un vestido negro",
       "María de pie en un andén de cercanías en Madrid frente a un tren rojo y blanco de Renfe Cercanías con una túnica asimétrica cortada de un sari geométrico en tono teja y negro",
-    ],
-    spanishPairCaptions: [
-      "Cortamos este shrug de AlmaRise D Reborn en la India para que el pallu a rayas forme las mangas y la cenefa cachemir recorra el bajo; aquí lo lleva María en Madrid.",
-      "En un andén de cercanías en Madrid, María lleva una túnica asimétrica que cortamos en nuestro estudio a partir de un solo sari geométrico. No existe otra copia en ningún sitio.",
     ],
     pairSlots: [
       {
@@ -525,8 +474,6 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/almarise/indian-family-saree-handover-almarise.jpeg",
             alt: "Alma and Shirish inside a home near Mumbai receiving a bright orange silk saree with a woven purple and gold zari border from its owner",
-            caption:
-              "Alma and I visited this home near Mumbai to receive a kept orange silk saree with its woven zari border and note down its story before giving it a second life.",
             aspectRatio: "4:5",
           },
         ],
@@ -543,15 +490,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/almarise/design-students-saree-stacks-mumbai-studio.jpeg",
             alt: "Alma leaning across a red studio table stacked with turquoise, cream, red bandhani, and pink sarees alongside final-year fashion design students near Mumbai",
-            caption:
-              "Here Alma sits with final-year design students near Mumbai over stacks of kept sarees we collected, working out an individual silhouette from each weave.",
             aspectRatio: "4:3",
           },
           {
             url: "/images/almarise/reviewing-saree-garment-sketches-india.jpeg",
             alt: "Alma and a fashion design student looking over printed saree swatch sheets and pencil garment sketches on a studio desk in India",
-            caption:
-              "In our studio in India, Alma reviews pencil garment sketches and fabric notes with a student so our kept sarees become practical everyday pieces.",
             aspectRatio: "4:3",
           },
         ],
@@ -568,23 +511,20 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/almarise/almarise-reborn-bandhani-saree-shrug-madrid.jpeg",
             alt: "Maria seated outdoors in Madrid wearing an orange and yellow tie-dyed bandhani saree shrug over denim jeans and sandals in front of Puerta de San Vicente",
-            caption:
-              "Beside Puerta de San Vicente during Alma's September shoot in Madrid, Maria paired an orange bandhani saree shrug we stitched in India over jeans from her own closet.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/almarise/almarise-reborn-magenta-saree-shrug-principe-pio.jpeg",
             alt: "Maria standing under the painted green iron arches of Estación de Príncipe Pío in Madrid wearing an open magenta gold-dot saree shrug over a plain black slip dress",
-            caption:
-              "Under the green iron arches of Estación de Príncipe Pío during Alma's September shoot, Maria wore the sheer magenta saree shrug we made over her own plain black dress.",
             aspectRatio: "4:5",
           },
         ],
       },
       {
-        heading: "AlmaRise D Organic, home decor, and closing the circle",
+        heading:
+          "AlmaRise D Organic, AlmaRise D Home Decor, and closing the circle",
         paragraphs: [
-          "Tight starting funds and full cupboards gave us AlmaRise D Reborn, yet our first ambition around organic textiles never went away. Today [AlmaRise D Brand](/almarise) brings together two clothing lines that walk side by side, and we shaped the brand from the beginning to reach beyond clothing into home decor too. Alongside AlmaRise D Reborn, AlmaRise D Organic works with organic dyes and breathable fabrics with natural drape spun from fruit and plant waste such as sugarcane, orange, banana, and pineapple, among others. Both clothing lines follow the same discipline: give natural materials a second life without waste and stitch airy garments that feel gentle on the skin through spring and summer.",
+          "Tight starting funds and full cupboards gave us AlmaRise D Reborn, yet our first ambition around organic textiles never went away. Today [AlmaRise D Brand](/almarise) brings together two clothing lines that walk side by side, and we shaped the brand from the beginning to reach beyond clothing into AlmaRise D Home Decor too. Alongside AlmaRise D Reborn, AlmaRise D Organic works with organic dyes and breathable fabrics with natural drape spun from fruit and plant waste such as sugarcane, orange, banana, and pineapple, among others. Both clothing lines follow the same discipline: give natural materials a second life without waste and stitch airy garments that feel gentle on the skin through spring and summer.",
           "Those clothes also point straight to why KarmaRise D Global works in India. With AlmaRise D Reborn, the whole circle closes in one plain sentence: the saree belonged to a woman in India, a woman cuts and stitches it in our studio, and a woman wears it on the other side of the world. Alongside our commercial Manufacturing Programmes and AlmaRise D Brand, I am handling the legal groundwork for a registered Section 8 company to back [our planned Women's Training Initiative](/womens-training-initiative) in India. That programme is still in preparation and applications are not yet open. We are building it for one reason. In Maharashtra, we grow up believing you owe a debt back to society.",
           "Every piece that leaves our studio in India, whether it began as a mother's kept silk saree in Maharashtra or as plant-waste fibre dyed organically across India, answers to the same standard: careful pattern work, straight dealing, and respect for the hands that shaped it.",
         ],
@@ -602,9 +542,7 @@ export const stories: StoryEntry[] = [
         images: [
           {
             url: "/images/almarise/indian-family-saree-handover-almarise.jpeg",
-            alt: "Alma y Shirish en una casa cerca de Mumbai recibiendo de manos de su dueña un sari de seda naranja vivo con cenefa tejida en morado e hilo zari dorado",
-            caption:
-              "Alma y yo visitamos esta casa cerca de Mumbai para recibir un sari guardado de seda naranja con su cenefa tejida en zari y anotar su historia antes de darle una segunda vida.",
+            alt: "Alma y Shirish en una casa cerca de Bombay recibiendo de manos de su dueña un sari de seda naranja vivo con cenefa tejida en morado e hilo zari dorado",
             aspectRatio: "4:5",
           },
         ],
@@ -614,22 +552,18 @@ export const stories: StoryEntry[] = [
           "Oriente y Occidente: de saris guardados a shrugs irrepetibles",
         paragraphs: [
           "Lleva tejidos indios hacia España y el resto de Europa y una evidencia práctica salta a la vista enseguida. Casi nadie se envuelve en un sari entero en el día a día europeo. Si alguna persona lo prueba una vez, es solo por curiosidad. En la India hablamos de Ganga-Yamuna tehzeeb, el encuentro donde las tradiciones se mezclan. Swami Vivekananda expresó hace mucho el propósito mayor al hablar de unir el espíritu de Oriente con el carácter práctico y científico de Occidente. AlmaRise D Brand descansa sobre esa base.",
-          "Las mujeres en España y el resto de Europa salen a trabajar, se mueven en metro, cercanías y autobús y encadenan jornadas activas donde la ropa necesita ser cómoda y rápida de poner. Colocarse un sari entero lleva tiempo. Un shrug entra en segundos. Alma mantuvo la palabra inglesa shrug para nuestras prendas exteriores principales, tanto en cortes abiertos como cerrados, porque las opciones en español que probó, incluido sobretodo, siempre se quedaban cortas al hablar en el día a día. Cuando se sentó con estudiantes de último curso de diseño cerca de Mumbai frente a montones de saris guardados, la mayoría nunca había diseñado para mujeres europeas ni sabía situar España en el mapa. Alma les contó cómo allí las mujeres se mueven en transporte público todo el día en vez de subir a un coche de empresa en la puerta de casa. Aun así, una estudiante dejó que la trama del tejido guiara su lápiz y dibujó un vestido sacado directamente del folclore tradicional español.",
+          "Las mujeres en España y el resto de Europa salen a trabajar, se mueven en metro, cercanías y autobús y encadenan jornadas activas donde la ropa necesita ser cómoda y rápida de poner. Colocarse un sari entero lleva tiempo. Un shrug entra en segundos. Alma mantuvo la palabra inglesa shrug para nuestras prendas exteriores principales, tanto en cortes abiertos como cerrados, porque las opciones en español que probó, incluido sobretodo, siempre se quedaban cortas al hablar en el día a día. Cuando se sentó con estudiantes de último curso de diseño cerca de Bombay frente a montones de saris guardados, la mayoría nunca había diseñado para mujeres europeas ni sabía situar España en el mapa. Alma les contó cómo allí las mujeres se mueven en transporte público todo el día en vez de subir a un coche de empresa en la puerta de casa. Aun así, una estudiante dejó que la trama del tejido guiara su lápiz y dibujó un vestido sacado directamente del folclore tradicional español.",
           "En mi terreno, el de la producción, la ruptura frente a las tiradas industriales habituales es tajante. En una confección corriente por volumen, una marca encarga cincuenta, cien o doscientas prendas iguales con un solo patrón escalado, vistiendo a doscientas personas con idéntica silueta. Con AlmaRise D Reborn, cada sari guardado trae un gramaje distinto junto a su propia cenefa tejida en hilo zari y su extremo decorativo llamado pallu. Cada sari exige su patronaje individual y un plano de corte desde cero. Ese oficio lleva mucho más tiempo en nuestro estudio, pero logra algo imposible en una tirada masiva. No existe otra copia en ningún sitio.",
         ],
         images: [
           {
             url: "/images/almarise/design-students-saree-stacks-mumbai-studio.jpeg",
-            alt: "Alma inclinada sobre una mesa roja de estudio con pilas de saris turquesa, crema, bandhani rojo y rosa junto a estudiantes de último año de diseño de moda cerca de Mumbai",
-            caption:
-              "Aquí Alma trabaja con estudiantes de último curso de diseño cerca de Mumbai sobre pilas de saris guardados que reunimos, trazando una silueta distinta para cada tejido.",
+            alt: "Alma inclinada sobre una mesa roja de estudio con pilas de saris turquesa, crema, bandhani rojo y rosa junto a estudiantes de último año de diseño de moda cerca de Bombay",
             aspectRatio: "4:3",
           },
           {
             url: "/images/almarise/reviewing-saree-garment-sketches-india.jpeg",
             alt: "Alma y una estudiante de diseño de moda revisando hojas impresas con muestras de saris y bocetos de prendas a lápiz sobre una mesa de estudio en la India",
-            caption:
-              "En nuestro estudio en la India, Alma repasa bocetos a lápiz y notas de tejido con una estudiante para convertir nuestros saris guardados en prendas prácticas de uso diario.",
             aspectRatio: "4:3",
           },
         ],
@@ -646,24 +580,20 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/almarise/almarise-reborn-bandhani-saree-shrug-madrid.jpeg",
             alt: "María sentada al aire libre en Madrid con un shrug de sari bandhani teñido en naranja y amarillo sobre vaqueros y con sandalias frente a la Puerta de San Vicente",
-            caption:
-              "Junto a la Puerta de San Vicente, durante la sesión de septiembre de Alma en Madrid, María combinó un shrug naranja de sari bandhani que cosimos en la India con vaqueros de su propio armario.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/almarise/almarise-reborn-magenta-saree-shrug-principe-pio.jpeg",
             alt: "María de pie bajo los arcos de hierro pintados de verde de la Estación de Príncipe Pío en Madrid con un shrug abierto de sari magenta con topos dorados sobre un vestido liso negro de tirantes",
-            caption:
-              "Bajo los arcos verdes de hierro de la Estación de Príncipe Pío, durante la sesión de septiembre de Alma, María vistió el shrug translúcido de sari magenta que confeccionamos sobre su propio vestido negro liso.",
             aspectRatio: "4:5",
           },
         ],
       },
       {
         heading:
-          "AlmaRise D Organic, decoración del hogar y el cierre del círculo",
+          "AlmaRise D Organic, AlmaRise D Home Decor y el cierre del círculo",
         paragraphs: [
-          "Los fondos ajustados al comienzo y los armarios llenos nos dieron AlmaRise D Reborn, aunque nuestro propósito inicial con las telas orgánicas nunca se marchó. Hoy [AlmaRise D Brand](/es/almarise) reúne dos líneas de ropa que caminan juntas, y desde el origen planteamos la marca para crecer también fuera del vestuario hacia la decoración del hogar. Junto a AlmaRise D Reborn, AlmaRise D Organic trabaja con tintes orgánicos y tejidos transpirables con caída natural hilados a partir de residuos de frutas y plantas como la caña de azúcar, la naranja, el plátano y la piña, entre otros. Las dos líneas de ropa siguen idéntico criterio: dar una segunda vida a materiales naturales sin desperdicio y coser prendas frescas que respeten la piel en primavera y verano.",
+          "Los fondos ajustados al comienzo y los armarios llenos nos dieron AlmaRise D Reborn, aunque nuestro propósito inicial con las telas orgánicas nunca se marchó. Hoy [AlmaRise D Brand](/es/almarise) reúne dos líneas de ropa que caminan juntas, y desde el origen planteamos la marca para crecer también fuera del vestuario hacia AlmaRise D Home Decor, nuestra línea de decoración del hogar. Junto a AlmaRise D Reborn, AlmaRise D Organic trabaja con tintes orgánicos y tejidos transpirables con caída natural hilados a partir de residuos de frutas y plantas como la caña de azúcar, la naranja, el plátano y la piña, entre otros. Las dos líneas de ropa siguen idéntico criterio: dar una segunda vida a materiales naturales sin desperdicio y coser prendas frescas que respeten la piel en primavera y verano.",
           "Esa ropa remite directo a por qué KarmaRise D Global trabaja en la India. Con AlmaRise D Reborn, el círculo entero se cierra en una frase sencilla: el sari perteneció a una mujer en la India, una mujer lo corta y lo cose en nuestro estudio y otra mujer lo viste al otro lado del mundo. En paralelo a nuestros Programas de producción comerciales y a AlmaRise D Brand, llevo el trabajo jurídico de una sociedad registrada Section 8 que respalde [nuestra futura Iniciativa de formación para mujeres](/es/womens-training-initiative) en la India. Ese programa sigue en preparación y todavía no tiene inscripciones abiertas. Lo levantamos por un motivo claro. En Maharashtra crecemos sabiendo que tenemos una deuda con la sociedad.",
           "Cada prenda que sale de nuestro estudio en la India, ya naciera como el sari de seda guardado por una madre en Maharashtra o como una fibra de residuos vegetales teñida de manera orgánica en distintos puntos de la India, responde a la misma exigencia: patronaje cuidado, trato franco y respeto por las manos que le dieron forma.",
         ],
@@ -688,7 +618,7 @@ export const stories: StoryEntry[] = [
     issueNumber: "01",
     publishedAt: "2026-11-08",
     updatedAt: "2026-11-24",
-    readingTimeMinutes: 6,
+    readingTimeMinutes: 7,
     category: "People & Craftsmanship",
     location: "Across India",
     spanishLocation: "Por toda la India",
@@ -706,7 +636,7 @@ export const stories: StoryEntry[] = [
       spanishRole: "Cofundador de KarmaRise D Global",
       location: "India & Spain",
       spanishLocation: "India y España",
-      portraitUrl: "/images/founders/shirish-portrait.jpeg",
+      portraitUrl: "/images/workshops/shirish-at-leather-warehouse-desk.jpeg",
     },
     tags: [
       "Manufacturing Partner",
@@ -721,15 +651,12 @@ export const stories: StoryEntry[] = [
       "India",
     ],
     leadImage: {
-      url: "/images/workshops/shirish-leather-strap-workshop-india.jpg",
+      url: "/images/workshops/shirish-machinist-leather-strap-vertical.jpeg",
       alt: "Shirish standing beside a leather artisan stitching a black strap on an industrial sewing machine in India",
-      caption:
-        "I stand beside a machine operator on the stitching line while he guides a black leather strap under a heavy sewing head.",
+      objectPosition: "50% 24%",
     },
     spanishLeadAlt:
       "Shirish de pie junto a un artesano marroquinero que cose una correa negra en una máquina de coser industrial en la India",
-    spanishLeadCaption:
-      "Estoy de pie junto a un operario en la línea de costura mientras pasa una correa de piel negra bajo una máquina pesada.",
     leadSlot: {
       kind: "Photo",
       ratio: "4:3 horizontal",
@@ -749,23 +676,15 @@ export const stories: StoryEntry[] = [
       {
         url: "/images/workshops/shirish-master-cutter-seam-inspection.jpeg",
         alt: "Shirish flexing a soft tan leather panel in both hands beside a master cutter in an Indian leather atelier",
-        caption:
-          "I flex a soft tan hide in both hands beside the master cutter. Photographs never tell you how a skin feels in your palm.",
       },
       {
         url: "/images/workshops/shirish-tan-black-leather-bags-inspection.jpeg",
         alt: "Shirish checking a soft tan leather bag over a stack of black leather bags while male and female artisans work beside him",
-        caption:
-          "I inspect a finished tan bag over a stack of black bags beside the assembly benches, right next to the artisans trimming and finishing the batch.",
       },
     ],
     spanishPairAlts: [
       "Shirish flexionando con ambas manos una pieza de piel blanda en tono tostado junto a un maestro cortador en una marroquinería de la India",
       "Shirish revisando un bolso de piel blanda en tono tostado sobre una pila de bolsos de piel negra mientras artesanos y artesanas trabajan a su lado",
-    ],
-    spanishPairCaptions: [
-      "Compruebo con ambas manos la caída y la suavidad de una piel en tono tostado junto al cortador. Ninguna foto te dice cómo se siente una piel en la palma.",
-      "Reviso un bolso terminado en tono tostado sobre una pila de bolsos negros junto a los bancos de montaje, al lado de los artesanos y las artesanas que rematan el lote.",
     ],
     pairSlots: [
       {
@@ -785,7 +704,7 @@ export const stories: StoryEntry[] = [
         paragraphs: [
           "When an independent leather-goods boutique in Donostia came to us to produce four bag styles in black and tan, the founder did not hand us a tannery code. He gave us a Basque word. He wanted leather that felt goxo-goxo, silky and warm in the hand, the kind of supple hide you keep touching after lifting a bag off a counter.",
           "Over phone calls and email, almost every leather producer in India will say yes to that brief. Face to face, the picture changes fast. Alma and I travelled across India visiting leather ateliers and production units. We inspected hides under factory lights and paid out of our own pocket for trial samples. The first pieces looked fine in photographs. Once we held them, they felt stiff and dry. None of them felt goxo-goxo.",
-          'When a founder from Spain or the rest of Europe comes to us, I never see them as an invoice number or a "client" ticking boxes. I see an entrepreneur putting their name and savings into a brand. Many have heard stories of European buyers wiring a deposit to an unknown factory in India and never seeing the goods. When I sit with a founder, my commitment is direct: focus on your business and your marketing, and leave manufacturing in India to us. Keeping that word meant admitting early that one convenient factory under a single roof was never going to deliver the hand-feel this collection needed.',
+          'When a founder from Spain or the rest of Europe comes to us, I never see them as an invoice number or a "client" ticking boxes. I see an entrepreneur putting their name and savings into a brand. Many have heard stories of European brands wiring a deposit to an unknown factory in India and never seeing the goods. When I sit with a founder, my commitment is direct: focus on your business and your marketing, and leave manufacturing in India to us. Keeping that word meant admitting early that one convenient factory under a single roof was never going to deliver the hand-feel this collection needed.',
         ],
       },
       {
@@ -799,8 +718,6 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/workshops/alma-tan-leather-hides-batch-check.jpeg",
             alt: "Alma inspecting full tan leather hides beside a finished tan bag while three leather atelier specialists look on",
-            caption:
-              'Alma checks the tan hides side by side with the leather atelier team before we clear the batch for cutting. "Tan" shifts in every dye drum unless we verify it in person.',
             aspectRatio: "4:5",
           },
         ],
@@ -816,8 +733,6 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/workshops/shirish-artisan-cotton-lining-bench-india.jpeg",
             alt: "Smiling woman artisan at an assembly bench with yellow-and-white striped cotton linings, glue bottle, hammer, and trimmed leather straps beside Shirish",
-            caption:
-              "I stop at the lining and strap bench to talk through the day's assembly with one of the makers instead of heading straight back to the owner's office.",
             aspectRatio: "4:5",
           },
         ],
@@ -834,8 +749,6 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/workshops/leather-bags-export-cartons.jpeg",
             alt: "Eleven stretch-wrapped export cartons numbered and labelled by bag style and colour ready for air freight from India to Spain",
-            caption:
-              "Our eleven stretch-wrapped export cartons, numbered and labelled by black and tan style codes before that eventful first air shipment to Spain.",
             aspectRatio: "4:3",
           },
         ],
@@ -847,22 +760,20 @@ export const stories: StoryEntry[] = [
         paragraphs: [
           "Cuando una boutique independiente de marroquinería en Donostia acudió a nosotros para producir cuatro modelos de bolso en negro y en tono tostado, su fundador no nos entregó un código de curtiduría. Nos dio una palabra en euskera. Quería una piel con tacto goxo-goxo, sedosa y cálida al tocarla, de ese cuero blando que te apetece seguir acariciando en cuanto levantas el bolso del mostrador.",
           "Por teléfono o por correo, casi cualquier fabricante de piel en la India dice que sí a ese encargo. Cara a cara, el cuadro cambia enseguida. Alma y yo recorrimos la India visitando marroquineros y unidades de producción. Revisamos pieles bajo la luz de cada nave y pagamos de nuestro bolsillo muestras de prueba. En foto, las primeras piezas daban el pego. Nada más sostenerlas, resultaban rígidas y secas. Aquello no era goxo-goxo.",
-          'Cuando un fundador de España o del resto de Europa acude a nosotros, jamás lo veo como un número de factura ni como un "cliente" que rellena casillas. Veo a un emprendedor que pone su nombre y sus ahorros en una marca. Muchos han oído historias de compradores europeos que adelantaron dinero a una fábrica desconocida en la India y nunca vieron el pedido. Al sentarme con un fundador, mi compromiso es directo: céntrate en tu negocio y en tu marketing, y déjanos a nosotros la fabricación en la India. Cumplir esa palabra pasaba por admitir desde el principio que una sola fábrica cómoda bajo un mismo techo jamás nos iba a dar el tacto que pedía esta colección.',
+          "Cuando un fundador de España o del resto de Europa acude a nosotros, jamás lo veo como un número de factura ni como un «cliente» que rellena casillas. Veo a un emprendedor que pone su nombre y sus ahorros en una marca. Muchos han oído historias de marcas europeas que adelantaron dinero a una fábrica desconocida en la India y nunca vieron el pedido. Al sentarme con un fundador, mi compromiso es directo: céntrate en tu negocio y en tu marketing, y déjanos a nosotros la fabricación en la India. Cumplir esa palabra pasaba por admitir desde el principio que una sola fábrica cómoda bajo un mismo techo jamás nos iba a dar el tacto que pedía esta colección.",
         ],
       },
       {
         heading: "Repartir un mismo bolso entre varios estados de la India",
         paragraphs: [
-          'Cuando un problema de producción se atasca, me aferro a una sola regla: "La salida está en el propio problema. Solo tienes que seguir mirando la pregunta." Hay que volver una y otra vez sobre el encargo hasta que asome el modo de sacarlo adelante. Si una marroquinería no clava a la vez el acabado de la piel y el armado del bolso, toca dejar de forzar un solo techo para dos oficios distintos.',
+          "Cuando un problema de producción se atasca, me aferro a una sola regla: «La salida está en el propio problema. Solo tienes que seguir mirando la pregunta». Hay que volver una y otra vez sobre el encargo hasta que asome el modo de sacarlo adelante. Si una marroquinería no clava a la vez el acabado de la piel y el armado del bolso, toca dejar de forzar un solo techo para dos oficios distintos.",
           "Volvimos a la materia prima y estudiamos tratamientos del cuero y piel de curtido vegetal hasta entender cuántas pasadas exigía esa caída tan blanda. La marroquinería en la India se reparte por polos regionales especializados, no se concentra en una sola ciudad. Mandamos las pieles a curtidurías de Calcuta, donde el curtido vegetal saca mejor ese acabado natural y flexible. Como el armado de bolsos no alcanzaba allí nuestro nivel, trasladamos la piel terminada a Uttar Pradesh, donde nuestros marroquineros contaban con líneas de costura más firmes y un montaje más limpio para bolsos blandos con estructura. Desde Maharashtra, cerca de Bombay, llevamos la coordinación y la [supervisión presencial de la producción](/es/how-we-work), quedándonos sobre el terreno mientras avanzaba el lote.",
-          'Repartir el trabajo entre estados solo funciona si la fábrica colaboradora cuida los detalles menos vistosos tanto como nosotros. Alma ya había propuesto mejoras prácticas en los propios bolsos, como forros claros de algodón y cremalleras japonesas YKK de plástico de alta calidad que evitan arañazos en las manos y roces en los abrigos de invierno, ajustes que cuenta en [sus notas sobre muestras para valoración y ergonomía](/es/stories/why-sample-approval-decides-bulk). Después llegó la etiqueta colgante de cuidados en español. Alma rechazó el papel blanco blanqueado y pidió una etiqueta de cartón reciclado sin blanquear, libre de químicos. Nuestra unidad de producción pasó entre diez y quince días rastreando justo ese cartón en vez de colocarnos el sobrante del almacén. Antes de cortar una sola piel en tono tostado, ya que "tostado" es un color impreciso que en el bombo de tinte vira hacia el mostaza o se oscurece demasiado, Alma voló hasta allí y trabajó codo con codo con los marroquineros una semana entera revisando la partida. Entre control y control llamaba por videollamada en directo al fundador de la boutique, le enseñaba el punto de producción y le presentaba cara a cara a quienes estaban cosiendo sus piezas. Como resumió Alma después, es la diferencia entre sacar una camisa ya hecha de un perchero y encargártela a medida. Ves cómo cobra forma tu propia pieza.',
+          "Repartir el trabajo entre estados solo funciona si la fábrica colaboradora cuida los detalles menos vistosos tanto como nosotros. Alma ya había propuesto mejoras prácticas en los propios bolsos, como forros claros de algodón y cremalleras japonesas YKK de plástico de alta calidad que evitan arañazos en las manos y roces en los abrigos de invierno, ajustes que cuenta en [sus notas sobre muestras para valoración y ergonomía](/es/stories/why-sample-approval-decides-bulk). Después llegó la etiqueta colgante de cuidados en español. Alma rechazó el papel blanco blanqueado y pidió una etiqueta de cartón reciclado sin blanquear, libre de químicos. Nuestra unidad de producción pasó entre diez y quince días rastreando justo ese cartón en vez de colocarnos el sobrante del almacén. Antes de cortar una sola piel en tono tostado, ya que «tostado» es un color impreciso que en el bombo de tinte vira hacia el mostaza o se oscurece demasiado, Alma voló hasta allí y trabajó codo con codo con los marroquineros una semana entera revisando la partida. Entre control y control llamaba por videollamada en directo al fundador de la boutique, le enseñaba el punto de producción y le presentaba cara a cara a quienes estaban cosiendo sus piezas. Como resumió Alma después, es la diferencia entre sacar una camisa ya hecha de un perchero y encargártela a medida. Ves cómo cobra forma tu propia pieza.",
         ],
         images: [
           {
             url: "/images/workshops/alma-tan-leather-hides-batch-check.jpeg",
             alt: "Alma revisando pieles enteras en tono tostado junto a un bolso terminado del mismo tono mientras tres especialistas marroquineros observan",
-            caption:
-              'Alma revisa las pieles en tono tostado mano a mano con los marroquineros antes de autorizar el corte. El "tostado" cambia en cada bombo de tinte si no lo comprobamos en persona.',
             aspectRatio: "4:5",
           },
         ],
@@ -872,15 +783,13 @@ export const stories: StoryEntry[] = [
           "Pasar de largo ante el despacho del dueño hasta las líneas de costura",
         paragraphs: [
           "Casi todas las marcas extranjeras aterrizan en la India, estrechan la mano en un despacho con aire acondicionado, miran una bandeja de muestras y vuelven directos al aeropuerto. Punto final. Nunca se quedan una semana a pie de obra. Tampoco cruzan palabra con quienes cortan las pieles ni con quienes guían las correas bajo máquinas pesadas.",
-          'Nosotros descartamos de raíz las grandes plantas de producción masiva. En [nuestros Programas de producción](/es/manufacturing) trabajamos con fábricas de corte familiar bien asentadas, marroquineros y colectivos de artesanas donde el trabajo se hace a mano o con máquinas de pedal e industriales bajo control constante. Cuando Alma y yo auditamos una unidad de producción, pasamos de largo ante la mesa del dueño y nos sentamos junto a los artesanos para charlar de su oficio y de su día a día. "¿Cuesta este paso? ¿Cuánto llevas haciendo esto? Explícamelo." El ambiente cambia al instante. Gente acostumbrada a pasar inadvertida tras un tabique se endereza y sonríe. Te enseñan cómo meten una correa gruesa bajo la aguja o cómo apilan con orden los forros de algodón a rayas amarillas y blancas. Ese agradecimiento no se compra con dinero, y a cambio nace un compromiso mucho más serio. Cuando un artesano nota respeto por su oficio, no hace falta que ningún encargado levante la voz por la calidad. Manda el orgullo propio: "Este producto va a salir estupendo gracias a mi trabajo."',
+          "Nosotros descartamos de raíz las grandes plantas de producción masiva. En [nuestros Programas de producción](/es/manufacturing) trabajamos con fábricas de corte familiar bien asentadas, marroquineros y colectivos de artesanas donde el trabajo se hace a mano o con máquinas de pedal e industriales bajo control constante. Cuando Alma y yo auditamos una unidad de producción, pasamos de largo ante la mesa del dueño y nos sentamos junto a los artesanos para charlar de su oficio y de su día a día. «¿Cuesta este paso? ¿Cuánto llevas haciendo esto? Explícamelo». El ambiente cambia al instante. Gente acostumbrada a pasar inadvertida tras un tabique se endereza y sonríe. Te enseñan cómo meten una correa gruesa bajo la aguja o cómo apilan con orden los forros de algodón a rayas amarillas y blancas. Ese agradecimiento no se compra con dinero, y a cambio nace un compromiso mucho más serio. Cuando un artesano nota respeto por su oficio, no hace falta que ningún encargado levante la voz por la calidad. Manda el orgullo propio: «Este producto va a salir estupendo gracias a mi trabajo».",
           "Ahí fijamos también una frontera que no movemos. La cautela inicial de las fábricas de corte familiar es comprensible cuando unos desconocidos piden recorrer sus puntos de producción. Los dueños temen que la competencia copie su montaje, y respetamos esa reserva mientras hablamos con calma y nos ganamos su confianza. Mantenemos también una estricta tolerancia cero ante la explotación, sin explotación de menores, adultos ni mujeres en ningún eslabón de nuestra cadena. Si tras construir una relación una unidad de producción sigue negándonos puertas abiertas, oculta algo. En ese segundo se acaba la conversación y nos marchamos.",
         ],
         images: [
           {
             url: "/images/workshops/shirish-artisan-cotton-lining-bench-india.jpeg",
             alt: "Artesana sonriente en un banco de montaje con forros de algodón a rayas amarillas y blancas, bote de cola, martillo y correas de piel recortadas junto a Shirish",
-            caption:
-              "Me detengo en el banco de forros y correas para charlar sobre el montaje del día con una de las artesanas en lugar de volver enseguida al despacho del dueño.",
             aspectRatio: "4:5",
           },
         ],
@@ -890,15 +799,13 @@ export const stories: StoryEntry[] = [
           "Contratos bajo ley india, sustos de primera exportación y ocho bolsos en un escaparate de Donostia",
         paragraphs: [
           "Como abogado colegiado en el Bar Council de la India, llevo nuestras negociaciones legales y recojo cada obligación en acuerdos mutuos de confidencialidad NDA y en contratos escritos con unidades de producción bajo ley india. Las promesas de palabra dañan a los dos lados. Los fundadores de España y el resto de Europa temen adelantar un pago y recibir cajas defectuosas, mientras que los fabricantes indios honrados temen que un cliente cambie el briefing de producto a mitad de tirada. Un contrato claro protege a ambas partes, pero nunca lo tratamos como un cheque en blanco permanente. Cada fábrica colaboradora demuestra oficio y respuesta fiable pedido tras pedido. Tampoco frenamos nunca la búsqueda, porque cada día abren en la India nuevos especialistas, incluidos los productores indios de piel vegana que estamos evaluando ahora mismo.",
-          'Acertar con las unidades de producción no es el último escollo, y no voy a fingir que nuestra primera exportación de cuero llegara al aeropuerto sin sobresaltos. La producción terminó limpia. Esperaban once cajas de exportación retractiladas y etiquetadas por modelo y color. Entonces golpeó la realidad. Nunca habíamos exportado por cuenta propia ni teníamos cuenta corporativa con mensajería. Los primeros presupuestos de transporte aéreo llegaron entre seis y siete lakhs de rupias, por encima de todo el coste de fabricación. En aquel momento fue una pesadilla. Seguimos buscando hasta dar con un contacto de carga que todavía estaba aprendiendo a exportar pero tenía ganas de ayudar. También conectamos con un especialista en aduanas en Delhi para blindar nuestros papeles, y por fin subimos las cajas al avión. Incluso con los bolsos en el aire, me despertaba de madrugada para recargar la pantalla de seguimiento después de que la mensajería publicara un aviso falso de "retención en aduanas" en España sin pedirnos jamás un solo documento que faltara.',
-          'Dos o tres días después, las cajas llegaron frente a la puerta de la boutique en Donostia. Antes de la entrega, su fundador ya había intrigado a su clientela enseñando nada más una de nuestras bolsas guardapolvo de algodón de muestra, guardando el cuero a buen recaudo entre risas: "¡Tengo un secreto para vosotros! Sin spoilers, viene dentro de esta bolsa." Nada más recibir el envío, nos mandó una foto desde la entrada exclamando: "¡Lo tenemos! ¡Ya están aquí!" En la siguiente videollamada giró la cámara hacia la calle. Los cuatro modelos en negro y los cuatro en tono tostado llenaban de punta a punta su escaparate principal en el centro. Aquellas pieles se curtieron en Calcuta, se cosieron en Uttar Pradesh, pasaron aduanas por Delhi y se vigilaron desde Maharashtra, una puerta abierta cada vez.',
+          "Acertar con las unidades de producción no es el último escollo, y no voy a fingir que nuestra primera exportación de cuero llegara al aeropuerto sin sobresaltos. La producción terminó limpia. Esperaban once cajas de exportación retractiladas y etiquetadas por modelo y color. Entonces golpeó la realidad. Nunca habíamos exportado por cuenta propia ni teníamos cuenta corporativa con mensajería. Los primeros presupuestos de transporte aéreo llegaron entre seis y siete lakhs de rupias, por encima de todo el coste de fabricación. En aquel momento fue una pesadilla. Seguimos buscando hasta dar con un contacto de carga que todavía estaba aprendiendo a exportar pero tenía ganas de ayudar. También conectamos con un especialista en aduanas en Delhi para blindar nuestros papeles, y por fin subimos las cajas al avión. Incluso con los bolsos en el aire, me despertaba de madrugada para recargar la pantalla de seguimiento después de que la mensajería publicara un aviso falso de «retención en aduanas» en España sin pedirnos jamás un solo documento que faltara.",
+          "Dos o tres días después, las cajas llegaron frente a la puerta de la boutique en Donostia. Antes de la entrega, su fundador ya había intrigado a su clientela enseñando nada más una de nuestras bolsas guardapolvo de algodón de muestra, guardando el cuero a buen recaudo entre risas: «¡Tengo un secreto para vosotros! Sin spoilers, viene dentro de esta bolsa». Nada más recibir el envío, nos mandó una foto desde la entrada exclamando: «¡Lo tenemos! ¡Ya están aquí!». En la siguiente videollamada giró la cámara hacia la calle. Los cuatro modelos en negro y los cuatro en tono tostado llenaban de punta a punta su escaparate principal en el centro. Aquellas pieles se curtieron en Calcuta, se cosieron en Uttar Pradesh, pasaron aduanas por Delhi y se vigilaron desde Maharashtra, una puerta abierta cada vez.",
         ],
         images: [
           {
             url: "/images/workshops/leather-bags-export-cartons.jpeg",
             alt: "Once cajas de exportación numeradas y retractiladas con etiquetas de modelo y color listas para envío aéreo de la India a España",
-            caption:
-              "Nuestras once cajas de exportación numeradas y retractiladas, etiquetadas por código de modelo en negro y tostado antes de aquel movido primer envío aéreo a España.",
             aspectRatio: "4:3",
           },
         ],
@@ -923,7 +830,7 @@ export const stories: StoryEntry[] = [
     issueNumber: "01",
     publishedAt: "2026-11-04",
     updatedAt: "2026-11-24",
-    readingTimeMinutes: 8,
+    readingTimeMinutes: 9,
     category: "Art & Design",
     location: "India & Spain",
     spanishLocation: "India y España",
@@ -958,13 +865,9 @@ export const stories: StoryEntry[] = [
     leadImage: {
       url: "/images/almarise/alma-draping-saree-dress-form-studio.jpeg",
       alt: "Alma and a garment maker pinning embroidered teal fabric on a dressmaker form in our studio in India",
-      caption:
-        "I pin and adjust a garment sample on the dressmaker form with our team in our studio in India. If something pulls or hangs wrong here, I never even show it to the Client.",
     },
     spanishLeadAlt:
       "Alma y una modista prendiendo con alfileres una tela bordada en tono turquesa sobre el maniquí en nuestro estudio en la India",
-    spanishLeadCaption:
-      "Aquí ajusto con alfileres una prenda de muestra sobre el maniquí con el equipo, en nuestro estudio de la India. Si algo tira o cae mal aquí, ni siquiera se lo enseño al cliente.",
     leadSlot: {
       kind: "Photo",
       ratio: "16:9 horizontal",
@@ -982,25 +885,18 @@ export const stories: StoryEntry[] = [
     },
     pairImages: [
       {
-        url: "/images/workshops/alma-dark-leather-swatch-binder-review.jpeg",
-        alt: "Alma inspecting a dark leather swatch across a glass table while a leather specialist checks a swatch binder",
-        caption:
-          "Here I compare leather swatches across the glass table with a leather specialist before we cut a single prototype.",
+        url: "/images/workshops/brown-black-leather-panels-brass-hardware.jpg",
+        alt: "Cut brown and black vegetable-tanned leather panels fitted with antique brass D-rings on a leather atelier bench in India",
       },
       {
-        url: "/images/workshops/alma-cognac-leather-cutting-table.jpeg",
+        url: "/images/workshops/alma-cognac-crossbody-hide-table.jpeg",
         alt: "Alma checking brown leather hides beside a finished brown crossbody bag sample with antique brass hardware",
-        caption:
-          "I check these brown hides beside a finished crossbody sample with antique brass hardware. Even when a piece looks ready, I still look for what needs fixing before production begins.",
+        objectPosition: "50% 20%",
       },
     ],
     spanishPairAlts: [
-      "Alma revisando una muestra de piel oscura sobre una mesa de cristal mientras un marroquinero consulta el muestrario",
+      "Paneles cortados de piel marrón y negra de curtido vegetal con anillas de latón envejecido sobre la mesa de trabajo en la India",
       "Alma comprobando pieles marrones junto a la muestra terminada de un bolso bandolera marrón con herrajes de latón envejecido",
-    ],
-    spanishPairCaptions: [
-      "Aquí comparo muestras de piel sobre la mesa de cristal con un marroquinero antes de sacar un solo prototipo.",
-      "Reviso estas pieles marrones junto a una muestra terminada de bandolera con herrajes de latón envejecido. Aunque una pieza parezca lista, siempre busco qué corregir antes de entrar en producción.",
     ],
     pairSlots: [
       {
@@ -1028,7 +924,7 @@ export const stories: StoryEntry[] = [
         heading:
           'High-quality Japanese plastic YKK zippers, a "too small" bag, and the flaws you do not see',
         paragraphs: [
-          "Proper physical sample review exists so I can push back in time and save you complaints six months later. On that backpack, I advised fitting high-quality Japanese plastic YKK zippers instead of metal teeth. Metal teeth look smart sitting on a counter. Then a woman reaches in for her purse and scrapes the back of her hand. Put metal on a rear pocket and it rubs against a wool coat all winter until it ruins the fabric, or scratches bare skin in summer. I told the boutique owner straight: \"We will do whatever you prefer, but I suggest these high-quality Japanese plastic YKK zippers. Otherwise your shoppers will say, 'Oh, it is nice, but...'\"",
+          "Proper physical sample review exists so I can push back in time and save you complaints six months later. On that backpack, I advised fitting high-quality Japanese plastic YKK zippers instead of metal teeth. Metal teeth look smart sitting on a counter. Then a woman reaches in for her purse and scrapes the back of her hand. Put metal on a rear pocket and it rubs against a wool coat all winter until it ruins the fabric, or scratches bare skin in summer. I told the boutique owner straight: \"We will do whatever you prefer, but I suggest these high-quality Japanese plastic YKK zippers. Otherwise your shoppers will say, 'Oh, it is nice, but…'\"",
           'Something similar happened with two smaller styles from the same order. On paper they were meant to share the same measurements, and we ran the first tests in black because the tan hides took much longer to arrive. I walked into his shop in Donostia with both black pieces, he pulled out a tape measure on the spot, and he said, "This is too small." I answered without blinking: "It is not too small. It is smaller. If you want the same measurement, I will gladly order another sample." Then I asked him to think about how women carry bags in daily life. One had a sporty, informal feel, easy for everyday errands without heavy weight. The second looked dressier, suited to dinner out or a party when you carry just a few things. Stocking two different styles in the exact same size leaves one silhouette on the shelf; two sizes for two occasions give the same woman a reason to pick up both. He agreed and kept the smaller one.',
           'Most of my inspection happens long before a Client holds anything in their hands. The minute a production unit finishes a prototype, I examine it first on the ground in India. If I am unhappy with the drape, the feel, or how smoothly the zip runs, I do not even show it to the Client. It goes straight back to the leather atelier. Even when a pre-production sample comes off the line with final hides, linings, and fittings in place, I never settle for a quick "yes". Clients feel relieved to see their idea turned into an object and often miss details my eye catches straight away: strap drop, hardware alignment, how a bag holds its profile when we stuff each piece individually for photos, or whether the inner label was stitched straight.',
           'When I spot any of those things, even if the Client missed them, I put them on the table myself. "I am not 100% happy with this, and this will be changed." I want complete honesty from the first minute. If tomorrow a flaw slips past me without my noticing, nobody will ever think I tried to hide it.',
@@ -1037,15 +933,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/workshops/alma-natural-canvas-fabric-cutting-table.jpeg",
             alt: "Alma inspecting stacked natural canvas fabric at a table in India",
-            caption:
-              "I check the weight and weave of this natural canvas before signing off the sample batch.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/workshops/alma-purple-leather-hide-drape-check.jpeg",
             alt: "Alma and two leather specialists examining the drape and colour of a purple leather hide",
-            caption:
-              "Here I check the drape of this leather and the dye tone in person with our leather specialists. You can never match an exact shade through a screen.",
             aspectRatio: "4:5",
           },
         ],
@@ -1065,7 +957,7 @@ export const stories: StoryEntry[] = [
         paragraphs: [
           'Reviewing samples also clears up the quiet customs and presentation rules that decide whether a shipment enters the EU smoothly and sits right in a shop. European rules for leather goods ask for less than clothing, which requires a full sewn-in composition label. Still, for smooth customs clearance it is advisable to stitch a small, undetachable label inside reading "genuine leather" and "Made in India". End of the story. I remember opening one sample in our office, freezing because I thought they had left it out, and Shirish pointing straight to the inside corner: "There, right here." Thank goodness.',
           'I wanted to go a step further for the Client and for whoever would carry the bag. Together with the boutique owner, I put together unbleached, chemical-free recycled cardboard hangtags. I wrote the Spanish text while he handled the graphic design. Simply finding that unbleached, chemical-free recycled cardboard took our production unit ten to fifteen days. I had drafted a triple-folding leaflet first and sweated to trim it down to a single tag without dropping what mattered. Leather is animal, not plant fibre, so I wanted to respect the item by telling the truth: dyeing in natural tones, plain care advice so it lasts for years without frightening shoppers into "Oh my god, how many things do I have to do?", a brief note about a Spanish brand born in India, and the reminder that tiny irregularities prove handmade work. Handmade, not handicraft; it pays to call each thing by its right name.',
-          'Before production began on the tan hides, I flew back to India and spent a full week working elbow to elbow at the production site. I kept calling the Client on live video to show him the hides and introduce him to the people stitching his bags. That is the distance between buying ready-made wholesale and offering tailor-made fashion: you watch each piece take shape. He grew so excited that, picking up one of the cotton dust bags from his samples, he filmed a short teaser for his audience announcing: "I have a secret for you guys... it comes in this bag!" The very minute the cartons reached his shop door in Donostia, he sent a photo: "We got it! They\'re here!" Days later he called on video to show his entire main downtown window filled with all eight bags, four black and four tan.',
+          'Before production began on the tan hides, I flew back to India and spent a full week working elbow to elbow at the production site. I kept calling the Client on live video to show him the hides and introduce him to the people stitching his bags. That is the distance between buying ready-made wholesale and offering tailor-made fashion: you watch each piece take shape. He grew so excited that, picking up one of the cotton dust bags from his samples, he filmed a short teaser for his audience announcing: "I have a secret for you guys… it comes in this bag!" The very minute the cartons reached his shop door in Donostia, he sent a photo: "We got it! They\'re here!" Days later he called on video to show his entire main downtown window filled with all eight bags, four black and four tan.',
           "I will never promise a Client that weather, transport, or a dye batch cannot nudge a date, because that does not always sit in my hand. What I promise in every [Manufacturing Programme in India](/manufacturing) is checking every stage two, three, and five times over: from physical sample sign-off through the first pieces off the stitching line and final packing, so zero mistakes slip inside the boxes. From the Maratha stories Shirish has told me since I arrived in India, I sometimes tell Clients that in a way I am Maratha: I give my life before I fail a Client. Shirish holds that exact same line, and we expect it from every production unit we work with. Yesterday I sat down with a new textile maker and told him straight: our doors stay open for anyone ready to commit and work with clarity and honesty. Anything less does not work for us.",
         ],
       },
@@ -1084,7 +976,7 @@ export const stories: StoryEntry[] = [
         heading:
           "Cremalleras japonesas YKK de plástico de alta calidad, un bolso «demasiado pequeño» y los fallos que no ves",
         paragraphs: [
-          'Validar bien una muestra física sirve para llevar la contraria a tiempo y ahorrarte quejas seis meses después. En esa mochila aconsejé montar cremalleras japonesas YKK de plástico de alta calidad en vez de metal. El diente metálico luce estupendo encima de un mostrador. Luego metes la mano a buscar la cartera y sales con el dorso arañado. Pon metal en un bolsillo trasero y pasará el invierno rozando un abrigo de lana hasta destrozar el tejido, o raspando la espalda al aire en verano. Se lo dije sin rodeos al dueño de la boutique: «Haremos lo que tú prefieras, pero yo te aconsejo estas cremalleras japonesas YKK de plástico de alta calidad. Si no, tus clientas dirán: "Ay, qué bonito, pero..."».',
+          'Validar bien una muestra física sirve para llevar la contraria a tiempo y ahorrarte quejas seis meses después. En esa mochila aconsejé montar cremalleras japonesas YKK de plástico de alta calidad en vez de metal. El diente metálico luce estupendo encima de un mostrador. Luego metes la mano a buscar la cartera y sales con el dorso arañado. Pon metal en un bolsillo trasero y pasará el invierno rozando un abrigo de lana hasta destrozar el tejido, o raspando la espalda al aire en verano. Se lo dije sin rodeos al dueño de la boutique: «Haremos lo que tú prefieras, pero yo te aconsejo estas cremalleras japonesas YKK de plástico de alta calidad. Si no, tus clientas dirán: "Ay, qué bonito, pero…"».',
           "Con dos modelos más pequeños del mismo encargo nos ocurrió algo parecido. En teoría iban a medir igual, y sacamos primero las pruebas en negro porque las pieles tostadas tardaron mucho más en llegar. Entré en su comercio de Donostia con ambas piezas negras, sacó el metro al segundo y soltó: «Esto es demasiado pequeño». Le respondí sin dudar: «No es demasiado pequeño. Es más pequeño. Si quieres la misma medida, encargo otra muestra encantada». Acto seguido le pedí que mirara cómo los llevamos en la calle. Uno resultaba deportivo e informal, cómodo para el trote diario sin cargar peso. El otro quedaba más de vestir, pensado para salir a cenar o ir a una fiesta con apenas cuatro cosas encima. Dos modelos distintos con la misma medida dejan una sola opción en el estante; dos tamaños para dos planes dan a la misma mujer motivo para llevarse ambos. Me dio la razón y mantuvo el pequeño.",
           "La mayor parte de mi revisión sucede bastante antes de que el cliente sostenga nada en la mano. En cuanto una unidad de producción termina un prototipo, lo examino yo primero sobre el terreno en la India. Si no me convence cómo cae, qué textura tiene o cómo corre el cierre, ni siquiera se lo enseño al cliente. Vuelve directo al marroquinero. Incluso cuando sale la muestra de preproducción con las pieles definitivas, forros y herrajes puestos, no me conformo con un «sí» rápido. Los clientes respiran aliviados al ver su idea hecha realidad y suelen pasar por alto detalles donde mi ojo se clava al instante: la caída del asa, la alineación de los herrajes, cómo aguanta la forma al rellenar cada bolso uno a uno para las fotos o si la etiqueta interior quedó cosida recta.",
           "Si detecto cualquiera de esas cosas, aunque el cliente no la haya visto, la pongo sobre la mesa yo misma. «No estoy contenta al cien por cien con esto, y esto se va a cambiar.» Quiero honestidad completa desde el primer minuto. Si mañana se me escapa un fallo sin darme cuenta, nadie pensará jamás que intenté ocultarlo.",
@@ -1093,15 +985,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/workshops/alma-natural-canvas-fabric-cutting-table.jpeg",
             alt: "Alma revisando pilas de lona cruda sobre una mesa de trabajo en la India",
-            caption:
-              "Compruebo aquí el gramaje y la trama de esta lona cruda antes de dar el visto bueno a las muestras.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/workshops/alma-purple-leather-hide-drape-check.jpeg",
             alt: "Alma y dos marroquineros examinando la caída y el color de una piel morada",
-            caption:
-              "Aquí reviso en persona la caída de esta piel y el tono del tinte con nuestros marroquineros. Un matiz exacto jamás se iguala a través de una pantalla.",
             aspectRatio: "4:5",
           },
         ],
@@ -1121,7 +1009,7 @@ export const stories: StoryEntry[] = [
         paragraphs: [
           "Revisar muestras despeja esos requisitos discretos de aduana y presentación que deciden si el envío entra limpio en la UE y si el producto queda redondo en tienda. La normativa europea para marroquinería pide menos que la textil, donde hace falta una etiqueta cosida fija con toda la composición. Aun así, para despachar aduanas sin tropiezos conviene coser dentro una pequeña etiqueta que no se pueda despegar con «piel auténtica» y «Made in India». Punto final. Recuerdo abrir una muestra en nuestra oficina, quedarme helada pensando que la habían omitido y a Shirish señalando la esquina interior: «Está ahí». Menos mal.",
           "Quise ir un paso más por el cliente y por quien fuera a estrenar el bolso. Preparé con el dueño de la boutique unas etiquetas de cartón reciclado sin blanquear, libre de químicos. Yo escribí el texto en español y él diseñó el formato. Solo encontrar ese cartón sin blanquear ni tratamientos químicos costó a nuestra unidad de producción entre diez y quince días. Había redactado primero un tríptico desplegable y sudé tinta para condensarlo en una sola tarjeta sin perder lo sustancial. La piel es animal, no fibra vegetal, así que quise respetar el artículo diciendo la verdad: teñido en tonos naturales, cuidados sencillos para durar años sin asustar a nadie con un «¡Madre mía, cuántas cosas tengo que hacer!», una mención a una marca española nacida en la India y el aviso de que las ligeras irregularidades prueban trabajo hecho a mano. Hecho a mano, no artesanía tradicional; conviene llamar a cada cosa por su nombre.",
-          "Antes de arrancar la producción en piel tostada volé de nuevo a la India y pasé una semana entera trabajando codo con codo en el punto de producción. Hacía videollamadas en directo para enseñarle las pieles y presentarle a quienes cosían sus bolsos. Esa es la distancia entre comprar a un mayorista y ofrecer moda a medida: ves crecer cada pieza. Se ilusionó tanto que, aprovechando una de las bolsas guardapolvo de algodón de sus muestras, grabó un vídeo corto para su gente anunciando: «Tengo un secreto para vosotros... ¡viene en esta bolsa!». El mismo minuto en que llegaron las cajas a la puerta de su tienda en Donostia me envió una foto: «¡Ya han llegado! ¡Están aquí!». Días después llamó por vídeo para mostrar el escaparate principal del centro ocupado por los ocho bolsos, cuatro negros y cuatro tostados.",
+          "Antes de arrancar la producción en piel tostada volé de nuevo a la India y pasé una semana entera trabajando codo con codo en el punto de producción. Hacía videollamadas en directo para enseñarle las pieles y presentarle a quienes cosían sus bolsos. Esa es la distancia entre comprar a un mayorista y ofrecer moda a medida: ves crecer cada pieza. Se ilusionó tanto que, aprovechando una de las bolsas guardapolvo de algodón de sus muestras, grabó un vídeo corto para su gente anunciando: «Tengo un secreto para vosotros… ¡viene en esta bolsa!». El mismo minuto en que llegaron las cajas a la puerta de su tienda en Donostia me envió una foto: «¡Ya han llegado! ¡Están aquí!». Días después llamó por vídeo para mostrar el escaparate principal del centro ocupado por los ocho bolsos, cuatro negros y cuatro tostados.",
           "Jamás le prometeré a un cliente que el tiempo, el transporte o una tintada no puedan mover una fecha, porque eso no depende siempre de mí. Lo que sí prometo en cada [Programa de producción en la India](/es/manufacturing) es revisar cada fase dos, tres y hasta cinco veces: desde el visto bueno a la muestra física hasta las primeras unidades salidas de costura y el embalaje final, para que no se cuele ni un fallo dentro de las cajas. Por las historias marathas que Shirish me ha contado desde que llegué a la India, a veces les digo a los clientes que en el fondo tengo algo de maratha: doy la vida antes que fallarle a un cliente. Shirish sostiene exactamente esa misma línea, y se la pedimos a cada unidad de producción con la que colaboramos. Ayer mismo me senté con un fabricante textil nuevo y se lo solté sin rodeos: aquí tiene las puertas abiertas quien quiera comprometerse y trabajar con claridad y honradez. Todo lo que baje de ahí no nos vale.",
         ],
       },
@@ -1163,7 +1051,7 @@ export const stories: StoryEntry[] = [
       spanishRole: "Cofundador de KarmaRise D Global",
       location: "India & Spain",
       spanishLocation: "India y España",
-      portraitUrl: "/images/founders/shirish-portrait.jpeg",
+      portraitUrl: "/images/workshops/shirish-at-leather-warehouse-desk.jpeg",
     },
     tags: [
       "Maharashtra",
@@ -1180,13 +1068,9 @@ export const stories: StoryEntry[] = [
     leadImage: {
       url: "/images/culture/maharashtra-basalt-fort-valley.jpg",
       alt: "Aerial view of stone bastions, courtyard foundations, and arched stone pavilion at Shivneri Fort in Pune district, Maharashtra",
-      caption:
-        "When I think of Shivneri Fort in Pune district, where Chhatrapati Shivaji Maharaj was born, I picture walls cut straight into Sahyadri basalt to hold ground through monsoon rain while the life of Maharashtra unfolded around them.",
     },
     spanishLeadAlt:
       "Vista aérea de los bastiones de piedra, los cimientos del patio y el pabellón de piedra con arcos del fuerte de Shivneri en el distrito de Pune, Maharashtra",
-    spanishLeadCaption:
-      "Cuando pienso en el fuerte de Shivneri, en el distrito de Pune, donde nació Chhatrapati Shivaji Maharaj, veo murallas talladas en el basalto del Sahyadri para aguantar las lluvias del monzón mientras la vida de Maharashtra crecía a su alrededor.",
     leadSlot: {
       kind: "Photo",
       ratio: "16:10 horizontal",
@@ -1206,25 +1090,17 @@ export const stories: StoryEntry[] = [
       {
         url: "/images/culture/maharashtra-festive-paithani-attire.jpg",
         alt: "Maharashtrian woman laughing outdoors in a crimson silk saree with gold zari borders, Paithani peacock pallu, pearl nath, gold thushi, and green glass bangles",
-        caption:
-          "When I describe festive dress from Maharashtra, this is what I picture: a crimson silk saree with woven gold zari borders and Paithani peacock motifs on the pallu, worn with a fitted choli, a pearl nath on the left nostril, a gold thushi choker, and green glass bangles.",
         aspectRatio: "4:3",
       },
       {
         url: "/images/almarise/indian-family-saree-handover-almarise.jpeg",
-        alt: "Alma inside a Maharashtra home beside a local woman holding a folded orange saree with a purple and gold zari border",
-        caption:
-          "Here in Maharashtra, Alma visits a family home beside a woman holding one of her kept sarees, woven with a purple and gold zari border, before we carry that cloth into AlmaRise D Reborn.",
+        alt: "Alma and Shirish inside a Maharashtra home beside a local woman holding a folded orange saree with a purple and gold zari border",
         aspectRatio: "4:5",
       },
     ],
     spanishPairAlts: [
       "Mujer de Maharashtra riendo al aire libre con un sari de seda carmesí con cenefas de zari dorado, pallu Paithani de pavos reales, nath de perlas, gargantilla thushi de oro y pulseras de cristal verde",
-      "Alma dentro de una casa en Maharashtra junto a una mujer de la zona que sostiene un sari naranja doblado con cenefa en púrpura y zari dorado",
-    ],
-    spanishPairCaptions: [
-      "Cuando describo la vestimenta festiva de Maharashtra, pienso en esta imagen: un sari de seda carmesí con cenefas tejidas en zari dorado y motivos de pavo real Paithani en el pallu, con blusa ajustada choli, nath de perlas en la aleta izquierda de la nariz, gargantilla thushi de oro y pulseras de cristal verde.",
-      "Aquí, en Maharashtra, Alma visita una casa familiar junto a una mujer que sostiene uno de sus saris guardados, tejido con cenefa en púrpura y zari dorado, antes de que llevemos esa tela a AlmaRise D Reborn.",
+      "Alma y Shirish dentro de una casa en Maharashtra junto a una mujer de la zona que sostiene un sari naranja doblado con cenefa en púrpura y zari dorado",
     ],
     pairSlots: [
       {
@@ -1250,15 +1126,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/shirish-at-maharashtra-fort.jpg",
             alt: "Shirish standing inside a dressed dark basalt archway at a historic fort in Maharashtra with a curved stone bastion behind him",
-            caption:
-              "I am standing inside a dressed dark basalt archway at a historic fort in Maharashtra, with a curved stone bastion rising behind me.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/culture/rajgad-sanjivani-machi-arch-torna-fort.jpg",
             alt: "View framed through a stone arch on Sanjivani Machi at Rajgad Fort looking toward Torna Fort across Sahyadri basalt ridges",
-            caption:
-              "Through this stone arch on Sanjivani Machi at Rajgad Fort, the view runs across the same Sahyadri basalt ridges toward Torna Fort that I grew up hearing about in Maharashtra.",
             aspectRatio: "4:5",
           },
         ],
@@ -1282,15 +1154,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/maharashtra-handloom-zari-border.jpg",
             alt: "Weaver's hands working wooden shuttles and metallic gold zari spools across silk warp threads on a wooden handloom",
-            caption:
-              "When I watch silk warp threads, wooden shuttles, and metallic zari spools move across a handloom like this, I see the structural patience behind a denser woven border along the edge of the cloth.",
             aspectRatio: "4:3",
           },
           {
             url: "/images/culture/alma-colleague-maroon-sawtooth-saree-maharashtra.jpeg",
             alt: "Alma and a young colleague in our studio in Maharashtra inspecting a maroon saree woven with mustard-gold sawtooth triangles and a fringed green pallu",
-            caption:
-              "In our Maharashtra studio, Alma and our young colleague examine a maroon saree woven with rows of mustard-gold sawtooth triangles and a fringed green pallu before we cut a single pattern.",
             aspectRatio: "4:5",
           },
         ],
@@ -1316,15 +1184,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/shirish-at-maharashtra-fort.jpg",
             alt: "Shirish bajo un arco de basalto oscuro labrado en un fuerte histórico de Maharashtra con un bastión curvo de piedra al fondo",
-            caption:
-              "Estoy de pie bajo un arco de basalto oscuro labrado en un fuerte histórico de Maharashtra, con un bastión curvo de piedra alzándose detrás de mí.",
             aspectRatio: "4:5",
           },
           {
             url: "/images/culture/rajgad-sanjivani-machi-arch-torna-fort.jpg",
             alt: "Vista enmarcada por un arco de piedra en Sanjivani Machi, en el fuerte de Rajgad, hacia el fuerte de Torna sobre crestas de basalto del Sahyadri",
-            caption:
-              "A través de este arco de piedra en Sanjivani Machi, en el fuerte de Rajgad, la vista cruza hacia el fuerte de Torna por las mismas crestas de basalto del Sahyadri de las que oí hablar toda mi infancia en Maharashtra.",
             aspectRatio: "4:5",
           },
         ],
@@ -1349,15 +1213,11 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/culture/maharashtra-handloom-zari-border.jpg",
             alt: "Manos de un tejedor pasando lanzaderas de madera y bobinas de hilo metálico de zari dorado por urdimbres de seda en un telar manual",
-            caption:
-              "Cuando miro cómo corren las urdimbres de seda, las lanzaderas de madera y las bobinas de zari metálico en un telar manual como este, veo la paciencia estructural detrás de una cenefa más densa junto al orillo.",
             aspectRatio: "4:3",
           },
           {
             url: "/images/culture/alma-colleague-maroon-sawtooth-saree-maharashtra.jpeg",
             alt: "Alma y una joven compañera en nuestro estudio de Maharashtra examinando un sari granate tejido con triángulos de color mostaza dorado en diente de sierra y pallu verde con flecos",
-            caption:
-              "En nuestro estudio de Maharashtra, Alma y nuestra joven compañera revisan un sari granate tejido con hileras de triángulos de color mostaza dorado en diente de sierra y un pallu verde con flecos antes de cortar ningún patrón.",
             aspectRatio: "4:5",
           },
         ],
@@ -1366,7 +1226,7 @@ export const stories: StoryEntry[] = [
         heading: "Los saris guardados en el armario y lo que viaja con ellos",
         paragraphs: [
           "En Maharashtra, un sari no termina su vida en el telar ni en la boda donde se estrenó. Con el tiempo, casi todos acaban doblados dentro del armario familiar. En maratí los llamamos thevnitlya sadya, saris muy queridos que las mujeres conservan durante décadas aunque hayan dejado de ponérselos. Un padre, un hermano o un marido regaló ese sari con cariño. Con él puesto, una madre abrazó a sus hijos, bailó en las fiestas o posó para la foto familiar que aún preside el salón. No puedes tirar una tela así. Guarda demasiada vida entre sus pliegues.",
-          "Así nació [AlmaRise D Brand](/es/almarise) cuando Alma y yo hablábamos de qué clase de empresa queríamos levantar. No se puede decir que lo planeáramos todo sobre el papel. Arrancamos pensando en ropa orgánica, una línea que sigue viva en AlmaRise D Organic con tintes orgánicos y tejidos transpirables de residuos vegetales y de frutas como caña de azúcar, naranja, plátano y piña, entre otros, junto a la línea de decoración del hogar que crece hoy en nuestro estudio. Pronto nos dimos cuenta de que no queríamos vender tela sin historia; queríamos que nuestras prendas guardaran memoria humana. Swami Vivekananda hablaba de unir Oriente y Occidente, juntando la hondura espiritual de uno con el carácter práctico y científico del otro. En AlmaRise D Reborn eso pasa cada vez que recogemos un sari muy querido del armario de una casa de Maharashtra, con el consentimiento de su dueña y mediante un pago justo o una donación voluntaria, y lo cortamos de nuevo en un shrug o una túnica fáciles de llevar para una mujer trabajadora en España o el resto de Europa. Ninguna mujer con prisas en España o en algún lugar de Europa va a envolverse en cinco metros y medio u ocho metros de tela cada mañana. Te pones esa pieza, lees [la historia que hay detrás de cada sari guardado](/es/stories/giving-maharashtrian-sarees-a-second-life) y la tela sigue viviendo en lugar de quedarse doblada a oscuras.",
+          "Así nació [AlmaRise D Brand](/es/almarise) cuando Alma y yo hablábamos de qué clase de empresa queríamos levantar. No se puede decir que lo planeáramos todo sobre el papel. Arrancamos pensando en ropa orgánica, una línea que sigue viva en AlmaRise D Organic con tintes orgánicos y tejidos transpirables de residuos vegetales y de frutas como caña de azúcar, naranja, plátano y piña, entre otros, junto a la línea AlmaRise D Home Decor de decoración del hogar que crece hoy en nuestro estudio. Pronto nos dimos cuenta de que no queríamos vender tela sin historia; queríamos que nuestras prendas guardaran memoria humana. Swami Vivekananda hablaba de unir Oriente y Occidente, juntando la hondura espiritual de uno con el carácter práctico y científico del otro. En AlmaRise D Reborn eso pasa cada vez que recogemos un sari muy querido del armario de una casa de Maharashtra, con el consentimiento de su dueña y mediante un pago justo o una donación voluntaria, y lo cortamos de nuevo en un shrug o una túnica fáciles de llevar para una mujer trabajadora en España o el resto de Europa. Ninguna mujer con prisas en España o en algún lugar de Europa va a envolverse en cinco metros y medio u ocho metros de tela cada mañana. Te pones esa pieza, lees [la historia que hay detrás de cada sari guardado](/es/stories/giving-maharashtrian-sarees-a-second-life) y la tela sigue viviendo en lugar de quedarse doblada a oscuras.",
           "Para mí, el círculo entero se resume en una línea: el sari perteneció a una mujer, una mujer lo corta y lo cose en nuestro estudio y otra mujer lo viste al otro lado del mundo. Por eso preparamos nuestra [Iniciativa de formación para mujeres](/es/womens-training-initiative) junto a AlmaRise D Brand y a nuestros [Programas de producción](/es/manufacturing) comerciales. En Maharashtra crecemos convencidos de que tenemos una deuda con la sociedad que nos crio. Ya sea fabricando bolsos de piel para un cliente en España o dando una segunda vida a un sari familiar, volcamos nuestra historia, nuestro trato franco y nuestra gente en todo lo que sale de nuestras manos.",
         ],
       },
@@ -1374,7 +1234,7 @@ export const stories: StoryEntry[] = [
     takeaway: "",
     spanishTakeaway: "",
     seo: {
-      title: "Maharashtra Forts, Modi Script & Woven Borders",
+      title: "Maharashtra forts, Modi script and woven borders",
       description:
         "Shirish shares how Maharashtra basalt forts, Modi script, social reformers, Paithani looms, and kept family sarees shape KarmaRise and AlmaRise D Brand.",
       spanishTitle: "Maharashtra: fuertes, escritura Modi y Paithani",
@@ -1390,7 +1250,7 @@ export const stories: StoryEntry[] = [
     issueNumber: "01",
     publishedAt: "2026-10-22",
     updatedAt: "2026-11-24",
-    readingTimeMinutes: 7,
+    readingTimeMinutes: 8,
     category: "Inside KarmaRise",
     location: "India & Spain",
     spanishLocation: "India y España",
@@ -1425,13 +1285,9 @@ export const stories: StoryEntry[] = [
     leadImage: {
       url: "/images/almarise/karmarise-studio-sewing-tables-preparation-india.jpeg",
       alt: "Sunlit studio room in Maharashtra, India, with two industrial sewing tables and a dressmaker form under protective plastic covers and an open travel suitcase on the floor",
-      caption:
-        "This is how our studio in India looks right now while everything is still in preparation: two sewing tables and a dressmaker form under protective plastic covers, fabric bundles waiting on the benches, and my suitcase still open on the floor.",
     },
     spanishLeadAlt:
       "Sala soleada de nuestro estudio en Maharashtra, en la India, con dos mesas de costura industrial y un maniquí bajo plásticos protectores, y una maleta abierta en el suelo",
-    spanishLeadCaption:
-      "Así está hoy nuestro estudio en la India mientras todo sigue en preparación: las dos mesas de costura y el maniquí bajo plásticos protectores, los fardos de tela esperando en los bancos y mi maleta todavía abierta en el suelo.",
     leadSlot: {
       kind: "Photo",
       ratio: "4:3 horizontal",
@@ -1451,23 +1307,15 @@ export const stories: StoryEntry[] = [
       {
         url: "/images/almarise/alma-indian-woman-folded-silk-sarees-home.jpeg",
         alt: "Alma smiling face to face with an Indian woman holding a folded stack of green, orange, and magenta silk sarees inside a home near Mumbai",
-        caption:
-          "Here I am standing face to face with a woman in her home near Mumbai, with a stack of her kept silk sarees between us. For me, working with women starts as equals, never from pity.",
       },
       {
         url: "/images/workshops/shirish-woman-artisan-striped-cotton-linings.jpeg",
         alt: "Shirish standing beside a woman artisan preparing stacks of yellow-and-white striped cotton bag linings and cut black panels on an assembly table in India",
-        caption:
-          "In this photo, Shirish is standing beside a woman artisan preparing yellow-and-white striped cotton linings during a commercial run. Steady, paid work like this is where I want our future training to lead.",
       },
     ],
     spanishPairAlts: [
       "Alma, frente a frente y sonriendo con una mujer india que sostiene una pila de saris de seda doblados en verde, naranja y magenta dentro de una casa cerca de Bombay",
       "Shirish de pie junto a una artesana que prepara pilas de forros de algodón para bolsos, de rayas amarillas y blancas, y paneles negros cortados sobre una mesa de montaje en la India",
-    ],
-    spanishPairCaptions: [
-      "Aquí estoy cara a cara con una mujer en su casa cerca de Bombay, con una pila de sus saris de seda guardados entre las dos. Para mí, trabajar con mujeres empieza de igual a igual, nunca desde la lástima.",
-      "En esta foto Shirish está junto a una artesana que prepara forros de algodón a rayas amarillas y blancas durante un pedido comercial. A ese trabajo estable y pagado quiero que lleve nuestra futura formación.",
     ],
     pairSlots: [
       {
@@ -1522,8 +1370,6 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/founders/alma-shirish-planning-table-window-india.jpeg",
             alt: "Shirish and Alma sitting face to face across a small table with a tablet in front of a bright window in India discussing company plans",
-            caption:
-              "Here I am going over our next steps with Shirish by the window in our studio in India. Commercial orders and legal groundwork come first, before we open a single training seat.",
             aspectRatio: "4:3",
           },
         ],
@@ -1564,7 +1410,7 @@ export const stories: StoryEntry[] = [
         paragraphs: [
           "Cuando empecé a conocer de verdad a Shirish, después de coincidir tras el confinamiento en un congreso internacional de idiomas ligado al Birla College, hubo un día en que pensé: «No puede ser verdad, ¿todas estas piezas juntas?». Él empezó pidiéndome ayuda con su inglés y acabamos pasando horas hablando de historia de la India, costumbres y geopolítica. Siempre le tomo el pelo diciendo que es 150 % indio y 190 % maratí, cabezota para hacer las cosas a conciencia y enemigo de los atajos. Pero lo que me convenció de que podíamos levantar algo serio juntos fue comprobar cuánto le importa que las mujeres puedan valerse por sí mismas.",
           "Cuando habla de [AlmaRise D Brand](/es/almarise), Shirish resume el sentido entero del proyecto en una frase: el sari perteneció a una mujer en la India, una mujer lo corta y lo cose en nuestro estudio y otra mujer lo lleva al otro lado del mundo. Ese espíritu coincide con lo que vemos cada semana al recorrer el país. KarmaRise tiene una pata comercial y una pata social muy importante. Cuando auditamos en persona fábricas de corte familiar y colectivos de artesanas por toda la India, mantenemos una línea que no se negocia: tolerancia cero ante la explotación de menores, de personas adultas y, sobre todo, de mujeres. Siempre hablamos de dar una segunda oportunidad a los tejidos, a las frutas y a las plantas, pero en el fondo se trata de dar una segunda oportunidad a mujeres en situación de exclusión que tienen muy pocas salidas.",
-          "Esa misma idea guía los dos pilares que tienen que estar firmes antes de invitar a una sola mujer a sentarse en nuestras mesas de costura. El primero es una demanda comercial constante. Necesitamos hacer crecer nuestros [Programas de producción](/es/manufacturing) para clientes en España y el resto de Europa, donde ya trabajamos con unidades de producción y artesanas que cosen desde forros de algodón a rayas para bolsos hasta prendas terminadas. En paralelo, seguimos construyendo AlmaRise D Brand en todas sus líneas: AlmaRise D Reborn con saris de seda y tejidos naturales que mujeres indias han guardado en casa, AlmaRise D Organic con tintes orgánicos y telas de residuos de fruta y plantas como la caña de azúcar, la naranja, el plátano y la piña, entre otros, junto a nuestras piezas de decoración del hogar. Sin pedidos de verdad esperando al terminar, un curso solo reparte papeles vacíos.",
+          "Esa misma idea guía los dos pilares que tienen que estar firmes antes de invitar a una sola mujer a sentarse en nuestras mesas de costura. El primero es una demanda comercial constante. Necesitamos hacer crecer nuestros [Programas de producción](/es/manufacturing) para clientes en España y el resto de Europa, donde ya trabajamos con unidades de producción y artesanas que cosen desde forros de algodón a rayas para bolsos hasta prendas terminadas. En paralelo, seguimos construyendo AlmaRise D Brand en todas sus líneas: AlmaRise D Reborn con saris de seda y tejidos naturales que mujeres indias han guardado en casa, AlmaRise D Organic con tintes orgánicos y telas de residuos de fruta y plantas como la caña de azúcar, la naranja, el plátano y la piña, entre otros, junto a nuestras piezas de AlmaRise D Home Decor para el hogar. Sin pedidos de verdad esperando al terminar, un curso solo reparte papeles vacíos.",
           "El segundo pilar es la estructura legal. Shirish, que es abogado en la India, está tramitando el registro de una fundación Section 8 sin ánimo de lucro pensada específicamente para esta labor formativa. Como soy española y entro con él como cofundadora extranjera, el expediente exige pasos adicionales y bastante paciencia. Él repite que tenemos una deuda con la sociedad, y precisamente por respeto a las mujeres que llegarán después no pensamos saltarnos ni un solo requisito legal.",
           "De momento, las dos máquinas de coser de aquella sala soleada de Maharashtra siguen formando parte de nuestro estudio entre muestras de AlmaRise D Brand, mientras crecen los pedidos comerciales y los papeles de la fundación avanzan paso a paso. El día que quitemos los plásticos protectores para recibir al primer grupo de mujeres, te lo contaré aquí mismo. Hasta entonces, prefiero enseñarte la habitación tal como está hoy antes que venderte una formación que todavía no ha empezado.",
         ],
@@ -1572,8 +1418,6 @@ export const stories: StoryEntry[] = [
           {
             url: "/images/founders/alma-shirish-planning-table-window-india.jpeg",
             alt: "Shirish y Alma sentados frente a frente a ambos lados de una mesita con una tableta, delante de una ventana luminosa en la India, repasando los planes de la empresa",
-            caption:
-              "Aquí repaso los próximos pasos con Shirish junto a la ventana en nuestro estudio en la India. Primero cerramos pedidos comerciales y la base legal, antes de abrir una sola plaza.",
             aspectRatio: "4:3",
           },
         ],

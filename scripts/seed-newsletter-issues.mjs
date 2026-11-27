@@ -3,8 +3,6 @@ import { registerHooks } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { buildWelcomeHtml } from "./setup-brevo.mjs";
-
 const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -88,10 +86,17 @@ registerHooks({
   },
 });
 
+const { automatedEmailTemplates } = await import("@/data/email-sequences");
 const { newsletterIssueDrafts, toSanityNewsletterIssue } =
   await import("@/data/newsletter-issues");
 const { renderNewsletterHtml, syncNewsletterIssueToBrevo } =
   await import("@/lib/brevo-campaigns");
+const { renderAutomatedSequenceEmail } = await import("@/lib/brevo-sequences");
+const {
+  buildContactConfirmationEmail,
+  buildPreCallPrepEmail,
+  buildProductBriefConfirmationEmail,
+} = await import("@/lib/transactional-emails");
 
 const args = new Set(process.argv.slice(2));
 const previewOnly = args.has("--preview-only");
@@ -109,12 +114,11 @@ function inferContentType(filePath) {
   return "image/jpeg";
 }
 
-function escapeHtmlAttr(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function toLocalPreviewAssetPath(localPublicPath) {
+  return `../../public${localPublicPath
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/")}`;
 }
 
 async function uploadImageToSanity(localPublicPath) {
@@ -239,15 +243,15 @@ function buildPreviewGalleryHtml(entries) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KarmaRise Stories · Newsletter Preview Desk</title>
+  <title>KarmaRise D Global · Email &amp; Newsletter Preview Desk</title>
   <style>
     :root {
       --bg: #eef1ea;
       --panel: #faf6ee;
       --ink: #182d20;
       --muted: #584b44;
-      --accent: #bd7057;
-      --rule: #d9ceb8;
+      --accent: #833e28;
+      --rule: #d4c4aa;
     }
     * { box-sizing: border-box; }
     body {
@@ -256,7 +260,7 @@ function buildPreviewGalleryHtml(entries) {
       background: var(--bg);
       color: var(--ink);
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 360px 1fr;
       min-height: 100vh;
     }
     aside {
@@ -268,14 +272,11 @@ function buildPreviewGalleryHtml(entries) {
       position: sticky;
       top: 0;
     }
-    h1 {
-      font-size: 16px;
-      margin: 0 0 6px;
-    }
+    h1 { font-size: 16px; margin: 0 0 6px; }
     .sub {
       font-size: 12px;
       color: var(--muted);
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       line-height: 1.5;
     }
     .filters {
@@ -299,10 +300,7 @@ function buildPreviewGalleryHtml(entries) {
       color: #fff;
       border-color: var(--ink);
     }
-    .list {
-      display: grid;
-      gap: 8px;
-    }
+    .list { display: grid; gap: 8px; }
     .card {
       text-align: left;
       border: 1px solid var(--rule);
@@ -324,15 +322,8 @@ function buildPreviewGalleryHtml(entries) {
       text-transform: uppercase;
       color: var(--accent);
     }
-    .subject {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink);
-    }
-    .preview-txt {
-      font-size: 11.5px;
-      color: var(--muted);
-    }
+    .subject { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .preview-txt { font-size: 11.5px; color: var(--muted); }
     main {
       display: flex;
       flex-direction: column;
@@ -350,27 +341,11 @@ function buildPreviewGalleryHtml(entries) {
       border-radius: 12px;
       padding: 12px 16px;
     }
-    .inbox-bar {
-      display: grid;
-      gap: 2px;
-    }
-    .inbox-sender {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .inbox-subject {
-      font-size: 15px;
-      font-weight: 700;
-    }
-    .inbox-preview {
-      font-size: 12.5px;
-      color: var(--muted);
-    }
-    .viewport-btns {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
+    .inbox-bar { display: grid; gap: 2px; }
+    .inbox-sender { font-size: 12px; color: var(--muted); }
+    .inbox-subject { font-size: 15px; font-weight: 700; }
+    .inbox-preview { font-size: 12.5px; color: var(--muted); }
+    .viewport-btns { display: flex; gap: 6px; align-items: center; }
     .stage {
       flex: 1;
       display: flex;
@@ -386,9 +361,7 @@ function buildPreviewGalleryHtml(entries) {
       transition: width 180ms ease;
       width: 680px;
     }
-    iframe.mobile {
-      width: 390px;
-    }
+    iframe.mobile { width: 390px; }
     @media (max-width: 960px) {
       body { grid-template-columns: 1fr; }
       aside { position: static; max-height: none; }
@@ -398,11 +371,16 @@ function buildPreviewGalleryHtml(entries) {
 </head>
 <body>
   <aside>
-    <h1>KarmaRise Stories · Email Desk</h1>
-    <p class="sub">Unified bilingual campaign: welcome emails and all 8 issues (16 EN &amp; ES drafts) for KarmaRise Stories and Historias de KarmaRise.</p>
+    <h1>KarmaRise D Global · Email Desk</h1>
+    <p class="sub">Complete bilingual library (${entries.length} EN &amp; ES previews): Welcome sequence (W1 to W5), B2B follow-up &amp; transactional receipts, Re-engagement (R1 to R3), and 16 biweekly newsletters.</p>
     <div class="filters">
       <button class="filter-btn active" data-filter="all">All (${entries.length})</button>
       <button class="filter-btn" data-filter="welcome">Welcome</button>
+      <button class="filter-btn" data-filter="transactional">Transactional</button>
+      <button class="filter-btn" data-filter="lead-followup">Follow-up</button>
+      <button class="filter-btn" data-filter="reengagement">Re-engagement</button>
+      <button class="filter-btn" data-filter="season-1">Issues #01-#08</button>
+      <button class="filter-btn" data-filter="season-2">Issues #09-#16</button>
       <button class="filter-btn" data-filter="en">EN</button>
       <button class="filter-btn" data-filter="es">ES</button>
       <button class="filter-btn" data-filter="alma">Alma</button>
@@ -424,7 +402,7 @@ function buildPreviewGalleryHtml(entries) {
       </div>
     </div>
     <div class="stage">
-      <iframe id="preview-frame" title="Newsletter email preview"></iframe>
+      <iframe id="preview-frame" title="Email preview"></iframe>
     </div>
   </main>
   <script>
@@ -445,6 +423,7 @@ function buildPreviewGalleryHtml(entries) {
         const matches =
           activeFilter === "all" ||
           item.kind === activeFilter ||
+          item.season === activeFilter ||
           item.narrator === activeFilter ||
           item.lang === activeFilter;
         if (!matches) return;
@@ -465,9 +444,9 @@ function buildPreviewGalleryHtml(entries) {
       activeIndex = idx;
       const item = ITEMS[idx];
       if (!item) return;
-      senderEl.textContent = "From: " + item.sender + " <stories@karmarisedglobal.com>" + (item.brevoId ? " · Brevo Draft #" + item.brevoId : "");
+      senderEl.textContent = "From: " + item.sender + " · " + item.timing + (item.brevoId ? " · Brevo Draft #" + item.brevoId : "");
       subjectEl.textContent = item.subject + " (" + item.subject.length + " chars)";
-      previewEl.textContent = "Preview: " + item.preview;
+      previewEl.textContent = "Preview (" + item.preview.length + " chars): " + item.preview;
       frameEl.src = item.filename;
       rawLink.href = item.filename;
       renderList();
@@ -510,13 +489,11 @@ async function main() {
 
   console.log(
     previewOnly
-      ? "Generating local newsletter HTML previews..."
+      ? "Generating complete offline KarmaRise email preview desk..."
       : "Syncing KarmaRise Stories newsletter drafts to Sanity CDN, Sanity CMS, Brevo, and local previews...",
   );
 
-  // 1. Upload brand logo and founder welcome hero to Sanity CDN (when syncing live)
   let logoCdnUrl = null;
-  let welcomeHeroCdnUrl = null;
   const uploadedHeroMap = new Map();
 
   if (!previewOnly && sanityProjectId && sanityToken) {
@@ -528,14 +505,6 @@ async function main() {
       logoCdnUrl = `${logoAsset.url}?w=260&auto=format`;
       process.env.BREVO_LOGO_CDN_URL = logoCdnUrl;
       console.log(`   + Logo CDN: ${logoAsset.url}`);
-    }
-
-    const founderAsset = await uploadImageToSanity(
-      "/images/founders/alma-and-shirish-founders.jpg",
-    );
-    if (founderAsset) {
-      welcomeHeroCdnUrl = `${founderAsset.url}?w=1100&q=85&auto=format`;
-      console.log(`   + Welcome hero CDN: ${founderAsset.url}`);
     }
 
     for (const draft of newsletterIssueDrafts) {
@@ -550,7 +519,6 @@ async function main() {
     }
   }
 
-  // 2. Fetch existing Sanity newsletter issues & story IDs so updates are idempotent
   const existingIssues = previewOnly
     ? new Map()
     : await fetchExistingSanityIssues();
@@ -558,52 +526,151 @@ async function main() {
     ? new Set()
     : await fetchExistingSanityStoryIds();
 
-  // 3. Build local Welcome email previews
   const previewEntries = [];
-  const welcomePreviewAssets = {
-    logoUrl: logoCdnUrl || "../../public/brand/main-logo-transparent.png",
-    heroImageUrl:
-      welcomeHeroCdnUrl ||
-      "../../public/images/founders/alma-and-shirish-founders.jpg",
-  };
+  const localLogo =
+    logoCdnUrl || "../../public/brand/main-logo-transparent.png";
 
-  for (const lang of ["en", "es"]) {
-    const html = buildWelcomeHtml({
-      lang,
-      assets: welcomePreviewAssets,
-      previewTrackNote:
-        lang === "es"
-          ? "Cada dos semanas te escribimos una carta breve firmada por Alma o por Shirish: alternamos historias reales desde talleres de fabricación en la India con relatos de AlmaRise D Brand, cultura cotidiana entre España e India y avances honestos de nuestra futura formación textil."
-          : "Every two weeks we send one short letter signed by Alma or Shirish, alternating between real fieldwork in Indian workshops and our Stories on AlmaRise D Brand, everyday life between Spain and India, and honest updates on our planned training work.",
-    });
-    const filename = `welcome-${lang}.html`;
-    fs.writeFileSync(path.join(PREVIEW_DIR, filename), html, "utf8");
-    previewEntries.push({
-      badge: `Welcome · ${lang.toUpperCase()}`,
-      kind: "welcome",
-      narrator: "both",
-      lang,
-      sender: "Alma & Shirish · KarmaRise D Global",
-      subject:
-        lang === "es"
-          ? "Qué alegría tenerte por aquí · Alma y Shirish"
-          : "Glad you are here · Alma & Shirish",
-      preview:
-        lang === "es"
-          ? "Gracias por pasarte por aquí. Cuéntanos desde dónde nos lees y qué te trajo hasta KarmaRise."
-          : "Glad you are here. Hit reply and tell us where you are reading from.",
-      filename,
-      brevoId: null,
-    });
+  // 1. Render all automated sequence previews (Welcome W1-W5, B2B Follow-Up, Re-Engagement R1-R3)
+  for (const tpl of automatedEmailTemplates) {
+    for (const lang of ["en", "es"]) {
+      const rendered = renderAutomatedSequenceEmail(tpl, lang, {
+        logoUrl: localLogo,
+        heroImageUrl: tpl.localHeroImage
+          ? toLocalPreviewAssetPath(tpl.localHeroImage)
+          : undefined,
+        previewMode: true,
+      });
+      const filename = `seq-${tpl.id}-${lang}.html`;
+      fs.writeFileSync(path.join(PREVIEW_DIR, filename), rendered.html, "utf8");
+      previewEntries.push({
+        badge: `${tpl.family.toUpperCase()} · ${tpl.id} · ${lang.toUpperCase()}`,
+        kind: tpl.family,
+        season: "",
+        narrator: tpl.narrator,
+        lang,
+        sender: rendered.senderName,
+        timing: tpl.sendTiming,
+        subject: rendered.subject,
+        preview: rendered.previewText,
+        filename,
+        brevoId: null,
+      });
+    }
   }
 
-  // 4. Process all 8 issues (EN + ES = 16 drafts)
+  // 2. Render transactional Resend confirmation previews (Product Brief, Contact, Pre-Call Prep)
+  const transactionalPreviews = [
+    {
+      id: "tx-product-brief",
+      label: "Product Brief receipt",
+      timing: "Immediate (Resend)",
+      narrator: "both",
+      build: (lang) =>
+        buildProductBriefConfirmationEmail({
+          confirmationLanguage: lang,
+          fields: {
+            name: lang === "es" ? "Lucía" : "Claire",
+            company: lang === "es" ? "Casa Sol" : "Atelier Nord",
+            profile: "Independent boutique",
+            email: "founder@example.com",
+            language: lang === "es" ? "Spanish" : "English",
+            siteLanguage: lang,
+            product: "Bags and accessories",
+            readiness: "Sketches or early tech pack",
+            quantity: "150–250 units",
+            referenceUrl: "https://karmarisedglobal.com/manufacturing",
+            brief:
+              lang === "es"
+                ? "Bolso bandolera blando en piel de curtido vegetal color coñac, forro claro de algodón y cremallera YKK de plástico."
+                : "Soft vegetable-tanned cognac crossbody bag with light cotton lining and smooth Japanese plastic YKK zipper.",
+          },
+          attachmentNames: ["bag-sketch.jpg", "tan-swatch.png"],
+          recipientEmail: "inquiry@karmarisedglobal.com",
+        }),
+    },
+    {
+      id: "tx-book-call-prep",
+      label: "Book a Call prep note",
+      timing: "Immediate (Resend)",
+      narrator: "alma",
+      build: (lang) =>
+        buildPreCallPrepEmail({
+          siteLanguage: lang,
+          name: lang === "es" ? "Lucía" : "Claire",
+          company: lang === "es" ? "Casa Sol" : "Atelier Nord",
+          duration: "15",
+          callLanguage: lang,
+          startTime: "2026-12-03T10:30:00.000Z",
+          timeZone: "Europe/Madrid",
+          meetingUrl: "https://meet.google.com/abc-defg-hij",
+          notes:
+            lang === "es"
+              ? "Categoría de interés: Bolsos y artículos de piel"
+              : "Product focus: Leather goods",
+        }),
+    },
+    {
+      id: "tx-contact-receipt",
+      label: "Contact form receipt",
+      timing: "Immediate (Resend)",
+      narrator: "both",
+      build: (lang) =>
+        buildContactConfirmationEmail({
+          language: lang,
+          name: lang === "es" ? "Marta" : "Hannah",
+          topicValue: "AlmaRise D Brand",
+          topicLabel: "AlmaRise D Brand",
+          note:
+            lang === "es"
+              ? "Me encantaría conocer las próximas piezas de AlmaRise D Organic y AlmaRise D Home Decor."
+              : "I would love to hear when the next AlmaRise D Organic and AlmaRise D Home Decor pieces are ready.",
+          routedDepartmentEmail: "stories@karmarisedglobal.com",
+        }),
+    },
+  ];
+
+  for (const tx of transactionalPreviews) {
+    for (const lang of ["en", "es"]) {
+      const built = tx.build(lang);
+      const htmlWithLocalLogo = built.html.replaceAll(
+        "https://karmarisedglobal.com/brand/main-logo-transparent.png",
+        localLogo,
+      );
+      const filename = `${tx.id}-${lang}.html`;
+      fs.writeFileSync(
+        path.join(PREVIEW_DIR, filename),
+        htmlWithLocalLogo,
+        "utf8",
+      );
+      previewEntries.push({
+        badge: `TRANSACTIONAL · ${tx.label} · ${lang.toUpperCase()}`,
+        kind: "transactional",
+        season: "",
+        narrator: tx.narrator,
+        lang,
+        sender:
+          tx.narrator === "alma"
+            ? "Alma · KarmaRise D Global"
+            : lang === "es"
+              ? "Alma y Shirish · KarmaRise D Global"
+              : "Alma & Shirish · KarmaRise D Global",
+        timing: tx.timing,
+        subject: built.subject,
+        preview: built.preheader,
+        filename,
+        brevoId: null,
+      });
+    }
+  }
+
+  // 3. Process all 16 biweekly newsletter issues (EN + ES = 32 drafts)
   const sanityMutations = [];
   const summaryRows = [];
 
-  for (const draft of newsletterIssueDrafts) {
+  for (const [index, draft] of newsletterIssueDrafts.entries()) {
     const uploadedAsset = uploadedHeroMap.get(draft.localHeroImage);
     const existing = existingIssues.get(draft.id);
+    const seasonTag = index < 8 ? "season-1" : "season-2";
 
     const issueForSync = toSanityNewsletterIssue(draft, {
       heroImageUrl: uploadedAsset?.url || draft.localHeroImage,
@@ -632,13 +699,9 @@ async function main() {
       }
     }
 
-    // Write local previews (using Sanity CDN URLs if uploaded, otherwise relative paths so local files render offline too!)
     const localPreviewImage = uploadedAsset?.url
       ? uploadedAsset.url
-      : `../../public${draft.localHeroImage
-          .split("/")
-          .map((seg) => encodeURIComponent(seg))
-          .join("/")}`;
+      : toLocalPreviewAssetPath(draft.localHeroImage);
     const previewIssue = toSanityNewsletterIssue(draft, {
       heroImageUrl: uploadedAsset?.url || draft.localHeroImage,
     });
@@ -650,7 +713,7 @@ async function main() {
         html = html
           .replaceAll(
             `${remoteBase}/brand/main-logo-transparent.png`,
-            "../../public/brand/main-logo-transparent.png",
+            localLogo,
           )
           .replaceAll(
             `${remoteBase}${draft.localHeroImage
@@ -673,14 +736,18 @@ async function main() {
           ? "Alma · KarmaRise D Global"
           : draft.narrator === "shirish"
             ? "Shirish · KarmaRise D Global"
-            : "Alma & Shirish · KarmaRise D Global";
+            : lang === "es"
+              ? "Alma y Shirish · KarmaRise D Global"
+              : "Alma & Shirish · KarmaRise D Global";
 
       previewEntries.push({
-        badge: `${draft.issueNumber} · ${draft.narrator === "alma" ? "Alma" : "Shirish"} · ${lang.toUpperCase()}`,
+        badge: `${draft.issueNumber} · ${draft.narrator === "alma" ? "Alma" : draft.narrator === "shirish" ? "Shirish" : "Alma & Shirish"} · ${lang.toUpperCase()}`,
         kind: "issue",
+        season: seasonTag,
         narrator: draft.narrator,
         lang,
         sender: senderLabel,
+        timing: "Biweekly newsletter",
         subject: lang === "es" ? draft.subjectEs : draft.subjectEn,
         preview: lang === "es" ? draft.previewTextEs : draft.previewTextEn,
         filename,
@@ -699,9 +766,8 @@ async function main() {
       brevoEs: brevoCampaignIdEs ?? null,
     });
 
-    // Prepare Sanity document mutation
     if (!previewOnly && sanityProjectId && sanityToken) {
-      const storyRefId = `story-${draft.storySlug}`;
+      const storyRefId = draft.storySlug ? `story-${draft.storySlug}` : null;
       const doc = {
         _id: draft.id,
         _type: "newsletterIssue",
@@ -731,10 +797,8 @@ async function main() {
         replyPromptEs: draft.replyPromptEs,
         psEs: draft.psEs,
         ctaTextEs: draft.ctaTextEs,
-        ctaUrl: `https://karmarisedglobal.com/stories/${draft.storySlug}`,
-        ctaUrlEs: `https://karmarisedglobal.com/es/stories/${draft.storySlug}`,
-        heroImageCaptionEn: draft.heroImageCaptionEn,
-        heroImageCaptionEs: draft.heroImageCaptionEs,
+        ctaUrl: issueForSync.ctaUrl,
+        ctaUrlEs: issueForSync.ctaUrlEs,
         ...(uploadedAsset
           ? {
               heroImage: {
@@ -745,7 +809,7 @@ async function main() {
               },
             }
           : {}),
-        ...(existingStoryIds.has(storyRefId)
+        ...(storyRefId && existingStoryIds.has(storyRefId)
           ? {
               selectedStories: [
                 {
@@ -767,7 +831,6 @@ async function main() {
     }
   }
 
-  // 5. Update Sanity newsletterSettings + commit all 8 newsletterIssue docs
   if (!previewOnly && sanityProjectId && sanityToken) {
     const parseIntOrUndef = (raw) => {
       const n = Number.parseInt(raw || "", 10);
@@ -826,31 +889,27 @@ async function main() {
     sanityMutations.push({ createOrReplace: settingsDoc });
 
     console.log(
-      `\n3. Saving ${sanityMutations.length} documents to Sanity (${sanityDataset})...`,
+      `\n3. Committing ${sanityMutations.length} documents to Sanity CMS...`,
     );
-    const saved = await commitSanityMutations(sanityMutations);
+    const committed = await commitSanityMutations(sanityMutations);
     console.log(
-      saved
-        ? "   + Sanity newsletter issues and settings saved."
-        : "   ! Failed to save Sanity documents.",
+      committed
+        ? "   + Sanity newsletterIssue documents and newsletterSettings synced."
+        : "   ! Sanity mutation did not complete.",
     );
   }
 
-  // 6. Write interactive preview gallery index.html
-  const indexHtml = buildPreviewGalleryHtml(previewEntries);
-  fs.writeFileSync(path.join(PREVIEW_DIR, "index.html"), indexHtml, "utf8");
+  const galleryHtml = buildPreviewGalleryHtml(previewEntries);
+  const indexPath = path.join(PREVIEW_DIR, "index.html");
+  fs.writeFileSync(indexPath, galleryHtml, "utf8");
 
-  console.log("\n--- Newsletter Sync Summary ---");
-  for (const row of summaryRows) {
-    console.log(
-      `${row.issue} (${row.track}, ${row.narrator}) -> Brevo EN #${row.brevoEn ?? "-"} | ES #${row.brevoEs ?? "-"}`,
-    );
-  }
+  console.log(`\nPreview Desk ready: ${indexPath}`);
   console.log(
-    `\nLocal HTML previews (${previewEntries.length} emails + gallery): ${path.join(PREVIEW_DIR, "index.html")}`,
+    `Generated ${previewEntries.length} total email previews (${automatedEmailTemplates.length * 2} automated sequence + ${transactionalPreviews.length * 2} transactional + ${summaryRows.length * 2} biweekly newsletter drafts).`,
   );
-  // Keep escapeHtmlAttr referenced cleanly if extended later
-  void escapeHtmlAttr;
 }
 
-await main();
+main().catch((error) => {
+  console.error("Newsletter seed/preview failed:", error);
+  process.exit(1);
+});

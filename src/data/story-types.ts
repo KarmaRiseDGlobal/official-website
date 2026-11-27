@@ -174,7 +174,7 @@ export const storyCategoryDetails: StoryCategoryDetail[] = [
     description:
       "How we build AlmaRise D Brand for Spain and the rest of Europe: AlmaRise D Reborn from kept Indian sarees, AlmaRise D Home Decor, and AlmaRise D Organic with organic dyes and plant or fruit-waste fabrics, among others.",
     spanishDescription:
-      "Cómo levantamos AlmaRise D Brand para España y el resto de Europa: AlmaRise D Reborn con saris que mujeres indias han guardado, decoración del hogar y AlmaRise D Organic con tintes orgánicos y tejidos de residuos de fruta y plantas, entre otros.",
+      "Cómo levantamos AlmaRise D Brand para España y el resto de Europa: AlmaRise D Reborn con saris que mujeres indias han guardado, AlmaRise D Home Decor (decoración del hogar) y AlmaRise D Organic con tintes orgánicos y tejidos de residuos de fruta y plantas, entre otros.",
     coverImage:
       "/images/almarise/almarise-reborn-olive-pallu-shrug-madrid-street.jpeg",
     coverAlt:
@@ -192,7 +192,8 @@ export const storyCategoryDetails: StoryCategoryDetail[] = [
       "Inside the tanneries, leather ateliers, family-run factories, production units, and women artisan collectives we audit in person across Kolkata, Kanpur, Agra, Chennai, and Maharashtra.",
     spanishDescription:
       "Por dentro de las curtidurías, marroquineros, fábricas de corte familiar, unidades de producción y colectivos de artesanas que auditamos en persona entre Calcuta, Kanpur, Agra, Chennai y Maharashtra.",
-    coverImage: "/images/workshops/shirish-leather-strap-workshop-india.jpg",
+    coverImage:
+      "/images/workshops/shirish-machinist-leather-strap-vertical.jpeg",
     coverAlt:
       "Shirish standing beside a master machinist stitching a leather strap inside an Indian leather atelier",
     spanishCoverAlt:
@@ -224,11 +225,11 @@ export const storyCategoryDetails: StoryCategoryDetail[] = [
       "How Alma and Shirish work with retail shops and brands in Spain and the rest of Europe, alongside meals, schedules, and hospitality across both countries.",
     spanishDescription:
       "Cómo coordinamos proyectos con comercios y marcas de España y el resto de Europa, junto a comidas, horarios y hospitalidad en ambos lados.",
-    coverImage: "/images/founders/alma-and-shirish-founders.jpg",
+    coverImage: "/images/founders/alma-shirish-team-dinner-india.jpg",
     coverAlt:
-      "Shirish and Alma reviewing written Product Brief notes alongside leather and fabric swatches in India",
+      "Alma and Shirish smiling across a dinner table with colleagues in India",
     spanishCoverAlt:
-      "Shirish y Alma revisando anotaciones de un briefing de producto junto a muestras de piel y telas en la India",
+      "Alma y Shirish sonriendo alrededor de una mesa compartida en la India",
   },
   {
     slug: "inside-karmarise",
@@ -240,7 +241,7 @@ export const storyCategoryDetails: StoryCategoryDetail[] = [
       "Honest notes from our studio in India, completed Bulk Order dispatches, and our groundwork for the planned Women's Training Initiative.",
     spanishDescription:
       "Avances reales desde nuestro estudio en la India, pedidos de producción entregados y los preparativos de nuestra futura Iniciativa de formación para mujeres.",
-    coverImage: "/images/founders/shirish-co-founder-office-india.jpeg",
+    coverImage: "/images/workshops/shirish-at-leather-warehouse-desk.jpeg",
     coverAlt:
       "Shirish at the review desk in an Indian leather production unit surrounded by samples",
     spanishCoverAlt:

@@ -14,11 +14,11 @@ web
 
 ## Product Purpose
 
-KarmaRise D Global develops and delivers own-brand leather bags and small leather goods, clothing in natural and varied fabrics, custom sewn accessories and brand presentation, and home decor for Clients in Spain and the rest of Europe through hands-on managed manufacturing across India, from initial Product Brief to doorstep delivery.
+KarmaRise D Global develops and delivers own-brand leather goods, clothing, textile accessories, and textile home decor for Clients in Spain and the rest of Europe through hands-on managed manufacturing across India, from initial Product Brief to doorstep delivery.
 
 Alongside its core B2B Manufacturing Programmes, KarmaRise D Global owns **AlmaRise D Brand** (spanning **AlmaRise D Reborn** one-of-a-kind everyday garments cut from kept Indian sarees, _thevnitlya sadya_, **AlmaRise D Organic** garments using organic dyes and plant/fruit-waste fabrics such as sugarcane, orange, banana, and pineapple, among others, and **AlmaRise D Home Decor**) and is preparing the **Women's Training Initiative** in India (not yet open for applications; Section 8 foundation in preparation).
 
-Success means winning qualified B2B enquiries across all four categories (through the 3-step, 1-minute **Product Brief** or a **15-minute / 30-minute Google Meet video call with Alma**), building an engaged bilingual audience for KarmaRise Stories and AlmaRise D Brand, and establishing commercial groundwork for the Women's Training Initiative.
+Success means winning qualified B2B enquiries across all four categories (through the 3-step **Product Brief** or a **15-minute / 30-minute Google Meet video call with Alma**), building an engaged bilingual audience for KarmaRise Stories and AlmaRise D Brand, and establishing commercial groundwork for the Women's Training Initiative.
 
 ## Positioning
 
@@ -28,7 +28,7 @@ Unlike single-factory agents or mass _prêt-à-porter_ channels, KarmaRise match
 
 ## Operating Context
 
-- **Client intake and alignment:** Clients can start without finished tech packs or technical drawings using a 1-minute Product Brief (`/product-brief`), a rough sketch, reference photos, an existing shop item, or a 15-minute or 30-minute Google Meet call (`/book-a-call`), followed by written meeting conclusions (`conclusiones de la reunión`) from Alma.
+- **Client intake and alignment:** Clients can start without finished tech packs or technical drawings using a 3-step Product Brief (`/product-brief`), a rough sketch, reference photos, an existing shop item, or a 15-minute or 30-minute Google Meet call (`/book-a-call`), followed by written meeting conclusions (`conclusiones de la reunión`) from Alma.
 - **Physical verification rituals:** Colour is approved via physical colour swatches rather than phone photos; Clients hold and approve a physical sample in hand before production cutting starts; live video updates connect Clients directly with makers on site; written sign-offs close each stage before the next begins.
 - **Retail ergonomics and compliance:** Proactive advice covers strap drop (`caída del asa`), light cotton linings, antique brass hardware, high-quality Japanese plastic YKK zippers, sizing and drape, unbleached care hangtags, dust bags, REACH and EU sewn-in labelling, and export carton packing.
 - **Active platform integrations:** Bilingual Next.js 16 web application deployed to Cloudflare Workers via OpenNext (`karmarisedglobal.com`), backed by Sanity CMS (Stories), Brevo (biweekly bilingual newsletter campaigns and track segmentation), Resend (transactional enquiry and booking confirmations), Cal booking slots, and Cloudflare Turnstile form protection.
@@ -36,10 +36,10 @@ Unlike single-factory agents or mass _prêt-à-porter_ channels, KarmaRise match
 ## Capabilities and Constraints
 
 - **Bilingual parity:** Full route, metadata, `hreflang`, sitemap, and content parity between English (`/` in `en-GB`) and Peninsular Spanish (`/es` in `es-ES`, using natural `tú`/`vosotros` in marketing and formal `usted` strictly on statutory legal pages).
-- **Four core manufacturing categories:** (1) leather bags and other/small leather goods, (2) clothing in natural and varied fabrics and capsule collections, (3) custom sewn accessories and brand presentation, and (4) home decor (`decoración del hogar`).
+- **Four core manufacturing categories:** (1) leather goods (`bolsos y artículos de piel`), (2) clothing (`ropa y prendas`), (3) textile accessories (`complementos textiles`), and (4) textile home decor (`decoración textil del hogar`). Do not list retired "custom sewn accessories and brand presentation" as a product category.
 - **No public pricing or fixed MOQs:** Never publish public pricing, commission structures, or fixed minimum order quantities; every Manufacturing Programme is scoped individually per Product Brief.
 - **Confidentiality and privacy boundaries:** Never name confidential Clients in public copy. Never disclose the registered office city outside statutory legal and postal `<address>` blocks of `Karmarise Global LLP`. State mutual NDA availability clearly, while keeping the interactive NDA upload/download workflow in `/product-brief` deferred for a later release.
-- **No social media links:** Never add social media links on the KarmaRise website.
+- **Approved official social channels:** Official social links are strictly limited to the five verified LinkedIn and Instagram URLs in `src/data/socials.ts` (`KarmaRise D Global` LinkedIn and Instagram, `AlmaRise D Brand` Instagram, `Alma` LinkedIn, and `Shirish` LinkedIn). Never add unowned or third-party social networks (such as X, Facebook, or TikTok).
 - **Controlled vocabulary:** Use `KarmaRise D Global` (brand), `Karmarise Global LLP` (legal entity strictly in statutory disclosures), `AlmaRise D Brand` (and `AlmaRise D Reborn`, `AlmaRise D Organic`, `AlmaRise D Home Decor` in visible copy; keep `/almarise` and `/es/almarise` URL slugs lowercase), `Manufacturing Programme` (`Programa de producción`), `Client` (`cliente`), `Product Brief` (`briefing de producto`, reserving `ficha técnica` for final tech packs), `Manufacturing Partner` (`unidad de producción`, `punto de producción`, `fábrica colaboradora`, `taller colaborador` alongside `production sites`, `family-run factories`, `leather ateliers`, `tanneries`, `garment makers`, `women artisan collectives`), `Bulk Order` (`pedido de producción`), and `Stories` (`Historias`). Avoid `workshop floor`, `sales floor`, `bulk cutting` (`cortar la producción`), `tejido plano` in general marketing copy, and literal EN-to-ES UI calques. Always write `Spain and the rest of Europe` (`España y el resto de Europa`).
 - **Spoken-language mentions:** Mention Alma's spoken languages (Spanish, English, Portuguese) only where relevant or helpful (FAQs/Q&A, `/book-a-call`, `/contact`), never as boilerplate across general heroes or positioning copy.
 - **Deferred roadmap items:** Additional European languages beyond English and Spanish, external localization tooling, interactive NDA upload/download in `/product-brief`, live chat beyond the existing guide assistant, and WhatsApp Business automation beyond the static link remain deferred.
@@ -54,10 +54,10 @@ Unlike single-factory agents or mass _prêt-à-porter_ channels, KarmaRise match
 
 ## Evidence on Hand
 
-- **Canonical docs and founder transcripts:** `CONTEXT.md`, `.agents/product-marketing.md` (v6), `LANGUAGE.md`, `ALMA.md`, `SHIRISH.md`, `.translation/`, and 21 founder interview transcripts under `transcripts/`.
+- **Canonical docs and founder transcripts:** `CONTEXT.md`, `.agents/product-marketing.md` (v8), `LANGUAGE.md`, `ALMA.md`, `SHIRISH.md`, `.translation/`, and 21 founder interview transcripts under `transcripts/`.
 - **Real production delivery record (anonymized):** Completed end-to-end leather handbag collection (4 bag styles in black and vegetable-tanned tan leather, custom cotton dust bags, unbleached Spanish care hangtags sourced over 10 to 15 days, 2 physical sample iterations, 3 Indian regions coordinated across Kolkata tanning, Uttar Pradesh bag construction, and Maharashtra supervision, and 11 numbered export cartons delivered door-to-door to an independent boutique Client in Donostia, Spain; Client name stays confidential).
 - **AlmaRise D Brand street test:** Early AlmaRise D Brand pieces photographed in central Madrid with real wearer and passer-by reactions documented in founder transcripts.
-- **Editorial library and photography:** Bilingual first-person Stories, 8 biweekly newsletter issues, original founder and craft photography under `public/images/`, and stage video assets under `public/media/` and `public/phases/`.
+- **Editorial library and photography:** Bilingual first-person Stories, 16 biweekly newsletter issues, original founder and craft photography under `public/images/`, and stage video assets under `public/media/` and `public/phases/`.
 - **Explicit absences (do not fabricate):** No public client logos, named B2B testimonials, published pricing tiers, fixed MOQ tables, conversion benchmarks, or traffic metrics exist; future work must never invent them.
 
 ## Product Principles

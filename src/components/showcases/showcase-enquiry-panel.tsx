@@ -12,7 +12,8 @@ import {
 
 import type { SiteLanguage } from "@/lib/urls";
 
-type EnquiryCategorySlug = "bags" | "garments" | "other" | "home-decor";
+type EnquiryCategorySlug =
+  "bags" | "garments" | "textile-accessories" | "home-decor";
 
 interface CategoryOption {
   readonly slug: EnquiryCategorySlug;
@@ -24,7 +25,7 @@ const ENQUIRY_CATEGORIES: readonly CategoryOption[] = [
   {
     slug: "bags",
     chipLabel: {
-      en: "Leather bags & goods",
+      en: "Leather goods",
       es: "Bolsos y artículos de piel",
     },
     ctaLabel: {
@@ -35,8 +36,8 @@ const ENQUIRY_CATEGORIES: readonly CategoryOption[] = [
   {
     slug: "garments",
     chipLabel: {
-      en: "Clothing & capsules",
-      es: "Ropa y colecciones cápsula",
+      en: "Clothing",
+      es: "Ropa y prendas",
     },
     ctaLabel: {
       en: "Start clothing brief",
@@ -44,25 +45,25 @@ const ENQUIRY_CATEGORIES: readonly CategoryOption[] = [
     },
   },
   {
-    slug: "other",
+    slug: "textile-accessories",
     chipLabel: {
-      en: "Custom sewn accessories",
-      es: "Complementos a medida",
+      en: "Textile accessories",
+      es: "Complementos textiles",
     },
     ctaLabel: {
-      en: "Start accessories brief",
-      es: "Empezar briefing de complementos",
+      en: "Start textile accessories brief",
+      es: "Briefing de complementos",
     },
   },
   {
     slug: "home-decor",
     chipLabel: {
-      en: "Home decor",
-      es: "Decoración del hogar",
+      en: "Textile home decor",
+      es: "Decoración textil del hogar",
     },
     ctaLabel: {
-      en: "Start home decor brief",
-      es: "Empezar briefing de decoración",
+      en: "Start textile decor brief",
+      es: "Briefing de decoración textil",
     },
   },
 ];
@@ -111,6 +112,9 @@ export function ShowcaseEnquiryPanel({
   const briefHref = activeCategory
     ? localizeHref(`/product-brief?product=${activeCategory.slug}`)
     : localizeHref("/product-brief");
+  const callHref = activeCategory
+    ? localizeHref(`/book-a-call?duration=15&product=${activeCategory.slug}`)
+    : localizeHref("/book-a-call?duration=15");
   const primaryLabel = activeCategory
     ? activeCategory.ctaLabel[language]
     : isEs
@@ -141,8 +145,8 @@ export function ShowcaseEnquiryPanel({
             </h2>
             <p className="lead max-w-[44ch]">
               {isEs
-                ? "Elige una categoría para empezar tu briefing en un minuto o reserva una llamada tranquila con Alma."
-                : "Pick a category to start your 1-minute Product Brief, or book a relaxed call with Alma."}
+                ? "Elige una categoría para contarnos tu idea o reserva una llamada tranquila con Alma."
+                : "Pick a category to share your idea, or book a relaxed call with Alma."}
             </p>
             <div
               className="mt-1 flex flex-wrap gap-2.5"
@@ -164,7 +168,7 @@ export function ShowcaseEnquiryPanel({
                     className={`enquiry-category-chip press-scale relative inline-flex min-h-[var(--tap-min)] cursor-pointer items-center justify-center rounded-[var(--radius-pill)] border px-4 py-2 text-center text-[length:var(--text-xs)] font-semibold ${
                       isSelected
                         ? "border-transparent bg-transparent text-[var(--color-night)]"
-                        : "border-[var(--color-paper)]/28 bg-[var(--color-paper)]/10 text-[var(--color-paper)] hover:border-[var(--color-gold)] hover:bg-[var(--color-paper)]/18"
+                        : "border-[var(--color-paper)]/52 bg-[var(--color-paper)]/10 text-[var(--color-paper)] hover:border-[var(--color-gold)] hover:bg-[var(--color-paper)]/18"
                     }`}
                   >
                     <span className={isSelected ? "opacity-0" : undefined}>
@@ -198,18 +202,13 @@ export function ShowcaseEnquiryPanel({
                 <span>{primaryLabel}</span>
               </Link>
             </ViewTransition>
-            <Link
-              className="enquiry-secondary-link"
-              href={localizeHref("/book-a-call?duration=15")}
-            >
-              {isEs
-                ? "Llamada gratis de 15 min con Alma"
-                : "Book a free 15-min call with Alma"}
+            <Link className="enquiry-secondary-link" href={callHref}>
+              {isEs ? "Reserva una llamada con Alma" : "Book a call with Alma"}
             </Link>
             <p className="m-0 max-w-[36ch] text-start text-[length:var(--text-xs)] leading-[1.55] tracking-[0.008em] text-[var(--color-paper-2)]/85 lg:text-end">
               {isEs
-                ? "Guardado automático y confidencialidad bajo NDA."
-                : "Saves as you go. Confidential under a mutual NDA."}
+                ? "Se guarda mientras escribes. Tus diseños son confidenciales (NDA)."
+                : "Saves as you go. Your designs stay confidential (NDA)."}
             </p>
           </div>
         </div>

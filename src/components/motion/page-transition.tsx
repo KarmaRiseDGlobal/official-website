@@ -28,6 +28,26 @@ function isSpanishPath(path: string): boolean {
   return normalized === "/es" || normalized.startsWith("/es/");
 }
 
+function focusMainLandmark() {
+  const main = document.getElementById("main");
+  if (!main) {
+    return;
+  }
+  const active = document.activeElement;
+  if (
+    active &&
+    active !== document.body &&
+    active !== document.documentElement &&
+    main.contains(active)
+  ) {
+    return;
+  }
+  if (!main.hasAttribute("tabindex")) {
+    main.setAttribute("tabindex", "-1");
+  }
+  main.focus({ preventScroll: true });
+}
+
 function getInternalRouteTarget(event: MouseEvent): {
   readonly href: string;
   readonly crossesLocale: boolean;
@@ -55,7 +75,6 @@ function getInternalRouteTarget(event: MouseEvent): {
     return null;
   }
 
-  // Explicit opt-out for component-level links
   if (anchor.closest("[data-no-page-transition]")) {
     return null;
   }
@@ -83,7 +102,6 @@ function getInternalRouteTarget(event: MouseEvent): {
       return null;
     }
 
-    // Same-pathname query/hash changes are component-level updates, not full-page transitions
     if (
       normalizePath(destination.pathname) ===
       normalizePath(window.location.pathname)
@@ -118,15 +136,21 @@ export function PageTransition() {
   const stageRef = useRef<TransitionStage>("idle");
   const reverseRef = useRef(false);
   const lastCommittedPathnameRef = useRef<string>(pathname);
+  const committedWhileCoveringRef = useRef<string | null>(null);
   const activeTlRef = useRef<gsap.core.Timeline | null>(null);
+  const pushTimerRef = useRef<number | null>(null);
   const safetyTimerRef = useRef<number | null>(null);
 
-  const clearTimers = () => {
+  const clearTimers = useCallback(() => {
+    if (pushTimerRef.current !== null) {
+      window.clearTimeout(pushTimerRef.current);
+      pushTimerRef.current = null;
+    }
     if (safetyTimerRef.current !== null) {
       window.clearTimeout(safetyTimerRef.current);
       safetyTimerRef.current = null;
     }
-  };
+  }, []);
 
   const setStage = useCallback((nextStage: TransitionStage) => {
     stageRef.current = nextStage;
@@ -150,6 +174,7 @@ export function PageTransition() {
     const main = document.getElementById("main");
 
     clearTimers();
+    committedWhileCoveringRef.current = null;
     activeTlRef.current?.kill();
     setStage("revealing");
 
@@ -210,8 +235,8 @@ export function PageTransition() {
         { autoAlpha: 1, y: 0, yPercent: 0 },
         {
           yPercent: -100,
-          duration: 0.42,
-          stagger: 0.045,
+          duration: 0.38,
+          stagger: 0.04,
           ease: "power4.inOut",
           force3D: true,
         },
@@ -222,16 +247,16 @@ export function PageTransition() {
     if (heroTargets.length > 0) {
       tl.fromTo(
         heroTargets,
-        { opacity: 0, y: 16 },
+        { opacity: 0, y: 14 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.36,
-          stagger: 0.055,
+          duration: 0.34,
+          stagger: 0.05,
           ease: "power3.out",
           force3D: true,
         },
-        0.12,
+        0.1,
       );
     }
   };
@@ -241,7 +266,7 @@ export function PageTransition() {
     revealRef.current = revealIncomingPage;
   });
 
-  // Intercept cross-page links and language switches to sweep the 3 tone-matched KarmaRise bands before routing.
+  // Intercept cross-page links and language switches to sweep the 3 tone-matched bands while initiating routing early.
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -274,19 +299,42 @@ export function PageTransition() {
       }
 
       clearTimers();
+      committedWhileCoveringRef.current = null;
       activeTlRef.current?.kill();
 
       reverseRef.current = reverse;
       root.dataset.tone = tone;
       setStage("covering");
 
+      let pushed = false;
+      const triggerPush = () => {
+        if (pushed) return;
+        pushed = true;
+        if (isLanguageSwitch) {
+          markLanguageSwitchSkip(tone);
+        }
+        router.push(href);
+      };
+
+      // Begin same-layout route push early (~100ms) so navigation feels brisk while bands glide into place.
+      if (!isLanguageSwitch) {
+        pushTimerRef.current = window.setTimeout(() => {
+          pushTimerRef.current = null;
+          triggerPush();
+        }, 100);
+      }
+
       const coverTl = gsap.timeline({
         onComplete: () => {
           setStage("covered");
-          if (isLanguageSwitch) {
-            markLanguageSwitchSkip(tone);
+          triggerPush();
+
+          if (committedWhileCoveringRef.current !== null) {
+            const committedPath = committedWhileCoveringRef.current;
+            committedWhileCoveringRef.current = null;
+            revealRef.current(resolveRouteTone(committedPath));
+            return;
           }
-          router.push(href);
 
           safetyTimerRef.current = window.setTimeout(() => {
             if (
@@ -306,8 +354,8 @@ export function PageTransition() {
         { autoAlpha: 1, y: 0, yPercent: 100 },
         {
           yPercent: 0,
-          duration: 0.3,
-          stagger: 0.045,
+          duration: 0.26,
+          stagger: 0.035,
           ease: "power3.inOut",
           force3D: true,
         },
@@ -357,10 +405,11 @@ export function PageTransition() {
     window.addEventListener(PAGE_TRANSITION_EVENT, onCustomNavigate);
 
     return () => {
+      clearTimers();
       document.removeEventListener("click", onCaptureClick, true);
       window.removeEventListener(PAGE_TRANSITION_EVENT, onCustomNavigate);
     };
-  }, [router, setStage]);
+  }, [router, setStage, clearTimers]);
 
   // Trigger incoming reveal when cross-layout EN/ES switch mounts (bands pre-painted via data-transition-cover).
   useEffect(() => {
@@ -371,12 +420,13 @@ export function PageTransition() {
 
     const frame = requestAnimationFrame(() => {
       revealRef.current(crossLayout.tone);
+      focusMainLandmark();
     });
 
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Trigger incoming reveal whenever pathname changes after navigation (StrictMode-safe).
+  // Trigger incoming reveal and restore focus to #main whenever pathname changes after SPA navigation.
   useEffect(() => {
     if (pathname === lastCommittedPathnameRef.current) {
       return;
@@ -384,7 +434,16 @@ export function PageTransition() {
 
     const frame = requestAnimationFrame(() => {
       lastCommittedPathnameRef.current = pathname;
-      revealRef.current(resolveRouteTone(pathname));
+      focusMainLandmark();
+
+      if (stageRef.current === "covering") {
+        committedWhileCoveringRef.current = pathname;
+        return;
+      }
+
+      if (stageRef.current === "covered") {
+        revealRef.current(resolveRouteTone(pathname));
+      }
     });
 
     return () => cancelAnimationFrame(frame);

@@ -94,23 +94,34 @@ export function getTrackForStory(story: {
 }
 
 export function getWelcomeTrackCopy(
-  _tracks: readonly NewsletterTrack[],
+  tracks: readonly NewsletterTrack[],
   language: "EN" | "ES",
 ): {
   trackLabel: string;
   trackNote: string;
+  primaryTrack: "manufacturing" | "almarise" | "both";
 } {
   const isEs = language === "ES";
+  const hasManufacturing = tracks.includes("manufacturing");
+  const hasAlmarise = tracks.includes("almarise");
+  const primaryTrack: "manufacturing" | "almarise" | "both" =
+    hasManufacturing && !hasAlmarise
+      ? "manufacturing"
+      : hasAlmarise && !hasManufacturing
+        ? "almarise"
+        : "both";
 
   return isEs
     ? {
         trackLabel: "Historias de KarmaRise",
         trackNote:
-          "Cada dos semanas te escribimos una carta breve firmada por Alma o por Shirish: alternamos historias reales desde talleres de fabricación en la India con relatos de AlmaRise D Brand, cultura cotidiana entre España e India y avances honestos de nuestra futura formación textil.",
+          "Cada dos semanas recibirás una carta breve firmada por Alma o por Shirish. Alternamos escenas reales sobre el terreno en fábricas de corte familiar y unidades de producción por toda la India (marroquinería, ropa de tejidos naturales, complementos y decoración textil del hogar) con historias de AlmaRise D Brand, vida cotidiana entre España y la India y avances honestos de nuestra futura formación textil.",
+        primaryTrack,
       }
     : {
         trackLabel: "KarmaRise Stories",
         trackNote:
-          "Every two weeks we send one short letter signed by Alma or Shirish, alternating between real fieldwork with Indian artisans and our Stories on AlmaRise D Brand, everyday life between Spain and India, and honest updates on our planned training work.",
+          "Every two weeks you will receive one short letter signed by Alma or Shirish. We alternate real scenes from family-run factories and production units across India (leather goods, natural-fabric clothing, textile accessories, and textile home decor) with Stories from AlmaRise D Brand, everyday life between Spain and India, and honest updates on our planned training work.",
+        primaryTrack,
       };
 }

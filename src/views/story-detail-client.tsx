@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { StoriesScrollChoreography } from "@/components/stories/stories-scroll-choreography";
 import {
   getAspectConfig,
   getImageDimensionsFromUrl,
@@ -14,10 +15,12 @@ import {
   splitChapterIntoRows,
 } from "@/components/stories/story-detail-helpers";
 import {
+  EditorialArrowIcon,
   StoryAuthorSection,
   StoryGlossarySection,
   StoryRelatedSection,
   StoryShareUtilityStrip,
+  type ContextualGuideLink,
 } from "@/components/stories/story-detail-sections";
 import { StoryMedia } from "@/components/stories/story-media";
 import { useLanguage } from "@/context/language-context";
@@ -62,12 +65,23 @@ export function StoryDetailClient({
   const { language: contextLanguage, localizeHref } = useLanguage();
   const language = lang ?? contextLanguage;
   const isEs = language === "es";
-  const [copiedLink, setCopiedLink] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
+  const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canNativeShare = useSyncExternalStore(
     subscribeNoop,
     getCanNativeShareSnapshot,
     getCanNativeShareServerSnapshot,
   );
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimerRef.current !== null) {
+        clearTimeout(copyResetTimerRef.current);
+      }
+    };
+  }, []);
 
   const localized = getLocalizedStory(story, language);
   const categorySlug = getCategoryDetail(story.category).slug;
@@ -141,17 +155,28 @@ export function StoryDetailClient({
 
   const shareUrl = `${siteUrl}${localizeHref(`/stories/${story.slug}`)}`;
   const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(`${localized.title} ${shareUrl}`)}`;
-  const xShareHref = `https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(localized.title)}`;
   const emailShareHref = `mailto:?subject=${encodeURIComponent(localized.title)}&body=${encodeURIComponent(`${localized.summary}\n\n${shareUrl}`)}`;
 
   const handleCopyLink = async () => {
     if (typeof window === "undefined") return;
+    if (copyResetTimerRef.current !== null) {
+      clearTimeout(copyResetTimerRef.current);
+      copyResetTimerRef.current = null;
+    }
     try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard unavailable");
+      }
       await navigator.clipboard.writeText(window.location.href);
-      setCopiedLink(true);
-      window.setTimeout(() => setCopiedLink(false), 2400);
+      setCopyStatus("copied");
+      copyResetTimerRef.current = setTimeout(() => {
+        setCopyStatus("idle");
+      }, 2600);
     } catch {
-      setCopiedLink(false);
+      setCopyStatus("failed");
+      copyResetTimerRef.current = setTimeout(() => {
+        setCopyStatus("idle");
+      }, 6000);
     }
   };
 
@@ -196,29 +221,29 @@ export function StoryDetailClient({
       : "Alma is co-founder of KarmaRise D Global. Working between Spain and India, she guides retail shops and brands in Spain and the rest of Europe from early ideas to approved physical samples and directs AlmaRise D Brand.";
   })();
 
-  const contextualGuideLinks: ReadonlyArray<{
-    href: string;
-    label: string;
-  }> = (() => {
+  const contextualGuideLinks: readonly ContextualGuideLink[] = (() => {
     if (story.category === "Sustainable Fashion") {
       return [
         {
           href: "/almarise",
           label: isEs
             ? "Conocer AlmaRise D Reborn y AlmaRise D Organic"
-            : "Explore AlmaRise D Reborn & AlmaRise D Organic",
+            : "Explore AlmaRise D Reborn and AlmaRise D Organic",
+          tier: "primary",
         },
         {
           href: "/manufacturing",
           label: isEs
             ? "Programa de producción en la India"
             : "Manufacturing Programme in India",
+          tier: "secondary",
         },
         {
           href: "/contact",
           label: isEs
             ? "Preguntarnos por AlmaRise D Brand"
             : "Ask us about AlmaRise D Brand",
+          tier: "secondary",
         },
       ];
     }
@@ -229,45 +254,41 @@ export function StoryDetailClient({
           label: isEs
             ? "Leer sobre la Iniciativa de formación para mujeres"
             : "Read about the Women's Training Initiative",
+          tier: "primary",
         },
         {
           href: "/almarise",
           label: isEs ? "Conocer AlmaRise D Brand" : "Explore AlmaRise D Brand",
+          tier: "secondary",
         },
         {
           href: "/contact",
           label: isEs
             ? "Escribirnos sobre la iniciativa"
             : "Contact us about the initiative",
+          tier: "secondary",
         },
       ];
     }
     return [
       {
+        href: "/product-brief",
+        label: isEs
+          ? "Empieza tu briefing de producto"
+          : "Start a Product Brief",
+        tier: "primary",
+      },
+      {
         href: "/manufacturing",
         label: isEs
           ? "Explorar el Programa de producción"
           : "Explore the Manufacturing Programme",
-      },
-      {
-        href: "/how-we-work",
-        label: isEs
-          ? "Cómo trabajamos España-India"
-          : "How we work Spain-India",
-      },
-      {
-        href: "/product-brief",
-        label: isEs ? "Empieza tu briefing" : "Start a Product Brief",
-      },
-      {
-        href: "/book-a-call?duration=15",
-        label: isEs
-          ? "Llamada gratis de 15 min con Alma"
-          : "Book a free 15-min call with Alma",
+        tier: "secondary",
       },
       {
         href: "/contact",
         label: isEs ? "Escribir a Alma y Shirish" : "Write to Alma and Shirish",
+        tier: "secondary",
       },
     ];
   })();
@@ -282,10 +303,7 @@ export function StoryDetailClient({
     if (!rawUrl) return undefined;
     if (/alma.*shirish/i.test(story.author.name)) {
       const dims = getImageDimensionsFromUrl(rawUrl);
-      if (
-        rawUrl.includes("alma-and-shirish-founders") ||
-        (dims && dims.width / dims.height > 1.35)
-      ) {
+      if (dims && dims.width / dims.height > 1.35) {
         return "/images/founders/alma-and-shirish-avatar.jpg";
       }
     }
@@ -294,44 +312,44 @@ export function StoryDetailClient({
 
   return (
     <>
+      <StoriesScrollChoreography />
       <article className="bg-[var(--color-paper)] pt-[calc(var(--nav-height)+var(--space-2xl))] pb-[var(--section-gap)] text-[var(--color-forest-deep)] lg:pt-[calc(var(--nav-height)+var(--space-3xl))]">
         <div className="container grid gap-[var(--space-xl)] lg:gap-[var(--space-2xl)]">
-          {/* Top Hairline Semantic Breadcrumb & Reading Metadata */}
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-b border-[var(--color-rule)] py-2 text-[length:var(--text-xs)] font-semibold tracking-[0.06em] uppercase">
+          {/* Semantic Breadcrumb & Reading Metadata */}
+          <div className="flex flex-wrap items-center justify-between gap-4 text-[length:var(--text-xs)] font-semibold tracking-[var(--tracking-label)] uppercase">
             <nav
               aria-label={isEs ? "Ruta de navegación" : "Breadcrumb"}
-              className="flex items-center"
+              className="flex min-w-0 items-center"
             >
-              <ol className="m-0 flex list-none flex-wrap items-center gap-2.5 p-0">
+              <ol className="m-0 flex min-w-0 list-none flex-wrap items-center gap-2.5 p-0">
                 <li>
                   <Link
-                    className="inline-flex min-h-[44px] items-center text-[var(--color-muted)] no-underline transition-colors hover:text-[var(--color-forest-deep)]"
+                    className="inline-flex min-h-[var(--tap-min)] min-w-[var(--tap-min)] items-center text-[var(--color-muted)] no-underline transition-colors hover:text-[var(--color-forest-deep)]"
                     href={localizeHref("/")}
                   >
                     {isEs ? "Inicio" : "Home"}
                   </Link>
                 </li>
-                <li aria-hidden="true" className="text-[var(--color-rule-2)]">
+                <li aria-hidden="true" className="text-[var(--color-muted)]">
                   /
                 </li>
                 <li>
                   <Link
-                    className="inline-flex min-h-[44px] items-center text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                    className="inline-flex min-h-[var(--tap-min)] items-center text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                     href={localizeHref("/stories")}
                   >
                     {isEs ? "Historias" : "Stories"}
                   </Link>
                 </li>
-                <li aria-hidden="true" className="text-[var(--color-rule-2)]">
+                <li aria-hidden="true" className="text-[var(--color-muted)]">
                   /
                 </li>
-                <li>
-                  <Link
-                    className="inline-flex min-h-[44px] items-center text-[var(--color-clay-ink)] no-underline transition-colors hover:underline"
-                    href={localizeHref(`/stories?category=${categorySlug}`)}
-                  >
-                    {localized.categoryLabel}
-                  </Link>
+                <li
+                  aria-current="page"
+                  title={localized.title}
+                  className="inline-flex min-h-[var(--tap-min)] max-w-[32ch] items-center truncate text-[var(--color-clay-ink)]"
+                >
+                  <span className="truncate">{localized.title}</span>
                 </li>
               </ol>
             </nav>
@@ -360,19 +378,33 @@ export function StoryDetailClient({
             </div>
           </div>
 
-          {/* Studio DADO-inspired Asymmetric 5/7 Monograph Header */}
-          <header className="grid gap-8 pt-2 lg:grid-cols-12 lg:items-end lg:gap-[var(--gap-columns)]">
-            <div className="grid content-between gap-6 lg:col-span-5 lg:pr-10">
-              <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
-                {localized.location}
-              </p>
+          {/* Asymmetric 5/7 Monograph Header */}
+          <header
+            data-chat-avoid
+            className="grid gap-8 pt-2 lg:grid-cols-12 lg:items-end lg:gap-[var(--gap-columns)]"
+          >
+            <div className="grid content-between gap-6 lg:col-span-5 lg:pe-10">
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[length:var(--text-xs)] font-semibold tracking-[var(--tracking-label)] uppercase">
+                <Link
+                  href={localizeHref(`/stories?category=${categorySlug}`)}
+                  className="inline-flex min-h-[var(--tap-min)] items-center text-[var(--color-clay-ink)] no-underline transition-colors hover:underline"
+                >
+                  {localized.categoryLabel}
+                </Link>
+                <span aria-hidden="true" className="text-[var(--color-muted)]">
+                  ·
+                </span>
+                <span className="text-[var(--color-muted)]">
+                  {localized.location}
+                </span>
+              </div>
 
               <div className="flex items-center gap-3.5 pt-1">
                 {authorPortraitUrl ? (
-                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
+                  <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[var(--radius-pill)] border border-[var(--color-rule)] bg-[var(--color-paper-2)]">
                     <Image
                       src={authorPortraitUrl}
-                      alt={authorDisplayName}
+                      alt=""
                       fill
                       sizes="44px"
                       className="object-cover"
@@ -380,25 +412,17 @@ export function StoryDetailClient({
                   </div>
                 ) : null}
                 <div className="grid gap-0.5 text-[length:var(--text-xs)]">
-                  <p className="font-semibold text-[var(--color-forest-deep)]">
+                  <p className="m-0 font-semibold text-[var(--color-forest-deep)]">
                     <Link
-                      href={localizeHref(
-                        /alma.*shirish|shirish.*alma/i.test(story.author.name)
-                          ? "/about"
-                          : /shirish/i.test(story.author.name)
-                            ? "/about#shirish"
-                            : /alma/i.test(story.author.name)
-                              ? "/about#alma"
-                              : "/about",
-                      )}
-                      className="text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)]/60 underline-offset-4 transition-colors hover:text-[var(--color-clay-ink)]"
+                      href={localizeHref(authorHref)}
+                      className="inline-flex min-h-[var(--tap-min)] items-center py-1 text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)]/70 underline-offset-4 transition-colors hover:text-[var(--color-clay-ink)]"
                     >
                       {isEs
                         ? `Por ${authorDisplayName}`
                         : `By ${authorDisplayName}`}
                     </Link>
                   </p>
-                  <p className="text-[var(--color-muted)]">
+                  <p className="m-0 leading-[1.45] text-[var(--color-muted)]">
                     {localized.authorRole}
                   </p>
                 </div>
@@ -406,11 +430,11 @@ export function StoryDetailClient({
             </div>
 
             <div className="grid gap-6 lg:col-span-7">
-              <h1 className="max-w-[17ch] text-[clamp(1.85rem,3.8vw+0.75rem,4.65rem)] leading-[1.02] font-normal tracking-[-0.015em] text-balance text-[var(--color-forest-deep)]">
+              <h1 className="max-w-[18ch] text-[length:var(--text-display)] leading-[1.06] font-normal tracking-[var(--tracking-display)] text-balance text-[var(--color-forest-deep)]">
                 {localized.title}
               </h1>
 
-              <p className="max-w-[52ch] font-[family-name:var(--font-display)] text-[clamp(1.18rem,1.55vw,1.45rem)] leading-[1.44] text-[var(--color-ink-2)]">
+              <p className="max-w-[38rem] font-[family-name:var(--font-display)] text-[length:var(--text-title)] leading-[1.38] font-normal text-[var(--color-ink-2)]">
                 {localized.summary}
               </p>
             </div>
@@ -440,7 +464,6 @@ export function StoryDetailClient({
                         ratio="4:5 portrait"
                         aspectClass="aspect-[4/5]"
                         title={story.leadSlot.title}
-                        description={story.leadSlot.description}
                         sizes="(max-width: 64rem) 100vw, 560px"
                         variant="editorial"
                         priority
@@ -458,7 +481,6 @@ export function StoryDetailClient({
                 ratio="16:10 wide"
                 aspectClass="aspect-[16/10]"
                 title={story.leadSlot.title}
-                description={story.leadSlot.description}
                 sizes="(max-width: 80rem) 100vw, 1312px"
                 variant="editorial"
                 priority
@@ -473,9 +495,7 @@ export function StoryDetailClient({
                 key={chapter.id}
                 id={chapter.id}
                 className={`grid scroll-mt-32 gap-10 lg:gap-14 ${
-                  chapterIndex > 0 || chapter.heading
-                    ? "border-t border-[var(--color-rule)] pt-10 lg:pt-14"
-                    : ""
+                  chapterIndex > 0 || chapter.heading ? "pt-6 lg:pt-8" : ""
                 }`}
               >
                 {rows.map((row, rowIndex) => {
@@ -491,6 +511,7 @@ export function StoryDetailClient({
                     return (
                       <div
                         key={row.key}
+                        data-choreo="stories-reveal"
                         className="grid lg:grid-cols-12 lg:gap-[var(--gap-columns)]"
                       >
                         <div className="lg:col-span-7 lg:col-start-6">
@@ -499,14 +520,12 @@ export function StoryDetailClient({
                               image={{
                                 url: row.block.url,
                                 alt: row.block.alt,
-                                caption: row.block.caption,
                                 objectPosition: row.block.objectPosition,
                               }}
                               kind="Photo"
                               ratio={ratioLabel}
                               aspectClass={aspectClass}
                               title={row.block.alt}
-                              description={row.block.caption || row.block.alt}
                               sizes="(max-width: 64rem) 100vw, 720px"
                               variant="editorial"
                             />
@@ -520,6 +539,7 @@ export function StoryDetailClient({
                     return (
                       <div
                         key={row.key}
+                        data-choreo="stories-reveal"
                         className="grid items-start gap-[var(--gap-columns)] sm:grid-cols-2"
                       >
                         {row.images.map((img) => {
@@ -534,7 +554,6 @@ export function StoryDetailClient({
                               ratio={ratioLabel}
                               aspectClass={aspectClass}
                               title={img.alt || `${localized.title} detail`}
-                              description={img.caption || localized.summary}
                               sizes="(max-width: 40rem) 100vw, 48vw"
                               variant="editorial"
                             />
@@ -549,9 +568,12 @@ export function StoryDetailClient({
                       key={row.key}
                       className="grid gap-6 lg:grid-cols-12 lg:gap-[var(--gap-columns)]"
                     >
-                      <div className="lg:col-span-5 lg:pr-12">
+                      <div className="lg:col-span-5 lg:pe-12">
                         {rowIndex === 0 && chapter.heading ? (
-                          <h2 className="font-[family-name:var(--font-display)] text-[clamp(1.45rem,2.1vw,2.05rem)] leading-[1.16] font-normal text-[var(--color-forest-deep)] lg:sticky lg:top-32">
+                          <h2
+                            data-choreo="stories-section-header"
+                            className="font-[family-name:var(--font-display)] text-[length:var(--text-2xl)] leading-[1.16] font-normal tracking-[var(--tracking-display)] text-[var(--color-forest-deep)] lg:sticky lg:top-32"
+                          >
                             {chapter.headingNodes}
                           </h2>
                         ) : null}
@@ -568,7 +590,10 @@ export function StoryDetailClient({
 
             {/* Paired Documentary Photographs */}
             {localized.pairImages && localized.pairImages.length > 0 ? (
-              <div className="grid items-start gap-[var(--gap-columns)] border-t border-[var(--color-rule)] pt-12 sm:grid-cols-2 lg:pt-14">
+              <div
+                data-choreo="stories-reveal"
+                className="grid items-start gap-[var(--gap-columns)] pt-6 sm:grid-cols-2 lg:pt-8"
+              >
                 {localized.pairImages.map((img, index) => {
                   const { aspectClass, ratioLabel } = getAspectConfig(
                     resolveAspectRatio(img.url, img.aspectRatio),
@@ -585,11 +610,6 @@ export function StoryDetailClient({
                         img.alt ||
                         `${localized.title} detail`
                       }
-                      description={
-                        img.caption ||
-                        story.pairSlots[index]?.description ||
-                        localized.summary
-                      }
                       sizes="(max-width: 40rem) 100vw, 48vw"
                       variant="editorial"
                     />
@@ -602,39 +622,45 @@ export function StoryDetailClient({
             {localized.takeaway ? (
               <div
                 id="story-takeaway"
-                className="grid scroll-mt-32 gap-6 border-t border-[var(--color-rule)] pt-10 lg:grid-cols-12 lg:gap-[var(--gap-columns)] lg:pt-14"
+                className="grid scroll-mt-32 gap-6 pt-6 lg:grid-cols-12 lg:gap-[var(--gap-columns)] lg:pt-8"
               >
-                <div className="grid content-start gap-1.5 lg:col-span-5 lg:pr-12">
-                  <p className="text-[length:var(--text-xs)] font-semibold tracking-[0.08em] text-[var(--color-clay-ink)] uppercase">
+                <div className="grid content-start gap-1.5 lg:col-span-5 lg:pe-12">
+                  <h2 className="m-0 font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.2] font-normal text-[var(--color-forest-deep)]">
                     {isEs ? "En resumen" : "Key takeaway"}
-                  </p>
+                  </h2>
                   <p className="text-[length:var(--text-xs)] text-[var(--color-muted)]">
                     {localized.categoryLabel}
                   </p>
                 </div>
 
-                <div className="grid max-w-[60ch] gap-6 lg:col-span-7">
-                  <p className="font-[family-name:var(--font-display)] text-[clamp(1.35rem,2.1vw,1.85rem)] leading-[1.3] font-normal text-[var(--color-forest-deep)]">
+                <div className="grid max-w-[var(--measure-copy)] gap-6 lg:col-span-7">
+                  <p className="font-[family-name:var(--font-display)] text-[length:var(--text-xl)] leading-[1.36] font-normal text-[var(--color-forest-deep)] md:text-[length:var(--text-2xl)]">
                     {localized.takeaway}
                   </p>
-                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[length:var(--text-sm)] font-semibold">
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[length:var(--text-sm)]">
                     <Link
-                      className="inline-flex min-h-[44px] items-center text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
+                      className="editorial-arrow-link inline-flex min-h-[var(--tap-min)] items-center gap-2 font-semibold text-[var(--color-forest-deep)] underline decoration-[var(--color-clay)] underline-offset-4 hover:text-[var(--color-clay-ink)]"
                       href={localizeHref("/contact")}
                     >
-                      {isEs
-                        ? "Hablar con Alma y Shirish"
-                        : "Speak with Alma & Shirish"}
+                      <span>
+                        {isEs
+                          ? "Hablar con Alma y Shirish"
+                          : "Speak with Alma and Shirish"}
+                      </span>
+                      <EditorialArrowIcon />
                     </Link>
                     {nextStory && nextStoryLocalized ? (
                       <Link
-                        className="inline-flex min-h-[44px] items-center text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
+                        className="editorial-arrow-link inline-flex min-h-[var(--tap-min)] items-center gap-2 font-medium text-[var(--color-muted)] underline decoration-[var(--color-rule-2)] underline-offset-4 hover:text-[var(--color-forest-deep)]"
                         href={localizeHref(`/stories/${nextStory.slug}`)}
                         data-transition-title={nextStoryLocalized.title}
                       >
-                        {isEs
-                          ? `Siguiente: ${nextStoryLocalized.title}`
-                          : `Next: ${nextStoryLocalized.title}`}
+                        <span>
+                          {isEs
+                            ? `Siguiente: ${nextStoryLocalized.title}`
+                            : `Next: ${nextStoryLocalized.title}`}
+                        </span>
+                        <EditorialArrowIcon />
                       </Link>
                     ) : null}
                   </div>
@@ -663,10 +689,10 @@ export function StoryDetailClient({
               tags={localized.tags}
               isEs={isEs}
               whatsappShareHref={whatsappShareHref}
-              xShareHref={xShareHref}
               emailShareHref={emailShareHref}
               canNativeShare={canNativeShare}
-              copiedLink={copiedLink}
+              copiedLink={copyStatus === "copied"}
+              copyFailed={copyStatus === "failed"}
               contextualGuideLinks={contextualGuideLinks}
               localizeHref={localizeHref}
               onNativeShare={() => void handleNativeShare()}

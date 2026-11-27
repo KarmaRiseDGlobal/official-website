@@ -50,6 +50,9 @@ export function useRouter() {
 export function usePathname() {
   return "/";
 }
+export function useSearchParams() {
+  return new URLSearchParams();
+}
 `,
   "null-component.mjs": `
 export function SiteFooter() { return null; }
@@ -424,9 +427,14 @@ test("GET /api/newsletter/preferences verifies optional HMAC sig and renders imp
         const updatedHtml = await validSigRes.text();
         assert.match(updatedHtml, /href="\/es\/stories"/);
         assert.match(updatedHtml, /¡Listo!/);
-        assert.equal(calls.length, 1);
+        assert.equal(calls.length, 2);
         assert.equal(calls[0]?.url, "https://api.brevo.com/v3/contacts");
         assert.deepEqual(calls[0]?.jsonBody?.attributes, { LANGUAGE: "ES" });
+        assert.equal(calls[1]?.url, "https://api.brevo.com/v3/events");
+        assert.equal(
+          calls[1]?.jsonBody?.event_name,
+          "newsletter_language_switched",
+        );
       },
     );
   } finally {
@@ -477,7 +485,7 @@ test("POST /api/newsletter/preferences supports JSON and form-urlencoded, valida
         );
         assert.equal(jsonOk.status, 200);
         assert.deepEqual(await jsonOk.json(), { ok: true, language: "ES" });
-        assert.equal(calls.length, 1);
+        assert.equal(calls.length, 2);
 
         const formOk = await preferencesPost(
           new Request(
@@ -507,7 +515,7 @@ test("POST /api/newsletter/preferences supports JSON and form-urlencoded, valida
         const formHtml = await formOk.text();
         assert.match(formHtml, /href="\/es\/stories"/);
         assertCleanPreferencesHtml(formHtml, "POST form-urlencoded ES");
-        assert.equal(calls.length, 2);
+        assert.equal(calls.length, 4);
 
         const invalidLangRes = await preferencesPost(
           new Request(
@@ -584,7 +592,7 @@ test("POST /api/newsletter/preferences supports JSON and form-urlencoded, valida
         assert.equal(honeypotRes.status, 200);
         assert.equal(
           calls.length,
-          2,
+          4,
           "Honeypot should skip Brevo update silently",
         );
 
@@ -625,7 +633,7 @@ test("POST /api/newsletter/preferences supports JSON and form-urlencoded, valida
           ),
         );
         assert.equal(validTurnstileRes.status, 200);
-        assert.equal(calls.length, 4);
+        assert.equal(calls.length, 7);
 
         delete (process.env as Record<string, string | undefined>)
           .TURNSTILE_SECRET_KEY;
@@ -692,10 +700,14 @@ test("renderNewsletterHtml sanitizes URLs, escapes attributes, uses spanishLocat
     assert.equal(unsafeHtml.includes("javascript:alert"), false);
     assert.equal(unsafeHtml.includes("data:text/html"), false);
     assert.equal(unsafeHtml.includes("vbscript:"), false);
-    assert.match(unsafeHtml, /href="https:\/\/karmarisedglobal\.com\/stories"/);
+    assert.match(unsafeHtml, /href="https:\/\/karmarisedglobal\.com\/es"/);
     assert.match(
       unsafeHtml,
-      /src="https:\/\/karmarisedglobal\.com\/images\/founders\/alma-and-shirish-founders\.jpg"/,
+      /href="https:\/\/karmarisedglobal\.com\/es\/stories\/spanish-loc-story\?utm_source=brevo&amp;utm_medium=email/,
+    );
+    assert.match(
+      unsafeHtml,
+      /src="https:\/\/karmarisedglobal\.com\/images\/founders\/alma-shirish-planning-table-window-india\.jpeg"/,
     );
     assert.match(unsafeHtml, /Por toda la India desde Madrid/);
     assertCleanVoiceAndCopy(unsafeHtml, "renderNewsletterHtml ES unsafe");
@@ -731,7 +743,7 @@ test("renderNewsletterHtml sanitizes URLs, escapes attributes, uses spanishLocat
     );
     assert.match(
       escapedAttrHtml,
-      /href="https:\/\/karmarisedglobal\.com\/stories\?tag=craft&amp;lang=en"/,
+      /href="https:\/\/karmarisedglobal\.com\/stories\?tag=craft&amp;lang=en&amp;utm_source=brevo&amp;utm_medium=email/,
     );
     assertCleanVoiceAndCopy(escapedAttrHtml, "renderNewsletterHtml EN escaped");
   } finally {
@@ -808,7 +820,7 @@ test("syncNewsletterIssueToBrevo does not mask re-sync or partial failures with 
         });
         assert.equal(res.ok, false);
         assert.equal(res.brevoCampaignIdEn, 101);
-        assert.equal(res.brevoCampaignIdEs, undefined);
+        assert.equal(res.brevoCampaignIdEs, 202);
         assert.match(res.error ?? "", /ES:/);
       },
     );

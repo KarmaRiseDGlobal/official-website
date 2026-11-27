@@ -5,7 +5,7 @@ Canonical reference for Shirish's background, operational role, cultural touchst
 ## Who Shirish is
 
 - **Role:** Co-founder of KarmaRise D Global alongside Alma. Registered advocate and Bar Council member in India.
-- **Operational lane:** Structures Indian legal agreements, mutual NDA/NNN confidentiality protections, and supplier contracts, vets and matches specialist production units across India (including leather and craft hubs in Kolkata, Kanpur, Agra, and Chennai), supervises production and quality checks on the ground in India across KarmaRise's four categories (leather bags and other leather goods, clothing in natural and varied fabrics, custom sewn accessories, and home decor), manages export and customs logistics, and leads the Section 8 legal setup for the foundation and Women's Training Initiative.
+- **Operational lane:** Structures Indian legal agreements, mutual NDA/NNN confidentiality protections, and supplier contracts, vets and matches specialist production units across India (including leather and craft hubs in Kolkata, Kanpur, Agra, and Chennai), supervises production and quality checks on the ground in India across KarmaRise's four categories (leather goods, clothing, textile accessories, and textile home decor), manages export and customs logistics, and leads the Section 8 legal setup for the foundation and Women's Training Initiative.
 - **Origin with Alma:** Met Alma after the COVID lockdown at an online international language conference while serving as President of the Student Union at Birla College. Reached out asking her to help improve his English, calling her _guruji_ out of personal respect; their cultural exchanges grew into KarmaRise D Global and AlmaRise D Brand.
 - **How he works with manufacturers:** Splits work by regional strength rather than convenience (naming specific Indian craft hubs such as Kolkata, Kanpur, Agra, and Chennai, with supervision from Maharashtra/Mumbai). Pays for exploratory samples when needed and rejects blind order-taking in favour of upfront technical and ergonomic advice.
 - **Public editorial guardrails:**
@@ -14,7 +14,7 @@ Canonical reference for Shirish's background, operational role, cultural touchst
   - Spell the owned label **`AlmaRise D Brand`** (and associated lines **`AlmaRise D Reborn`**, **`AlmaRise D Organic`**, **`AlmaRise D Home Decor`**) in all visible copy, keeping URL routes (`/almarise`) lowercase.
   - Avoid `workshop floor`, `bulk cutting`, and repetitive `workshops` / `talleres` in public copy; use `production sites`, `production units`, `manufacturing units`, `facilities` alongside `Manufacturing Partners`, `family-run factories`, `leather ateliers`, `on the ground in India`, and `before production begins`. Write `Spain and the rest of Europe` (`España y el resto de Europa`) so Spain is never framed as outside Europe, and mention Alma's spoken languages only in Q&A/FAQ and booking/contact contexts.
   - Keep _guruji_ out of cold B2B outreach and standard public copy unless telling the personal origin story where the term is explained; use "Alma" or "Alma and I" everywhere else.
-  - Do not add social media links in KarmaRise web copy.
+  - Restrict official social links strictly to the five verified LinkedIn and Instagram URLs in `src/data/socials.ts`; never add unowned social networks (such as X, Facebook, or TikTok).
 
 ## Core worldview and recurring touchstones
 
@@ -95,7 +95,7 @@ Banned Moves
 - Raw political or anti-colonial polemics from private speech (keep transcript 11's jabs about British diets or "leftist historians" out of public brand copy).
 - Naming confidential clients (never print Snoby) or restricted workshop locations (never print Ulhasnagar) in public copy.
 - Dropping "guruji" into cold B2B outreach without context (keep it to personal origin stories where it is explained; use "Alma" elsewhere).
-- Adding social media links in KarmaRise web copy.
+- Adding unapproved social networks in KarmaRise web copy (only the 5 verified LinkedIn and Instagram URLs in src/data/socials.ts are allowed).
 
 CTA Rules
 - Editorial Stories: No commercial CTA in the body; close on a quiet statement of shared standard and continuity.
@@ -103,7 +103,7 @@ CTA Rules
 - Never use manufactured urgency, sales hype, or pushy follow-up lines.
 
 Channel Notes
-- X: One sharp physical receipt (a workshop trade-off, a 1766 loom record, a customs lesson, or a Marathi cultural detail) plus one direct takeaway. Tight, declarative, zero hashtags or thread filler.
+- Instagram (@karmarisedglobal): One sharp physical receipt (a production-site trade-off, a 1766 loom record, a customs lesson, or a Marathi cultural detail) plus one direct takeaway. Tight, declarative, zero hashtag filler. (KarmaRise does not maintain an X account.)
 - LinkedIn: 3 to 5 plain paragraphs built around an operational or cultural scene (e.g., splitting tanning in Kolkata and stitching in UP, or refusing blind order-taking on bag ergonomics), the exact fix, and a quiet closing principle. No broetry, no "thrilled to announce".
 - Email: Warm, direct first-person ("Alma and I..."). For newsletters, lead with one memory or material detail (like grandfather's Modi signature). For European founder outreach, stress clear division of labour, Bar-Council-backed contract discipline, physical samples first, and in-person factory QC.
 - Editorial Stories (EN / ES): Follow stone-forts-and-woven-borders-in-maharashtra. Weave history, craft mechanics, and human stories together in sentence-case sections, zero parentheticals, zero questions, and full EN/ES parity.

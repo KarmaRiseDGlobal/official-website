@@ -1,67 +1,269 @@
-/* Hallmark · v2.0.0 · theme: Garden (dealt 3/3) · genre: editorial · shape: founder narrative · job: trust then hire · hero: Ledge · nav: project floating pill · footer: project statement · imagery: user photographs, natural · signature: woodland portrait close · draw: 5cfeec */
-/* Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V4 · weakest: E, kept the first screen to one sentence and one action before adding the longer founder narrative */
-/* Hallmark · hero-review: fix · 5 findings · 4 resolved · 1 dismissed: the user requested the woodland portrait as the closing reveal */
-
 .about {
   background: var(--color-paper);
   color: var(--color-forest-deep);
+  overflow-x: clip;
 }
 
-.founder {
-  padding-block: var(--section-gap-l);
+/* ==========================================================================
+   Spain-to-India Founders Bridge Section (Giant Half-Visible Flanking Maps)
+   ========================================================================== */
+
+.bridgeSection {
+  position: relative;
+  overflow-x: clip;
+  padding-top: var(--space-md);
+  padding-bottom: var(--section-gap);
   background: var(--color-paper);
+  color: var(--color-forest-deep);
 }
 
-.founder + .founder {
-  padding-top: 0;
+.geoStage {
+  position: relative;
+  width: 100%;
+  isolation: isolate;
 }
 
-.founderGrid {
+.geoMapsBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.geoMapsFrame {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: clip;
+}
+
+.geoMapWing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: fit-content;
+  margin-block: auto;
+  display: grid;
+  gap: var(--space-md);
+  color: var(--color-forest-deep);
+}
+
+.geoMapWingSpain {
+  left: 0;
+  justify-items: start;
+}
+
+.geoMapWingIndia {
+  right: 0;
+  justify-items: end;
+}
+
+.countryMapWrapSpain {
+  width: min(clamp(420px, 40vw, 680px), max(0px, calc((100vw - 40rem) * 0.92)));
+  transform: translateX(-50%);
+}
+
+.countryMapWrapIndia {
+  width: min(clamp(390px, 36vw, 620px), max(0px, calc((100vw - 40rem) * 0.92)));
+  transform: translateX(50%);
+}
+
+.geoStage[data-zoom-safe="true"] .geoMapWing {
+  opacity: 0.06 !important;
+}
+
+.geoStage[data-zoom-safe="true"] .geoLabelSpain,
+.geoStage[data-zoom-safe="true"] .geoLabelIndia {
+  display: none;
+}
+
+.countryMapSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.geoLabelSpain,
+.geoLabelIndia {
+  display: grid;
+  margin: 0;
+  color: var(--color-forest-deep);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.06;
+}
+
+.geoLabelSpain {
+  padding-inline-start: var(--space-lg);
+  text-align: start;
+}
+
+.geoLabelIndia {
+  padding-inline-end: var(--space-lg);
+  text-align: end;
+}
+
+.geoPreposition {
+  color: var(--color-muted);
+  font-size: var(--text-md);
+  line-height: 1.2;
+}
+
+/* Centered Founder Story Corridor Moving Between Spain and India */
+.centerCorridor {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(36rem, calc(100% - 2 * var(--gutter)));
+  margin-inline: auto;
+  gap: clamp(var(--space-3xl), 8svh, var(--space-4xl));
+  padding-block: clamp(var(--space-xl), 6svh, var(--space-3xl));
+}
+
+.geoIntro {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  margin-inline: auto;
+  max-width: 34rem;
+  text-align: center;
+}
+
+.geoHeading {
+  margin: 0;
+  max-width: 18ch;
+  color: var(--color-forest-deep);
+  font-family: var(--font-display);
+  font-size: var(--text-display-s);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+.geoSummary {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--color-muted);
+  font-size: var(--text-md);
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+
+.foundersStream {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  align-items: center;
-  gap: clamp(var(--space-2xl), 7vw, var(--space-4xl));
+  gap: clamp(var(--space-3xl), 10svh, var(--space-4xl));
 }
 
-.founderShirish .founderGrid {
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+.founderStoryCard {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: var(--space-lg);
+  scroll-margin-top: calc(var(--nav-height) + var(--space-lg));
 }
 
-.founderPortrait {
+.founderFrame {
   position: relative;
-  min-height: clamp(620px, 72vw, 920px);
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  max-height: 520px;
   overflow: hidden;
   border-radius: var(--radius-card);
   background: var(--color-paper-2);
+  outline: 1px solid color-mix(in srgb, var(--color-night) 10%, transparent);
+  outline-offset: -1px;
 }
 
-.founderPortrait img {
+.founderFrame img {
   object-fit: cover;
-  object-position: 64% center;
+  filter: saturate(0.9) contrast(1.04);
 }
 
-.shirishPortrait img {
-  object-position: center 44%;
+.almaPortraitImg {
+  object-position: 50% 28%;
 }
 
-.founderCopy {
+.shirishPortraitImg {
+  object-position: 50% 20%;
+}
+
+.founderCopyBlock {
   display: grid;
   min-width: 0;
-  align-content: center;
-  gap: var(--space-xl);
+  gap: var(--space-sm);
 }
 
-.founderCopy h2,
-.originStory h2,
+.founderHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.founderName {
+  margin: 0;
+  color: var(--color-forest-deep);
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.12;
+}
+
+.founderPlace {
+  color: var(--color-clay-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.founderLead {
+  margin: 0;
+  max-width: 36ch;
+  color: var(--color-ink-2);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: -0.01em;
+  line-height: 1.28;
+  text-wrap: pretty;
+}
+
+.founderBody {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--color-muted);
+  font-size: var(--text-md);
+  line-height: 1.66;
+  text-wrap: pretty;
+}
+
+/* ==========================================================================
+   Shared Editorial Section Typography & Splits
+   ========================================================================== */
+
 .meaningTitle h2,
 .indiaCopy h2,
-.futureHeading h2,
-.invitation h2 {
+.futureHeading h2 {
   color: var(--color-forest-deep);
-  font-size: var(--text-display-s);
-  font-weight: 500;
-  line-height: 1.04;
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.06;
   text-wrap: balance;
 }
 
@@ -71,37 +273,28 @@
   color: var(--color-muted);
 }
 
-.founderLead,
 .largeCopy {
-  max-width: 34ch;
+  margin: 0;
+  max-width: 38ch;
   color: var(--color-ink-2);
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 2.1vw, 2.25rem);
-  letter-spacing: -0.012em;
-  line-height: 1.22;
+  font-size: var(--text-xl);
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.38;
+  text-wrap: pretty;
 }
 
-.origin {
-  padding-block: var(--section-gap-l);
-  background: var(--color-forest-deep);
-  color: var(--color-paper);
-}
-
-.originStory h2 {
-  max-width: 14ch;
-  color: var(--color-paper);
-  font-size: clamp(2.1rem, 5.6vw, 5.75rem);
-  letter-spacing: -0.018em;
-  line-height: 1;
-}
-
-.originStory > p:last-child {
-  max-width: 48ch;
-  color: var(--color-paper-2);
+@media (min-width: 64rem) {
+  .largeCopy {
+    font-size: var(--text-2xl);
+    line-height: 1.34;
+  }
 }
 
 .meaning {
-  padding-block: var(--section-gap-l);
+  padding-block: var(--section-gap);
   background: var(--color-pale-sage);
 }
 
@@ -117,11 +310,11 @@
 .meaningCopy {
   display: grid;
   min-width: 0;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
 }
 
 .meaningTitle h2 {
-  max-width: 10ch;
+  max-width: 12ch;
 }
 
 .meaningCopy {
@@ -129,7 +322,7 @@
 }
 
 .india {
-  padding-block: var(--section-gap-l);
+  padding-block: var(--section-gap);
   background: var(--color-paper);
 }
 
@@ -143,52 +336,36 @@
 
 .indiaImage {
   position: relative;
-  min-height: clamp(480px, 55vw, 720px);
+  margin: 0;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: var(--radius-card);
   background: var(--color-paper-2);
+  outline: 1px solid color-mix(in srgb, var(--color-night) 10%, transparent);
+  outline-offset: -1px;
 }
 
 .indiaImage img {
   object-fit: cover;
-  object-position: 65% 46%;
+  object-position: 50% 10%;
+  filter: saturate(0.9) contrast(1.04);
 }
 
 .indiaCopy {
   display: grid;
   min-width: 0;
-  gap: var(--space-xl);
-}
-
-.indiaCopy a {
-  display: inline-flex;
-  min-height: 44px;
-  width: fit-content;
-  align-items: center;
-  color: var(--color-forest-deep);
-  font-weight: 600;
-  text-decoration-color: var(--color-clay);
-}
-
-.indiaCopy a:active {
-  color: var(--color-muted);
-}
-
-.indiaCopy a:focus-visible,
-.invitationActions a:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 4px;
+  gap: var(--space-lg);
 }
 
 .future {
-  padding-block: var(--section-gap-l);
-  background: var(--color-paper-2);
+  padding-block: var(--section-gap);
+  background: var(--color-dune);
 }
 
 .futureGrid {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 6fr) repeat(2, minmax(0, 3fr));
+  grid-template-columns: minmax(0, 5fr) repeat(2, minmax(0, 3.5fr));
   align-items: start;
   gap: var(--gap-columns);
 }
@@ -196,133 +373,34 @@
 .futureHeading {
   display: grid;
   min-width: 0;
-  gap: var(--space-xl);
-  padding-right: var(--space-2xl);
+  gap: var(--space-lg);
+  padding-inline-end: var(--space-xl);
 }
 
 .future article {
   display: grid;
   min-width: 0;
   gap: var(--space-lg);
-  padding-top: var(--space-sm);
 }
 
 .future h3 {
-  max-width: 13ch;
+  max-width: 16ch;
   color: var(--color-forest-deep);
   font-family: var(--font-display);
   font-size: var(--text-2xl);
-  font-weight: 500;
-  line-height: 1.1;
+  font-weight: var(--display-weight);
+  font-synthesis: none;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
-.invitation {
-  padding-block: var(--section-gap-l);
-  background: var(--color-forest-deep);
-  color: var(--color-paper);
-}
-
-.invitationInner {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-xl);
-  text-align: center;
-}
-
-.invitation h2 {
-  max-width: 14ch;
-  color: var(--color-paper);
-  font-size: clamp(2.1rem, 5.2vw, 5.25rem);
-  letter-spacing: -0.018em;
-  line-height: 1.02;
-}
-
-.invitationActions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-lg);
-  margin-top: var(--space-md);
-}
-
-.invitationActions a {
-  display: inline-flex;
-  min-height: var(--control-height);
-  padding-inline: var(--space-lg);
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.primaryAction {
-  background: var(--color-paper);
-  color: var(--color-forest-deep);
-}
-
-.primaryAction:active {
-  background: var(--color-paper-2);
-}
-
-.secondaryAction {
-  color: var(--color-paper);
-  text-decoration: underline;
-  text-decoration-color: var(--color-clay);
-  text-underline-offset: 0.25em;
-}
-
-.secondaryAction:active {
-  color: var(--color-paper-2);
-}
-
-.togetherPortrait {
-  position: relative;
-  width: 100%;
-  min-height: clamp(760px, 95svh, 1080px);
-  overflow: hidden;
-  background: var(--color-forest-deep);
-}
-
-.togetherPortrait::after {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  content: "";
-  background: linear-gradient(
-    180deg,
-    var(--color-forest-deep) 0%,
-    color-mix(in srgb, var(--color-forest-deep) 68%, transparent) 8%,
-    transparent 24%,
-    transparent 74%,
-    color-mix(in srgb, var(--color-night) 76%, transparent) 90%,
-    var(--color-night) 100%
-  );
-}
-
-.togetherPortrait img {
-  object-fit: cover;
-  object-position: center bottom;
-}
-
 @media (width < 80rem) {
-  .founderPortrait {
-    width: 100%;
-    min-height: 0;
-    aspect-ratio: 4 / 5;
-    max-height: 70svh;
+  .centerCorridor {
+    width: min(32rem, calc(100% - 2 * var(--gutter)));
   }
 
   .indiaImage {
     width: 100%;
-    min-height: 0;
-    aspect-ratio: 4 / 3;
-    max-height: 62svh;
-  }
-
-  .togetherPortrait {
     min-height: 0;
     aspect-ratio: 4 / 3;
     max-height: 62svh;
@@ -335,34 +413,65 @@
   .futureHeading {
     grid-column: 1 / -1;
     max-width: 720px;
-    padding-right: 0;
+    padding-inline-end: 0;
     padding-bottom: var(--space-md);
   }
 }
 
+@media (width < 75rem) {
+  .geoMapWing {
+    opacity: 0.08;
+  }
+
+  .geoLabelSpain,
+  .geoLabelIndia {
+    display: none;
+  }
+
+  .countryMapWrapSpain {
+    width: clamp(260px, 44vw, 420px);
+    transform: translateX(-52%);
+  }
+
+  .countryMapWrapIndia {
+    width: clamp(240px, 40vw, 380px);
+    transform: translateX(52%);
+  }
+}
+
 @media (width < 64rem) {
-  .founderGrid,
-  .founderShirish .founderGrid,
+  .centerCorridor {
+    width: min(38rem, calc(100% - 2 * var(--gutter)));
+    padding-block: var(--space-xl);
+  }
+
+  .founderFrame {
+    aspect-ratio: 4 / 3;
+    max-height: 480px;
+  }
+
   .meaningGrid,
   .indiaGrid {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2xl);
   }
-
-  .founderShirish .founderCopy {
-    order: 2;
-  }
-
-  .founderShirish .founderPortrait {
-    order: 1;
-  }
-
-  .founderCopy {
-    gap: var(--space-lg);
-  }
 }
 
-@media (width < 46rem) {
+@media (width < 40rem) {
+  .geoMapWing {
+    opacity: 0.07;
+  }
+
+  .countryMapWrapSpain {
+    width: clamp(200px, 58vw, 280px);
+    transform: translateX(-54%);
+  }
+
+  .countryMapWrapIndia {
+    width: clamp(190px, 54vw, 260px);
+    transform: translateX(54%);
+  }
+
   .futureGrid {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2xl);
@@ -370,15 +479,5 @@
 
   .futureHeading {
     padding-bottom: 0;
-  }
-
-  .future article {
-    padding-top: 0;
-  }
-
-  .invitationActions {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
   }
 }
